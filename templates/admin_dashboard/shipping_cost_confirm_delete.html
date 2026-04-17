@@ -1,0 +1,93 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5 animate-fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+                <div class="card-header bg-danger-soft p-4 border-0 text-center">
+                    <div class="warning-icon-box mb-3 mx-auto">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                    </div>
+                    <h4 class="fw-900 text-navy mb-1">Decommission Rate Tier?</h4>
+                    <p class="text-muted small mb-0">This action will remove the shipping protocol for this hub.</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <div class="impact-preview p-3 rounded-4 mb-4 border border-dashed">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="extra-small fw-800 text-muted text-uppercase">Target Hub</span>
+                            <span class="fw-900 text-navy small">{{ shipping_cost.delivery_hub.name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="extra-small fw-800 text-muted text-uppercase">Distance Range</span>
+                            <span class="fw-700 text-navy small">{{ shipping_cost.min_distance_km }}km - {{ shipping_cost.max_distance_km }}km</span>
+                        </div>
+                        <hr class="my-2 opacity-10">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="extra-small fw-800 text-muted text-uppercase">Tariff Rate</span>
+                            <span class="fw-900 text-danger small">₹{{ shipping_cost.cost|floatformat:2 }}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-center text-muted extra-small mb-4 px-3">
+                        <i class="bi bi-info-circle me-1"></i> 
+                        Warning: Deleting this node may cause delivery calculation errors for customers within this distance range.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger-pro py-3 rounded-4 shadow-danger">
+                                <i class="bi bi-trash3-fill me-2"></i> Confirm Deletion
+                            </button>
+                            <a href="{% url 'shipping_cost_list' %}" class="btn btn-light py-3 rounded-4 fw-700 text-muted">
+                                Keep Rate Tier
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CORE PALETTE */
+    .text-navy { color: #0a192f; }
+    .bg-danger-soft { background-color: rgba(239, 68, 68, 0.05); }
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .extra-small { font-size: 0.65rem; }
+
+    /* WARNING ICON */
+    .warning-icon-box {
+        width: 60px; height: 60px;
+        background: white; border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 20px rgba(239, 68, 68, 0.15);
+    }
+
+    /* IMPACT BOX */
+    .impact-preview {
+        background: #fffafa;
+        border-color: #fee2e2 !important;
+    }
+
+    /* BUTTONS */
+    .btn-danger-pro {
+        background: #ef4444; color: white; border: none; font-weight: 800; transition: 0.3s;
+    }
+    .btn-danger-pro:hover { 
+        background: #dc2626; transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    }
+    .shadow-danger { box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+
+    /* ANIMATION */
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

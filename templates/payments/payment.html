@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Choose Payment Method</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      padding: 2rem;
+    }
+
+    .payment-container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #FF9933;
+      border-bottom: 2px solid #138808;
+      padding-bottom: 0.5rem;
+    }
+
+    .payment-method {
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      transition: 0.3s;
+      background: #fdfdfd;
+      cursor: pointer;
+    }
+
+    .payment-method:hover {
+      border-color: #138808;
+      background-color: #f0fff4;
+    }
+
+    .payment-method input[type="radio"]:checked + label {
+      font-weight: 700;
+      color: #138808;
+    }
+
+    .payment-method input[type="radio"] {
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: #138808;
+      color: #fff;
+      border: none;
+      padding: 0.9rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-submit:hover {
+      background-color: #0f6d06;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #0072bc;
+      margin-top: 1rem;
+    }
+
+    #upi-section {
+      margin-top: 1.5rem;
+      border-top: 1px dashed #ccc;
+      padding-top: 1rem;
+    }
+
+    .upi-copy {
+      background: #eee;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    .upi-copy:hover {
+      background: #ddd;
+    }
+
+    @media (max-width: 600px) {
+      .payment-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="payment-container">
+    <h2>Select a Payment Method</h2>
+
+    <form method="POST" action="">
+      {% csrf_token %}
+      {% with selected_method=request.POST.payment_method|default:'' %}
+
+      {% for method in payment_methods %}
+        <div class="payment-method">
+          <input 
+            type="radio" 
+            name="payment_method" 
+            value="{{ method.name }}" 
+            id="method-{{ forloop.counter }}" 
+            required
+            {% if selected_method == method.name %}checked{% endif %}
+          />
+          <label for="method-{{ forloop.counter }}">{{ method.display_name }}</label>
+        </div>
+      {% endfor %}
+
+      <!-- UPI Section -->
+      <div id="upi-section" style="display: {% if selected_method == 'upi' %}block{% else %}none{% endif %};">
+        <h3>Send UPI Payment</h3>
+
+        <p>
+          <strong>UPI ID:</strong> 
+          <span id="upi-id">{{ upi_config.upi_id }}</span>
+          <span class="upi-copy" id="copy-btn" role="button" tabindex="0" aria-label="Copy UPI ID">Copy</span>
+        </p>
+
+        {% if upi_qr_base64 %}
+          <p><img src="data:image/png;base64,{{ upi_qr_base64 }}" alt="UPI QR Code" width="200" /></p>
+        {% endif %}
+
+        <p>
+          <a id="upi-link" href="#" target="_blank" class="btn-submit" style="width:auto; background-color:#0072bc;">
+            Open in UPI App
+          </a>
+        </p>
+
+        <label for="txn_id">Enter UPI Transaction ID (UTR):</label>
+        <input 
+          type="text" 
+          name="txn_id" 
+          id="txn_id" 
+          {% if selected_method == 'upi' %}required{% endif %}
+          style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; margin-bottom: 1rem;" 
+        />
+      </div>
+
+      <button type="submit" class="btn-submit">Continue to Pay</button>
+      {% endwith %}
+    </form>
+  
+
+    <p class="note">Secure and fast checkout powered by trusted providers.</p>
+  </div>
+
+  <script>
+    const upiId = "{{ upi_config.upi_id|default:'' }}";
+    const payeeName = "{{ upi_config.payee_name|default:''|urlencode }}";
+    const amount = "{{ order.total }}";
+
+    function toggleUPISection(selectedValue) {
+      const upiSection = document.getElementById('upi-section');
+      const upiInput = document.getElementById('txn_id');
+      const upiLink = document.getElementById('upi-link');
+
+      if (selectedValue === 'upi') {
+        const upiUri = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR`;
+        upiLink.href = upiUri;
+
+        document.getElementById('upi-id').innerText = upiId;
+        upiSection.style.display = 'block';
+        upiInput.required = true;
+      } else {
+        upiSection.style.display = 'none';
+        upiInput.required = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const radioButtons = document.querySelectorAll('input[name="payment_method"]');
+      radioButtons.forEach(function (rb) {
+        rb.addEventListener('change', function () {
+          toggleUPISection(this.value);
+        });
+      });
+
+      // Run once on load to toggle based on pre-selected
+      const checked = document.querySelector('input[name="payment_method"]:checked');
+      if (checked) {
+        toggleUPISection(checked.value);
+      }
+
+      if (window.innerWidth > 768) {
+        alert("Note: UPI App links only work on mobile devices. For desktop, scan the QR code or open this page on your phone.");
+      }
+
+      // Copy UPI ID to clipboard with better UX than alert
+      const copyBtn = document.getElementById('copy-btn');
+      copyBtn.addEventListener('click', function () {
+        const upiText = document.getElementById('upi-id').innerText;
+        navigator.clipboard.writeText(upiText).then(() => {
+          copyBtn.innerText = 'Copied!';
+          setTimeout(() => {
+            copyBtn.innerText = 'Copy';
+          }, 2000);
+        });
+      });
+
+      // Support keyboard accessibility for copy button
+      copyBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          copyBtn.click();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

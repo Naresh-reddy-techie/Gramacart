@@ -1,0 +1,131 @@
+<div class="dashboard-card quick-actions-card bg-white p-4 rounded-4 shadow-sm border-0 h-100">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <h6 class="fw-800 text-navy mb-0 ls-tight">Command Center</h6>
+        <div class="bg-warning-subtle p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-lightning-charge-fill text-warning"></i>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-6 col-md-12">
+            <a href="{% url 'list_product' %}" class="action-card-modern main-action">
+                <div class="action-content">
+                    <div class="action-icon-wrapper">
+                        <i class="bi bi-plus-circle-fill"></i>
+                    </div>
+                    <span class="action-label">New Product</span>
+                </div>
+                <i class="bi bi-arrow-right-short arrow-icon"></i>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-12">
+            <a href="{% url 'list_category' %}" class="action-card-modern secondary-action emerald">
+                <div class="action-content">
+                    <div class="action-icon-wrapper">
+                        <i class="bi bi-tag-fill"></i>
+                    </div>
+                    <span class="action-label">Add Category</span>
+                </div>
+                <i class="bi bi-arrow-right-short arrow-icon"></i>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-12">
+            <a href="{% url 'admin_orders' %}" class="action-card-modern secondary-action navy">
+                <div class="action-content">
+                    <div class="action-icon-wrapper">
+                        <i class="bi bi-cart-fill"></i>
+                    </div>
+                    <span class="action-label">Active Orders</span>
+                </div>
+                <i class="bi bi-arrow-right-short arrow-icon"></i>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-12">
+            <a href="{% url 'delivery_boy_list' %}" class="action-card-modern secondary-action orange">
+                <div class="action-content">
+                    <div class="action-icon-wrapper">
+                        <i class="bi bi-bicycle"></i>
+                    </div>
+                    <span class="action-label">Track Riders</span>
+                </div>
+                <i class="bi bi-arrow-right-short arrow-icon"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Premium Action Cards Styling */
+    .action-card-modern {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 16px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 2;
+    }
+
+    .action-icon-wrapper {
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .action-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .arrow-icon {
+        font-size: 1.5rem;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    /* Hover Effects */
+    .action-card-modern:hover {
+        transform: translateX(5px);
+    }
+
+    .action-card-modern:hover .arrow-icon {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Color Variants */
+    .main-action {
+        background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+    }
+
+    .secondary-action {
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        color: #0f172a;
+    }
+
+    /* Border highlights for secondary actions */
+    .emerald:hover { border-color: #10b981; color: #10b981; background: #f0fff4; }
+    .navy:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+    .orange:hover { border-color: #f59e0b; color: #f59e0b; background: #fffbeb; }
+
+    @media (max-width: 768px) {
+        .action-label { font-size: 0.75rem; }
+        .arrow-icon { display: none; }
+    }
+</style>

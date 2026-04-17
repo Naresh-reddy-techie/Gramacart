@@ -1,0 +1,199 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: #f8fafc; min-height: 100vh;">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-900 text-navy mb-0" style="letter-spacing: -1px;">User Intelligence</h3>
+            <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="badge bg-emerald-soft text-emerald border-emerald-subtle fw-800 px-2">LIVE NETWORK</span>
+                <span class="text-muted small fw-700 tracking-wider">TRACKING {{ total_customers }} REGISTERED USERS</span>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <div class="stat-pill-modern shadow-sm">
+                <div class="label">REVENUE LEAD</div>
+                <div class="value text-emerald">₹{{ total_revenue|default:"0" }}</div>
+            </div>
+            <div class="stat-pill-modern shadow-sm border-primary-subtle">
+                <div class="label">GROWTH</div>
+                <div class="value text-primary">+{{ weekly_new|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 border-start border-4 border-emerald">
+        <form method="GET" action="{% url 'admin_customer_list' %}" class="row g-2 align-items-center">
+            <div class="col-lg-8 col-md-7">
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" name="q" class="form-control search-field" 
+                           placeholder="Search by Name, Email, or Village Cluster..." 
+                           value="{{ request.GET.q|default:'' }}">
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-3">
+                <button type="submit" class="btn btn-navy w-100 fw-800 rounded-3 py-2">
+                    <i class="bi bi-filter-right me-2"></i>Filter
+                </button>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                {% if request.GET.q %}
+                    <a href="{% url 'admin_customer_list' %}" class="btn btn-light border w-100 fw-800 rounded-3 py-2 text-danger">
+                        <i class="bi bi-x-circle me-1"></i> Clear
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden border-top border-light">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-faint-navy border-bottom">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted fw-800 small uppercase tracking-tighter">Customer Profile</th>
+                        <th class="text-muted fw-800 small uppercase tracking-tighter">Village/Hub</th>
+                        <th class="text-center text-muted fw-800 small uppercase tracking-tighter">Activity</th>
+                        <th class="text-muted fw-800 small uppercase tracking-tighter">Value Generated</th>
+                        <th class="text-muted fw-800 small uppercase tracking-tighter">Engagement</th>
+                        <th class="text-end pe-4 text-muted fw-800 small uppercase tracking-tighter">Tools</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr class="customer-row">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                               <div class="progress mt-1" style="height: 3px; width: 50px; background: #e2e8f0;">
+                                    <div class="progress-bar bg-emerald" style="width: 70%"></div> 
+                                </div>
+                                <div>
+                                    <div class="fw-900 text-navy lh-1 mb-1">{{ customer.get_full_name|default:customer.username }}</div>
+                                    <div class="text-muted extra-small fw-700"><i class="bi bi-envelope me-1"></i>{{ customer.email|truncatechars:20 }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            {% with last_addr=customer.order_set.first.address %}
+                                {% if last_addr %}
+                                    <div class="village-badge">
+                                        <span class="dot"></span> {{ last_addr.city|upper }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted opacity-50 small italic">Not Linked</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <td class="text-center">
+                            <div class="fw-900 text-navy mb-0">{{ customer.order_count }}</div>
+                            <div class="extra-small text-muted fw-800 text-uppercase">Orders</div>
+                        </td>
+
+                        <td>
+                            <div class="fw-900 text-emerald mb-0">₹{{ customer.total_spent|floatformat:2|default:"0.00" }}</div>
+                            <div class="progress mt-1" style="height: 3px; width: 50px; background: #e2e8f0;">
+                                <div class="progress-bar bg-emerald" style="width: 70%"></div>                            </div>
+                        </td>
+
+                        <td>
+                            <div class="small fw-800 text-navy">{{ customer.date_joined|date:"d M Y" }}</div>
+                            <div class="extra-small text-muted fw-700 uppercase">{{ customer.date_joined|timesince }} AGENT</div>
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'customer_detail' customer.id %}" class="btn-tool bg-navy text-white" title="Insights">
+                                    <i class="bi bi-bar-chart-fill"></i>
+                                </a>
+                                <button class="btn-tool bg-light border text-navy" title="Message">
+                                    <i class="bi bi-chat-dots-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="bi bi-person-x display-4 text-light"></i>
+                                <h5 class="fw-800 text-muted mt-3">No Village Customers Found</h5>
+                                <p class="text-muted small">Try broadening your search or check your network sync.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* TYPOGRAPHY & COLORS */
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .text-navy { color: #0f172a; }
+    .text-emerald { color: #10b981; }
+    .bg-emerald { background-color: #10b981; }
+    .bg-emerald-soft { background: rgba(16, 185, 129, 0.1); }
+    .bg-faint-navy { background: #f8fafc; }
+    .extra-small { font-size: 0.62rem; letter-spacing: 0.5px; }
+
+    /* STAT PILLS */
+    .stat-pill-modern {
+        background: white; border: 1px solid #e2e8f0; border-radius: 14px;
+        padding: 8px 16px; min-width: 120px;
+    }
+    .stat-pill-modern .label { font-size: 0.55rem; font-weight: 900; color: #94a3b8; letter-spacing: 1px; }
+    .stat-pill-modern .value { font-size: 1.1rem; font-weight: 900; line-height: 1.2; }
+
+    /* SEARCH WRAPPER */
+    .search-input-wrapper { position: relative; }
+    .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .search-field { 
+        padding-left: 45px; height: 48px; border-radius: 12px; border: 1px solid #e2e8f0;
+        font-weight: 600; font-size: 0.95rem;
+    }
+    .search-field:focus { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05); }
+
+    /* AVATAR BOXES */
+    .avatar-box {
+        width: 40px; height: 40px; border-radius: 12px; display: flex;
+        align-items: center; justify-content: center; color: white; font-weight: 900;
+        background: #6366f1; /* Fallback */
+    }
+    .bg-random-1 { background: #6366f1; } .bg-random-2 { background: #f59e0b; }
+    .bg-random-3 { background: #ec4899; } .bg-random-4 { background: #10b981; }
+
+    /* VILLAGE BADGE */
+    .village-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: white; border: 1px solid #e2e8f0; padding: 4px 10px;
+        border-radius: 100px; font-size: 0.65rem; font-weight: 900; color: #475569;
+    }
+    .village-badge .dot { height: 6px; width: 6px; background: #10b981; border-radius: 50%; }
+
+    /* TOOLS */
+    .btn-tool {
+        width: 32px; height: 32px; border-radius: 8px; display: flex;
+        align-items: center; justify-content: center; text-decoration: none;
+        transition: 0.2s; border: none;
+    }
+    .btn-tool:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .bg-navy { background: #0f172a; }
+
+    /* ROW ANIMATION */
+    .customer-row { transition: 0.2s; }
+    .customer-row:hover { background-color: #f1f5f9 !important; }
+
+    .btn-navy { background: #0f172a; color: white; }
+</style>
+{% endblock %}

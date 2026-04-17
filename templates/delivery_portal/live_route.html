@@ -1,0 +1,128 @@
+{% extends 'delivery_portal/base.html' %}
+{% load static %}
+
+{% block title %}Navigate | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Taskbar-style Bottom Navigation */
+    .taskbar-fixed {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        padding: 20px;
+        border-top: 1px solid #eee;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+        z-index: 1050;
+        border-radius: 30px 30px 0 0;
+    }
+    
+    .address-display {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 24px;
+    }
+
+    .info-label {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        font-weight: 800;
+        font-size: 11px;
+    }
+
+    #map-engine { height: 0; width: 0; position: absolute; visibility: hidden; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="map-engine"></div>
+
+<div class="container px-3 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-success text-white px-3 rounded-pill mb-2 fw-bold">ACTIVE ORDER</span>
+            <h1 class="fw-900 mb-0" style="font-size: 2.2rem;">{{ delivery.order.address.recipient_name|upper }}</h1>
+        </div>
+        <a href="tel:{{ delivery.order.address.phone_number }}" class="btn btn-primary rounded-circle shadow-lg p-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-telephone-fill fs-2"></i>
+        </a>
+    </div>
+
+    <div class="address-display p-4 mb-3">
+        <div class="mb-4">
+            <label class="info-label d-block mb-1">Full Delivery Address</label>
+            <h4 class="fw-900 text-dark mb-1">{{ delivery.order.address.city|upper }}</h4>
+            <p class="fs-5 text-secondary mb-3">
+                {{ delivery.order.address.house_number }}, {{ delivery.order.address.address_line1 }}<br>
+                <span class="text-primary fw-bold"><i class="bi bi-geo-alt-fill"></i> LANDMARK: {{ delivery.order.address.landmark|upper }}</span>
+            </p>
+        </div>
+
+        <div class="d-grid">
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ delivery.order.address.latitude }},{{ delivery.order.address.longitude }}&travelmode=two-wheeler" 
+               target="_blank" 
+               class="btn btn-primary btn-lg py-3 fw-900 rounded-4 shadow-sm">
+                <i class="bi bi-google me-2"></i> OPEN GOOGLE MAPS
+            </a>
+        </div>
+    </div>
+
+    <p class="text-center text-muted small px-4">
+        Contact the customer if you are unable to find the exact village location.
+    </p>
+</div>
+
+<div class="taskbar-fixed">
+    <div class="row align-items-center mb-3 text-center">
+        <div class="col-6 border-end">
+            <span class="info-label d-block">YOUR EARNING</span>
+            <span class="fw-900 fs-3 text-success">₹{{ delivery.rider_earning }}</span>
+        </div>
+        <div class="col-6">
+            <span class="info-label d-block">ROAD DISTANCE</span>
+            <span id="dist-display" class="fw-900 fs-3 text-dark">-- KM</span>
+        </div>
+    </div>
+
+    <form action="{% url 'delivery_complete' delivery.id %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="actual_road_km" id="actual_road_km">
+        
+        <button type="submit" class="btn btn-dark w-100 py-3 rounded-4 fw-900 fs-4 shadow-lg border-0">
+            COMPLETE DELIVERY
+        </button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+    // Pulling Coordinates from Database
+    const srcLat = {{ delivery.nearest_hub.latitude }};
+    const srcLng = {{ delivery.nearest_hub.longitude }};
+    const destLat = {{ delivery.order.address.latitude }};
+    const destLng = {{ delivery.order.address.longitude }};
+
+    const engine = L.map('map-engine').setView([srcLat, srcLng], 13);
+
+    const routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(srcLat, srcLng),
+            L.latLng(destLat, destLng)
+        ],
+        router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+        createMarker: function() { return null; },
+        addWaypoints: false
+    }).addTo(engine);
+
+    routingControl.on('routesfound', function(e) {
+        const distance = (e.routes[0].summary.totalDistance / 1000).toFixed(2);
+        document.getElementById('dist-display').innerText = distance + " KM";
+        document.getElementById('actual_road_km').value = distance;
+    });
+</script>
+{% endblock %}

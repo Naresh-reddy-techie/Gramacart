@@ -1,0 +1,44 @@
+{% extends "admin_dashboard/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Update Delivery Boy: {{ user.username }}</h3>
+  <div class="card shadow-sm p-4 mt-3">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Username & Email -->
+      <div class="mb-3">
+        <label for="id_username" class="form-label">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        <label for="id_email" class="form-label">Email</label>
+        {{ form.email }}
+      </div>
+
+      <!-- Phone Number -->
+      <div class="mb-3">
+        <label for="id_phone_number" class="form-label">Phone Number</label>
+        {{ form.phone_number }}
+      </div>
+
+      <!-- Hub -->
+      <div class="mb-3">
+        <label for="id_hub" class="form-label">Hub</label>
+        {{ form.hub }}
+      </div>
+
+      <!-- Active Status -->
+      <div class="form-check mb-3">
+        {{ form.is_active }}
+        <label class="form-check-label" for="id_is_active">Active</label>
+      </div>
+
+      <!-- Buttons -->
+      <button type="submit" class="btn btn-primary">Update Delivery Boy</button>
+      <a href="{% url 'delivery_boy_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

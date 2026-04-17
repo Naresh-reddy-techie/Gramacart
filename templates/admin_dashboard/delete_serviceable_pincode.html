@@ -1,0 +1,22 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card border-danger">
+    <div class="card-body">
+      <h4 class="card-title text-danger">Confirm Deletion</h4>
+      <p>Are you sure you want to delete the following pincode?</p>
+      <p><strong>{{ pincode.pin }} - {{ pincode.area_name }}</strong></p>
+
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+        <a href="{% url 'list_serviceable_pincodes' %}" class="btn btn-secondary ms-2">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

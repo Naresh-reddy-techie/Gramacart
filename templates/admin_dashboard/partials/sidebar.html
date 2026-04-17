@@ -1,0 +1,197 @@
+{% load static %}
+
+{% load static %}
+
+<div class="sidebar-header d-flex align-items-center gap-3 p-4">
+    <div class="brand-logo-box shadow-emerald flex-shrink-0">
+        <span class="fw-900 text-white">G<span class="text-emerald">C</span></span>
+    </div>
+    <div class="brand-info overflow-hidden">
+        <div class="brand-text fw-900 text-white tracking-tighter text-truncate">GRAMA<span class="text-emerald">CART</span></div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="status-dot-pulse"></span>
+            <span class="brand-status-text text-truncate opacity-75">Network Live</span>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar-content d-flex flex-column custom-scrollbar overflow-x-hidden">
+    <div class="sidebar-nav-container px-3 py-2">
+
+        <!-- DASHBOARD -->
+        <div class="sidebar-section mb-4">
+            <p class="sidebar-heading text-uppercase tracking-widest">Operational Hub</p>
+            <a href="{% url 'dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'admin_orders' %}" class="menu-item {% if 'orders' in request.path %}active{% endif %}">
+                <i class="bi bi-cart-check-fill"></i>
+                <span>Village Orders</span>
+                <span class="badge rounded-pill bg-danger ms-auto pulse-red">{{ pending_orders }}</span>
+            </a>
+        </div>
+
+        <!-- INVENTORY & CATALOG -->
+        <div class="sidebar-section mb-4">
+            <p class="sidebar-heading text-uppercase tracking-widest">Inventory & Catalog</p>
+            <a href="{% url 'list_product' %}" class="menu-item {% if 'product' in request.path %}active{% endif %}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span>Products</span>
+            </a>
+            <a href="{% url 'live_inventory' %}" class="menu-item">
+                <i class="bi bi-archive-fill"></i>
+                <span>Live Inventory</span>
+                {% if low_stock_count > 0 %}
+                    <span class="badge bg-warning-soft text-warning ms-auto extra-small fw-800">{{ low_stock_count }} LOW</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'list_category' %}" class="menu-item {% if 'category' in request.path %}active{% endif %}">
+                <i class="bi bi-tags-fill"></i>
+                <span>Categories</span>
+            </a>
+        </div>
+
+        <!-- DELIVERY PARTNERS -->
+        <div class="sidebar-section mb-4">
+            <p class="sidebar-heading text-uppercase tracking-widest">Field Operations</p>
+            <a href="{% url 'list_delivery_hubs' %}" class="menu-item {% if 'hubs' in request.path %}active{% endif %}">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>Village Hubs</span>
+            </a>
+            <a href="{% url 'delivery_boy_list' %}" class="menu-item {% if 'partners' in request.path %}active{% endif %}">
+                <i class="bi bi-bicycle"></i>
+                <span>Delivery Partners</span>
+                <span class="badge bg-primary-soft text-primary ms-auto extra-small fw-800">{{ active_riders }} ACTIVE</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="bi bi-send-check-fill"></i>
+                <span>Dispatch Center</span>
+            </a>
+        </div>
+
+        <!-- FINANCIAL CORE -->
+     <div class="sidebar-section mb-4">
+        <p class="sidebar-heading text-uppercase tracking-widest">Financial Core</p>
+        
+        <a href="{% url 'payment_methods_list' %}" class="menu-item {% if 'payment' in request.path %}active{% endif %}">
+            <i class="bi bi-credit-card-2-front-fill"></i>
+            <span>Payment Methods</span>
+            <span class="badge bg-emerald-soft text-emerald ms-auto extra-small fw-800">LIVE</span>
+        </a>
+
+        <a href="{% url 'rider_cash_settlement_list' %}" class="menu-item {% if 'rider-settlement' in request.path %}active{% endif %}">
+            <i class="bi bi-cash-stack"></i>
+            <span>Rider Cash Collection</span>
+            <span class="badge rounded-pill bg-warning-soft text-warning ms-auto extra-small">COD</span>
+        </a>
+
+        <a href="{% url 'vendor_payout_list' %}" class="menu-item {% if 'vendor-payouts' in request.path %}active{% endif %}">
+            <i class="bi bi-bank2"></i>
+            <span>Shop Payouts</span>
+        </a>
+    </div>
+
+    <div class="sidebar-section mb-4">
+        <p class="sidebar-heading text-uppercase tracking-widest">Intelligence</p>
+        
+        <a href="{% url 'shipping_cost_list' %}" class="menu-item {% if 'shipping' in request.path %}active{% endif %}">
+            <i class="bi bi-truck"></i>
+            <span>Logistics Tariffs</span>
+        </a>
+
+        <a href="#" class="menu-item">
+            <i class="bi bi-graph-up-arrow text-emerald"></i>
+            <span>Profit Analytics</span>
+        </a>
+    </div>
+
+        <!-- ACCESS CONTROL -->
+        <div class="sidebar-section mb-4">
+            <p class="sidebar-heading text-uppercase tracking-widest">Access Control</p>
+            <a href="{% url 'manage_groups' %}" class="menu-item {% if 'groups' in request.path %}active{% endif %}">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Roles & Permissions</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>Admin Activity Logs</span>
+            </a>
+        </div>
+
+       
+
+    </div>
+    
+    <div class="sidebar-section mb-4">
+        <p class="sidebar-heading text-uppercase tracking-widest">User Intelligence</p>
+        <a href="{% url 'admin_customer_list' %}" class="menu-item {% if 'customers' in request.path %}active{% endif %}">
+            <i class="bi bi-people-fill"></i>
+            <span>Registered Customers</span>
+            <span class="badge bg-emerald-soft text-emerald ms-auto extra-small fw-800">{{ total_customers }}</span>
+        </a>
+        <a href="#" class="menu-item">
+            <i class="bi bi-geo-fill"></i>
+            <span>Village Coverage</span>
+        </a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="sidebar-footer mt-auto p-3 bg-navy-darker border-top border-white border-opacity-10">
+        <a href="{% url 'company_info_update' %}" class="menu-item mb-2 {% if 'company-info' in request.path %}active{% endif %}">
+            <i class="bi bi-gear-fill"></i> <span>Global Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" class="logout-pill">
+            <i class="bi bi-power"></i>
+            <span class="logout-text fw-800">Logout</span>
+        </a>
+    </div>
+</div>
+
+<style>
+    /* MOBILE & UI FIXES */
+    .bg-navy-darker { background: rgba(0, 0, 0, 0.3); }
+    .bg-warning-soft { background: rgba(255, 193, 7, 0.1); }
+    
+    /* Logout Pill Design for Mobile */
+    .logout-pill {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        padding: 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+    .logout-pill:hover { background: #ef4444; color: white; }
+
+    /* Prevents sidebar expansion on long text */
+    .menu-item span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+    }
+
+    .brand-logo-box {
+        width: 40px; height: 40px; background: #112240; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+
+    /* Fixed visibility for Global Settings Icon */
+    .bi-gear-fill { color: #94a3b8; font-size: 1.1rem; }
+    .menu-item.active .bi-gear-fill { color: #fff; }
+
+    /* Custom Scrollbar for better UX */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    @media (max-width: 991px) {
+        .brand-text { font-size: 0.85rem; }
+        .sidebar-heading { font-size: 0.55rem; }
+    }
+</style>

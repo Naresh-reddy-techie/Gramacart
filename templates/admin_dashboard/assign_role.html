@@ -1,0 +1,42 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-navy text-white py-3">
+                    <h5 class="mb-0 fw-bold">Assign Role to: {{ target_user.username }}</h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <p class="text-muted small mb-4">Select the operational roles for this user. They will inherit all permissions assigned to these groups.</p>
+                        
+                        <div class="list-group mb-4">
+                            {% for group in all_groups %}
+                            <label class="list-group-item d-flex align-items-center gap-3 py-3 border rounded mb-2">
+                                <input class="form-check-input" type="checkbox" name="groups" value="{{ group.id }}"
+                                       {% if group.id in user_groups %}checked{% endif %}
+                                       style="width: 1.2rem; height: 1.2rem;">
+                                <div>
+                                    <span class="fw-bold text-navy d-block">{{ group.name }}</span>
+                                    <span class="extra-small text-muted">{{ group.permissions.count }} Access Rules</span>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-emerald fw-bold py-2">Update Access Levels</button>
+                            <a href="{% url 'manage_users' %}" class="btn btn-light text-muted">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

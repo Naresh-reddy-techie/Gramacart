@@ -1,0 +1,142 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #f8fafc; min-height: 100vh;">
+    
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-900 text-dark mb-1">Village Cluster Hubs</h2>
+            <p class="text-muted">Manage your 7KM delivery zones and active service points.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{% url 'add_delivery_hub' %}" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm fw-bold">
+                <i class="bi bi-plus-circle me-2"></i> Add New Cluster
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success-subtle text-success p-3 rounded-3 me-3">
+                        <i class="bi bi-geo-alt-fill fs-3"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-bold d-block">Active Centers</small>
+                        <h3 class="fw-900 mb-0">{{ hubs|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 border-0 text-uppercase small fw-bold text-muted">ID</th>
+                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted">Village / Cluster Name</th>
+                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Location (Lat, Lng)</th>
+                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Service Reach</th>
+                        <th class="pe-4 py-3 border-0 text-uppercase small fw-bold text-muted text-end">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hub in hubs %}
+                    <tr class="border-top">
+                        <td class="ps-4">
+                            <span class="text-muted">#{{ forloop.counter }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="hub-avatar bg-success text-white me-3">
+                                    {{ hub.name|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <span class="d-block fw-bold text-dark fs-6">{{ hub.name }}</span>
+                                    <small class="text-muted">Krishna District Area</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-primary border px-3 py-2 font-monospace">
+                                {{ hub.latitude|floatformat:4 }}, {{ hub.longitude|floatformat:4 }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="fw-900 text-success">{{ hub.max_delivery_radius_km }} <small>KM</small></div>
+                            <div class="progress mt-1 mx-auto" style="height: 4px; width: 60px;">
+                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                            </div>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'edit_delivery_hub' hub.id %}" class="btn btn-outline-primary btn-sm rounded-start-3" title="Edit Hub">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'delete_delivery_hub' hub.id %}" class="btn btn-outline-danger btn-sm rounded-end-3" title="Delete Hub">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-geo-fill display-1 opacity-25"></i>
+                                <h5 class="mt-3">No village clusters added yet</h5>
+                                <p>Click the "Add New Cluster" button to start your delivery network.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .hub-avatar {
+        width: 40px; height: 40px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 1.1rem;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+        transition: 0.2s;
+    }
+    .btn-group .btn {
+        padding: 0.5rem 0.8rem;
+    }
+    .font-monospace {
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+
+{% if messages %}
+<div class="modal fade" id="msgModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-body text-center p-4">
+                {% with messages.0 as msg %}
+                    <i class="bi {% if msg.tags == 'success' %}bi-check-circle-fill text-success{% else %}bi-exclamation-triangle-fill text-danger{% endif %} display-4 mb-3 d-block"></i>
+                    <h5 class="fw-bold">{{ msg }}</h5>
+                {% endwith %}
+                <button type="button" class="btn btn-dark w-100 rounded-pill mt-3" data-bs-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var myModal = new bootstrap.Modal(document.getElementById('msgModal'));
+    myModal.show();
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends "delivery_portal/base.html" %}
+{% block title %}Live Radar | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 1. Tactical Map Styling - Leaflet is Free */
+    #active-map {
+        height: 300px; 
+        width: 100%;
+        border-radius: 24px;
+        margin-bottom: 20px;
+        border: 2px solid var(--ui-border);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        background: #f1f5f9;
+        z-index: 1;
+    }
+
+    .mission-header {
+        background: var(--ui-card);
+        padding: 15px;
+        border-radius: 20px;
+        border: 1px solid var(--ui-border);
+        margin-bottom: 15px;
+    }
+
+    .section-title {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--ui-subtext);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* GPS Status Pill */
+    .gps-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 5px 12px;
+        border-radius: 50px;
+        background: rgba(0, 204, 102, 0.1);
+        color: var(--brand-primary);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Animated Radar Pulse */
+    .radar-ping {
+        width: 8px; height: 8px;
+        background: var(--brand-primary);
+        border-radius: 50%;
+        animation: radar-pulse 2s infinite;
+    }
+
+    @keyframes radar-pulse {
+        0% { box-shadow: 0 0 0 0px rgba(0, 204, 102, 0.7); }
+        70% { box-shadow: 0 0 0 12px rgba(0, 204, 102, 0); }
+        100% { box-shadow: 0 0 0 0px rgba(0, 204, 102, 0); }
+    }
+
+    /* Rider Marker Ripple */
+    @keyframes marker-ripple {
+        0% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(3); opacity: 0; }
+    }
+
+    /* Navigation Button Specifics */
+    .btn-nav-external {
+        background: #4285F4; /* Google Blue */
+        color: white !important;
+        border-radius: 14px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container px-2 pb-5">
+    
+    <div class="mission-header d-flex justify-content-between align-items-center mt-2 shadow-sm">
+        <div>
+            <div class="section-title mb-1"><div class="radar-ping"></div> Mission Control</div>
+            <h6 class="fw-900 mb-0">{{ deliveries|length }} Active Shipments</h6>
+        </div>
+        <div id="gps-status" class="gps-badge">
+            <i class="bi bi-broadcast"></i> GPS LINKED
+        </div>
+    </div>
+
+    <div id="active-map"></div>
+
+    <div class="section-title mb-3 px-2">
+        <i class="bi bi-signpost-split-fill"></i> Routing Summary
+    </div>
+
+    {% if deliveries %}
+        <div class="delivery-list">
+            {% for d in deliveries %}
+            <div class="glass-card p-4 mb-3 shadow-sm" style="background: var(--ui-card); border-radius: 24px; border: 1px solid var(--ui-border);">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge {% if d.status == 'out_for_delivery' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill mb-2">
+                            {{ d.get_status_display|upper }}
+                        </span>
+                        <h5 class="fw-900 mb-0">{{ d.order.address.recipient_name }}</h5>
+                        <small class="text-muted fw-bold">{{ d.order.address.village }}, {{ d.order.address.landmark }}</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-900 text-success fs-5">₹{{ d.delivery_fee }}</div>
+                        <small class="text-muted fw-bold">ID: #{{ d.order.order_number }}</small>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a href="tel:{{ d.order.address.phone_number }}" class="btn btn-light w-100 py-3 border-0 fw-800" style="border-radius: 14px; background: var(--ui-bg);">
+                            <i class="bi bi-telephone-fill me-2"></i> CALL
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ d.order.address.latitude }},{{ d.order.address.longitude }}&travelmode=two-wheeler" 
+                           target="_blank" 
+                           class="btn-nav-external w-100 h-100">
+                            <i class="bi bi-google"></i> NAV
+                        </a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <a href="{% url 'delivery_complete' d.id %}" class="btn-grama py-3 text-center text-decoration-none">
+                            COMPLETE DELIVERY
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-check-circle-fill display-1 text-success opacity-25"></i>
+            <h5 class="fw-900 mt-3">NO ACTIVE MISSIONS</h5>
+            <p class="text-muted small">Go back to the Radar to accept new village orders.</p>
+            <a href="{% url 'rider_dashboard' %}" class="btn btn-dark px-5 py-3 rounded-pill fw-800 text-decoration-none">DASHBOARD</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+let map, riderMarker;
+const deliveryMarkers = [];
+
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Setup Delivery Locations
+    const locations = [
+        {% for d in deliveries %}
+            {% if d.order.address.latitude and d.order.address.longitude %}
+            {
+                lat: {{ d.order.address.latitude }},
+                lng: {{ d.order.address.longitude }},
+                village: "{{ d.order.address.village }}",
+                customer: "{{ d.order.address.recipient_name }}",
+                id: "{{ d.id }}"
+            },
+            {% endif %}
+        {% endfor %}
+    ];
+            
+    // 2. Initialize Map (Voyager style is clean)
+    map = L.map('active-map', { zoomControl: false, attributionControl: false }).setView([16.5062, 80.6480], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+
+    // 3. Custom Marker for Customers (Green)
+    const deliveryIcon = L.divIcon({
+        className: 'custom-icon',
+        html: `<div style="background-color: #00cc66; width: 14px; height: 14px; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></div>`,
+        iconSize: [14, 14]
+    });
+
+    locations.forEach(loc => {
+        const m = L.marker([loc.lat, loc.lng], { icon: deliveryIcon }).addTo(map);
+        m.bindPopup(`<b class="fw-800">${loc.customer}</b><br><span class="small">${loc.village}</span>`);
+        deliveryMarkers.push(m);
+    });
+
+    // Fit map to markers
+    if (deliveryMarkers.length > 0) {
+        const group = new L.featureGroup(deliveryMarkers);
+        map.fitBounds(group.getBounds().pad(0.3));
+    }
+
+    initTracking();
+});
+
+function initTracking() {
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(position => {
+            const { latitude, longitude } = position.coords;
+
+            // 4. Update Rider Position (Blue Marker)
+            if (!riderMarker) {
+                const riderIcon = L.divIcon({
+                    className: 'rider-icon',
+                    html: `
+                        <div style="position: relative;">
+                            <div style="background-color: #0d6efd; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(13,110,253,0.5);"></div>
+                            <div style="position: absolute; top:0; left:0; width:16px; height:16px; border-radius:50%; background:#0d6efd; animation: marker-ripple 2s infinite; z-index:-1;"></div>
+                        </div>`,
+                    iconSize: [16, 16]
+                });
+                riderMarker = L.marker([latitude, longitude], { icon: riderIcon, zIndexOffset: 1000 }).addTo(map);
+            } else {
+                riderMarker.setLatLng([latitude, longitude]);
+            }
+
+            // 5. Silent background sync to DB
+            const syncId = "{% if deliveries %}{{ deliveries.0.id }}{% else %}0{% endif %}";
+            if(syncId !== "0") {
+                fetch(`/delivery/update-location/${syncId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ lat: latitude, lng: longitude })
+                }).catch(() => {}); 
+            }
+        }, null, { enableHighAccuracy: true });
+    }
+}
+</script>
+{% endblock %}

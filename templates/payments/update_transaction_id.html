@@ -1,0 +1,13 @@
+<h2>Update UPI Transaction ID</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  <label for="transaction_id">Enter Correct UPI Transaction ID (UTR):</label>
+  <input type="text" name="transaction_id" id="transaction_id"
+         value="{{ payment.transaction_id }}" required
+         style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; margin-bottom: 1rem;" />
+
+  <button type="submit" class="btn-submit">Update Transaction ID</button>
+</form>
+
+<p><a href="{% url 'order_pending_confirmation' order.id %}">Back to Order Confirmation</a></p>

@@ -1,0 +1,33 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-4">Edit Pincode</h3>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        {{ form.pin.label_tag }}  
+        {{ form.pin }}
+        {{ form.pin.errors }}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.area_name.label_tag }}  
+        {{ form.area_name }}
+        {{ form.area_name.errors }}
+      </div>
+       <div class="col-md-4 mb-3">
+        {{ form.is_active.label_tag }}  
+        {{ form.is_active }}
+        {{ form.is_active.errors }}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-pencil me-1"></i> Update Pincode
+    </button>
+    <a href="{% url 'list_serviceable_pincodes' %}" class="btn btn-secondary ms-2">Back to List</a>
+  </form>
+</div>
+{% endblock %}

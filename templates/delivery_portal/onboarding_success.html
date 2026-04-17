@@ -1,0 +1,38 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card border-0 shadow-lg mx-auto" style="max-width: 500px;">
+        <div class="card-body p-5">
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="fw-bold text-navy">Registration Successful!</h2>
+            <p class="text-muted">New partner has been onboarded to the <strong>{{ onboarding_data.hub }}</strong> hub.</p>
+
+            <div class="bg-light p-4 rounded-4 my-4 text-start">
+                <p class="small text-uppercase fw-bold text-muted mb-3">Login Credentials</p>
+                <div class="mb-2">
+                    <label class="small text-muted">Username:</label>
+                    <div class="fw-bold">{{ onboarding_data.username }}</div>
+                </div>
+                <div class="mb-0">
+                    <label class="small text-muted">Initial Password:</label>
+                    <div class="fw-bold text-primary">{{ onboarding_data.password }}</div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="{% url 'delivery_boy_list' %}" class="btn btn-navy py-2">View Fleet Dashboard</a>
+                <a href="{% url 'add_delivery_boy' %}" class="btn btn-outline-secondary">Add Another Partner</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-navy { background: #1e293b; color: white; border-radius: 8px; }
+    .btn-navy:hover { background: #0f172a; color: white; }
+    .text-navy { color: #1e293b; }
+</style>
+{% endblock %}

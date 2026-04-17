@@ -1,0 +1,51 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Vendor Payouts</h2>
+        <p class="text-muted">Pay shopkeepers their product cost share</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for wallet in wallets %}
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-primary-subtle text-primary rounded-3 p-2">
+                        <i class="bi bi-shop fs-4"></i>
+                    </div>
+                    <span class="badge bg-light text-dark border rounded-pill">Vendor Wallet</span>
+                </div>
+                
+                <h5 class="fw-bold mb-1">{{ wallet.user.username }}</h5>
+                <p class="text-muted small mb-4">Total Settled: ₹{{ wallet.total_withdrawn }}</p>
+                
+                <div class="bg-light rounded-3 p-3 mb-4">
+                    <small class="text-muted d-block mb-1">Current Amount Due</small>
+                    <h2 class="fw-extrabold mb-0 text-primary">₹{{ wallet.pending_balance }}</h2>
+                </div>
+
+                <form method="POST" action="{% url 'settle_vendor_payout' wallet.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="txn_id" class="form-control form-control-sm rounded-3" 
+                               placeholder="Enter UPI Ref or Cash ID" required>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 rounded-3 py-2" 
+                            {% if wallet.pending_balance <= 0 %}disabled{% endif %}>
+                        Confirm Payout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted">No vendor balances to settle.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Check Delivery Availability</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="latitude" class="form-label">Your Latitude</label>
+      <input type="text" name="latitude" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="longitude" class="form-label">Your Longitude</label>
+      <input type="text" name="longitude" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Check</button>
+  </form>
+
+  {% if delivery_available is not None %}
+    <div class="alert alert-{{ 'success' if delivery_available else 'danger' }} mt-3">
+      {{ 'Delivery is available in your area!' if delivery_available else 'Sorry, we don\'t deliver to your area.' }}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-900 text-navy mb-1">Delivery Partners</h2>
+            <p class="text-muted small mb-0">Manage your village-level logistics fleet</p>
+        </div>
+        <a href="{% url 'add_delivery_boy' %}" class="btn btn-emerald shadow-sm d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>Register New Partner</span>
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3">
+                <div class="text-muted small text-uppercase fw-bold">Total Fleet</div>
+                <div class="h4 fw-900 mb-0">{{ delivery_profiles.count }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3">
+                <div class="text-success small text-uppercase fw-bold">Active Status</div>
+                <div class="h4 fw-900 mb-0 text-success">
+                    {{ delivery_profiles.all|dictsort:"is_active"|length }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, username or village hub...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="deliveryTable">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase extra-small fw-800 text-muted">Partner Details</th>
+                        <th class="py-3 text-uppercase extra-small fw-800 text-muted">Village Hub</th>
+                        <th class="py-3 text-uppercase extra-small fw-800 text-muted text-center">Current Status</th>
+                        <th class="pe-4 py-3 text-uppercase extra-small fw-800 text-muted text-end">Management</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in delivery_profiles %}
+                    <tr>
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-circle bg-navy-light text-white fw-bold">
+                                    {{ profile.user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-navy">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                                    <div class="text-muted small">@{{ profile.user.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-navy border">
+                                <i class="bi bi-geo-alt-fill me-1 text-emerald"></i>
+                                {{ profile.hub.name|default:"Unassigned" }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% if profile.is_active and profile.user.id in busy_ids %}
+                                <span class="status-pill busy">Busy</span>
+                            {% elif profile.is_active %}
+                                <span class="status-pill active">Available</span>
+                            {% else %}
+                                <span class="status-pill offline">Offline</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'update_delivery_boy' profile.user.id %}" class="btn btn-icon btn-light" title="Edit Profile">
+                                    <i class="bi bi-pencil-square text-primary"></i>
+                                </a>
+                                <a href="{% url 'delete_delivery_boy' profile.id %}" class="btn btn-icon btn-light" onclick="return confirm('Remove partner from fleet?')" title="Delete">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <i class="bi bi-people text-muted opacity-25" style="font-size: 3rem;"></i>
+                            <p class="mt-3 text-muted">No delivery partners registered in this area yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ... (Your styles remain the same) ... */
+    .fw-900 { font-weight: 900; }
+    .extra-small { font-size: 0.7rem; }
+    .text-navy { color: #1e293b; }
+    .bg-navy-light { background: #334155; }
+    .btn-emerald { background: #10B981; color: white; border-radius: 10px; padding: 10px 20px; font-weight: 700; border: none; }
+    .btn-emerald:hover { background: #059669; color: white; }
+    .btn-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: 0.2s; border: 1px solid #f1f5f9; }
+    .btn-icon:hover { background: #f8fafc; transform: translateY(-2px); }
+    .avatar-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+    .status-pill.active { background: #ecfdf5; color: #059669; border: 1px solid #bbf7d0; }
+    .status-pill.busy { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+    .status-pill.offline { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+</style>
+{% endblock %}

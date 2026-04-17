@@ -1,0 +1,242 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Hub Control | GramaCart Admin{% endblock %}
+{% block breadcrumb %}Real-time Analytics{% endblock %}
+{% block page_title %}Operational Nerve Center{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Premium KPI Containers */
+    .kpi-card {
+        border-radius: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        position: relative;
+        overflow: hidden;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1) !important;
+    }
+    .kpi-icon {
+        width: 54px; height: 54px;
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem;
+    }
+
+    /* Operational Urgency Pulse */
+    .pulse-indicator {
+        position: absolute; top: 15px; right: 15px;
+        width: 8px; height: 8px; border-radius: 50%;
+    }
+    .pulse-danger { background: #ef4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); animation: pulse-red 2s infinite; }
+    
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Modern Table Styling */
+    .table-modern thead th {
+        background: #f8fafc;
+        padding: 15px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .table-modern tbody td { padding: 18px 15px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+    
+    .village-badge {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    /* Action Buttons */
+    .btn-action-lg {
+        padding: 12px; border-radius: 14px; font-weight: 800; font-size: 13px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: 0.2s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm p-4 border-0">
+            {% if pending_orders > 0 %}<div class="pulse-indicator pulse-danger"></div>{% endif %}
+            <div class="kpi-icon bg-orange-soft"><i class="bi bi- megaphone-fill"></i></div>
+            <h6 class="text-muted fw-800 mb-1 small text-uppercase">Active Orders</h6>
+            <h2 class="fw-900 text-navy mb-0">{{ pending_orders }}</h2>
+            <div class="extra-small text-danger fw-700 mt-2"><i class="bi bi-clock-history"></i> Immediate Attention</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm p-4 border-0">
+            <div class="kpi-icon bg-emerald-soft"><i class="bi bi-patch-check-fill"></i></div>
+            <h6 class="text-muted fw-800 mb-1 small text-uppercase">Fulfilled Today</h6>
+            <h2 class="fw-900 text-navy mb-0">{{ completed_orders }}</h2>
+            <div class="extra-small text-emerald fw-700 mt-2"><i class="bi bi-graph-up"></i> +12% from yesterday</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm p-4 border-0">
+            <div class="kpi-icon bg-purple-soft"><i class="bi bi-layers-half"></i></div>
+            <h6 class="text-muted fw-800 mb-1 small text-uppercase">Low Stock items</h6>
+            <h2 class="fw-900 text-navy mb-0">{{ low_stock_count }}</h2>
+            <div class="extra-small text-muted fw-700 mt-2">Critical in 2 Village Hubs</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm p-4 border-0">
+            <div class="kpi-icon bg-blue-soft"><i class="bi bi-bicycle"></i></div>
+            <h6 class="text-muted fw-800 mb-1 small text-uppercase">Fleet Status</h6>
+            <h2 class="fw-900 text-navy mb-0">{{ active_riders }}</h2>
+            <div class="extra-small text-primary fw-700 mt-2"><span class="status-dot-pulse d-inline-block me-1"></span>Riders Online</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 24px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="fw-900 text-navy mb-1">Revenue Stream</h5>
+                    <p class="text-muted extra-small fw-600 mb-0">Visualizing village-to-city growth</p>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm border fw-800 px-3 dropdown-toggle" data-bs-toggle="dropdown">Last 7 Days</button>
+                </div>
+            </div>
+            {% include "admin_dashboard/partials/_sales_overview.html" %}
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 24px;">
+            <h5 class="fw-900 text-navy mb-4">Operational Status</h5>
+            
+            <div class="mb-4 bg-light p-3 rounded-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="extra-small fw-800 text-uppercase">Hub Availability</span>
+                    <span class="extra-small fw-900 text-primary">82%</span>
+                </div>
+                <div class="progress progress-sm" style="height: 8px;">
+                    <div class="progress-bar bg-primary rounded-pill" style="width: 82%"></div>
+                </div>
+            </div>
+
+            <div class="list-group list-group-flush mb-4">
+                <div class="list-group-item px-0 border-0 d-flex justify-content-between">
+                    <span class="text-muted small fw-700">Live Catalog</span>
+                    <span class="fw-900">{{ total_products }}</span>
+                </div>
+                <div class="list-group-item px-0 border-0 d-flex justify-content-between">
+                    <span class="text-muted small fw-700">Hubs Offline</span>
+                    <span class="text-danger fw-900">0</span>
+                </div>
+            </div>
+
+            <hr class="my-4 opacity-50">
+            
+            <h6 class="fw-900 mb-3 small text-uppercase tracking-widest text-muted">Quick Dispatch</h6>
+            <div class="d-grid gap-2">
+                <a href="{% url 'admin_orders' %}" class="btn btn-dark btn-action-lg shadow-sm">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> Process Orders
+                </a>
+                <a href="{% url 'delivery_boy_list' %}" class="btn btn-outline-dark btn-action-lg">
+                    <i class="bi bi-people-fill"></i> Fleet Manager
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius: 24px;">
+    <div class="card-header bg-white border-0 p-4 pb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="fw-900 text-navy mb-1">Active Village Logistics</h5>
+                <p class="text-muted extra-small fw-700 mb-0">Live tracking of hub-to-door deliveries</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-light btn-sm fw-800 px-3 border rounded-pill">Filters</button>
+                <button class="btn btn-navy text-white btn-sm fw-800 px-3 rounded-pill">Export Logs</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0"> <div class="table-responsive">
+            <table class="table table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Order Tracking</th>
+                        <th>Village Hub</th>
+                        <th>Consignee</th>
+                        <th>Amount</th>
+                        <th>Logistics Status</th>
+                        <th>Field Rider</th>
+                        <th class="pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in active_orders %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-900 text-primary">#{{ order.id }}</div>
+                            <div class="extra-small text-muted fw-700">{{ order.total_items }} SKU Items</div>
+                        </td>
+                        <td><span class="village-badge"><i class="bi bi-geo-alt-fill me-1 text-primary"></i> {{ order.village_name }}</span></td>
+                        <td>
+                            <div class="fw-800 text-navy">{{ order.customer_name }}</div>
+                            <div class="extra-small text-muted">Village Resident</div>
+                        </td>
+                        <td class="fw-900 text-navy">₹{{ order.total_amount|floatformat:0 }}</td>
+                        <td>
+                            {% if order.status == 'Pending' %}
+                                <span class="badge bg-warning-soft text-warning fw-900 px-3 py-2 rounded-pill border border-warning border-opacity-25">QUEUED</span>
+                            {% elif order.status == 'Delivered' %}
+                                <span class="badge bg-emerald-soft text-emerald fw-900 px-3 py-2 rounded-pill">COMPLETED</span>
+                            {% else %}
+                                <span class="badge bg-info-soft text-info fw-900 px-3 py-2 rounded-pill text-uppercase">{{ order.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-sm bg-blue-soft rounded-circle fw-900 text-primary d-flex align-items-center justify-content-center" style="width:30px; height:30px; font-size:10px;">
+                                    {{ order.assigned_rider_name|slice:":1"|default:"?" }}
+                                </div>
+                                <span class="extra-small fw-800 text-navy">{{ order.assigned_rider_name|default:"UNASSIGNED" }}</span>
+                            </div>
+                        </td>
+                        <td class="pe-4">
+                            <a href="#" class="btn btn-light btn-sm border rounded-circle shadow-sm"><i class="bi bi-arrow-right-short fs-5"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="py-4">
+                                <i class="bi bi-shield-exclamation display-4 text-muted opacity-25"></i>
+                                <p class="fw-800 text-muted mt-3">No active deliveries at this moment.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

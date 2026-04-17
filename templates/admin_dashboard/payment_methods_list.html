@@ -1,0 +1,181 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4 animate-fade-in">
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+                    <span class="fw-600 small">{{ message }}</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <h3 class="fw-800 text-navy mb-1">Payment Infrastructure</h3>
+            <p class="text-muted small mb-0">Manage active gateways and transaction nodes across all village hubs.</p>
+        </div>
+        <a href="{% url 'payment_method_add' %}" class="btn btn-emerald-lg px-4 py-2 shadow-emerald">
+            <i class="bi bi-plus-lg me-2"></i> Register New Node
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light bg-opacity-50">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase extra-small fw-800 text-muted tracking-wider">Gateway Provider</th>
+                        <th class="py-3 text-uppercase extra-small fw-800 text-muted tracking-wider">Interface Name</th>
+                        <th class="py-3 text-uppercase extra-small fw-800 text-muted tracking-wider">Priority</th>
+                        <th class="py-3 text-uppercase extra-small fw-800 text-muted tracking-wider text-center">Status</th>
+                        <th class="pe-4 py-3 text-uppercase extra-small fw-800 text-muted tracking-wider text-end">Operations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for method in payment_methods %}
+                    <tr>
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="gateway-icon-sm">
+                                    {% if method.name|lower == 'upi' %}
+                                        <i class="bi bi-qr-code text-emerald"></i>
+                                    {% elif method.name|lower == 'phonepe' %}
+                                        <i class="bi bi-phone-vibrate text-primary"></i>
+                                    {% elif method.name|lower == 'razorpay' %}
+                                        <i class="bi bi-credit-card-2-front text-navy"></i>
+                                    {% else %}
+                                        <i class="bi bi-wallet2 text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-700 text-navy text-uppercase small">{{ method.name }}</h6>
+                                    <span class="extra-small text-muted">ID: #00{{ method.pk }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="py-3">
+                            <span class="fw-600 text-navy small">{{ method.display_name }}</span>
+                        </td>
+
+                        <td class="py-3">
+                            <span class="badge bg-light text-navy border fw-700 px-2 py-1">
+                                <i class="bi bi-sort-numeric-down me-1"></i> {{ method.sort_order }}
+                            </span>
+                        </td>
+
+                        <td class="py-3 text-center">
+                            {% if method.is_active %}
+                                <span class="badge-status-active">
+                                    <span class="status-dot-pulse"></span> ONLINE
+                                </span>
+                            {% else %}
+                                <span class="badge-status-offline">OFFLINE</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="pe-4 py-3 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'payment_method_edit' method.pk %}" class="btn btn-action-edit" title="Edit Configuration">
+                                    <i class="bi bi-gear-fill"></i>
+                                </a>
+                                <a href="{% url 'payment_method_delete' method.pk %}" class="btn btn-action-delete" title="Remove Node">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="opacity-25 mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                            <h6 class="fw-700 text-muted">No Payment Nodes Found</h6>
+                            <p class="small text-muted mb-0">Connect your first gateway to start accepting orders.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* UI Design Tokens */
+    .text-navy { color: #0a192f; }
+    .text-emerald { color: #10b981; }
+    .extra-small { font-size: 0.65rem; }
+    .tracking-wider { letter-spacing: 1px; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+
+    /* Icons */
+    .gateway-icon-sm {
+        width: 38px;
+        height: 38px;
+        background: #f8fafc;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        border: 1px solid #f1f5f9;
+    }
+
+    /* Buttons */
+    .btn-emerald-lg {
+        background: #10b981;
+        color: white;
+        border: none;
+        font-weight: 800;
+        border-radius: 12px;
+        transition: 0.3s;
+    }
+    .btn-emerald-lg:hover { background: #059669; transform: translateY(-2px); }
+    .shadow-emerald { box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2); }
+
+    .btn-action-edit { background: #f1f5f9; color: #64748b; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: none; transition: 0.2s; }
+    .btn-action-edit:hover { background: #e2e8f0; color: #0a192f; }
+
+    .btn-action-delete { background: #fff1f2; color: #ef4444; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: none; transition: 0.2s; }
+    .btn-action-delete:hover { background: #fee2e2; transform: scale(1.1); }
+
+    /* Status Badges */
+    .badge-status-active {
+        background: #ecfdf5;
+        color: #059669;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 5px 12px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .status-dot-pulse {
+        width: 6px;
+        height: 6px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: pulse-dot 2s infinite;
+    }
+    .badge-status-offline { background: #f1f5f9; color: #94a3b8; font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-radius: 50px; }
+
+    @keyframes pulse-dot {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

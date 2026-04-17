@@ -1,0 +1,33 @@
+<div class="dashboard-card cluster-performance-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h6 class="fw-800 text-navy mb-1">Cluster Demand</h6>
+            <p class="text-muted extra-small mb-0">Orders per Village Cluster</p>
+        </div>
+        <span class="badge bg-emerald-subtle text-emerald fw-700">Update: {% now "H:i" %}</span>
+    </div>
+
+    <div class="cluster-stats-list">
+        {% for cluster in village_clusters %}
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="fw-700 text-navy small">{{ cluster.village_name|upper }}</span>
+                <span class="fw-800 text-navy small">{{ cluster.order_count }} Orders</span>
+            </div>
+            <div class="progress" style="height: 8px; border-radius: 10px; background-color: #f1f5f9;">
+                <div class="progress-bar {% if forloop.first %}bg-emerald{% else %}bg-primary{% endif %}" 
+                     role="progressbar" 
+                     style="width: {{ cluster.percentage }}%" 
+                     aria-valuenow="{{ cluster.percentage }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <p class="text-muted small">No cluster data available for this period.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>

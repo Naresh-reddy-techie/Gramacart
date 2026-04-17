@@ -1,0 +1,34 @@
+{
+  "id": "/",
+  "name": "GramaCart",
+  "short_name": "GramaCart",
+  "description": "All Essentials One Cart",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#00b359",
+  "icons": [
+    {
+      "src": "/static/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/images/logo.png",
+      "sizes": "1408x768",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GramaCart Desktop"
+    },
+    {
+      "src": "/static/images/logo.png",
+      "sizes": "1408x768",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "GramaCart Mobile"
+    }
+  ]
+}

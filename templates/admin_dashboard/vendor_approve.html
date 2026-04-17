@@ -1,0 +1,53 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-8 col-xl-7">
+            <div class="card shadow-lg rounded-3 border-0">
+                <div class="card-header bg-gradient text-white text-center py-4 rounded-3">
+                    <h3 class="fw-bold mb-0">Approve Vendor: {{ vendor.shop_name }}</h3>
+                </div>
+                <div class="card-body px-4 py-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="shop_name" class="form-label fw-semibold">Shop Name</label>
+                            <input type="text" id="shop_name" class="form-control" value="{{ vendor.shop_name }}" disabled>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <input type="email" id="email" class="form-control" value="{{ vendor.email }}" disabled>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" id="phone_number" class="form-control" value="{{ vendor.phone_number }}" disabled>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="address" class="form-label fw-semibold">Address</label>
+                            <input type="text" id="address" class="form-control" value="{{ vendor.door_number }} {{ vendor.street }}, {{ vendor.city }}, {{ vendor.state }} - {{ vendor.zipcode }}" disabled>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="role" class="form-label fw-semibold">Assign Role</label>
+                            <select id="role" name="role" class="form-control">
+                                <option value="vendor">Vendor</option>
+                                <option value="superuser">Superuser</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2">Approve Vendor</button>
+                            <a href="{% url 'vendor_list' %}" class="btn btn-secondary rounded-pill px-4 py-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

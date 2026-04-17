@@ -1,0 +1,79 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-8 col-xl-7">
+            <div class="card shadow-lg rounded-3 border-0">
+                <div class="card-header bg-gradient text-white text-center py-4 rounded-3">
+                    <h3 class="fw-bold mb-0">Edit Vendor: {{ vendor.shop_name }}</h3>
+                </div>
+                <div class="card-body px-4 py-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- Shop Name -->
+                        <div class="mb-4">
+                            <label for="shop_name" class="form-label fw-semibold">Shop Name</label>
+                            {{ form.shop_name }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            {{ form.email }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+                        
+                        <!-- Phone Number -->
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label fw-semibold">Phone Number</label>
+                            {{ form.phone_number }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+
+                        <!-- Address Fields -->
+                        <div class="mb-4">
+                            <label for="address" class="form-label fw-semibold">Address</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.door_number }}  <!-- Bootstrap class is already applied in forms.py -->
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.street }}  <!-- Bootstrap class is already applied in forms.py -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.city }}  <!-- Bootstrap class is already applied in forms.py -->
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.state }}  <!-- Bootstrap class is already applied in forms.py -->
+                                </div>
+                            </div>
+                            {{ form.mandal }}  <!-- Bootstrap class is already applied in forms.py -->
+                            {{ form.zipcode }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+
+                        <!-- Active -->
+                        <div class="mb-4">
+                            <label for="is_active" class="form-label fw-semibold">Active</label>
+                            {{ form.is_active }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+
+                        <!-- Role (Group) Selection -->
+                        <div class="mb-4">
+                            <label for="group" class="form-label fw-semibold">Assign Role</label>
+                            {{ form.group }}  <!-- Bootstrap class is already applied in forms.py -->
+                        </div>
+
+                        <!-- Save and Cancel buttons -->
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2">Save Changes</button>
+                            <a href="{% url 'vendor_list' %}" class="btn btn-secondary rounded-pill px-4 py-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

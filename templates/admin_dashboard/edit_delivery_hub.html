@@ -1,0 +1,147 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container-fluid py-4" style="background-color: #fcfdfa;">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'list_delivery_hubs' %}" class="btn btn-light rounded-circle shadow-sm me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="fw-900 text-dark mb-0">Edit Village Cluster</h2>
+                    <p class="text-muted mb-0">Adjusting the service area for <span class="text-success fw-bold">{{ hub.name }}</span></p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                        
+                        <form method="POST" novalidate id="editHubForm">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">Cluster Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-2 border-end-0"><i class="bi bi-pencil-square"></i></span>
+                                    <input type="text" name="name" id="id_name" class="form-control form-control-lg border-2 border-start-0" value="{{ form.name.value|default:'' }}" required>
+                                </div>
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="fw-bold small text-muted text-uppercase mb-2">Latitude</label>
+                                    <input type="number" step="any" name="latitude" id="id_latitude" class="form-control bg-light border-2" value="{{ form.latitude.value }}" readonly required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="fw-bold small text-muted text-uppercase mb-2">Longitude</label>
+                                    <input type="number" step="any" name="longitude" id="id_longitude" class="form-control bg-light border-2" value="{{ form.longitude.value }}" readonly required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">Delivery Range (Current)</label>
+                                <div class="input-group">
+                                    <input type="number" name="max_delivery_radius_km" id="id_max_delivery_radius_km" class="form-control border-2" value="{{ form.max_delivery_radius_km.value }}" required>
+                                    <span class="input-group-text bg-white border-2 fw-bold text-success">KM</span>
+                                </div>
+                                <div class="text-danger small">{{ form.max_delivery_radius_km.errors }}</div>
+                            </div>
+
+                            <div class="alert alert-warning border-0 rounded-4 small mb-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> 
+                                Changing coordinates will update the delivery zone for all customers in this cluster.
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg fw-900 rounded-pill py-3 shadow">
+                                    UPDATE HUB SETTINGS
+                                </button>
+                                <a href="{% url 'list_delivery_hubs' %}" class="btn btn-link text-muted fw-bold text-decoration-none">Discard Changes</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                        <div id="map" style="height: 100%; min-height: 550px;"></div>
+                        <div class="position-absolute top-0 end-0 m-3 z-index-1000">
+                            <button type="button" id="reCenterBtn" class="btn btn-white btn-sm shadow-sm border rounded-pill px-3">
+                                <i class="bi bi-geo-alt"></i> Reset to Original
+                            </button>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 m-3 z-index-1000">
+                            <div class="badge bg-primary p-2 rounded-3 shadow opacity-90">
+                                <i class="bi bi-arrows-move me-1"></i> Drag pin to relocate
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // 1. Get existing coordinates from form
+    const initialLat = parseFloat(document.getElementById('id_latitude').value);
+    const initialLng = parseFloat(document.getElementById('id_longitude').value);
+    const initialRadius = parseFloat(document.getElementById('id_max_delivery_radius_km').value);
+
+    // 2. Initialize Map
+    var map = L.map('map').setView([initialLat, initialLng], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    var marker = L.marker([initialLat, initialLng], {draggable: true}).addTo(map);
+    var circle = L.circle([initialLat, initialLng], {
+        color: '#0d6efd', // Primary blue for Edit mode
+        fillColor: '#0d6efd',
+        fillOpacity: 0.1,
+        radius: initialRadius * 1000
+    }).addTo(map);
+
+    function updateFormFields(lat, lng) {
+        document.getElementById('id_latitude').value = lat.toFixed(6);
+        document.getElementById('id_longitude').value = lng.toFixed(6);
+        marker.setLatLng([lat, lng]);
+        circle.setLatLng([lat, lng]);
+    }
+
+    // 3. Listeners
+    marker.on('dragend', function() {
+        const pos = marker.getLatLng();
+        updateFormFields(pos.lat, pos.lng);
+    });
+
+    map.on('click', function(e) {
+        updateFormFields(e.latlng.lat, e.latlng.lng);
+    });
+
+    document.getElementById('id_max_delivery_radius_km').addEventListener('input', function() {
+        circle.setRadius(this.value * 1000);
+    });
+
+    document.getElementById('reCenterBtn').addEventListener('click', function() {
+        updateFormFields(initialLat, initialLng);
+        map.panTo([initialLat, initialLng]);
+    });
+
+</script>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    #map { z-index: 1; }
+    .btn-white { background: white; color: #333; }
+    .z-index-1000 { z-index: 1000; }
+    .form-control:focus { border-color: #0d6efd; box-shadow: none; }
+    .input-group-text { border-color: #dee2e6; }
+</style>
+{% endblock %}

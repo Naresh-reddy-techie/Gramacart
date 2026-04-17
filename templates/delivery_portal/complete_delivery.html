@@ -1,0 +1,255 @@
+{% extends "delivery_portal/base.html" %}
+{% block title %}Verify Delivery #{{ delivery.order.order_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --gc-primary: #10b981;
+        --gc-dark: #0f172a;
+        --gc-danger: #ef4444;
+        --gc-soft-bg: #f8fafc;
+        --gc-accent: #3b82f6;
+    }
+
+    .mission-wrapper {
+        background: #ffffff;
+        border-radius: 40px 40px 0 0;
+        margin-top: -25px;
+        padding: 30px 24px 120px;
+        min-height: 95vh;
+        box-shadow: 0 -15px 50px rgba(0,0,0,0.1);
+    }
+
+    .alert-toast {
+        position: relative;
+        padding: 16px 45px 16px 20px;
+        border-radius: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        border: 1.5px solid transparent;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease-out;
+    }
+    .alert-error { background: #fee2e2; color: var(--gc-danger); border-color: #fecaca; }
+    .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    
+    @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .checklist-card {
+        background: var(--gc-soft-bg);
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        padding: 22px;
+        margin-bottom: 25px;
+    }
+    .item-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf2f7;
+    }
+    .item-line:last-child { border: none; }
+    .size-badge { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
+
+    .pay-card {
+        border-radius: 30px; padding: 25px; text-align: center;
+        margin-bottom: 30px; border: 2px solid;
+    }
+    .pay-unpaid { background: #fffbeb; border-color: #fef3c7; color: #92400e; }
+    .pay-paid { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
+
+    .utr-field {
+        background: #ffffff; border: 2px solid #e2e8f0; border-radius: 18px;
+        padding: 16px; font-weight: 800; text-align: center;
+        letter-spacing: 2px; font-size: 1.2rem; width: 100%; margin-bottom: 20px;
+    }
+    .otp-field {
+        width: 60px; height: 75px; border-radius: 18px; border: 2px solid #e2e8f0;
+        text-align: center; font-size: 1.8rem; font-weight: 900; background: #fff;
+    }
+    .btn-action {
+        background: var(--gc-dark); color: white; border-radius: 25px;
+        padding: 22px; width: 100%; font-weight: 900; border: none;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+    }
+    .btn-action:disabled { background: #cbd5e1; box-shadow: none; }
+    
+    .caps-label { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+    .step-badge { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 900; margin-bottom: 5px; display: inline-block; }
+    
+    .upi-copy-box {
+        background: #f1f5f9; padding: 12px; border-radius: 14px;
+        font-family: monospace; font-weight: bold; font-size: 14px; margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: var(--gc-dark); height: 80px;" class="d-flex align-items-center px-4">
+    <a href="javascript:history.back()" class="text-white text-decoration-none small fw-bold">
+        <i class="bi bi-chevron-left"></i> EXIT PROCESS
+    </a>
+</div>
+
+<div class="mission-wrapper">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast alert-{{ message.tags }}">
+                {{ message }}
+                <button type="button" class="btn-close-msg" onclick="this.parentElement.style.display='none'">&times;</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="text-center mb-4">
+        <span class="caps-label">Delivery Verification</span>
+        <h5 class="fw-900 m-0">#{{ delivery.order.order_number }}</h5>
+    </div>
+
+    <div class="checklist-card">
+        <span class="caps-label" style="color:#64748b">Check Bag Contents</span>
+        {% for item in delivery.order.items.all %}
+        <div class="item-line">
+            <div>
+                <div class="fw-bold text-dark">{{ item.product.name }}</div>
+                {% if item.product.size %}<div class="size-badge">SIZE: {{ item.product.size }}</div>{% endif %}
+            </div>
+            <div class="fw-900 text-primary">x{{ item.quantity }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="pay-card {% if upi_uri %}pay-unpaid{% else %}pay-paid{% endif %}">
+        <span class="caps-label" style="color: inherit; opacity: 0.7;">
+            {% if upi_uri %}UPI Payment PENDING{% else %}PRE-PAID ONLINE{% endif %}
+        </span>
+        <div class="display-5 fw-900 py-1">₹{{ delivery.order.total|floatformat:0 }}</div>
+        
+        {% if upi_uri %}
+            <div class="fw-bold small opacity-75 mt-1">⚠️ COLLECT PAYMENT</div>
+            <button type="button" class="btn btn-dark btn-sm rounded-pill px-4 mt-3 fw-bold" data-bs-toggle="modal" data-bs-target="#qrModal">
+                SHOW QR OPTIONS
+            </button>
+        {% endif %}
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="mainForm">
+        {% csrf_token %}
+
+        {% if upi_uri %}
+        <div class="mb-5">
+            <span class="step-badge">STEP 1</span>
+            <span class="caps-label text-dark">Transaction ID (UTR)</span>
+            <input type="text" name="transaction_id" id="id_utr" class="utr-field" 
+                   placeholder="12 Digit Number" maxlength="12"
+                   inputmode="numeric" oninput="valCheck()">
+        </div>
+        {% endif %}
+
+        <div class="mb-5">
+            <span class="step-badge">STEP 2</span>
+            <span class="caps-label text-dark">Handover Proof</span>
+            <div class="bg-light rounded-4 p-4 text-center border-2 border-dashed" onclick="document.getElementById('id_proof_photo').click()" style="cursor: pointer;">
+                <div id="preview-wrap">
+                    <i class="bi bi-camera-fill display-5 text-muted"></i>
+                    <div class="fw-bold text-muted small mt-2">TAKE PHOTO AT DOORSTEP</div>
+                </div>
+                <input type="file" name="proof_photo" id="id_proof_photo" accept="image/*" capture="environment" onchange="imgIn(this)" style="display:none;">
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <span class="step-badge">STEP 3</span>
+            <span class="caps-label text-dark text-center">Customer 4-Digit PIN</span>
+            <div class="d-flex justify-content-center gap-2 mt-2">
+                <input type="hidden" name="order_token" id="fullToken">
+                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
+                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
+                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
+                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-action shadow-lg mb-4" id="subBtn" disabled>
+            VERIFY & COMPLETE DELIVERY
+        </button>
+    </form>
+</div>
+
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered px-4">
+        <div class="modal-content rounded-5 border-0 shadow-lg">
+            <div class="modal-body text-center p-5">
+                <span class="caps-label">Scan to Pay</span>
+                <h5 class="fw-900 mb-4">GramaCart UPI</h5>
+                
+                {% if upi_qr_base64 %}
+                    <div class="p-3 bg-white border rounded-4 mb-3">
+                        <img src="data:image/png;base64,{{ upi_qr_base64 }}" class="img-fluid" style="max-height: 220px;">
+                    </div>
+                {% endif %}
+
+                {% if upi_uri %}
+                <a href="{{ upi_uri }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 shadow-sm">
+                    <i class="bi bi-phone-vibrate me-2"></i> OPEN IN APPS
+                </a>
+                {% endif %}
+
+                <div class="upi-copy-box">
+                    {{ upi_id|default:"UPI ID NOT FOUND" }}
+                </div>
+
+                <button type="button" class="btn btn-dark w-100 rounded-pill py-3 mt-4 fw-bold" data-bs-dismiss="modal">
+                    DONE, BACK TO VERIFY
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+    const cells = document.querySelectorAll('.d-cell');
+    const hidden = document.getElementById('fullToken');
+    const btn = document.getElementById('subBtn');
+    const utrField = document.getElementById('id_utr');
+    const photoInput = document.getElementById('id_proof_photo');
+
+    cells.forEach((cell, idx) => {
+        cell.addEventListener('input', (e) => {
+            if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
+            if (e.target.value && idx < cells.length - 1) cells[idx + 1].focus();
+            valCheck();
+        });
+        cell.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && idx > 0) cells[idx - 1].focus();
+        });
+    });
+
+    function imgIn(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('preview-wrap').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:18px; max-height:200px; object-fit:cover;">`;
+                valCheck();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function valCheck() {
+        let pinVal = "";
+        cells.forEach(c => pinVal += c.value);
+        hidden.value = pinVal;
+        const hasPhoto = photoInput.files.length > 0;
+        let utrValid = true;
+        if (utrField) {
+            utrValid = utrField.value.trim().length === 12;
+            utrField.style.borderColor = utrValid ? "#10b981" : "#e2e8f0";
+        }
+        btn.disabled = !(hasPhoto && pinVal.length === 4 && utrValid);
+    }
+</script>
+{% endblock %}

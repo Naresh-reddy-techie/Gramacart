@@ -1,0 +1,267 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in py-4">
+    <div class="col-12 col-xl-10">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-lg rounded-4 mb-4 p-3" role="alert" style="border-left: 5px solid {% if message.tags == 'success' %}#10b981{% else %}#ef4444{% endif %} !important; background: white;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-circle bg-{{ message.tags }} text-white shadow-sm">
+                            <i class="bi {% if message.tags == 'success' %}bi-check-lg{% else %}bi-exclamation-triangle{% endif %}"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-800 text-uppercase small text-navy">System Notification</h6>
+                            <p class="mb-0 small fw-600 text-muted">{{ message }}</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="d-flex align-items-center justify-content-between mb-4 px-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="node-icon shadow-emerald">
+                    <i class="bi bi-cpu-fill text-white fs-4"></i>
+                </div>
+                <div>
+                    <h4 class="fw-800 text-navy mb-0">{{ title }}</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item small"><a href="#" class="text-decoration-none text-muted">Finance</a></li>
+                            <li class="breadcrumb-item active small text-emerald fw-700" id="activeNodeText">NODE_CONFIG</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="text-end d-none d-md-block">
+                <span class="badge bg-white border text-navy rounded-pill px-3 py-2 shadow-sm fw-700">
+                    <i class="bi bi-hdd-network text-emerald me-1"></i> Operations v1.0.4
+                </span>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    
+                    <div class="col-lg-4 bg-navy p-4 p-md-5 text-white d-flex flex-column" style="background-color: #0a192f;">
+                        <div class="mb-5">
+                            <h5 class="fw-800 mb-3 text-white">Deployment Guide</h5>
+                            <div id="guideContent" class="animate-fade-in text-white-50">
+                                <p class="small">Select a payment gateway to view specific configuration requirements and security protocols.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto">
+                            <div class="p-3 rounded-4 mb-3 shadow-sm" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="extra-small fw-800 text-uppercase tracking-wider text-emerald">Security Status</span>
+                                    <div class="status-dot-small bg-emerald shadow-emerald-sm"></div>
+                                </div>
+                                <p class="mb-1 fw-700 text-white" style="font-size: 0.75rem;">Encryption: <span class="text-emerald">AES-256 Active</span></p>
+                                <p class="mb-0 text-white-50" style="font-size: 0.65rem; line-height: 1.4;">
+                                    All API keys and merchant secrets are hashed before being committed to the central Grama Cart vault.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8 p-4 p-md-5 bg-white">
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger border-0 rounded-4 mb-4 p-3 shadow-sm">
+                                <p class="fw-800 small mb-1 text-danger"><i class="bi bi-bug-fill me-2"></i> VALIDATION FAILED</p>
+                                {% for error in form.non_field_errors %}
+                                    <span class="small fw-600 text-muted">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <form method="post" id="nodeForm" novalidate>
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label class="label-premium">GATEWAY PROVIDER</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-layers-half text-emerald left-icon"></i>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+
+                            <div class="row g-3" id="dynamicFieldsContainer">
+                                {% for field in form.visible_fields %}
+                                    {% if field.name != 'name' %}
+                                        <div class="col-12 field-group {% if field.name not in basic_fields %}d-none{% endif %}" 
+                                             data-field-id="{{ field.name }}">
+                                            
+                                            <div class="d-flex justify-content-between">
+                                                <label class="label-premium" for="{{ field.id_for_label }}">
+                                                    {{ field.label }} 
+                                                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                </label>
+                                                {% if field.name == 'sort_order' %}
+                                                    <span class="extra-small text-muted fw-600" title="Lower number = Higher display priority">Display Priority</span>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if field.field.widget.input_type == "checkbox" %}
+                                                <div class="custom-switch-box">
+                                                    {{ field }}
+                                                    <span class="ms-2 fw-700 text-navy small">Live on Customer App</span>
+                                                </div>
+                                            {% else %}
+                                                <div class="input-group-custom">
+                                                    <i class="bi bi-dot dynamic-icon text-emerald"></i>
+                                                    <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                                                           name="{{ field.html_name }}" 
+                                                           id="{{ field.id_for_label }}"
+                                                           class="form-control-premium"
+                                                           placeholder="Configuring..."
+                                                           value="{{ field.value|default_if_none:'' }}">
+                                                </div>
+                                            {% endif %}
+
+                                            {% if field.errors %}
+                                                <div class="error-msg animate-fade-in text-danger mt-1">
+                                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ field.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-5 d-flex flex-column flex-md-row gap-3">
+                                <button type="submit" class="btn btn-emerald-node w-100 py-3 shadow-emerald">
+                                    COMMIT CONFIGURATION
+                                </button>
+                                <a href="{% url 'payment_methods_list' %}" class="btn btn-outline-secondary border-0 fw-700 py-3 px-4">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* TYPOGRAPHY & COLORS */
+    .text-navy { color: #0a192f; }
+    .bg-navy { background-color: #0a192f; }
+    .text-emerald { color: #10b981; }
+    .bg-emerald { background-color: #10b981; }
+    .extra-small { font-size: 0.7rem; }
+    .tracking-wider { letter-spacing: 1.5px; }
+    .text-white-50 { color: rgba(255, 255, 255, 0.6) !important; }
+
+    /* CUSTOM COMPONENTS */
+    .node-icon { width: 50px; height: 50px; background: #10b981; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+    .shadow-emerald { box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25); }
+    .status-dot-small { width: 8px; height: 8px; border-radius: 50%; }
+    .shadow-emerald-sm { box-shadow: 0 0 8px rgba(16, 185, 129, 0.8); }
+    .icon-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .bg-success { background-color: #10b981 !important; }
+    .bg-danger { background-color: #ef4444 !important; }
+
+    .label-premium { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+
+    .input-group-custom { position: relative; }
+    .input-group-custom .left-icon, .input-group-custom .dynamic-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); z-index: 5; font-size: 1.1rem; }
+
+    .form-control-premium, .form-select { 
+        padding: 14px 14px 14px 48px; 
+        border: 2px solid #f1f5f9; 
+        border-radius: 14px; 
+        background: #f8fafc; 
+        font-weight: 600; 
+        width: 100%; 
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+    .form-control-premium:focus, .form-select:focus { border-color: #10b981; background: white; outline: none; box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1); }
+
+    .custom-switch-box { background: #f8fafc; border: 2px solid #f1f5f9; padding: 12px 16px; border-radius: 14px; display: flex; align-items: center; }
+
+    .btn-emerald-node { background: #10b981; color: white; border: none; font-weight: 800; border-radius: 14px; letter-spacing: 1px; transition: 0.3s; }
+    .btn-emerald-node:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); }
+
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .d-none { display: none !important; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const methodSelect = document.querySelector('[name="name"]');
+    const fieldWrappers = document.querySelectorAll('.field-group');
+    const guideContent = document.getElementById('guideContent');
+    const activeNodeText = document.getElementById('activeNodeText');
+
+    const UI_SCHEMA = {
+        "upi": {
+            fields: ["upi_id", "payee_name"],
+            icons: { upi_id: "bi-qr-code-scan", payee_name: "bi-person-badge", sort_order: "bi-sort-numeric-down" },
+            placeholders: { upi_id: "example@ybl", payee_name: "GramaCart Hub Name", sort_order: "e.g. 1" },
+            guide: "<strong>UPI Node:</strong> Instant peer-to-peer settlement. Best for reducing transaction costs. Ensure the UPI ID is correct to avoid payment failure."
+        },
+        "phonepe": {
+            fields: ["merchant_id", "salt_key", "salt_index"],
+            icons: { merchant_id: "bi-building-up", salt_key: "bi-shield-lock-fill", salt_index: "bi-hash", sort_order: "bi-sort-numeric-down" },
+            placeholders: { merchant_id: "PGMMERCHANT...", salt_key: "099eb0cd-...", salt_index: "1", sort_order: "e.g. 2" },
+            guide: "<strong>PhonePe Node:</strong> Enterprise integration. Requires Salt Key v1 and Merchant ID from your PhonePe Business Dashboard."
+        },
+        "razorpay": {
+            fields: ["key_id", "key_secret"],
+            icons: { key_id: "bi-key-fill", key_secret: "bi-lock-fill", sort_order: "bi-sort-numeric-down" },
+            placeholders: { key_id: "rzp_live_...", key_secret: "••••••••••••", sort_order: "e.g. 3" },
+            guide: "<strong>Razorpay Node:</strong> Supports Credit/Debit cards. Use <em>rzp_live</em> keys for actual production transactions."
+        },
+        "cod": {
+            fields: [],
+            icons: { sort_order: "bi-sort-numeric-down" },
+            placeholders: { sort_order: "e.g. 5" },
+            guide: "<strong>COD Node:</strong> Cash on Delivery. Recommended for low-trust areas. Keep sort order high to show this option last."
+        }
+    };
+
+    const CORE_KEYS = ['display_name', 'is_active', 'sort_order'];
+
+    function updateDeploymentUI() {
+        const selected = methodSelect.value.toLowerCase();
+        const config = UI_SCHEMA[selected] || { fields: [], guide: "Select a provider." };
+
+        activeNodeText.innerText = selected.toUpperCase() + "_CONFIG";
+        guideContent.innerHTML = `<p class="small animate-fade-in text-white-50">${config.guide}</p>`;
+
+        fieldWrappers.forEach(wrap => {
+            const fieldName = wrap.getAttribute('data-field-id');
+            const input = wrap.querySelector('input:not([type="checkbox"])');
+            const icon = wrap.querySelector('.dynamic-icon');
+
+            if (CORE_KEYS.includes(fieldName) || config.fields.includes(fieldName)) {
+                wrap.classList.remove('d-none');
+                
+                if (input && config.placeholders[fieldName]) {
+                    input.placeholder = config.placeholders[fieldName];
+                }
+                if (icon && config.icons[fieldName]) {
+                    icon.className = `bi ${config.icons[fieldName]} dynamic-icon text-emerald`;
+                } else if (icon) {
+                    icon.className = `bi bi-gear-wide-connected dynamic-icon opacity-25`;
+                }
+            } else {
+                wrap.classList.add('d-none');
+            }
+        });
+    }
+
+    methodSelect.classList.add("form-select");
+    methodSelect.addEventListener('change', updateDeploymentUI);
+    updateDeploymentUI();
+});
+</script>
+{% endblock %}

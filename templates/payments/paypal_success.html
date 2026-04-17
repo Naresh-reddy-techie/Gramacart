@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Successful</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f8f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #ffffff;
+      max-width: 500px;
+      width: 90%;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #2e7d32;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .order-details {
+      margin-top: 1rem;
+      text-align: left;
+      background-color: #f0f7f4;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .order-details p {
+      margin: 0.3rem 0;
+    }
+
+    .btn-home {
+      display: inline-block;
+      margin-top: 1.5rem;
+      background-color: #2e7d32;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-home:hover {
+      background-color: #27662a;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .btn-home {
+        padding: 0.6rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Optional SVG Success Icon -->
+    <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M16 8l-5.5 5.5L8 11"></path>
+    </svg>
+
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your purchase.</p>
+
+    <div class="order-details">
+      <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+      <p><strong>Amount Paid:</strong> ₹{{ order.total }}</p>
+      <p><strong>Status:</strong> {{ order.status|capfirst }}</p>
+    </div>
+
+    <a href="{% url 'homepage' %}" class="btn-home">Continue Shopping</a>
+  </div>
+</body>
+</html>

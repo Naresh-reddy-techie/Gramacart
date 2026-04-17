@@ -1,0 +1,206 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+        <div class="messages-container mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-lg rounded-4 p-3" role="alert" 
+                     style="background: white; border-left: 5px solid {% if message.tags == 'success' %}#10b981{% else %}#ef4444{% endif %};">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="message-icon-circle bg-{{ message.tags }}-soft">
+                            <i class="bi {% if message.tags == 'success' %}bi-check-all{% else %}bi-exclamation-octagon{% endif %} fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-800 text-navy small">System Update</h6>
+                            <span class="text-muted extra-small fw-600">{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        ```
+
+
+
+
+<div class="container-fluid py-4 animate-fade-in">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 class="fw-900 text-navy mb-0">Logistics Tariffs</h3>
+                <span class="badge bg-emerald-soft text-emerald extra-small rounded-pill px-2">LIVE RATES</span>
+            </div>
+            <p class="text-muted small mb-0">Define delivery cost tiers, rider payouts, and hub margins based on distance.</p>
+        </div>
+        <a href="{% url 'add_shipping_cost' %}" class="btn btn-emerald-pro px-4 py-2 shadow-emerald">
+            <i class="bi bi-plus-lg me-2"></i> Create New Tier
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-5 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-navy text-white">
+                    <tr>
+                        <th class="ps-4 py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75">Delivery Hub</th>
+                        <th class="py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75">Distance Range</th>
+                        <th class="py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75">Total Cost</th>
+                        <th class="py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75 text-center">Rider Share</th>
+                        <th class="py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75 text-center">Platform Fee</th>
+                        <th class="pe-4 py-4 text-uppercase extra-small fw-800 tracking-wider opacity-75 text-end">Control</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    {% for cost in shipping_costs %}
+                    <tr class="cost-row">
+                        <td class="ps-4 py-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="hub-icon shadow-sm">
+                                    <i class="bi bi-geo-fill text-emerald"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-800 text-navy small text-uppercase">{{ cost.delivery_hub.name }}</h6>
+                                    <span class="text-muted extra-small">Operational Hub</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="py-4">
+                            <div class="distance-badge">
+                                <i class="bi bi-signpost-split-fill me-1"></i>
+                                {{ cost.min_distance_km }}km - {{ cost.max_distance_km }}km
+                            </div>
+                        </td>
+
+                        <td class="py-4">
+                            <span class="fw-900 text-navy">₹{{ cost.cost|floatformat:2 }}</span>
+                        </td>
+
+                        <td class="py-4 text-center">
+                            <span class="badge bg-light text-emerald fw-800 px-3 py-2 border-dashed-emerald">
+                                ₹{{ cost.rider_earning|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td class="py-4 text-center">
+                            <span class="badge bg-light text-navy fw-800 px-3 py-2">
+                                ₹{{ cost.platform_fee|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td class="pe-4 py-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'update_shipping_cost' cost.id %}" class="btn-tool" title="Modify Rates">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'delete_shipping_cost' cost.id %}" class="btn-tool-danger" 
+                                   onclick="return confirm('Decommission this rate tier?');" title="Remove Tier">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="empty-state-icon mb-3 opacity-25">
+                                <i class="bi bi-truck-flatbed fs-1 text-muted"></i>
+                            </div>
+                            <h6 class="fw-800 text-navy">No Logistics Tiers Found</h6>
+                            <p class="text-muted small">Hub costs are not configured yet. Set them up to begin deliveries.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    ```css
+    /* MESSAGE STYLING */
+    .bg-success-soft { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .bg-error-soft, .bg-danger-soft { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    .message-icon-circle {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .messages-container {
+        perspective: 1000px;
+    }
+
+    .alert {
+        animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    /* TYPOGRAPHY & COLORS */
+    .text-navy { color: #0a192f; }
+    .bg-navy { background-color: #0a192f; }
+    .text-emerald { color: #10b981; }
+    .bg-emerald-soft { background-color: rgba(16, 185, 129, 0.1); }
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .extra-small { font-size: 0.65rem; }
+
+    /* HUB ICON */
+    .hub-icon {
+        width: 38px; height: 38px;
+        background: #f8fafc; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* DISTANCE BADGE */
+    .distance-badge {
+        background: #f1f5f9; color: #475569;
+        font-size: 0.75rem; font-weight: 700;
+        padding: 6px 12px; border-radius: 8px;
+        display: inline-block;
+    }
+
+    /* CUSTOM BADGE STYLE */
+    .border-dashed-emerald {
+        border: 1px dashed #10b981;
+        color: #059669 !important;
+    }
+
+    /* BUTTONS */
+    .btn-emerald-pro {
+        background: #10b981; color: white; border: none; 
+        font-weight: 800; border-radius: 12px; transition: 0.3s;
+    }
+    .btn-emerald-pro:hover { 
+        background: #059669; transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-tool, .btn-tool-danger {
+        width: 34px; height: 34px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: 0.2s; text-decoration: none;
+    }
+    .btn-tool { background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; }
+    .btn-tool:hover { background: #0a192f; color: white; }
+    .btn-tool-danger { background: #fff1f2; border: 1px solid #fee2e2; color: #ef4444; }
+    .btn-tool-danger:hover { background: #ef4444; color: white; }
+
+    /* ANIMATION */
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

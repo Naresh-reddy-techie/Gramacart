@@ -1,0 +1,216 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="action-icon-circle shadow-sm">
+                        <i class="bi bi-box-seam-fill text-emerald"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-800 text-navy mb-0">Create New Product</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="{% url 'list_product' %}" class="text-muted text-decoration-none small fw-600">Inventory</a></li>
+                                <li class="breadcrumb-item active text-emerald small fw-800" aria-current="page">New Entry</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                <a href="{% url 'list_product' %}" class="btn btn-light border px-4 rounded-pill fw-700 small shadow-sm text-navy">
+                    <i class="bi bi-x-circle me-2"></i>Discard Draft
+                </a>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" novalidate id="productForm">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-white py-3 border-bottom border-light">
+                                <h5 class="mb-0 fw-800 text-navy"><i class="bi bi-pencil-square me-2 text-emerald"></i>General Information</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Product Display Name</label>
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-type"></i>
+                                        {{ form.name }}
+                                    </div>
+                                    {% if form.name.errors %}<div class="error-msg">{{ form.name.errors }}</div>{% endif %}
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label-custom">Detailed Description</label>
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between">
+                                <h5 class="mb-0 fw-800 text-navy"><i class="bi bi-images me-2 text-emerald"></i>Product Media</h5>
+                                <span class="badge bg-light text-muted fw-700 px-3 py-2 rounded-pill border">Max 5 Photos</span>
+                            </div>
+                            <div class="card-body p-4">
+                                {{ formset.management_form }}
+                                <div class="row g-3">
+                                    {% for image_form in formset %}
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="image-upload-wrapper">
+                                            <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                                            <p class="small text-muted fw-600 mb-2">Slot {{ forloop.counter }}</p>
+                                            {{ image_form.image }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-navy text-white overflow-hidden position-relative">
+                            <div class="card-body p-4 z-1">
+                                <h5 class="fw-800 mb-4"><i class="bi bi-tag-fill me-2 text-emerald"></i>Pricing & Units</h5>
+                                <div class="mb-4">
+                                    <label class="small fw-800 opacity-75">Cost Price</label>
+                                    <div class="input-group-custom dark">
+                                        <i class="bi bi-exclamation-triangle text-emerald"></i>
+                                        {{ form.cost_price}}
+                                    </div>
+                                    {% if form.cost_price.errors %}
+                                        <div class="error-msg">{{ form.cost_price.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="small fw-800 opacity-75">RETAIL PRICE (₹)</label>
+                                    <div class="input-group-custom dark">
+                                        <i class="bi bi-currency-rupee text-emerald"></i>
+                                        {{ form.price }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="small fw-800 opacity-75">UNIT SIZE (e.g. 1kg, 5L)</label>
+                                    <div class="input-group-custom dark">
+                                        <i class="bi bi-rulers text-emerald"></i>
+                                        {{ form.size }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="small fw-800 opacity-75">TOTAL STOCK</label>
+                                    <div class="input-group-custom dark">
+                                        <i class="bi bi-box-fill text-emerald"></i>
+                                        {{ form.stock_available }}
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="small fw-800 opacity-75">MIN STOCK LEVEL</label>
+                                    <div class="input-group-custom dark">
+                                        <i class="bi bi-exclamation-triangle text-emerald"></i>
+                                        {{ form.min_stock_level }}
+                                    </div>
+                                    {% if form.min_stock_level.errors %}
+                                        <div class="error-msg">{{ form.min_stock_level.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                          <div class="card-body p-4">
+                              <h5 class="fw-800 text-navy mb-4">
+                                  <i class="bi bi-diagram-3-fill me-2 text-emerald"></i>Classification
+                              </h5>
+                              
+                              <div class="mb-4">
+                                  <div class="d-flex justify-content-between align-items-center mb-2">
+                                      <label class="form-label-custom mb-0 text-uppercase extra-small fw-800 text-muted">Select Category</label>
+                                      
+                                      <a href="{% url 'add_category' %}" class="btn btn-sm btn-light border rounded-pill px-3 fw-700 extra-small text-navy">
+                                          <i class="bi bi-plus-lg text-emerald me-1"></i> Create New
+                                      </a>
+                                  </div>
+                                  
+                                  <div class="input-group-custom">
+                                      <i class="bi bi-folder2-open"></i>
+                                      {{ form.category }}
+                                  </div>
+                                  <p class="extra-small text-muted mt-2 fw-600 italic">* Can't find the category? Click "Create New" above.</p>
+                              </div>
+
+                              <hr class="my-4 border-light">
+
+                              <div class="form-check form-switch p-0 d-flex align-items-center justify-content-between">
+                                  <div>
+                                      <label class="fw-800 text-navy mb-0 small">VISIBLE IN APP</label>
+                                      <p class="text-muted extra-small mb-0 fw-600">Toggle to publish live to customers</p>
+                                  </div>
+                                  {{ form.is_active }}
+                              </div>
+                          </div>
+                      </div>
+
+                        <button type="submit" class="btn btn-emerald w-100 py-3 rounded-4 shadow-emerald fw-800 text-uppercase d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-rocket-takeoff-fill"></i> Launch Product
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CUSTOM STYLING FOR GRAMACART PREMIUM CONSOLE */
+    .bg-navy { background-color: #0f172a; }
+    .text-emerald { color: #00c853 !important; }
+    .btn-emerald { background-color: #00c853; color: white; border: none; transition: 0.3s; }
+    .btn-emerald:hover { background-color: #00e676; transform: translateY(-3px); }
+    .shadow-emerald { box-shadow: 0 10px 25px rgba(0, 200, 83, 0.3); }
+
+    .action-icon-circle {
+        width: 50px; height: 50px; background: white; border-radius: 15px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+
+    .form-label-custom { font-weight: 800; font-size: 12px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 0.5px; }
+
+    /* INPUT STYLING */
+    .input-group-custom { position: relative; width: 100%; }
+    .input-group-custom i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 10; font-size: 1.1rem; }
+    .input-group-custom input, .input-group-custom select, textarea {
+        width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 15px 12px 45px;
+        font-size: 14px; font-weight: 600; color: #1e293b; transition: all 0.2s;
+    }
+    textarea { padding-left: 15px; min-height: 120px; }
+    
+    /* DARK INPUTS (NAVY CARD) */
+    .input-group-custom.dark input { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: white; }
+    .input-group-custom.dark input:focus { background: rgba(255,255,255,0.1); border-color: #00c853; }
+
+    /* IMAGE UPLOAD SLOTS */
+    .image-upload-wrapper {
+        border: 2px dashed #cbd5e1; border-radius: 15px; padding: 20px; text-align: center;
+        background: #f8fafc; transition: 0.2s; cursor: pointer;
+    }
+    .image-upload-wrapper:hover { border-color: #00c853; background: rgba(0,200,83,0.02); }
+    .image-upload-wrapper input[type="file"] { font-size: 10px; width: 100%; }
+    .upload-icon { font-size: 1.5rem; color: #cbd5e1; margin-bottom: 5px; }
+
+    /* SWITCH CUSTOM */
+    .form-switch .form-check-input { width: 3em; height: 1.5em; background-color: #cbd5e1; cursor: pointer; }
+    .form-switch .form-check-input:checked { background-color: #00c853; border-color: #00c853; }
+
+    .extra-small { font-size: 10px; }
+    .fw-800 { font-weight: 800; }
+    .error-msg { color: #ef4444; font-size: 11px; font-weight: 700; margin-top: 5px; }
+</style>
+{% endblock %}

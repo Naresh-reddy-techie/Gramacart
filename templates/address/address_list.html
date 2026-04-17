@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GramaCart | My Addresses</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <style>
+        :root { --primary: #10B981; --navy: #0F172A; --bg: #F8FAFC; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--navy); margin: 0; padding-bottom: 100px; }
+
+        .header {
+            background: #fff; padding: 20px 20px; position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+        .header h2 { font-size: 20px; font-weight: 800; margin: 0; color: var(--navy); }
+        
+        /* Floating Add Button */
+        .btn-add-float {
+            position: fixed; bottom: 30px; right: 20px; z-index: 1001;
+            background: var(--primary); color: #fff; width: 60px; height: 60px;
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); text-decoration: none; font-size: 24px;
+        }
+
+        .address-grid { padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        
+        .address-card {
+            background: #fff; border-radius: 28px; padding: 20px; position: relative;
+            border: 1px solid #E2E8F0; transition: all 0.3s ease; overflow: hidden;
+        }
+        .address-card.default { border-color: var(--primary); background: #F0FDF4; }
+
+        .type-badge {
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            padding: 5px 12px; border-radius: 10px; background: #F1F5F9; color: #64748B;
+        }
+        .address-card.default .type-badge { background: var(--primary); color: white; }
+
+        .recipient-name { font-size: 18px; font-weight: 800; margin-top: 10px; display: block; }
+        .address-details { font-size: 13px; color: #64748B; line-height: 1.6; margin: 10px 0; font-weight: 500; }
+        
+        .address-map { height: 160px; border-radius: 20px; margin: 15px 0; border: 1px solid #E2E8F0; }
+
+        .delivery-status {
+            padding: 10px 15px; border-radius: 14px; font-size: 12px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .status-inside { background: #DCFCE7; color: #166534; }
+        .status-outside { background: #FEE2E2; color: #991B1B; }
+
+        .address-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; }
+        .action-btn { 
+            width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            background: #fff; border: 1px solid #E2E8F0; color: var(--navy); text-decoration: none; transition: 0.2s;
+        }
+        .action-btn.delete:hover { background: #FEF2F2; color: #EF4444; border-color: #FEE2E2; }
+        .action-btn.edit:hover { background: #F0FDF4; color: var(--primary); border-color: #DCFCE7; }
+        
+        .no-data { text-align: center; padding: 60px 20px; }
+        .no-data i { font-size: 50px; color: #CBD5E1; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'public_dashboard' %}" class="text-dark"><i class="bi bi-arrow-left fs-4"></i></a>
+        <h2>Saved Addresses</h2>
+    </div>
+    <span class="badge bg-light text-dark rounded-pill px-3 py-2 border fw-700" style="font-size: 11px;">
+        {{ addresses.count }} Total
+    </span>
+</div>
+
+<a href="{% url 'address_create' %}" class="btn-add-float">
+    <i class="bi bi-plus-lg"></i>
+</a>
+
+{% if addresses %}
+<div class="address-grid">
+    {% for address in addresses %}
+    <div class="address-card {% if address.is_default %}default{% endif %}">
+        <div class="address-actions">
+            <a href="{% url 'address_update' address.pk %}" class="action-btn edit"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'address_delete' address.pk %}" class="action-btn delete"><i class="bi bi-trash3"></i></a>
+        </div>
+
+        <span class="type-badge">
+            {% if address.address_type == 'home' %}<i class="bi bi-house-fill me-1"></i>{% endif %}
+            {{ address.get_address_type_display }}
+        </span>
+
+        <span class="recipient-name">{{ address.recipient_name }}</span>
+        
+        <div class="address-details">
+            <i class="bi bi-geo-alt-fill me-1"></i> {{ address.address_line }}<br>
+            <i class="bi bi-pin-map me-1"></i> {{ address.landmark }}, {{ address.city }}<br>
+            <i class="bi bi-telephone-fill me-1"></i> {{ address.phone_number }}
+        </div>
+
+        {% if address.latitude and address.longitude %}
+            <div id="map-{{ address.pk }}" class="address-map"></div>
+            <div id="status-{{ address.pk }}" class="delivery-status">
+                <div class="spinner-border spinner-border-sm" role="status"></div> Checking coverage...
+            </div>
+        {% else %}
+            <div class="delivery-status status-outside">
+                <i class="bi bi-exclamation-triangle-fill"></i> Location coordinates missing
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-data">
+    <i class="bi bi-geo-fill mb-3 d-block"></i>
+    <h5 class="fw-800">No Addresses Yet</h5>
+    <p class="text-muted small">Add an address to start ordering fresh village products!</p>
+    <a href="{% url 'address_create' %}" class="btn btn-primary rounded-pill px-4 fw-800 mt-2">Add New Address</a>
+</div>
+{% endif %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Your Hub Data (Dynamic from Context)
+const nearestHubs = [
+    {% for hub in nearest_hubs %}
+    {
+        lat: {{ hub.latitude }}, 
+        lon: {{ hub.longitude }}, 
+        radius: {{ hub.max_delivery_radius_km|default:7 }} * 1000, 
+        name: "{{ hub.name }}" 
+    },
+    {% endfor %}
+];
+
+// Map Marker Icons
+const userIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/1673/1673188.png',
+    iconSize: [35, 35],
+    iconAnchor: [17, 35]
+});
+
+const hubIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/609/609803.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30]
+});
+
+// Initialize each address map
+{% for address in addresses %}
+{% if address.latitude and address.longitude %}
+(function(){
+    const lat = {{ address.latitude }};
+    const lon = {{ address.longitude }};
+    const map = L.map('map-{{ address.pk }}', { zoomControl: false, attributionControl: false }).setView([lat, lon], 14);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+    // Add Hubs to Map
+    nearestHubs.forEach(hub => {
+        L.circle([hub.lat, hub.lon], {
+            radius: hub.radius,
+            color: '#10B981',
+            fillColor: '#10B981',
+            fillOpacity: 0.1,
+            weight: 1
+        }).addTo(map);
+        
+        L.marker([hub.lat, hub.lon], {icon: hubIcon}).addTo(map).bindPopup("Hub: " + hub.name);
+    });
+
+    // Add User Marker
+    L.marker([lat, lon], {icon: userIcon}).addTo(map);
+
+    // Calculate Coverage
+    const statusEl = document.getElementById('status-{{ address.pk }}');
+    let isDeliverable = false;
+
+    nearestHubs.forEach(hub => {
+        const distance = map.distance([lat, lon], [hub.lat, hub.lon]);
+        if(distance <= hub.radius) isDeliverable = true;
+    });
+
+    if(isDeliverable) {
+        statusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i> Serviceable Area';
+        statusEl.className = "delivery-status status-inside";
+    } else {
+        statusEl.innerHTML = '<i class="bi bi-x-circle-fill"></i> Outside Delivery Range';
+        statusEl.className = "delivery-status status-outside";
+    }
+})();
+{% endif %}
+{% endfor %}
+</script>
+
+</body>
+</html>

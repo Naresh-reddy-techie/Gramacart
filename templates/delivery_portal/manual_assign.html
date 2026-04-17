@@ -1,0 +1,23 @@
+{% extends 'admin_dashboard/base.html' %}
+{% block content %}
+
+<h3 class="mb-4">Assign Delivery #{{ delivery.id }}</h3>
+
+<div class="card p-4 shadow-sm" style="max-width:500px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.delivery_boy.label_tag }}
+            {{ form.delivery_boy }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Assign
+        </button>
+        <a href="{% url 'admin_delivery_list' %}" class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

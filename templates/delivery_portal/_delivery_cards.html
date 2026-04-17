@@ -1,0 +1,101 @@
+{% if d %}
+<div class="swiper delivery-swiper mb-4" id="swiper-{{ d.id }}">
+    <div class="swiper-wrapper">
+        
+        <div class="swiper-slide action-slide bg-success text-white">
+            <a href="tel:{{ d.order.address.phone_number }}" class="text-white text-decoration-none w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-telephone-fill fs-2"></i>
+                <span class="fw-bold small">CALL</span>
+            </a>
+        </div>
+
+        <div class="swiper-slide main-card-slide">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="border: 1px solid var(--ui-border) !important;">
+                
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-2 px-3">
+                    <span class="badge bg-dark rounded-pill">#{{ d.order.order_number|default:d.order.id }}</span>
+                    <div class="text-end">
+                        <small class="text-muted fw-bold d-block" style="font-size: 9px;">YOUR EARNING</small>
+                        <span class="text-success fw-900 fs-5">₹{{ d.rider_earning|default:"20" }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="fw-900 mb-0 text-uppercase">{{ d.order.address.recipient_name }}</h5>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> {{ d.order.address.city }}
+                            </p>
+                        </div>
+                        
+                        <div class="text-center px-2 py-1 rounded-3 {% if d.order.is_paid %}bg-success-subtle text-success{% else %}bg-warning-subtle text-dark{% endif %} border">
+                            <div class="extra-small fw-900">{% if d.order.is_paid %}PAID{% else %}COD{% endif %}</div>
+                            <div class="fw-900">₹{{ d.order.total_amount }}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-2 rounded-3 mb-3 border">
+                        <small class="text-muted fw-bold extra-small text-uppercase">Landmark</small>
+                        <div class="small fw-800 text-dark">
+                            <i class="bi bi-flag-fill text-warning"></i> {{ d.order.address.landmark|default:"Near Village Center" }}
+                        </div>
+                    </div>
+
+                    <div class="item-manifest mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <hr class="flex-grow-1 m-0 opacity-10">
+                            <small class="text-muted fw-bold text-uppercase" style="font-size: 10px; letter-spacing: 1px;">Items to Deliver</small>
+                            <hr class="flex-grow-1 m-0 opacity-10">
+                        </div>
+                        
+                        <div class="item-list" style="max-height: 150px; overflow-y: auto;">
+                            {% for item in d.order.items.all %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-white border rounded-2 text-center me-2" style="width: 32px; height: 32px; line-height: 32px;">
+                                        <span class="fw-900 text-primary small">{{ item.quantity }}x</span>
+                                    </div>
+                                    <div>
+                                        <div class="fw-800 small mb-0" style="line-height: 1;">{{ item.product.name }}</div>
+                                        <span class="badge bg-secondary-subtle text-muted fw-bold" style="font-size: 9px;">
+                                            {{ item.product_variant.size|default:"Standard Size" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-center text-muted extra-small">Check physical invoice for items</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if d.status == 'assigned' %}
+                            <a href="{% url 'delivery_pickup' d.id %}" class="btn-grama py-3 text-decoration-none text-center">
+                                <i class="bi bi-box-seam me-2"></i> CONFIRM PICKUP
+                            </a>
+                        {% elif d.status == 'out' %}
+                            <a href="{% url 'delivery_complete' d.id %}" class="btn btn-dark py-3 rounded-4 fw-900">
+                                <i class="bi bi-check2-circle me-2"></i> COMPLETE DROP
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="swiper-slide action-slide bg-primary">
+          <div class="swiper-slide action-slide bg-primary">
+        <a href="https://www.google.com/maps/dir/?api=1&destination={{ d.order.address.latitude }},{{ d.order.address.longitude }}&travelmode=two-wheeler" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="text-white text-decoration-none w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+            <i class="bi bi-compass-fill fs-2"></i>
+            <span class="fw-bold small">ROUTE</span>
+        </a>
+    </div>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,225 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: #f8fafc; min-height: 100vh;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'admin_customer_list' %}" class="btn btn-white border shadow-sm rounded-pill px-4 fw-800 text-navy">
+            <i class="bi bi-arrow-left me-2 text-emerald"></i> Back to Network
+        </a>
+        <div class="d-flex gap-2">
+            <button class="btn btn-white border shadow-sm rounded-pill fw-800 text-navy px-3">
+                <i class="bi bi-telephone-fill me-2 text-primary"></i> Call Customer
+            </button>
+            <button class="btn btn-navy shadow-sm rounded-pill fw-800 px-4">
+                <i class="bi bi-pencil-square me-2"></i> Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="p-4 text-center border-bottom bg-white border-top border-4 border-emerald">
+                    <div class="avatar-xl bg-emerald text-white mx-auto mb-3 shadow-emerald-sm">
+                        {{ customer.get_full_name|default:customer.username|slice:":1"|upper }}
+                    </div>
+                    <h4 class="fw-900 text-navy mb-1">{{ customer.get_full_name|default:customer.username }}</h4>
+                    <span class="badge bg-emerald-soft text-emerald rounded-pill fw-800 extra-small px-3">
+                        VILLAGE LOYALIST
+                    </span>
+                </div>
+
+                <div class="p-4 bg-white">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-4 text-center">
+                                <div class="extra-small fw-900 text-muted uppercase mb-1">Lifetime Value</div>
+                                <div class="fw-900 text-emerald fs-5">₹{{ total_spent|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-4 text-center">
+                                <div class="extra-small fw-900 text-muted uppercase mb-1">Avg Order</div>
+                                <div class="fw-900 text-navy fs-5">₹{{ avg_order|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="fw-800 text-navy extra-small uppercase mb-3 tracking-widest">Network Data</h6>
+                        <div class="list-group list-group-flush small">
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                                <span class="text-muted fw-700">Customer ID</span>
+                                <span class="text-navy fw-900">#GC-{{ customer.id }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                                <span class="text-muted fw-700">Joined Date</span>
+                                <span class="text-navy fw-900">{{ customer.date_joined|date:"d M, Y" }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                                <span class="text-muted fw-700">Success Rate</span>
+                                <span class="text-emerald fw-900">{{ success_rate|floatformat:0 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-top">
+                        <h6 class="fw-800 text-navy extra-small uppercase mb-3 tracking-widest">Primary Logistics</h6>
+                        {% if address %}
+                            <div class="d-flex gap-3 bg-faint-emerald p-3 rounded-4">
+                                <div class="icon-circle bg-emerald text-white">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div class="small fw-700 text-navy lh-sm">
+                                    {{ address.address_line }}<br>
+                                    <span class="text-emerald fw-800">{{ address.city|upper }}</span>, {{ address.pincode }}<br>
+                                    <span class="extra-small text-muted mt-1 d-block">PH: {{ address.phone_number }}</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center p-3 border border-dashed rounded-4">
+                                <p class="text-muted small fw-700 mb-0 italic">No Logistics Data Linked</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden border-top border-4 border-navy">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-900 text-navy mb-0">Order Chronology</h5>
+                    <span class="badge bg-navy text-white fw-800 rounded-pill px-3">{{ order_count }} TOTAL</span>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 fw-800 small text-muted uppercase py-3">Reference</th>
+                                <th class="fw-800 small text-muted uppercase">Timeline</th>
+                                <th class="fw-800 small text-muted uppercase">Status</th>
+                                <th class="fw-800 small text-muted uppercase">Amount</th>
+                                <th class="text-end pe-4 fw-800 small text-muted uppercase">Management</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td class="ps-4 fw-900 text-navy">#{{ order.order_number }}</td>
+                                <td class="small fw-700 text-muted">
+                                    {{ order.placed_at|date:"d M Y" }}
+                                    <div class="extra-small text-muted opacity-75">{{ order.placed_at|time:"h:i A" }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill 
+                                        {% if order.status == 'delivered' %}bg-emerald-soft text-emerald
+                                        {% elif order.status == 'cancelled' %}bg-danger-soft text-danger
+                                        {% else %}bg-primary-soft text-primary{% endif %} fw-800 extra-small px-2 py-1">
+                                        {{ order.get_status_display|upper }}
+                                    </span>
+                                </td>
+                                <td class="fw-900 text-navy">₹{{ order.total }}</td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-white border rounded-pill fw-800 px-3 shadow-sm"
+                                            data-bs-toggle="modal" data-bs-target="#orderModal{{ order.id }}">
+                                        View Details
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <div class="modal fade" id="orderModal{{ order.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                        <div class="modal-header border-bottom-0 pb-0">
+                                            <h5 class="fw-900 text-navy">Summary #{{ order.order_number }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="p-3 bg-light rounded-4 mb-4">
+                                                <div class="d-flex justify-content-between extra-small fw-900 text-muted mb-1">
+                                                    <span>DISPATCH HUB</span>
+                                                    <span class="text-navy">GRAMACART MAIN</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between extra-small fw-900 text-muted">
+                                                    <span>PAYMENT</span>
+                                                    <span class="text-emerald">COD VERIFIED</span>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="fw-800 text-navy extra-small uppercase mb-3 tracking-widest">Ordered Inventory</h6>
+                                            <div class="items-list">
+                                                {% for item in order.orders.all %} 
+                                                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light">
+                                                    <div>
+                                                        <div class="small fw-900 text-navy">{{ item.product.product_name }}</div>
+                                                        <div class="extra-small text-muted fw-700">QTY: {{ item.quantity }} × ₹{{ item.product.price }}</div>
+                                                    </div>
+                                                    <div class="small fw-900 text-navy text-end">
+                                                        ₹{{ item.get_total_price|default:item.total }}
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                                <div class="fw-900 text-navy fs-5">Payable Total</div>
+                                                <div class="fw-900 text-emerald fs-4">₹{{ order.total }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 p-3">
+                                            <button class="btn btn-navy w-100 rounded-3 fw-800 py-2 shadow-sm" data-bs-dismiss="modal">Close Manifest</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted fw-700 small italic">No order history found for this customer.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* TYPOGRAPHY */
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .text-navy { color: #0f172a; }
+    .bg-navy { background: #0f172a; }
+    .text-emerald { color: #10b981; }
+    .bg-emerald { background: #10b981; }
+    .bg-emerald-soft { background: rgba(16, 185, 129, 0.1); }
+    .bg-danger-soft { background: rgba(239, 68, 68, 0.1); }
+    .bg-primary-soft { background: rgba(13, 110, 253, 0.1); }
+    .bg-faint-emerald { background: rgba(16, 185, 129, 0.04); }
+    .extra-small { font-size: 0.65rem; }
+    .uppercase { text-transform: uppercase; }
+
+    /* AVATAR */
+    .avatar-xl {
+        width: 100px; height: 100px; border-radius: 24px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem; font-weight: 900;
+    }
+    .shadow-emerald-sm { box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+
+    /* UI ELEMENTS */
+    .icon-circle {
+        width: 32px; height: 32px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .btn-white { background: white; transition: 0.3s; }
+    .btn-white:hover { background: #f1f5f9; transform: translateY(-2px); }
+
+    .modal-content { overflow: hidden; }
+</style>
+{% endblock %}

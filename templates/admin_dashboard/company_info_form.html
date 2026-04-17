@@ -1,0 +1,183 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4 animate-fade-in">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 class="fw-900 text-navy mb-0">Global Ecosystem Settings</h3>
+                <span class="badge bg-navy text-white extra-small rounded-pill px-2">CORE CONFIG</span>
+            </div>
+            <p class="text-muted small mb-0">Update brand identity, contact protocols, and regional localization for Grama Cart.</p>
+        </div>
+        <div class="text-md-end">
+            <span class="text-muted extra-small d-block mb-1">Last Updated</span>
+            <span class="fw-700 text-navy small"><i class="bi bi-clock-history me-1"></i> {% now "d M Y, H:i" %}</span>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-3">
+                <i class="bi bi-check-circle-fill fs-5 text-emerald"></i>
+                <span class="fw-700 text-navy small">{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-5 p-4 h-100">
+                    <h5 class="fw-800 text-navy mb-4"><i class="bi bi-fingerprint me-2 text-emerald"></i>Brand Identity</h5>
+                    
+                    <div class="mb-4 text-center">
+                        <label class="form-label d-block text-start">Company Logo</label>
+                        <div class="logo-preview-container mb-3 mx-auto">
+                            {% if form.instance.logo %}
+                                <img src="{{ form.instance.logo.url }}" alt="Current Logo" class="img-fluid rounded-4 shadow-sm border" id="logo-preview" />
+                            {% else %}
+                                <div class="empty-logo-placeholder">
+                                    <i class="bi bi-image text-muted fs-1"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="custom-file-upload">
+                            {{ form.logo }}
+                            <small class="text-muted d-block mt-2">Transparent PNG recommended (Max 2MB)</small>
+                        </div>
+                        {% if form.logo.errors %}<div class="text-danger extra-small mt-1">{{ form.logo.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Legal Company Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger extra-small">{{ form.name.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label">Brand Tagline</label>
+                        {{ form.tagline }}
+                        {% if form.tagline.errors %}<div class="text-danger extra-small">{{ form.tagline.errors }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-5 p-4 mb-4">
+                    <h5 class="fw-800 text-navy mb-4"><i class="bi bi-geo-alt me-2 text-emerald"></i>Headquarters Location</h5>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Address Line 1</label>
+                            {{ form.address_line_1 }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address Line 2 (Optional)</label>
+                            {{ form.address_line_2 }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            {{ form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Pincode</label>
+                            {{ form.pincode }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-5 p-4">
+                    <h5 class="fw-800 text-navy mb-4"><i class="bi bi-envelope-at me-2 text-emerald"></i>Digital Presence</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Support Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Official Phone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-phone"></i></span>
+                                {{ form.phone }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Website URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-globe"></i></span>
+                                {{ form.website }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3">
+            <button type="reset" class="btn btn-light px-4 py-2 fw-700 rounded-3 text-muted">Discard Changes</button>
+            <button type="submit" class="btn btn-emerald-pro px-5 py-2 shadow-emerald">
+                <i class="bi bi-shield-check me-2"></i> Commit Global Settings
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Reuse your Navy/Emerald palette */
+    .text-navy { color: #0a192f; }
+    .text-emerald { color: #10b981; }
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .extra-small { font-size: 0.65rem; }
+
+    /* Form Styling */
+    .form-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .form-control { 
+        border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; 
+        font-size: 0.9rem; font-weight: 600; color: #0a192f; transition: 0.2s;
+    }
+    .form-control:focus { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+    
+    .input-group-text { border-radius: 10px 0 0 10px !important; border: 1px solid #e2e8f0; }
+    .input-group .form-control { border-radius: 0 10px 10px 0 !important; }
+
+    /* Logo Specifics */
+    .logo-preview-container {
+        width: 180px; height: 120px;
+        display: flex; align-items: center; justify-content: center;
+        background: #f8fafc; border-radius: 16px; overflow: hidden;
+    }
+    .empty-logo-placeholder { background: #f1f5f9; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    /* Button Styling */
+    .btn-emerald-pro {
+        background: #10b981; color: white; border: none; font-weight: 800; border-radius: 12px; transition: 0.3s;
+    }
+    .btn-emerald-pro:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+
+    .shadow-emerald { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+    // Simple preview for logo upload
+    document.querySelector('input[type="file"]').onchange = evt => {
+        const [file] = evt.target.files;
+        if (file) {
+            document.getElementById('logo-preview').src = URL.createObjectURL(file);
+        }
+    }
+</script>
+{% endblock %}

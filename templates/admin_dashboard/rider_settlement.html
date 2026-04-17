@@ -1,0 +1,68 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Rider Cash Settlement</h2>
+        <p class="text-muted">Manage COD handovers and rider commissions</p>
+    </div>
+    <div class="badge bg-primary-subtle text-primary p-2 px-3 rounded-pill">
+        <i class="bi bi-cash-stack me-2"></i>Live Financial Data
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Rider Partner</th>
+                        <th class="py-3">Cash in Hand (COD)</th>
+                        <th class="py-3">Pending Earnings</th>
+                        <th class="py-3">Net Collection</th>
+                        <th class="pe-4 py-3 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wallet in wallets %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm bg-info-subtle text-info rounded-circle p-2 me-3">
+                                    <i class="bi bi-person-badge fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">{{ wallet.user.get_full_name|default:wallet.user.username }}</h6>
+                                    <small class="text-muted">ID: #RC{{ wallet.user.id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-danger fw-bold">₹{{ wallet.cash_in_hand }}</td>
+                        <td class="text-success fw-bold">₹{{ wallet.pending_balance }}</td>
+                        <td>
+                            <span class="badge {% if wallet.net_to_collect > 0 %}bg-warning-subtle text-warning-emphasis{% else %}bg-success-subtle text-success-emphasis{% endif %} rounded-pill px-3">
+                                ₹{{ wallet.net_to_collect }}
+                            </span>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <form method="POST" action="{% url 'settle_rider_handover' wallet.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3" 
+                                        onclick="return confirm('Confirm you received ₹{{ wallet.net_to_collect }} from this rider?')">
+                                    Settle Account
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No active rider wallets found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

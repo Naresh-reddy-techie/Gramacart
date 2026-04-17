@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GramaCart | Checkout</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root { --emerald: #10B981; --navy: #0F172A; --bg: #F8FAFC; }
+        
+        body { 
+            background-color: var(--bg); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; padding: 0; color: var(--navy);
+        }
+
+        /* 1. STATUS HEADER (Matches Basket Page) */
+        .status-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: white; padding: 18px 20px;
+            z-index: 1000; border-bottom: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { margin: 0; font-weight: 800; font-size: 1.3rem; }
+        .header-title span { color: var(--emerald); font-size: 0.7rem; display: block; letter-spacing: 1px; }
+
+        .back-btn {
+            color: var(--navy); text-decoration: none; font-weight: 700; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* 2. MAIN CONTENT */
+        .checkout-container { margin-top: 85px; padding: 15px; padding-bottom: 240px; }
+        
+        .section-label { font-weight: 800; font-size: 0.9rem; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: block; }
+
+        .card-box {
+            background: white; border-radius: 20px; padding: 18px;
+            margin-bottom: 15px; border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* ADDRESS SELECTION */
+        .address-card {
+            border: 2px solid #f1f5f9; border-radius: 15px;
+            padding: 15px; margin-bottom: 10px; cursor: pointer;
+            transition: 0.2s; position: relative;
+        }
+        .address-card:hover { border-color: var(--emerald); }
+        .address-card.active {
+            border-color: var(--emerald);
+            background: #f0fffb;
+        }
+        .address-card strong { display: block; font-size: 1rem; margin-bottom: 4px; }
+        .address-card small { color: #64748b; font-weight: 500; line-height: 1.4; display: block; }
+        
+        .check-mark { 
+            position: absolute; top: 15px; right: 15px; 
+            color: var(--emerald); font-size: 1.2rem; display: none; 
+        }
+        .address-card.active .check-mark { display: block; }
+
+        .add-address-link {
+            display: flex; align-items: center; justify-content: center;
+            padding: 12px; border: 2px dashed #e2e8f0; border-radius: 15px;
+            text-decoration: none; color: #64748b; font-weight: 700; font-size: 0.85rem;
+        }
+
+        /* PAYMENT RADIO BUTTONS */
+        .payment-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+        }
+        .payment-option:last-child { border-bottom: none; }
+        .form-check-input:checked { background-color: var(--emerald); border-color: var(--emerald); }
+        .form-check-label { font-weight: 700; color: var(--navy); }
+
+        /* 3. ORDER SUMMARY BAR */
+        .checkout-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 20px;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+            z-index: 1001;
+        }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; color: #64748b; font-size: 0.85rem; }
+        .total-line { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.4rem; margin-top: 5px; margin-bottom: 15px; }
+
+        .btn-place {
+            background: var(--navy); color: white; width: 100%; padding: 18px;
+            border-radius: 18px; border: none; font-weight: 800; font-size: 1.1rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .amt-pill { background: var(--emerald); padding: 4px 12px; border-radius: 10px; font-size: 1rem; }
+    </style>
+</head>
+
+<body>
+
+<div class="status-header">
+    <div class="header-title">
+        <span>STEP 2 OF 3</span>
+        Checkout
+    </div>
+    <a href="{% url 'cart_view' %}" class="back-btn"><i class="bi bi-arrow-left"></i> Basket</a>
+</div>
+
+<div class="checkout-container">
+    <form method="POST" id="checkout-form">
+        {% csrf_token %}
+
+        <span class="section-label">Delivery Address</span>
+        <div class="card-box">
+            {% if user_addresses %}
+                {% for address in user_addresses %}
+                <div class="address-card" data-id="{{ address.id }}">
+                    <i class="bi bi-check-circle-fill check-mark"></i>
+                    <strong>{{ address.recipient_name }}</strong>
+                    <small>{{ address.address_line }}, {{ address.city }}</small>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <a href="{% url 'address_create' %}" class="add-address-link">
+                <i class="bi bi-plus-lg me-2"></i> Add New Address
+            </a>
+            <input type="hidden" name="address_id" id="address_id" required>
+        </div>
+
+        <span class="section-label">Payment Method</span>
+        <div class="card-box">
+            {% for method in payment_methods %}
+            <div class="payment-option">
+                <input class="form-check-input" type="radio" name="payment_method" id="pm{{ method.id }}" value="{{ method.id }}" required>
+                <label class="form-check-label" for="pm{{ method.id }}">{{ method.name }}</label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <span class="section-label">Price Details</span>
+        <div class="card-box">
+            <div class="summary-line"><span>Items Subtotal</span><span id="sub_total">₹{{ order_totals.sub_total }}</span></div>
+            <div class="summary-line"><span>Village Delivery Fee</span><span id="shipping_cost">₹{{ order_totals.shipping_cost }}</span></div>
+            <div class="summary-line"><span>Taxes</span><span id="taxes">₹{{ order_totals.taxes }}</span></div>
+        </div>
+
+        <div class="checkout-bar">
+            <div class="total-line">
+                <span>Total Amount</span>
+                <span id="total_amount">₹{{ order_totals.final_total }}</span>
+            </div>
+            <button type="submit" class="btn-place">
+                <span>Confirm Order</span>
+                <span class="amt-pill" id="btn-total">₹{{ order_totals.final_total }}</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // ADDRESS SELECTION LOGIC
+    document.querySelectorAll('.address-card').forEach(card => {
+        card.addEventListener('click', () => {
+            // UI Update
+            document.querySelectorAll('.address-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            
+            // Set Input Value
+            const addrId = card.dataset.id;
+            document.getElementById('address_id').value = addrId;
+
+            // AJAX Update Costs
+            fetch("{% url 'get_shipping_cost' %}?address_id=" + addrId)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('sub_total').textContent = "₹" + data.sub_total;
+                    document.getElementById('shipping_cost').textContent = "₹" + data.shipping_cost;
+                    document.getElementById('taxes').textContent = "₹" + data.taxes;
+                    document.getElementById('total_amount').textContent = "₹" + data.final_total;
+                    document.getElementById('btn-total').textContent = "₹" + data.final_total;
+                }
+            })
+            .catch(err => console.error(err));
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,279 @@
+{% extends "delivery_portal/base.html" %}
+{% load static %}
+{% block title %}Rider Pro | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --brand-success: #10B981;
+        --brand-warning: #F59E0B;
+        --brand-danger: #EF4444;
+        --brand-primary: #2563EB;
+        --ui-card: #ffffff;
+        --ui-border: #f1f5f9;
+        --ui-subtext: #64748b;
+    }
+
+    .dashboard-shell { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
+
+    /* Calendar Strip */
+    .calendar-strip {
+        display: flex; gap: 10px; overflow-x: auto; padding: 10px 2px;
+        scrollbar-width: none;
+    }
+    .calendar-strip::-webkit-scrollbar { display: none; }
+    
+    .date-card {
+        min-width: 62px; height: 75px; background: var(--ui-card);
+        border: 1px solid var(--ui-border); border-radius: 20px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: all 0.2s ease; cursor: pointer;
+    }
+    
+    .date-card.active {
+        background: var(--brand-success); border-color: var(--brand-success); color: white;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25); transform: translateY(-3px);
+    }
+    .date-card .day-name { font-size: 9px; font-weight: 800; text-transform: uppercase; opacity: 0.7; }
+    .date-card .day-num { font-size: 20px; font-weight: 900; }
+
+    .wallet-card {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white; border-radius: 28px; padding: 25px;
+        box-shadow: 0 15px 30px -10px rgba(30, 41, 59, 0.3);
+    }
+    .stat-box {
+        background: var(--ui-card); border: 1px solid var(--ui-border);
+        border-radius: 20px; padding: 15px 10px; text-align: center;
+    }
+    .stat-val { font-size: 20px; font-weight: 900; display: block; }
+    .stat-lbl { font-size: 9px; font-weight: 800; color: var(--ui-subtext); text-transform: uppercase; }
+
+    /* Radar Scanning Animation */
+    .scanning-wrapper { padding: 40px 20px; text-align: center; }
+    .radar-pulse {
+        width: 80px; height: 80px; background: rgba(16, 185, 129, 0.2);
+        border-radius: 50%; margin: 0 auto 20px; position: relative;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .radar-pulse::after {
+        content: ''; position: absolute; width: 100%; height: 100%;
+        border: 2px solid var(--brand-success); border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(2); opacity: 0; }
+    }
+
+    .view-switcher {
+        display: flex; background: #e2e8f0; padding: 4px; border-radius: 18px; margin: 20px 0;
+    }
+    .view-btn {
+        flex: 1; border: none; padding: 14px; border-radius: 14px;
+        font-weight: 800; font-size: 11px; color: var(--ui-subtext);
+        background: transparent; transition: 0.3s;
+    }
+    .view-btn.active { background: white; color: #1e293b; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    .order-card {
+        background: white; border-radius: 20px; padding: 15px;
+        border: 1px solid var(--ui-border); margin-bottom: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell px-3">
+    
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-1 px-1">
+        <span class="fw-800 text-muted" style="font-size: 11px; letter-spacing: 0.5px;">WEEKLY ACTIVITY</span>
+        <div class="d-flex align-items-center gap-2">
+            <span id="sync-indicator" class="text-success fw-900" style="font-size: 10px;">LIVE SYNC</span>
+        </div>
+    </div>
+
+    <div class="calendar-strip mb-4" id="calendar-strip"></div>
+
+    <div id="stats-container">
+        <div class="wallet-card mb-3">
+            <span class="small opacity-75 fw-bold text-uppercase" id="date-label">Today's Earnings</span>
+            <h1 class="fw-900 mb-0 mt-1" id="wallet-display">₹0</h1>
+        </div>
+
+        <div class="row g-2 mb-4">
+            <div class="col-4">
+                <div class="stat-box shadow-sm">
+                    <span class="stat-val text-success" id="stat-delivered">0</span>
+                    <span class="stat-lbl">Delivered</span>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-box shadow-sm">
+                    <span class="stat-val text-danger" id="stat-cancelled">0</span>
+                    <span class="stat-lbl">Rejected</span>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-box shadow-sm">
+                    <span class="stat-val text-primary" id="stat-cash">₹0</span>
+                    <span class="stat-lbl">COD Cash</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="view-switcher">
+        <button class="view-btn active" id="tab-radar" onclick="switchView('radar')">RADAR FEED</button>
+        <button class="view-btn" id="tab-duty" onclick="switchView('duty')">MY TASKS (<span id="duty-count">0</span>)</button>
+    </div>
+
+    <div id="view-radar">
+        <div id="radar-list">
+            <div class="scanning-wrapper">
+                <div class="radar-pulse"><i class="fa-solid fa-satellite-dish text-success fs-4"></i></div>
+                <p class="fw-bold text-muted small">Scanning for nearby village orders...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-duty" style="display: none;">
+        <div id="duty-list"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+    let currentSelectedDate = new Date().toISOString().split('T')[0];
+
+    // 1. Initialize Calendar
+    function renderCalendar() {
+        const strip = document.getElementById('calendar-strip');
+        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const today = new Date();
+        let html = '';
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(today.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const isToday = i === 0;
+
+            html += `
+                <div class="date-card ${isToday ? 'active' : ''}" 
+                     data-date="${dateStr}" 
+                     onclick="handleDateClick(this, '${dateStr}')">
+                    <span class="day-name">${days[d.getDay()]}</span>
+                    <span class="day-num">${d.getDate()}</span>
+                </div>`;
+        }
+        strip.innerHTML = html;
+    }
+
+    // 2. Click Handler
+    function handleDateClick(element, dateString) {
+        document.querySelectorAll('.date-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+        currentSelectedDate = dateString;
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('date-label').innerText = (dateString === todayStr) ? "Today's Earnings" : "Earnings for " + dateString;
+        
+        fetchDashboardData();
+    }
+
+    // 3. Core Data Fetching
+    async function fetchDashboardData() {
+        try {
+            // FIXED: Removed extra quote and ensured correct template tag usage
+            const res = await fetch("{% url 'check_new_orders' %}?date=" + currentSelectedDate);
+            const data = await res.json();
+
+            // Update Header Stats
+            document.getElementById('wallet-display').innerText = `₹${data.today_earnings}`;
+            document.getElementById('stat-delivered').innerText = data.orders_delivered;
+            document.getElementById('stat-cancelled').innerText = data.orders_cancelled;
+            document.getElementById('stat-cash').innerText = `₹${data.cash_to_pay}`;
+
+            renderRadar(data.orders);
+            renderTasks(data.assigned, data.out_deliveries);
+            
+            document.getElementById('duty-count').innerText = data.assigned.length + data.out_deliveries.length;
+
+        } catch (e) {
+            console.error("Dashboard Sync Error:", e);
+        }
+    }
+
+    function renderRadar(orders) {
+        const container = document.getElementById('radar-list');
+        if (!orders || orders.length === 0) {
+            container.innerHTML = `
+                <div class="scanning-wrapper">
+                    <div class="radar-pulse"><i class="fa-solid fa-satellite-dish text-success fs-4"></i></div>
+                    <p class="fw-bold text-muted small">No new orders found in your hub.</p>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        orders.forEach(order => {
+            html += `
+                <div class="order-card shadow-sm border-start border-success border-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-light text-dark mb-1">${order.hub_name}</span>
+                            <h6 class="fw-900 mb-0">TO: ${order.village}</h6>
+                        </div>
+                        <div class="text-end">
+                            <span class="d-block fw-900 text-success">₹${order.earnings}</span>
+                            <a href="${order.accept_url}" class="btn btn-success btn-sm fw-bold rounded-pill px-3 py-1 mt-1">ACCEPT</a>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderTasks(assigned, out) {
+        const container = document.getElementById('duty-list');
+        const total = [...assigned, ...out];
+        
+        if (total.length === 0) {
+            container.innerHTML = `<p class="text-center text-muted mt-5 small">No active tasks. Go to Radar to accept orders.</p>`;
+            return;
+        }
+
+        let html = '';
+        total.forEach(task => {
+            const isOut = task.status === 'out_for_delivery';
+            html += `
+                <div class="order-card shadow-sm border-start border-${isOut ? 'info' : 'primary'} border-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small fw-800 text-muted">#${task.order_number}</span>
+                        <span class="badge ${isOut ? 'bg-info text-dark' : 'bg-primary'}">${task.status.replace(/_/g, ' ').toUpperCase()}</span>
+                    </div>
+                    <h6 class="fw-900">${task.drop.name}</h6>
+                    <p class="small text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i> ${task.drop.village}</p>
+                    <div class="d-grid">
+                        <a href="/delivery_portal/pickup/${task.id}/" class="btn btn-dark btn-sm rounded-pill fw-bold">PROCEED TO PICKUP</a>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function switchView(view) {
+        document.getElementById('view-radar').style.display = view === 'radar' ? 'block' : 'none';
+        document.getElementById('view-duty').style.display = view === 'duty' ? 'block' : 'none';
+        document.getElementById('tab-radar').classList.toggle('active', view === 'radar');
+        document.getElementById('tab-duty').classList.toggle('active', view === 'duty');
+    }
+
+    // Run
+    renderCalendar();
+    fetchDashboardData();
+    setInterval(fetchDashboardData, 5000);
+</script>
+{% endblock %}

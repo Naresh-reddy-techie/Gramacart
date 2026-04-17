@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Order Confirmed | GramaCart</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root { --emerald: #10B981; --navy: #0F172A; --bg: #F8FAFC; --primary: #00b359; }
+        
+        body { 
+            background-color: var(--bg); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; padding: 0; color: var(--navy);
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+        }
+
+        .success-card {
+            background: white; width: 92%; max-width: 450px;
+            padding: 45px 30px; border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.1);
+            text-align: center; border: 1px solid rgba(241, 245, 249, 1);
+        }
+
+        /* ANIMATED CHECKMARK */
+        .check-container {
+            width: 100px; height: 100px; background: #ECFDF5;
+            color: var(--emerald); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; margin: 0 auto 25px;
+            position: relative;
+        }
+        
+        .check-container::after {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            border-radius: 50%; border: 2px solid var(--emerald);
+            animation: ripple 1.5s infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .order-tag {
+            background: #F1F5F9; color: #475569;
+            padding: 8px 16px; border-radius: 100px;
+            font-weight: 800; font-size: 0.8rem; display: inline-block;
+            margin-bottom: 20px; letter-spacing: 0.5px;
+        }
+
+        h1 { font-weight: 800; font-size: 1.8rem; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .sub-msg { color: #64748b; font-size: 1rem; margin-bottom: 30px; line-height: 1.6; }
+
+        /* PAYMENT BADGE */
+        .pay-badge {
+            background: #f8fafc; border: 1px dashed #cbd5e1;
+            padding: 12px; border-radius: 16px; margin-bottom: 30px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-weight: 700; font-size: 0.9rem;
+        }
+
+        /* ACTION BUTTONS */
+        .btn-stack { display: flex; flex-direction: column; gap: 14px; }
+        
+        .btn-track {
+            background: var(--navy); color: white; padding: 18px;
+            border-radius: 20px; text-decoration: none; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+            transition: transform 0.2s;
+        }
+        .btn-track:active { transform: scale(0.98); }
+
+        .btn-wa {
+            background: #25D366; color: white; padding: 18px;
+            border-radius: 20px; text-decoration: none; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .redirect-note { font-size: 0.85rem; color: #94a3b8; margin-top: 25px; font-weight: 600; }
+        #countdown { color: var(--navy); font-weight: 800; }
+    </style>
+</head>
+<body>
+
+<div class="success-card">
+    <div class="check-container">
+        <i class="bi bi-check-lg"></i>
+    </div>
+
+    <div class="order-tag">ORDER #{{ order.order_number }}</div>
+    
+    <h1>Placed Successfully!</h1>
+    <p class="sub-msg">Your village essentials are being prepared at the hub. We’ll notify you when the rider starts.</p>
+
+    <div class="pay-badge">
+        {% if order.is_paid %}
+            <i class="bi bi-shield-check text-success"></i> 
+            <span class="text-success">Payment of ₹{{ order.total }} Received</span>
+        {% else %}
+            <i class="bi bi-cash-stack text-warning"></i>
+            <span>Pay ₹{{ order.total }} on Delivery</span>
+        {% endif %}
+    </div>
+
+    <div class="btn-stack">
+        <a href="{% url 'track_order' order.id %}" class="btn-track">
+            Track Live Order <i class="bi bi-geo-alt-fill"></i>
+        </a>
+
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi GramaCart! I just placed Order #{{ order.order_number }}. Please help with the update." class="btn-wa">
+            <i class="bi bi-whatsapp"></i> Chat with Us
+        </a>
+    </div>
+
+    <div class="redirect-note">
+        Opening live tracker in <span id="countdown">5</span>s...
+    </div>
+</div>
+
+<script>
+    let seconds = 20;
+    const countEl = document.getElementById('countdown');
+
+    const timer = setInterval(() => {
+        seconds--;
+        countEl.textContent = seconds;
+        if(seconds <= 0) {
+            clearInterval(timer);
+            // Automatically take them to the live tracking map
+            window.location.href = "{% url 'track_order' order.id %}";
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>

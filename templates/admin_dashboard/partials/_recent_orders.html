@@ -1,0 +1,94 @@
+<div class="dashboard-card border-0 shadow-sm mt-4 bg-white rounded-4 overflow-hidden">
+    <div class="d-flex justify-content-between align-items-center p-4">
+        <div>
+            <h6 class="fw-800 text-navy mb-1">Recent Logistics Feed</h6>
+            <p class="text-muted extra-small mb-0">Live delivery status across Krishna District clusters</p>
+        </div>
+        <a href="{% url 'admin_orders' %}" class="btn btn-light btn-sm rounded-pill fw-800 px-3 border">
+            View All <i class="bi bi-chevron-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr class="bg-light">
+                    <th class="ps-4 py-3 text-muted extra-small fw-800 ls-wide">ORDER ID</th>
+                    <th class="py-3 text-muted extra-small fw-800 ls-wide">CUSTOMER / CLUSTER</th>
+                    <th class="py-3 text-muted extra-small fw-800 ls-wide">BILLING</th>
+                    <th class="py-3 text-muted extra-small fw-800 ls-wide">STATUS</th>
+                    <th class="pe-4 py-3 text-end text-muted extra-small fw-800 ls-wide">ACTION</th>
+                </tr>
+            </thead>
+            <tbody class="border-top-0">
+                {% if recent_orders %}
+                    {% for order in recent_orders %}
+                    <tr class="hover-bg-light transition-all">
+                        <td class="ps-4">
+                            <span class="fw-800 text-primary">#{{ order.id }}</span>
+                            <div class="text-muted extra-small fw-600">{{ order.created_at|timesince }} ago</div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-sm bg-navy text-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 36px; height: 36px; font-size: 12px;">
+                                    {{ order.customer.name|default:"?"|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-800 text-navy small mb-0">{{ order.customer.name|default:"Walk-in Customer" }}</div>
+                                    <div class="text-emerald extra-small fw-700">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>{{ order.delivery_hub.name|default:"Main Hub" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-900 text-navy">₹{{ order.total_amount|floatformat:0 }}</div>
+                            <div class="badge bg-light text-muted border-0 extra-small fw-700">{{ order.payment_method|upper }}</div>
+                        </td>
+                        <td>
+                            {% if order.status == 'started' or order.status == 'shipped' %}
+                                <span class="badge bg-emerald-subtle text-emerald border border-emerald-subtle rounded-pill px-3 py-2 fw-800">
+                                    <span class="spinner-grow spinner-grow-sm me-1" style="width: 8px; height: 8px;"></span> IN-TRANSIT
+                                </span>
+                            {% elif order.status == 'pending' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fw-800">PENDING</span>
+                            {% elif order.status == 'delivered' %}
+                                <span class="badge bg-blue-subtle text-primary border border-blue-subtle rounded-pill px-3 py-2 fw-800">COMPLETED</span>
+                            {% elif order.status == 'canceled' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 fw-800">CANCELLED</span>
+                            {% else %}
+                                <span class="badge bg-light text-muted border rounded-pill px-3 py-2 fw-800">{{ order.status|upper }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                {% if order.status == 'started' or order.status == 'shipped' %}
+                                <a href="{% url 'admin_live_tracking' order.id %}" class="btn btn-white btn-sm border shadow-sm rounded-3 text-emerald" title="Track Rider">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-white btn-sm border shadow-sm rounded-3" title="View Details">
+                                    <i class="bi bi-eye-fill text-navy"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-inbox display-6 text-muted d-block mb-3"></i>
+                            <p class="text-muted fw-700">No recent orders found</p>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .ls-wide { letter-spacing: 0.05em; }
+    .hover-bg-light:hover { background-color: #fcfdfe; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+</style>

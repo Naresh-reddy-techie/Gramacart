@@ -1,0 +1,131 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <a href="{% url 'delivery_boy_list' %}" class="text-decoration-none text-muted small d-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Back to Fleet List
+        </a>
+        <h2 class="fw-900 text-navy mt-2">Onboard New Partner</h2>
+        <p class="text-muted">Register a new rider to a specific Village Hub.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <div class="bg-navy p-1"></div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-shield-lock me-2 text-primary"></i>Login Credentials
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-at"></i></span>
+                                    <input type="text" name="username" class="form-control border-start-0 ps-0" placeholder="e.g. kaza_rider_01" required>
+                                </div>
+                                <div class="form-text">This will be used for mobile app login.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key"></i></span>
+                                    <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-5">
+                                <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-person-vcard me-2 text-emerald"></i>Personal Information
+                                </h5>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">First Name</label>
+                                <input type="text" name="first_name" class="form-control" placeholder="Enter first name">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" placeholder="Enter last name">
+                            </div>
+
+                            <div class="col-12 mt-5">
+                                <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-geo-alt me-2 text-warning"></i>Hub Assignment
+                                </h5>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Assigned Village Hub</label>
+                                <select name="hub" class="form-select" required>
+                                    <option value="" selected disabled>Select a Hub...</option>
+                                    {% for hub in hubs %}
+                                        <option value="{{ hub.id }}">
+                                            {{ hub.name }} — Radius: {{ hub.max_delivery_radius_km }}km 
+                                            {% if not hub.is_accepting_orders %}(Busy){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" checked>
+                                    <label class="form-check-label fw-bold text-navy" for="isActive">Set as Active Fleet Member</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 d-flex gap-3">
+                            <button type="submit" class="btn btn-emerald px-5 py-2 fw-bold shadow-sm">
+                                <i class="bi bi-check-circle-fill me-2"></i>Complete Registration
+                            </button>
+                            <a href="{% url 'delivery_boy_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-navy { background-color: #1e293b; }
+    .text-navy { color: #1e293b; }
+    .text-emerald { color: #10B981; }
+    .fw-900 { font-weight: 900; }
+    
+    /* Button Style */
+    .btn-emerald { background: #10B981; color: white; border-radius: 8px; border: none; transition: 0.3s; }
+    .btn-emerald:hover { background: #059669; color: white; transform: translateY(-2px); }
+
+    /* Form Design */
+    .form-label { color: #64748b; letter-spacing: 0.5px; }
+    .form-control, .form-select {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #10B981;
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.05);
+    }
+    .input-group-text { border-color: #e2e8f0; color: #94a3b8; }
+
+    /* Switch Customization */
+    .form-check-input:checked { background-color: #10B981; border-color: #10B981; }
+</style>
+{% endblock %}

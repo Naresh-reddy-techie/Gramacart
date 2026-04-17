@@ -1,0 +1,242 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #f8fafc; min-height: 100vh;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-800 text-dark mb-1" style="letter-spacing: -1px;">Live Inventory</h2>
+            <p class="text-muted small fw-600">Track stock levels, monitor wastage, and manage your village hub supply.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'add_product' %}" class="btn btn-primary shadow-sm px-4 fw-700 rounded-3">
+                <i class="bi bi-plus-lg me-2"></i>New Product
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+        <form method="GET" class="row g-2">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search product name..." value="{{ request.GET.q|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select border-light fw-600" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"i" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-dark w-100 fw-700">Filter</button>
+                    <a href="{% url 'live_inventory' %}" class="btn btn-light border w-100 fw-700">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-primary border-4">
+                <div class="small fw-700 text-muted text-uppercase mb-1">Total Inventory Value</div>
+                <div class="h3 fw-800 mb-0 text-dark">₹{{ total_inventory_value|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-warning border-4">
+                <div class="small fw-700 text-muted text-uppercase mb-1">Low Stock Alerts</div>
+                <div class="h3 fw-800 mb-0 text-warning">{{ low_stock_count }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-danger border-4">
+                <div class="small fw-700 text-muted text-uppercase mb-1">Out of Stock</div>
+                <div class="h3 fw-800 mb-0 text-danger">{{ out_of_stock_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted fw-700 small">PRODUCT DETAILS</th>
+                        <th class="text-muted fw-700 small">STOCK LEVEL</th>
+                        <th class="text-muted fw-700 small">STATUS</th>
+                        <th class="text-center text-muted fw-700 small">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                    {% if product.product_images.first %}
+                                        <img src="{{ product.product_images.first.image.url }}" class="rounded-3 w-100 h-100 object-fit-cover">
+                                    {% else %}
+                                        <i class="bi bi-box-seam text-muted"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-800 text-dark mb-0">{{ product.name }}</div>
+                                    <span class="text-muted extra-small fw-600">{{ product.category.name }} • {{ product.size }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="fw-800 {% if product.stock_available <= product.min_stock_level %}text-danger{% else %}text-dark{% endif %}">
+                                {{ product.stock_available }} units
+                            </div>
+                            <div class="extra-small text-muted fw-600">Min. Threshold: {{ product.min_stock_level }}</div>
+                        </td>
+
+                        <td>
+                            {% if product.stock_available <= 0 %}
+                                <span class="badge rounded-pill bg-danger-subtle text-danger px-3">OUT OF STOCK</span>
+                            {% elif product.stock_available <= product.min_stock_level %}
+                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3">LOW STOCK</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3">HEALTHY</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn btn-sm btn-dark rounded-pill px-3 fw-700 shadow-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ product.id }}">
+                                    Update Stock
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill px-2 fw-700" data-bs-toggle="modal" data-bs-target="#minStockModal{{ product.id }}">
+                                    <i class="bi bi-bell-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="restockModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 rounded-4 shadow">
+                                <form method="POST" action="{% url 'restock_product' product.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="fw-800 text-dark">Stock Adjustment: {{ product.name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="p-3 bg-light rounded-4 mb-3 d-flex justify-content-between align-items-center border">
+                                            <div>
+                                                <div class="small fw-700 text-muted text-uppercase mb-1" style="font-size: 10px;">Current Balance</div>
+                                                <div class="fw-800 h5 mb-0">{{ product.stock_available }} Units</div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger fw-800 rounded-3 px-3" 
+                                                    onclick="document.getElementById('amt_{{ product.id }}').value = -{{ product.stock_available }}; document.getElementById('reason_{{ product.id }}').value = 'WASTAGE';">
+                                                Zero Out (Expired)
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label small fw-700 text-muted">Amount to Add or Subtract</label>
+                                                <input type="number" name="change_amount" id="amt_{{ product.id }}" class="form-control rounded-3 fw-700 p-3" placeholder="Example: 50 or -10" required>
+                                                <div class="extra-small text-muted mt-1 px-1">Tip: To remove stock, use a minus sign (e.g., -5).</div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small fw-700 text-muted">Category of Adjustment</label>
+                                                <select name="reason" id="reason_{{ product.id }}" class="form-select rounded-3 fw-600 p-3">
+                                                    <option value="RESTOCK">Regular Restock (Added)</option>
+                                                    <option value="WASTAGE">Wastage / Expired / Damaged</option>
+                                                    <option value="RETURN">Customer Return</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small fw-700 text-muted">Admin Note (Optional)</label>
+                                                <textarea name="note" class="form-control rounded-3" rows="2" placeholder="Describe why this change is happening..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="submit" class="btn btn-primary w-100 rounded-3 fw-800 p-3 shadow-sm">Save Changes & Sync Inventory</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="minStockModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content border-0 rounded-4 shadow">
+                                <form method="POST" action="{% url 'update_min_stock' product.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header border-0 pb-0 text-center">
+                                        <h6 class="fw-800 w-100 text-uppercase text-muted" style="letter-spacing: 1px;">Safety Alert Level</h6>
+                                    </div>
+                                    <div class="modal-body text-center pt-0">
+                                        <p class="text-muted extra-small fw-600 mb-3">Notify me when <b>{{ product.name }}</b> falls below this level:</p>
+                                        <input type="number" name="min_level" class="form-control text-center fw-800 rounded-3 border-warning p-3 mb-2" value="{{ product.min_stock_level }}">
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="submit" class="btn btn-warning w-100 rounded-pill fw-800 shadow-sm">Update Alert Level</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <div class="py-4">
+                                <i class="bi bi-search display-4 text-muted"></i>
+                                <p class="text-muted mt-3 fw-600">No products match your search or filters.</p>
+                                <a href="{% url 'live_inventory' %}" class="btn btn-sm btn-light border fw-700">Clear All Filters</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if products.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center p-3 bg-light border-top">
+            <span class="small fw-700 text-muted">Showing {{ products.start_index }}-{{ products.end_index }} of {{ products.paginator.count }}</span>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link border-0 rounded-circle mx-1 shadow-sm text-dark" href="?page={{ products.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"><i class="bi bi-chevron-left"></i></a>
+                    </li>
+                    {% endif %}
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link border-0 rounded-circle mx-1 shadow-sm text-dark" href="?page={{ products.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"><i class="bi bi-chevron-right"></i></a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .fw-600 { font-weight: 600; }
+    .extra-small { font-size: 0.65rem; }
+    .bg-success-subtle { background-color: #dcfce7 !important; color: #15803d !important; }
+    .bg-warning-subtle { background-color: #fef9c3 !important; color: #854d0e !important; }
+    .bg-danger-subtle { background-color: #fee2e2 !important; color: #b91c1c !important; }
+    .badge { font-weight: 800; font-size: 0.65rem; padding: 0.5em 1em; }
+    .table-hover tbody tr:hover { background-color: #f1f5f9; cursor: pointer; }
+    .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1); }
+</style>
+{% endblock %}

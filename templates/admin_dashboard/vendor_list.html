@@ -1,0 +1,49 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Registered Vendor List</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Vendor Name</th>
+                <th>Shop Name</th>
+                <th>City</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendor in vendors %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ vendor.user.username }}</td> <!-- Display vendor's username -->
+                <td>{{ vendor.shop_name }}</td> <!-- Display shop name -->
+                <td>{{ vendor.city }}</td> <!-- Display vendor's city -->
+                <td>
+                    {% if vendor.status == 'Rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% elif vendor.is_active %}
+                        <span class="badge bg-success">Approved</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Action buttons: Approve, Reject, View Details -->
+                    <a href="{% url 'approve_vendor' vendor.id %}" class="btn btn-success btn-sm">Approve</a>
+                    <a href="{% url 'reject_vendor' vendor.id %}" class="btn btn-danger btn-sm">Reject</a>
+                    <a href="{% url 'vendor_details' vendor.id %}" class="btn btn-info btn-sm">View Details</a>
+                    <a href="{% url 'edit_vendor' vendor.id %}" class="btn btn-warning btn-sm">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No registered vendors found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

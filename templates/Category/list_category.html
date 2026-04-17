@@ -1,0 +1,114 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: #ffffff; min-height: 100vh;">
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="p-4 rounded-4 border-dashed text-center" style="border: 2px dashed #e2e8f0; background: #f8fafc;">
+                <h4 class="fw-800 text-dark mb-3">Create a New Category</h4>
+                <form method="post" action="{% url 'add_category' %}" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="text" name="name" class="form-control form-control-lg rounded-3 shadow-sm" 
+                           placeholder="Type category name here (e.g. Fresh Milk)..." required autofocus>
+                    <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold shadow">
+                        <i class="bi bi-plus-lg"></i> ADD
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-800 mb-0"><i class="bi bi-list-stars me-2"></i>Existing Categories</h5>
+                <div class="search-box">
+                    <input type="text" id="simpleSearch" class="form-control form-control-sm rounded-pill px-3" placeholder="Search categories...">
+                </div>
+            </div>
+
+            <div class="table-responsive shadow-sm rounded-4 border">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th class="ps-4 py-3">Category Name</th>
+                            <th class="py-3 text-center">Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryList">
+                        {% for category in categories %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold fs-5 text-dark">{{ category.name }}</span>
+                                <br><small class="text-muted">ID: #{{ category.id }}</small>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-outline-primary btn-sm px-3 me-2 fw-bold" 
+                                        onclick="openEditModal('{{ category.id }}', '{{ category.name }}', '{% url 'edit_category' category.id %}')">
+                                    <i class="bi bi-pencil-square"></i> EDIT
+                                </button>
+                                
+                                <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold" 
+                                            onclick="return confirm('Are you 100% sure you want to delete this?');">
+                                        <i class="bi bi-trash"></i> DELETE
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if categories.has_other_pages %}
+            <div class="mt-4 d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination pagination-lg shadow-sm">
+                        {% if categories.has_previous %}
+                        <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ categories.previous_page_number }}">&laquo; Previous</a></li>
+                        {% endif %}
+
+                        {% for i in categories.paginator.page_range %}
+                            {% if categories.number == i %}
+                                <li class="page-item active"><span class="page-link border-0 bg-dark text-white fw-bold">{{ i }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if categories.has_next %}
+                        <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ categories.next_page_number }}">Next &raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+    .border-dashed { border-style: dashed !important; }
+    .page-link { margin: 0 5px; border-radius: 8px !important; }
+    .search-box input:focus { border-color: #0d6efd; box-shadow: none; }
+    table thead th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+
+<script>
+    // The simplest search possible
+    document.getElementById('simpleSearch').addEventListener('keyup', function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#categoryList tr");
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+        });
+    });
+</script>
+
+{% include "Category/category_modals.html" %}
+{% endblock %}

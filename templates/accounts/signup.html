@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GramaCart | Create Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --emerald: #00c853;
+            --navy: #0f172a;
+            --bg-gray: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-gray);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 40px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 460px;
+            padding: 50px 45px;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        /* --- BRANDING (Same as Sign-In) --- */
+        .brand {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 50px; height: 50px;
+            background: var(--navy);
+            color: var(--emerald);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0 auto 15px;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--navy);
+            letter-spacing: -1.5px;
+        }
+        .brand-name span { color: var(--emerald); }
+
+        /* --- FORM ELEMENTS --- */
+        .field-wrap {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--navy);
+            margin-bottom: 6px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        /* Input Icons */
+        .field-icon {
+            position: absolute;
+            left: 18px;
+            top: 38px;
+            color: #94a3b8;
+            font-size: 14px;
+            z-index: 5;
+        }
+
+        .field-wrap input, .field-wrap select {
+            width: 100%;
+            padding: 12px 18px 12px 48px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #fcfdfe;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .field-wrap input:focus {
+            outline: none;
+            border-color: var(--emerald);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 200, 83, 0.08);
+        }
+
+        /* --- BUTTON --- */
+        .btn-signup {
+            background: var(--emerald);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 15px;
+            box-shadow: 0 10px 20px rgba(0, 200, 83, 0.15);
+        }
+
+        .btn-signup:hover {
+            background: #00a846;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 200, 83, 0.2);
+        }
+
+        .form-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .form-footer a {
+            color: var(--emerald);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* --- MODAL STYLING --- */
+        .modal-content { border-radius: 24px; border: none; overflow: hidden; }
+        .modal-header { border: none; padding: 25px 25px 10px; }
+        .modal-body { padding: 10px 25px 30px; font-weight: 500; }
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="brand">
+            <div class="brand-icon">GC</div>
+            <h1 class="brand-name">GRAMA<span>CART</span></h1>
+            <p class="small text-muted fw-600">Create System Account</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in signupform %}
+                <div class="field-wrap">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    
+                    <i class="field-icon fas 
+                        {% if 'user' in field.label|lower %}fa-user-circle
+                        {% elif 'email' in field.label|lower %}fa-envelope
+                        {% elif 'pass' in field.label|lower %}fa-shield-halved
+                        {% elif 'phone' in field.label|lower %}fa-phone
+                        {% else %}fa-pen-to-square{% endif %}"></i>
+                    
+                    {{ field }}
+                    
+                    {% if field.errors %}
+                        <div class="text-danger mt-1 fw-600" style="font-size: 11px;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn-signup">
+                Create Account <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+
+        <div class="form-footer">
+            Already have access? <a href="{% url 'user_signin' %}">Sign in here</a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="modal fade" id="messageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                {% with messages.0 as message %}
+                <div class="modal-header {% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% else %}text-primary{% endif %}">
+                    <h5 class="modal-title fw-800">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-circle-info{% endif %} me-2"></i>
+                        System Notification
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                {% endwith %}
+                <div class="modal-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for message in messages %}
+                        <li class="mb-2"><i class="fas fa-caret-right me-2 opacity-50"></i> {{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+            messageModal.show();
+            setTimeout(function () { messageModal.hide(); }, 4000);
+        });
+    </script>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

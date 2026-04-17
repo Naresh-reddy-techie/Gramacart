@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delete Address - FreshFarm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f9fff9;
+      color: #2e7d32;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 480px;
+      margin: 80px auto;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    h2 {
+      color: #d32f2f;
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .address-info {
+      font-weight: 500;
+      margin-bottom: 20px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+      margin: 4px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-danger {
+      background-color: #d32f2f;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background-color: #9a0007;
+    }
+
+    .btn-secondary {
+      background-color: #f1f1f1;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Confirm Delete</h2>
+    <p>Are you sure you want to delete this address?</p>
+    <div class="address-info">
+      {{ address.address_line_1 }}{% if address.address_line_2 %}, {{ address.address_line_2 }}{% endif %}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'address_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+
+</body>
+</html>

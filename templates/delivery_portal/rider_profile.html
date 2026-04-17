@@ -1,0 +1,197 @@
+{% extends "delivery_portal/base.html" %}
+{% block title %}My Profile | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 1. Professional Header Card - GramaCart Dark Mode */
+    .profile-header-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 35px;
+        padding: 40px 25px 30px;
+        text-align: center;
+        color: white;
+        margin-top: 10px;
+        position: relative;
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 32px; /* Premium Squircle */
+        border: 4px solid rgba(255,255,255,0.1);
+        margin: 0 auto 15px;
+        background: linear-gradient(135deg, #00cc66 0%, #00994d 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: white;
+        font-weight: 900;
+        box-shadow: 0 10px 25px rgba(0, 204, 102, 0.2);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .status-pill {
+        background: rgba(0, 204, 102, 0.15);
+        color: #00ff80;
+        font-size: 0.65rem;
+        font-weight: 900;
+        padding: 6px 14px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        border: 1px solid rgba(0, 204, 102, 0.2);
+    }
+
+    /* 2. Performance Bar */
+    .performance-bar {
+        background: rgba(255,255,255,0.05);
+        border-radius: 24px;
+        padding: 15px;
+        margin-top: 25px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* 3. Info List Style */
+    .info-list-card {
+        background: white;
+        border-radius: 28px;
+        padding: 10px 22px;
+        border: 1px solid var(--ui-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 0;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .info-item:last-child { border-bottom: none; }
+
+    .info-label { 
+        color: #94a3b8; 
+        font-weight: 800; 
+        font-size: 0.6rem; 
+        text-transform: uppercase; 
+        letter-spacing: 1px;
+    }
+
+    .info-value { 
+        color: #1e293b; 
+        font-weight: 900; 
+        font-size: 0.9rem; 
+    }
+
+    /* 4. Action Buttons */
+    .btn-action {
+        height: 62px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.9rem;
+        transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1.5px solid #f1f5f9;
+    }
+
+    .btn-action:active { transform: scale(0.96); }
+    
+    .btn-logout {
+        background: #fff1f2;
+        color: #e11d48;
+        border: 1.5px solid #ffe4e6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container px-3 pb-5">
+    
+    <div class="profile-header-card mb-4">
+        <div class="profile-avatar">
+            {{ profile.user.first_name|slice:":1" }}{{ profile.user.last_name|slice:":1" }}
+        </div>
+        
+        <h3 class="fw-900 mb-2 letter-spacing-n1">{{ profile.user.get_full_name|default:profile.user.username }}</h3>
+        
+        <div class="mb-2">
+            <span class="status-pill">
+                <i class="bi bi-patch-check-fill me-1"></i> VERIFIED RIDER
+            </span>
+        </div>
+
+        <div class="performance-bar">
+            <div class="row g-0">
+                <div class="col-6 border-end border-white border-opacity-10">
+                    <div class="extra-small opacity-50 fw-800 text-uppercase mb-1">Join Date</div>
+                    <div class="fw-900 small">{{ profile.user.date_joined|date:"M Y" }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="extra-small opacity-50 fw-800 text-uppercase mb-1">Rider ID</div>
+                    <div class="fw-900 small">#GC-{{ profile.id|stringformat:"04d" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-1 mb-2 d-flex align-items-center gap-2">
+        <i class="bi bi-shield-check text-success"></i>
+        <h6 class="fw-900 m-0 text-uppercase extra-small letter-spacing-1 text-muted">Account Verification</h6>
+    </div>
+
+    <div class="info-list-card mb-4">
+        <div class="info-item">
+            <span class="info-label">Mobile Number</span>
+            <span class="info-value">+91 {{ profile.phone_number }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <span class="info-value text-lowercase">{{ profile.user.email|default:"Not Linked" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Assigned Hub</span>
+            <span class="info-value">
+                {% if profile.hub %}
+                    <span class="text-primary"><i class="bi bi-geo-alt-fill me-1"></i> {{ profile.hub.name }}</span>
+                {% else %}
+                    <span class="text-danger">Awaiting Hub</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Work Status</span>
+            <span class="info-value">
+                {% if profile.is_active %}
+                    <span class="text-success fw-900"><i class="bi bi-dot fs-4 vertical-align-middle"></i> ONLINE</span>
+                {% else %}
+                    <span class="text-muted fw-900"><i class="bi bi-dot fs-4 vertical-align-middle"></i> OFFLINE</span>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="d-grid gap-3">
+        <button onclick="if(window.haptic) haptic('medium')" class="btn btn-white btn-action shadow-sm">
+            <i class="bi bi-lock-fill me-2 text-primary"></i> Update Security
+        </button>
+        
+        <a href="{% url 'logout' %}" onclick="if(window.haptic) haptic('heavy')" class="btn btn-logout btn-action text-decoration-none">
+            <i class="bi bi-power me-2"></i> Terminate Session
+        </a>
+    </div>
+
+    <div class="mt-4 p-4 rounded-4 text-center bg-light border">
+        <div class="fw-900 text-dark small mb-1">GramaCart Support</div>
+        <p class="extra-small text-muted fw-700 mb-0" style="line-height: 1.5;">
+            Need to change your Hub or update your mobile number? Please contact your 
+            <span class="text-dark">District Manager</span> or visit the nearest hub office.
+        </p>
+    </div>
+</div>
+{% endblock %}

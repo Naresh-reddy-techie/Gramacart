@@ -1,0 +1,67 @@
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card h-100 bg-white border-0 shadow-sm p-4 rounded-4 position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 h-100 bg-emerald" style="width: 4px;"></div>
+            
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="kpi-icon bg-emerald-soft text-emerald p-2 rounded-3">
+                    <i class="bi bi-shop-window fs-4"></i>
+                </div>
+                <span class="badge bg-emerald-subtle text-emerald border-0 rounded-pill px-2 fw-800">
+                    <i class="bi bi-graph-up me-1"></i> PROFIT
+                </span>
+            </div>
+            <div class="kpi-label text-muted small fw-700 text-uppercase ls-wide">Commerce Margin</div>
+            <div class="kpi-value fw-900 text-navy fs-2">₹{{ total_trade_margin|floatformat:0 }}</div>
+            <div class="kpi-subtitle extra-small text-muted mt-1">Markup from hub inventory</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card h-100 bg-navy p-4 rounded-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="kpi-icon bg-emerald text-navy p-2 rounded-3">
+                    <i class="bi bi-lightning-charge-fill fs-4"></i>
+                </div>
+                <span class="badge bg-emerald-soft text-emerald border-0 rounded-pill px-2 fw-800 animate-pulse">LIVE</span>
+            </div>
+            <div class="kpi-label text-white-50 small fw-700 text-uppercase ls-wide">Platform Fees</div>
+            <div class="kpi-value fw-900 text-white fs-2">₹{{ total_platform_earnings|floatformat:0 }}</div>
+            <div class="kpi-subtitle extra-small text-white-50 mt-1">Delivery service revenue</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card h-100 bg-white border-0 shadow-sm p-4 rounded-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="kpi-icon bg-blue-soft text-primary p-2 rounded-3">
+                    <i class="bi bi-bicycle fs-4"></i>
+                </div>
+                <span class="badge bg-blue-subtle text-primary border-0 rounded-pill px-2 fw-800">
+                    {{ active_riders }} ONLINE
+                </span>
+            </div>
+            <div class="kpi-label text-muted small fw-700 text-uppercase ls-wide">Active Orders</div>
+            <div class="kpi-value fw-900 text-navy fs-2">{{ live_order_count }}</div>
+            <div class="kpi-subtitle extra-small text-muted mt-1">Orders in 7km radius</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card h-100 bg-white border-0 shadow-sm p-4 rounded-4 border border-danger-subtle">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="kpi-icon bg-orange-soft text-danger p-2 rounded-3">
+                    <i class="bi bi-wallet2 fs-4"></i>
+                </div>
+                <a href="#" class="badge bg-danger text-white text-decoration-none border-0 rounded-pill px-2 fw-800">
+                    <i class="bi bi-arrow-repeat me-1"></i> SETTLE
+                </a>
+            </div>
+            <div class="kpi-label text-muted small fw-700 text-uppercase ls-wide">Unsettled Cash</div>
+            <div class="kpi-value fw-900 text-danger fs-2">₹{{ unsettled_cash|floatformat:0 }}</div>
+            <div class="kpi-subtitle extra-small text-muted mt-1">Cash held by rider fleet</div>
+        </div>
+    </div>
+
+</div>

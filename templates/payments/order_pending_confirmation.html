@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Pending</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 3rem;
+      background-color: #f9f9f9;
+    }
+    .box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #28a745;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>UPI Payment Submitted</h2>
+    <p>Thank you! We've received your payment details for <strong>Order #{{ order.order_number }}</strong>.</p>
+    
+    <p><strong>Transaction ID Entered:</strong> {{ payment.transaction_id }}</p>
+
+    <p>Your payment is now <strong>awaiting manual verification</strong> by our team.</p>
+
+    <p><strong>Status:</strong> <span style="color: orange;">Pending Confirmation</span></p>
+
+    <p>You’ll receive an email or SMS once your order is marked as paid and confirmed.</p>
+
+    <p>
+      Entered the wrong ID? 
+      <a href="{% url 'update_transaction_id' payment.id %}">Click here to update</a>
+    </p>
+  </div>
+</body>
+</html>

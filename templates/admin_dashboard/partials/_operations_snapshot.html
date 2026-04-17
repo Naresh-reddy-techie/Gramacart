@@ -1,0 +1,93 @@
+<div class="dashboard-card ops-snapshot-card bg-white p-4 rounded-4 shadow-sm border-0">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <h6 class="fw-800 text-navy mb-0">Operations Snapshot</h6>
+        <div class="refresh-indicator d-flex align-items-center">
+            <span class="pulse-dot-online me-2"></span>
+            <small class="text-muted fw-800 extra-small ls-wide">LIVE PULSE</small>
+        </div>
+    </div>
+
+    <div class="ops-list">
+        <div class="ops-item d-flex justify-content-between align-items-center p-2 mb-2 rounded-3 hover-bg-light transition-all">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ops-icon-box bg-orange-soft text-warning rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                    <i class="bi bi-hourglass-split fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-800 text-navy small mb-0">Pending Orders</div>
+                    <div class="text-muted extra-small fw-600">Awaiting Hub Confirmation</div>
+                </div>
+            </div>
+            <span class="badge bg-orange-soft text-warning fw-900 px-3 py-2 rounded-pill border border-warning-subtle">{{ ops.pending_count|default:"0" }}</span>
+        </div>
+
+        <div class="ops-item d-flex justify-content-between align-items-center p-2 mb-2 rounded-3 hover-bg-light transition-all">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ops-icon-box bg-blue-soft text-primary rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                    <i class="bi bi-box-seam fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-800 text-navy small mb-0">Processing</div>
+                    <div class="text-muted extra-small fw-600">Packing in Hub</div>
+                </div>
+            </div>
+            <span class="badge bg-blue-soft text-primary fw-900 px-3 py-2 rounded-pill border border-blue-subtle">{{ ops.processing_count|default:"0" }}</span>
+        </div>
+
+        <div class="ops-item d-flex justify-content-between align-items-center p-2 mb-2 rounded-3 hover-bg-light transition-all">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ops-icon-box bg-emerald-soft text-emerald rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                    <i class="bi bi-patch-check fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-800 text-navy small mb-0">Delivered Today</div>
+                    <div class="text-muted extra-small fw-600">Successful completions</div>
+                </div>
+            </div>
+            <span class="badge bg-emerald-soft text-emerald fw-900 px-3 py-2 rounded-pill border border-emerald-subtle">{{ ops.delivered_count|default:"0" }}</span>
+        </div>
+
+        <div class="ops-item d-flex justify-content-between align-items-center p-2 border-0 rounded-3 hover-bg-light transition-all">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ops-icon-box bg-danger-soft text-danger rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                    <i class="bi bi-x-circle fs-5"></i>
+                </div>
+                <div>
+                    <div class="ops-label fw-800 text-navy small mb-0">Cancelled</div>
+                    <div class="text-muted extra-small fw-600">Returns or cancellations</div>
+                </div>
+            </div>
+            <span class="badge bg-danger-soft text-danger fw-900 px-3 py-2 rounded-pill border border-danger-subtle">{{ ops.cancelled_count|default:"0" }}</span>
+        </div>
+
+        <div class="ops-footer mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-clock-history text-muted extra-small"></i>
+                <span class="text-muted extra-small fw-700 text-uppercase ls-wide">Auto-Sync: <span id="sync-time" class="text-primary">Just now</span></span>
+            </div>
+            <button class="btn btn-light btn-sm rounded-circle shadow-sm border" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise text-navy"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Pulse Animation for Live Indicator */
+    .pulse-dot-online {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    
+    .hover-bg-light:hover { background-color: #f8fafc; }
+</style>
