@@ -39,12 +39,30 @@
                 <i class="bi bi-box-seam-fill"></i>
                 <span>Products</span>
             </a>
-            <a href="{% url 'live_inventory' %}" class="menu-item">
+            <a href="{% url 'shop_list' %}" class="menu-item">
+                <i class="bi bi-shop"></i>
+                <span>Shops & Warehouses</span>
+            </a>
+            <a href="{% url 'inventory_assign' %}" class="menu-item">
+                <i class="bi bi-box-seam"></i>
+                <span>Inventory Allocation Center</span>
+            </a>
+            <a href="{% url 'live_inventory' %}" class="menu-item {% if 'inventory' in request.path %}active{% endif %}">
+
                 <i class="bi bi-archive-fill"></i>
+
                 <span>Live Inventory</span>
+
                 {% if low_stock_count > 0 %}
-                    <span class="badge bg-warning-soft text-warning ms-auto extra-small fw-800">{{ low_stock_count }} LOW</span>
+                    <span class="badge bg-warning-soft text-warning ms-auto extra-small fw-800 rounded-pill px-2">
+                        {{ low_stock_count }} LOW
+                    </span>
+                {% else %}
+                    <span class="badge bg-emerald-soft text-emerald ms-auto extra-small fw-800 rounded-pill px-2">
+                        OK
+                    </span>
                 {% endif %}
+
             </a>
             <a href="{% url 'list_category' %}" class="menu-item {% if 'category' in request.path %}active{% endif %}">
                 <i class="bi bi-tags-fill"></i>
@@ -84,6 +102,11 @@
             <i class="bi bi-cash-stack"></i>
             <span>Rider Cash Collection</span>
             <span class="badge rounded-pill bg-warning-soft text-warning ms-auto extra-small">COD</span>
+        </a>
+
+        <a href="#" class="menu-item">
+            <i class="bi bi-journal-text"></i>
+            <span>Shop Ledger</span>
         </a>
 
         <a href="{% url 'vendor_payout_list' %}" class="menu-item {% if 'vendor-payouts' in request.path %}active{% endif %}">

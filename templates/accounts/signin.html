@@ -47,24 +47,22 @@
         }
 
         .brand-icon {
-            width: 56px; height: 56px;
-            background: var(--navy);
-            color: var(--emerald);
+            width: 56px;
+            height: 56px;
+            background: transparent; /* remove background if using image */
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            font-weight: 800;
             margin: 0 auto 18px;
             box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+            overflow: hidden;
         }
 
-        .brand-name {
-            font-weight: 800;
-            font-size: 28px;
-            color: var(--navy);
-            letter-spacing: -1.5px;
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* keeps proportions */
         }
         .brand-name span { color: var(--emerald); }
 
@@ -188,7 +186,9 @@
 <div class="auth-container">
 
     <div class="brand">
-        <div class="brand-icon">GC</div>
+        <div class="brand-icon">
+            <img src="{% static 'images/logo.png' %}" alt="GramaCart Logo">
+        </div>
         <h1 class="brand-name">GRAMA<span>CART</span></h1>
         <p class="small text-muted fw-600 mb-0">Private Hub Access</p>
     </div>

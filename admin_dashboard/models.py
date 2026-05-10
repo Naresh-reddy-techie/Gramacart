@@ -37,12 +37,14 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
-    
+"""
+
 from django.urls import reverse
 
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+from django.db.models import Avg, Count
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -68,28 +70,24 @@ class Product(models.Model):
     # --- Logic Improvements ---
     @property
     def is_in_stock(self):
-        """TEMPLATE USES THIS: Returns True if there is at least 1 item"""
         return self.stock_available > 0
     
     @property
     def discount_amount(self):
-        """TEMPLATE USES THIS: For the 'SAVE ₹X' badge"""
         if self.discount_price:
             return int(self.price - self.discount_price)
         return 0
 
     def get_effective_price(self):
-        """TEMPLATE USES THIS: To show the lower price if on sale"""
+        #TEMPLATE USES THIS: To show the lower price if on sale
         return self.discount_price if self.discount_price else self.price
     
     @property
     def needs_restock(self):
-        """Logic for the 'Reorder' badge in your template."""
         return self.stock_available <= self.min_stock_level
 
     @property
     def stock_status(self):
-        """Returns a string for easier template styling."""
         if self.stock_available == 0:
             return "OUT_OF_STOCK"
         elif self.needs_restock:
@@ -100,6 +98,14 @@ class Product(models.Model):
     def margin_per_unit(self):
         return self.get_effective_price() - self.cost_price
     
+    @property
+    def avg_rating(self):
+        return self.ratings.aggregate(avg=Avg('score'))['avg'] or 0
+
+    @property
+    def rating_count(self):
+        return self.ratings.count()
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             super().save(*args, **kwargs)
@@ -107,12 +113,86 @@ class Product(models.Model):
             kwargs.pop('force_insert', None) 
         super().save(*args, **kwargs)
 
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_images' )
-    image = models.ImageField(upload_to='product_images/')
+"""  
+from django.db import models
+from django.utils.text import slugify
+from django.db.models import Avg
+
+class Product(models.Model):
+
+    
+
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True, null=True)
+
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+
+
+    slug = models.SlugField(unique=True, blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        return self.name
+
+    # ⭐ Ratings
+    @property
+    def avg_rating(self):
+        return self.ratings.aggregate(avg=Avg('score'))['avg'] or 0
+
+    @property
+    def rating_count(self):
+        return self.ratings.count()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            super().save(*args, **kwargs)
+            self.slug = slugify(f"{self.name}-{self.id}")
+            Product.objects.filter(id=self.id).update(slug=self.slug)
+            return
+        super().save(*args, **kwargs)
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(
+        'admin_dashboard.Product',
+        on_delete=models.CASCADE,
+        related_name='variants'
+    )
+
+    UNIT_CHOICES = [
+        ('ml', 'Millilitre'),
+        ('ltr', 'Litre'),
+        ('g', 'Gram'),
+        ('kg', 'Kilogram'),
+        ('pcs', 'Pieces'),
+        ('pack', 'Pack'),
+    ]
+
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
+
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # auto-generated display (NO manual mistakes)
+    @property
+    def display_name(self):
+        return f"{self.quantity}{self.unit}"
+
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('product', 'unit', 'quantity')
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity}{self.unit}"
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey( Product, on_delete=models.CASCADE, related_name='product_images' ) 
+    image = models.ImageField(upload_to='product_images/') 
+    def __str__(self): 
         return f"{self.product.name} Image"
+
 
 
 class StockLog(models.Model):
@@ -135,7 +215,10 @@ class DeliveryHub(models.Model):
     
     # Updated: More realistic default for village hyperlocal (e.g., 7km - 15km)
     max_delivery_radius_km = models.PositiveIntegerField(default=15)
-    
+    # ADDRESS (FIXED)
+    full_address = models.TextField(blank=True, null=True)
+    landmark = models.CharField(max_length=255, blank=True, null=True)
+
     # NEW: Safety and Operational Fields
     is_active = models.BooleanField(default=True, db_index=True)
     is_accepting_orders = models.BooleanField(default=True)
@@ -172,3 +255,116 @@ class ShippingCost(models.Model):
     def __str__(self):
         return f"{self.delivery_hub.name} | {self.min_distance_km}-{self.max_distance_km} km | ₹{self.cost}"
 #=========================================================================
+#Base of everything (ledger,dispatch,profit)
+
+class Shop(models.Model):
+    SHOP_TYPES = [
+        ('KIRANA','Kirana Store'),
+        ('DARK_STORE','Dark Store'),
+        ('WAREHOUSE','Warehouse')
+    ]
+    name = models.CharField(max_length=150)
+    shop_type = models.CharField(max_length=25,choices =SHOP_TYPES,db_index=True)
+    hub = models.ForeignKey('DeliveryHub',on_delete=models.CASCADE,related_name='shops',db_index=True)
+    phone = models.CharField(max_length=15,blank=True,null=True)
+    address = models.TextField(blank=True,null=True)
+    is_internal = models.BooleanField(default=False,help_text="True = owned by GramaCart (Dark Store/Warehouse)")
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('name', 'hub')  # prevent duplicates
+        indexes = [
+            models.Index(fields=['hub', 'shop_type']),
+        ]
+    def __str__(self):
+        return f"{self.name} ({self.shop_type})"
+    
+    def requires_payout(self):
+        return not self.is_internal
+    
+    def can_fulfill_orders(self):
+        return self.shop_type in ['KIRANA','DARK_STORE']
+    
+    def is_dark_store(self):
+        return self.shop_type == 'DARK_STORE'
+    
+    def is_warehouse(self):
+        return self.shop_type == 'WAREHOUSE'
+    
+#==============================================================
+# Order → Delivered → Ledger → Money tracked [for warehouse]
+# Internal → No payout → Only profit tracking[for darkstore]
+#You BUY from them → You PAY them → Ledger needed [for kirana stores]✅
+
+from django.core.exceptions import ValidationError
+
+class ShopLedger(models.Model):
+    shop = models.ForeignKey('admin_dashboard.Shop', on_delete=models.CASCADE, related_name='ledger_entries')
+    hub = models.ForeignKey('admin_dashboard.DeliveryHub', on_delete=models.CASCADE, related_name='ledger_entries')
+    order = models.ForeignKey(
+        'shop.Order',
+        on_delete=models.CASCADE,
+        related_name='ledger_entries'
+    )
+
+    inventory = models.ForeignKey(
+        'inventory.Inventory',
+        on_delete=models.CASCADE
+    )
+
+    quantity = models.PositiveIntegerField()
+
+    cost_price = models.DecimalField(max_digits=10, decimal_places=2)
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    total_revenue = models.DecimalField(max_digits=10, decimal_places=2)
+    profit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    is_settled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('order','inventory', 'shop')
+        indexes = [
+            models.Index(fields=['shop', 'created_at']),
+            models.Index(fields=['hub', 'created_at']),
+        ]
+
+    def clean(self):
+        super().clean()
+
+        if not self.inventory:
+            raise ValidationError("Inventory is required")
+
+        if not self.order:
+            raise ValidationError("Order is required")
+
+        if self.inventory.shop != self.shop:
+            raise ValidationError("Inventory does not belong to this shop")
+
+        if self.cost_price < 0 or self.selling_price < 0:
+            raise ValidationError("Prices cannot be negative")
+
+        if self.quantity <= 0:
+            raise ValidationError("Quantity must be greater than zero")
+            
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        if self.inventory:   # ✅ SAFE CHECK
+            self.cost_price = self.inventory.cost_price
+            self.selling_price = self.inventory.selling_price
+
+            self.total_cost = self.cost_price * self.quantity
+            self.total_revenue = self.selling_price * self.quantity
+            self.profit = self.total_revenue - self.total_cost
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+       
+        order_num = self.order.order_number if self.order else "NoOrder"
+        return f"{self.shop.name} - {order_num}"
+    

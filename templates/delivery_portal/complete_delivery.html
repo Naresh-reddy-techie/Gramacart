@@ -7,10 +7,57 @@
         --gc-primary: #10b981;
         --gc-dark: #0f172a;
         --gc-danger: #ef4444;
+        --gc-warning: #f59e0b;
         --gc-soft-bg: #f8fafc;
-        --gc-accent: #3b82f6;
     }
 
+    /* --- HIGH-END FLOATING MESSAGES --- */
+    .message-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .alert-toast {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-left: 5px solid transparent;
+        animation: toastIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .alert-error { border-left-color: var(--gc-danger); color: #7f1d1d; }
+    .alert-success { border-left-color: var(--gc-primary); color: #064e3b; }
+    .alert-warning { border-left-color: var(--gc-warning); color: #78350f; }
+
+    @keyframes toastIn {
+        from { transform: translateY(-100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .fw-800 { font-weight: 800; }
+    .fw-900 { font-weight: 900; }
+
+    /* Optional: Subtle pulse for the checklist to remind them to check the bag */
+    .items-checklist-pulse {
+        border-color: var(--gc-primary) !important;
+        animation: borderPulse 2s infinite;
+    }
+
+    @keyframes borderPulse {
+        0% { border-color: #f1f5f9; }
+        50% { border-color: #10b981; }
+        100% { border-color: #f1f5f9; }
+    }
+        /* --- UI WRAPPER --- */
     .mission-wrapper {
         background: #ffffff;
         border-radius: 40px 40px 0 0;
@@ -20,149 +67,190 @@
         box-shadow: 0 -15px 50px rgba(0,0,0,0.1);
     }
 
-    .alert-toast {
-        position: relative;
-        padding: 16px 45px 16px 20px;
-        border-radius: 20px;
-        font-weight: 700;
-        margin-bottom: 20px;
-        border: 1.5px solid transparent;
-        font-size: 0.9rem;
-        animation: slideIn 0.3s ease-out;
+    /* --- REQUIRED FIELD INDICATOR --- */
+    .field-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 8px;
     }
-    .alert-error { background: #fee2e2; color: var(--gc-danger); border-color: #fecaca; }
-    .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-    
-    @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    .checklist-card {
-        background: var(--gc-soft-bg);
-        border: 1px solid #e2e8f0;
-        border-radius: 28px;
-        padding: 22px;
+    .required-dot {
+        width: 6px;
+        height: 6px;
+        background-color: var(--gc-danger);
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* --- INTERACTIVE TOGGLE --- */
+    .payment-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        background: #f1f5f9;
+        padding: 6px;
+        border-radius: 22px;
         margin-bottom: 25px;
     }
-    .item-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #edf2f7;
-    }
-    .item-line:last-child { border: none; }
-    .size-badge { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
 
-    .pay-card {
-        border-radius: 30px; padding: 25px; text-align: center;
-        margin-bottom: 30px; border: 2px solid;
+    .toggle-btn {
+        border: none;
+        padding: 14px;
+        border-radius: 18px;
+        font-weight: 900;
+        font-size: 0.75rem;
+        color: #64748b;
+        background: transparent;
+        transition: 0.3s;
     }
-    .pay-unpaid { background: #fffbeb; border-color: #fef3c7; color: #92400e; }
-    .pay-paid { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
 
+    .toggle-btn.active {
+        background: white;
+        color: var(--gc-dark);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* --- INPUT STYLES --- */
     .utr-field {
-        background: #ffffff; border: 2px solid #e2e8f0; border-radius: 18px;
-        padding: 16px; font-weight: 800; text-align: center;
-        letter-spacing: 2px; font-size: 1.2rem; width: 100%; margin-bottom: 20px;
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 18px;
+        font-weight: 800;
+        text-align: center;
+        letter-spacing: 3px;
+        font-size: 1.2rem;
+        width: 100%;
+        transition: 0.3s;
     }
+
+    .utr-field:focus { border-color: var(--gc-primary); outline: none; }
+
     .otp-field {
-        width: 60px; height: 75px; border-radius: 18px; border: 2px solid #e2e8f0;
-        text-align: center; font-size: 1.8rem; font-weight: 900; background: #fff;
+        width: 62px;
+        height: 78px;
+        border-radius: 18px;
+        border: 2px solid #e2e8f0;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 900;
+        background: #fff;
     }
+
     .btn-action {
-        background: var(--gc-dark); color: white; border-radius: 25px;
-        padding: 22px; width: 100%; font-weight: 900; border: none;
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+        background: var(--gc-dark);
+        color: white;
+        border-radius: 28px;
+        padding: 24px;
+        width: 100%;
+        font-weight: 900;
+        border: none;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
+        transition: 0.3s;
     }
-    .btn-action:disabled { background: #cbd5e1; box-shadow: none; }
-    
-    .caps-label { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
-    .step-badge { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 900; margin-bottom: 5px; display: inline-block; }
-    
-    .upi-copy-box {
-        background: #f1f5f9; padding: 12px; border-radius: 14px;
-        font-family: monospace; font-weight: bold; font-size: 14px; margin-top: 10px;
-    }
+
+    .btn-action:disabled { background: #cbd5e1; box-shadow: none; opacity: 0.7; }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="message-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast alert-{{ message.tags }}">
+                <i class="bi {% if message.tags == 'error' %}bi-exclamation-octagon{% else %}bi-check-circle-fill{% endif %} fs-5"></i>
+                <span class="flex-grow-1">{{ message }}</span>
+                <i class="bi bi-x-lg opacity-50" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <div style="background: var(--gc-dark); height: 80px;" class="d-flex align-items-center px-4">
-    <a href="javascript:history.back()" class="text-white text-decoration-none small fw-bold">
-        <i class="bi bi-chevron-left"></i> EXIT PROCESS
+    <a href="javascript:history.back()" class="text-white text-decoration-none small fw-bold opacity-75">
+        <i class="bi bi-arrow-left me-2"></i> CANCEL
     </a>
 </div>
 
 <div class="mission-wrapper">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert-toast alert-{{ message.tags }}">
-                {{ message }}
-                <button type="button" class="btn-close-msg" onclick="this.parentElement.style.display='none'">&times;</button>
+    <div class="text-center mb-5">
+        <h5 class="fw-900 m-0 text-dark">Confirm Delivery</h5>
+        <p class="text-muted small fw-bold">Order #{{ delivery.order.order_number }}</p>
+        <div class="bg-light rounded-4 p-3 mb-4 border border-2" style="border-style: solid !important; border-color: #f1f5f9 !important;">
+        <div class="field-label mb-2" style="font-size: 10px;">Items Checklist</div>
+        <div class="d-flex flex-column gap-2">
+            {% for item in delivery.order.items.all %}
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="fw-800 text-dark" style="font-size: 13px;">
+                    {{ item.product.name }}
+                    {% if item.product.size %}
+                    <span class="text-muted fw-600" style="font-size: 11px;">• {{ item.product.size }}</span>
+                    {% endif %}
+                </div>
+                <span class="badge bg-white text-dark border fw-900" style="font-size: 11px; border-radius: 8px;">x{{ item.quantity }}</span>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="text-center mb-4">
-        <span class="caps-label">Delivery Verification</span>
-        <h5 class="fw-900 m-0">#{{ delivery.order.order_number }}</h5>
-    </div>
-
-    <div class="checklist-card">
-        <span class="caps-label" style="color:#64748b">Check Bag Contents</span>
-        {% for item in delivery.order.items.all %}
-        <div class="item-line">
-            <div>
-                <div class="fw-bold text-dark">{{ item.product.name }}</div>
-                {% if item.product.size %}<div class="size-badge">SIZE: {{ item.product.size }}</div>{% endif %}
-            </div>
-            <div class="fw-900 text-primary">x{{ item.quantity }}</div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-
-    <div class="pay-card {% if upi_uri %}pay-unpaid{% else %}pay-paid{% endif %}">
-        <span class="caps-label" style="color: inherit; opacity: 0.7;">
-            {% if upi_uri %}UPI Payment PENDING{% else %}PRE-PAID ONLINE{% endif %}
-        </span>
-        <div class="display-5 fw-900 py-1">₹{{ delivery.order.total|floatformat:0 }}</div>
-        
-        {% if upi_uri %}
-            <div class="fw-bold small opacity-75 mt-1">⚠️ COLLECT PAYMENT</div>
-            <button type="button" class="btn btn-dark btn-sm rounded-pill px-4 mt-3 fw-bold" data-bs-toggle="modal" data-bs-target="#qrModal">
-                SHOW QR OPTIONS
-            </button>
-        {% endif %}
     </div>
 
     <form method="post" enctype="multipart/form-data" id="mainForm">
         {% csrf_token %}
 
         {% if upi_uri %}
-        <div class="mb-5">
-            <span class="step-badge">STEP 1</span>
-            <span class="caps-label text-dark">Transaction ID (UTR)</span>
-            <input type="text" name="transaction_id" id="id_utr" class="utr-field" 
-                   placeholder="12 Digit Number" maxlength="12"
-                   inputmode="numeric" oninput="valCheck()">
+        <div class="mb-4">
+            <label class="field-label">Payment Mode <span class="required-dot"></span></label>
+            <div class="payment-toggle">
+                <button type="button" class="toggle-btn active" id="btn-upi" onclick="setMode('upi')">UPI / ONLINE</button>
+                <button type="button" class="toggle-btn" id="btn-cash" onclick="setMode('cash')">CASH</button>
+            </div>
+            <input type="hidden" name="payment_mode" id="id_payment_mode" value="upi">
+
+            <div id="upi-section">
+                <div class="p-3 rounded-4 border-2 bg-light mb-3 text-center border" style="border-style: dashed;">
+                    <div class="display-6 fw-900 text-dark mb-2">₹{{ delivery.order.total|floatformat:0 }}</div>
+                    <button type="button" class="btn btn-dark btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#qrModal">
+                        <i class="bi bi-qr-code-scan me-2"></i> SHOW QR
+                    </button>
+                </div>
+                
+                <label class="field-label">12-Digit Transaction ID (UTR) <span class="required-dot"></span></label>
+                <input type="text" name="transaction_id" id="id_utr" class="utr-field" placeholder="Enter UTR Number" maxlength="12" inputmode="numeric" oninput="valCheck()">
+            </div>
+
+            <div id="cash-section" style="display: none;">
+                <div class="p-4 rounded-4 bg-warning bg-opacity-10 border border-warning border-2 text-center">
+                    <div class="fw-900 text-warning mb-1">COLLECT CASH</div>
+                    <div class="display-6 fw-900 text-dark">₹{{ delivery.order.total|floatformat:0 }}</div>
+                    <p class="small text-muted mt-2 mb-0 fw-bold">Ensure you count the notes carefully!</p>
+                </div>
+            </div>
         </div>
         {% endif %}
 
         <div class="mb-5">
-            <span class="step-badge">STEP 2</span>
-            <span class="caps-label text-dark">Handover Proof</span>
-            <div class="bg-light rounded-4 p-4 text-center border-2 border-dashed" onclick="document.getElementById('id_proof_photo').click()" style="cursor: pointer;">
+            <label class="field-label">Handover Proof <span class="required-dot"></span></label>
+            <div class="bg-light rounded-4 p-5 text-center border-2 border-dashed" onclick="document.getElementById('id_proof_photo').click()" style="cursor: pointer; border-color: #cbd5e1 !important;">
                 <div id="preview-wrap">
-                    <i class="bi bi-camera-fill display-5 text-muted"></i>
-                    <div class="fw-bold text-muted small mt-2">TAKE PHOTO AT DOORSTEP</div>
+                    <div class="bg-white d-inline-block p-3 rounded-circle shadow-sm mb-2">
+                        <i class="bi bi-camera-fill fs-2 text-primary"></i>
+                    </div>
+                    <div class="fw-900 text-dark">Take Photo</div>
+                    <div class="text-muted small fw-bold">Capture the bag at the door</div>
                 </div>
-                <input type="file" name="proof_photo" id="id_proof_photo" accept="image/*" capture="environment" onchange="imgIn(this)" style="display:none;">
+                <input type="file" name="proof_photo" id="id_proof_photo" accept="image/*" capture="environment" onchange="imgIn(this)" style="display:none;" required>
             </div>
         </div>
 
         <div class="mb-5">
-            <span class="step-badge">STEP 3</span>
-            <span class="caps-label text-dark text-center">Customer 4-Digit PIN</span>
-            <div class="d-flex justify-content-center gap-2 mt-2">
+            <label class="field-label d-block text-center">Customer 4-Digit PIN <span class="required-dot"></span></label>
+            <div class="d-flex justify-content-center gap-3 mt-3">
                 <input type="hidden" name="order_token" id="fullToken">
                 <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
                 <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
@@ -171,37 +259,30 @@
             </div>
         </div>
 
-        <button type="submit" class="btn-action shadow-lg mb-4" id="subBtn" disabled>
-            VERIFY & COMPLETE DELIVERY
+        <button type="submit" class="btn-action" id="subBtn" disabled>
+            COMPLETE DELIVERY
         </button>
     </form>
 </div>
 
-<div class="modal fade" id="qrModal" tabindex="-1">
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered px-4">
-        <div class="modal-content rounded-5 border-0 shadow-lg">
+        <div class="modal-content rounded-5 border-0">
             <div class="modal-body text-center p-5">
-                <span class="caps-label">Scan to Pay</span>
-                <h5 class="fw-900 mb-4">GramaCart UPI</h5>
+                <div class="caps-label mb-3">Scan with PhonePe, GPay, Paytm</div>
                 
                 {% if upi_qr_base64 %}
-                    <div class="p-3 bg-white border rounded-4 mb-3">
-                        <img src="data:image/png;base64,{{ upi_qr_base64 }}" class="img-fluid" style="max-height: 220px;">
-                    </div>
+                <div class="p-3 bg-white border-2 border rounded-5 mb-4 shadow-sm">
+                    <img src="data:image/png;base64,{{ upi_qr_base64 }}" class="img-fluid" style="border-radius: 15px;">
+                </div>
                 {% endif %}
 
-                {% if upi_uri %}
-                <a href="{{ upi_uri }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 shadow-sm">
-                    <i class="bi bi-phone-vibrate me-2"></i> OPEN IN APPS
-                </a>
-                {% endif %}
-
-                <div class="upi-copy-box">
+                <div class="bg-light p-3 rounded-4 font-monospace fw-bold small text-muted mb-4">
                     {{ upi_id|default:"UPI ID NOT FOUND" }}
                 </div>
 
-                <button type="button" class="btn btn-dark w-100 rounded-pill py-3 mt-4 fw-bold" data-bs-dismiss="modal">
-                    DONE, BACK TO VERIFY
+                <button type="button" class="btn btn-dark w-100 rounded-pill py-3 fw-900" data-bs-dismiss="modal">
+                    DONE
                 </button>
             </div>
         </div>
@@ -210,12 +291,29 @@
 {% endblock %}
 
 {% block page_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const cells = document.querySelectorAll('.d-cell');
     const hidden = document.getElementById('fullToken');
     const btn = document.getElementById('subBtn');
     const utrField = document.getElementById('id_utr');
     const photoInput = document.getElementById('id_proof_photo');
+    const modeInput = document.getElementById('id_payment_mode');
+
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll('.alert-toast').forEach(el => el.style.opacity = '0');
+        setTimeout(() => document.querySelectorAll('.alert-toast').forEach(el => el.remove()), 500);
+    }, 5000);
+
+    function setMode(mode) {
+        modeInput.value = mode;
+        document.getElementById('btn-upi').classList.toggle('active', mode === 'upi');
+        document.getElementById('btn-cash').classList.toggle('active', mode === 'cash');
+        document.getElementById('upi-section').style.display = (mode === 'upi') ? 'block' : 'none';
+        document.getElementById('cash-section').style.display = (mode === 'cash') ? 'block' : 'none';
+        valCheck();
+    }
 
     cells.forEach((cell, idx) => {
         cell.addEventListener('input', (e) => {
@@ -232,7 +330,7 @@
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                document.getElementById('preview-wrap').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:18px; max-height:200px; object-fit:cover;">`;
+                document.getElementById('preview-wrap').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:25px; height:180px; object-fit:cover; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">`;
                 valCheck();
             };
             reader.readAsDataURL(input.files[0]);
@@ -244,12 +342,12 @@
         cells.forEach(c => pinVal += c.value);
         hidden.value = pinVal;
         const hasPhoto = photoInput.files.length > 0;
-        let utrValid = true;
-        if (utrField) {
-            utrValid = utrField.value.trim().length === 12;
-            utrField.style.borderColor = utrValid ? "#10b981" : "#e2e8f0";
+        const mode = modeInput ? modeInput.value : 'none';
+        let paymentValid = true;
+        if (mode === 'upi' && utrField) {
+            paymentValid = utrField.value.trim().length === 12;
         }
-        btn.disabled = !(hasPhoto && pinVal.length === 4 && utrValid);
+        btn.disabled = !(hasPhoto && pinVal.length === 4 && paymentValid);
     }
 </script>
 {% endblock %}

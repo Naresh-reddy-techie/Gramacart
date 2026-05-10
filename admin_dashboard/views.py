@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.urls import reverse
-
+from delivery_portal.models import Delivery, DeliveryProfile
 # -------------- DASHBOARD -----------------------
+"""
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Count, Sum, Q
@@ -75,7 +76,332 @@ def dashboard(request):
     }
 
     return render(request, 'admin_dashboard/dashboard.html', context)
+"""
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import (
+    Sum,
+    Count,
+    Q,
+    F,
+    DecimalField
+)
+from django.shortcuts import render
+from django.utils import timezone
 
+from shop.models import Order
+from payments.models import Payment
+
+from inventory.models import Inventory
+
+from admin_dashboard.models import (
+    CompanyInfo,
+    ShopLedger,
+)
+
+from delivery_portal.models import DeliveryProfile
+
+
+# ============================================================
+# ADMIN DASHBOARD
+# ============================================================
+
+@login_required
+def dashboard(request):
+
+    today = timezone.now().date()
+
+    # ========================================================
+    # COMPANY INFO
+    # ========================================================
+
+    company_info = (
+        CompanyInfo.objects
+        .only('id', 'name', 'logo')
+        .first()
+    )
+
+    # ========================================================
+    # ORDER ANALYTICS
+    # ========================================================
+
+    orders = (
+        Order.objects
+        .select_related('user', 'address')
+    )
+
+    order_stats = orders.aggregate(
+
+        pending_orders=Count(
+            'id',
+            filter=Q(status='pending')
+        ),
+
+        processing_orders=Count(
+            'id',
+            filter=Q(status='processing')
+        ),
+
+        shipped_orders=Count(
+            'id',
+            filter=Q(status='shipped')
+        ),
+
+        delivered_orders=Count(
+            'id',
+            filter=Q(status='delivered')
+        ),
+
+        cancelled_orders=Count(
+            'id',
+            filter=Q(status='cancelled')
+        ),
+
+        active_orders=Count(
+            'id',
+            filter=Q(
+                status__in=[
+                    'pending',
+                    'processing',
+                    'shipped'
+                ]
+            )
+        )
+    )
+
+    recent_orders = (
+        orders
+        .filter(
+            status__in=[
+                'pending',
+                'processing',
+                'shipped'
+            ]
+        )
+        .order_by('-placed_at')[:10]
+    )
+
+    # ========================================================
+    # INVENTORY ANALYTICS
+    # ========================================================
+
+    inventories = (
+        Inventory.objects
+        .select_related(
+            'variant',
+            'variant__product',
+            'shop'
+        )
+    )
+
+    inventory_stats = inventories.aggregate(
+
+        total_inventory_items=Count('id'),
+
+        total_products=Count(
+            'variant__product',
+            distinct=True
+        ),
+
+        total_variants=Count(
+            'variant',
+            distinct=True
+        ),
+
+        low_stock_count=Count(
+            'id',
+            filter=Q(
+                stock__gt=0,
+                stock__lte=F('min_stock_level')
+            )
+        ),
+
+        out_of_stock_count=Count(
+            'id',
+            filter=Q(stock__lte=0)
+        ),
+
+        total_stock_units=Sum('stock'),
+
+        total_inventory_value=Sum(
+            F('stock') * F('cost_price'),
+            output_field=DecimalField(
+                max_digits=14,
+                decimal_places=2
+            )
+        )
+    )
+
+    low_stock_items = (
+        inventories
+        .filter(
+            stock__gt=0,
+            stock__lte=F('min_stock_level')
+        )
+        .order_by('stock')[:10]
+    )
+
+    # ========================================================
+    # PAYMENT ANALYTICS
+    # ========================================================
+
+    successful_payments = (
+        Payment.objects
+        .filter(status='success')
+    )
+
+    payment_stats = successful_payments.aggregate(
+
+        total_revenue=Sum('amount'),
+
+        revenue_today=Sum(
+            'amount',
+            filter=Q(created_at__date=today)
+        )
+    )
+
+    # ========================================================
+    # PROFIT ANALYTICS
+    # ========================================================
+
+    ledger_stats = ShopLedger.objects.aggregate(
+
+        total_profit=Sum('profit'),
+
+        unsettled_entries=Count(
+            'id',
+            filter=Q(is_settled=False)
+        )
+    )
+
+    # ========================================================
+    # DELIVERY NETWORK ANALYTICS
+    # ========================================================
+
+    rider_stats = DeliveryProfile.objects.aggregate(
+
+        active_riders=Count(
+            'id',
+            filter=Q(is_active=True)
+        ),
+
+        inactive_riders=Count(
+            'id',
+            filter=Q(is_active=False)
+        )
+    )
+
+    # ========================================================
+    # CUSTOMER ANALYTICS
+    # ========================================================
+
+    customer_stats = User.objects.aggregate(
+
+        total_customers=Count(
+            'id',
+            filter=Q(is_staff=False)
+        ),
+
+        new_customers_today=Count(
+            'id',
+            filter=Q(
+                is_staff=False,
+                date_joined__date=today
+            )
+        )
+    )
+
+    # ========================================================
+    # FINAL CONTEXT
+    # ========================================================
+
+    context = {
+
+        # Company
+        'company_info': company_info,
+
+        # Orders
+        'pending_orders':
+            order_stats.get('pending_orders', 0),
+
+        'processing_orders':
+            order_stats.get('processing_orders', 0),
+
+        'shipped_orders':
+            order_stats.get('shipped_orders', 0),
+
+        'completed_orders':
+            order_stats.get('delivered_orders', 0),
+
+        'cancelled_orders':
+            order_stats.get('cancelled_orders', 0),
+
+        'active_orders_count':
+            order_stats.get('active_orders', 0),
+
+        'recent_orders':
+            recent_orders,
+
+        # Inventory
+        'total_inventory_items':
+            inventory_stats.get('total_inventory_items', 0),
+
+        'total_products':
+            inventory_stats.get('total_products', 0),
+
+        'total_variants':
+            inventory_stats.get('total_variants', 0),
+
+        'low_stock_count':
+            inventory_stats.get('low_stock_count', 0),
+
+        'out_of_stock_count':
+            inventory_stats.get('out_of_stock_count', 0),
+
+        'total_stock_units':
+            inventory_stats.get('total_stock_units') or 0,
+
+        'total_inventory_value':
+            inventory_stats.get('total_inventory_value') or 0,
+
+        'low_stock_items':
+            low_stock_items,
+
+        # Revenue
+        'total_revenue':
+            payment_stats.get('total_revenue') or 0,
+
+        'revenue_today':
+            payment_stats.get('revenue_today') or 0,
+
+        # Profit
+        'total_profit':
+            ledger_stats.get('total_profit') or 0,
+
+        'unsettled_entries':
+            ledger_stats.get('unsettled_entries', 0),
+
+        # Riders
+        'active_riders':
+            rider_stats.get('active_riders', 0),
+
+        'inactive_riders':
+            rider_stats.get('inactive_riders', 0),
+
+        # Customers
+        'total_customers':
+            customer_stats.get('total_customers', 0),
+
+        'new_customers_today':
+            customer_stats.get('new_customers_today', 0),
+    }
+
+    return render(
+        request,
+        'admin_dashboard/dashboard.html',
+        context
+    )
 #================================================
 
 
@@ -288,133 +614,247 @@ def delete_category(request,id):
 
 from django.core.files.storage import default_storage
 
-from .forms import ProductForm, ProductImageFormSet
+from .forms import ProductForm
 from .models import Product, ProductImage
+from django.contrib import messages
+from django.db import transaction
+from django.shortcuts import render, redirect
 
+from .models import Product
+from .forms import (
+    ProductForm,
+    ProductVariantFormSet,
+    ProductImageFormSet,
+)
+
+
+@transaction.atomic
 def add_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        formset = ProductImageFormSet(request.POST, request.FILES, queryset=ProductImage.objects.none())
 
-        if form.is_valid() and formset.is_valid():
+    if request.method == 'POST':
+
+        form = ProductForm(request.POST)
+
+        variant_formset = ProductVariantFormSet(
+            request.POST,
+            prefix='variants'
+        )
+
+        image_formset = ProductImageFormSet(
+            request.POST,
+            request.FILES,
+            prefix='images'
+        )
+
+        if (
+            form.is_valid()
+            and variant_formset.is_valid()
+            and image_formset.is_valid()
+        ):
+
+            # =================================================
+            # SAVE PRODUCT
+            # =================================================
+
             product = form.save()
 
-            # Save each image and link to the product
-            for image_form in formset.cleaned_data:
-                if image_form:
-                    image = image_form['image']
-                    ProductImage.objects.create(product=product, image=image)
+            # =================================================
+            # SAVE VARIANTS
+            # =================================================
 
-            messages.success(request, 'Product added successfully.')
+            variants = variant_formset.save(commit=False)
+
+            for variant in variants:
+                variant.product = product
+                variant.save()
+
+            # delete removed variants
+            for obj in variant_formset.deleted_objects:
+                obj.delete()
+
+            # =================================================
+            # SAVE IMAGES
+            # =================================================
+
+            images = image_formset.save(commit=False)
+
+            for image in images:
+                image.product = product
+                image.save()
+
+            for obj in image_formset.deleted_objects:
+                obj.delete()
+
+            messages.success(request,"Product created successfully.")
+
             return redirect('list_product')
+
         else:
             print(form.errors)
-            messages.error(request, 'Please correct the errors below.')
+            print(variant_formset.errors)
+            print(image_formset.errors)
+
+            messages.error(request,"Please correct the errors below.")
+
     else:
+
         form = ProductForm()
-        formset = ProductImageFormSet(queryset=ProductImage.objects.none())
+
+        variant_formset = ProductVariantFormSet(prefix='variants')
+
+        image_formset = ProductImageFormSet(prefix='images')
 
     context = {
         'form': form,
-        'formset': formset,
+        'variant_formset': variant_formset,
+        'image_formset': image_formset,
     }
-    return render(request, 'Product/add_product.html', context)
 
-from django.forms import modelformset_factory
-from .forms import ProductImageForm
+    return render(request,'Product/add_product.html',context)
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.db import transaction
+
+from .models import Product
+
+from .forms import (
+    ProductForm,
+    ProductVariantFormSet,
+    ProductImageFormSet
+)
+
+
+@transaction.atomic
 def edit_product(request, slug):
-    product = get_object_or_404(Product, slug=slug)
-    
-    # 1. Always get the current images first
-    existing_images = ProductImage.objects.filter(product=product)
-    existing_count = existing_images.count()
-    
-    # 2. Calculate how many empty slots to add to reach 5
-    extra_slots = max(0, 5 - existing_count)
 
-    # 3. Create a Dynamic Factory so 'extra' is always correct
-    DynamicFormSet = modelformset_factory(
-        ProductImage,
-        form=ProductImageForm,
-        extra=extra_slots,
-        can_delete=True,
-        max_num=5
+    product = get_object_or_404(
+        Product.objects.prefetch_related(
+            'variants',
+            'product_images'
+        ),
+        slug=slug
     )
 
+    # =====================================================
+    # POST
+    # =====================================================
+
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
-        # BUG FIX: You MUST pass the queryset here too!
-        formset = DynamicFormSet(
-            request.POST, 
-            request.FILES, 
-            queryset=existing_images
+
+        form = ProductForm(
+            request.POST,
+            instance=product
         )
 
-        if form.is_valid() and formset.is_valid():
+        variant_formset = ProductVariantFormSet(
+            request.POST,
+            instance=product,
+            prefix='variants'
+        )
+
+        image_formset = ProductImageFormSet(
+            request.POST,
+            request.FILES,
+            instance=product,
+            prefix='images'
+        )
+
+        if (
+            form.is_valid()
+            and variant_formset.is_valid()
+            and image_formset.is_valid()
+        ):
+
+            # =========================================
+            # SAVE PRODUCT
+            # =========================================
+
             product = form.save()
-            
-            # Save images but don't commit yet
-            instances = formset.save(commit=False)
-            
-            # Delete marked images
-            for obj in formset.deleted_objects:
-                obj.delete()
 
-            # Save new images and link them
-            for instance in instances:
-                instance.product = product
-                instance.save()
-                
-            messages.success(request, "Product & Images Updated!")
-            return redirect('list_product')
-        else:
-            # DEBUG: If it fails, we need to see why
-            print(formset.errors) 
-    else:
-        # GET Request
-        form = ProductForm(instance=product)
-        formset = DynamicFormSet(queryset=existing_images)
+            # =========================================
+            # SAVE VARIANTS
+            # =========================================
 
-    return render(request, 'Product/edit_product.html', {
-        'form': form,
-        'formset': formset,
-        'product': product
-    })
+            variants = variant_formset.save(commit=False)
 
+            for variant in variants:
+                variant.product = product
+                variant.save()
 
+            for deleted_variant in variant_formset.deleted_objects:
+                deleted_variant.delete()
 
-def duplicate_product(request, slug):
-    # 1. Fetch the original product
-    original_product = get_object_or_404(Product, slug=slug)
-    
-    # 2. Get a FRESH, separate instance from the DB (crucial fix)
-    new_product = Product.objects.get(pk=original_product.pk)
-    
-    # 3. Clear keys so Django treats it as a brand new entry
-    new_product.pk = None
-    new_product.id = None
-    
-    # 4. Update details
-    new_product.name = f"{original_product.name} (Copy)"
-    new_product.slug = None # This allows your model's save() to generate a new unique slug
-    
-    # 5. Save the new product first
-    new_product.save()
+            # =========================================
+            # SAVE IMAGES
+            # =========================================
 
-    # 6. Clone the images
-    if hasattr(original_product, 'product_images'):
-        for original_img in original_product.product_images.all():
-            ProductImage.objects.create(
-                product=new_product,
-                image=original_img.image
+            images = image_formset.save(commit=False)
+
+            for image in images:
+                image.product = product
+                image.save()
+
+            for deleted_image in image_formset.deleted_objects:
+                deleted_image.delete()
+
+            messages.success(
+                request,
+                "Product updated successfully."
             )
-    
-    # 7. Add a specific success message for the admin
-    messages.success(request, f'Product duplicated! You are now editing the copy: "{new_product.name}"')
-    
-    # 8. Redirect to the EDIT page of the BRAND NEW product
-    return redirect('edit_product', slug=new_product.slug)
+
+            return redirect('list_product')
+
+        else:
+
+            print(form.errors)
+            print(variant_formset.errors)
+            print(image_formset.errors)
+
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
+
+    # =====================================================
+    # GET
+    # =====================================================
+
+    else:
+
+        form = ProductForm(
+            instance=product
+        )
+
+        variant_formset = ProductVariantFormSet(
+            instance=product,
+            prefix='variants'
+        )
+
+        image_formset = ProductImageFormSet(
+            instance=product,
+            prefix='images'
+        )
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+        'product': product,
+        'form': form,
+        'variant_formset': variant_formset,
+        'image_formset': image_formset,
+    }
+
+    return render(
+        request,
+        'Product/edit_product.html',
+        context
+    )
+
+
+
 
 def delete_product(request, slug):
     product = get_object_or_404(Product, slug=slug)
@@ -1024,64 +1464,139 @@ def generate_invoice_pdf(request, order_id):
     return FileResponse(buffer, as_attachment=True, filename=f"GramaCart_Invoice_{order.order_number}.pdf")
     
 
-#live inventory
-from django.db import models
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from django.db.models import Sum, F
-from .models import Product
-from .forms import StockLogForm  # Ensure you import your new form
+# from django.shortcuts import render
+# from django.core.paginator import Paginator
+# from django.db.models import Q, Sum, F, DecimalField
+# from django.db.models.functions import Coalesce
 
-from django.db.models import Sum, F, Q
-from .models import Product, Category
+# from inventory.models import Inventory
+# from admin_dashboard.models import Category
+# from .forms import StockLogForm
 
-def live_inventory(request):
-    # 1. Get Filter Parameters from the URL
-    query = request.GET.get('q')
-    category_id = request.GET.get('category')
-    
-    # 2. Base Queryset (Optimized)
-    all_products = Product.objects.all().select_related('category').order_by('category__name', 'name')
 
-    # 3. Apply Filters if they exist
-    if query:
-        all_products = all_products.filter(Q(name__icontains=query) | Q(description__icontains=query))
-    if category_id:
-        all_products = all_products.filter(category_id=category_id)
+# def live_inventory(request):
 
-    # 4. Calculate Dashboard Stats (Based on the filtered list)
-    stats = all_products.aggregate(
-        total_value=Sum(F('price') * F('stock_available')),
-        out_of_stock=Sum(
-            models.Case(
-                models.When(stock_available=0, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        )
-    )
+#     query = request.GET.get('q', '').strip()
+#     category_id = request.GET.get('category')
 
-    low_stock_count = all_products.filter(
-        stock_available__lte=F('min_stock_level'), 
-        stock_available__gt=0
-    ).count()
+#     # =====================================================
+#     # BASE INVENTORY QUERY
+#     # =====================================================
 
-    # 5. Pagination
-    paginator = Paginator(all_products, 10)
-    page_number = request.GET.get('page')
-    products = paginator.get_page(page_number)
+#     inventories = (
+#         Inventory.objects
+#         .select_related(
+#             'variant',
+#             'variant__product',
+#             'shop'
+#         )
+#         .order_by('-updated_at')
+#     )
 
-    # 6. Context (Added 'categories' for the dropdown)
-    context = {
-        'products': products,
-        'categories': Category.objects.all(), # Needed for the filter dropdown
-        'stock_form': StockLogForm(),
-        'total_inventory_value': stats['total_value'] or 0,
-        'out_of_stock_count': stats['out_of_stock'] or 0,
-        'low_stock_count': low_stock_count,
-    }
+#     # =====================================================
+#     # SEARCH
+#     # =====================================================
 
-    return render(request, 'Product/live_inventory.html', context)
+#     if query:
+#         inventories = inventories.filter(
+#             Q(variant__product__name__icontains=query) |
+#             Q(variant__product__description__icontains=query) |
+#             Q(shop__name__icontains=query) |
+#             Q(variant__unit__icontains=query)
+#         )
+
+#     # =====================================================
+#     # CATEGORY FILTER
+#     # =====================================================
+
+#     if category_id:
+#         inventories = inventories.filter(
+#             variant__product__category_id=category_id
+#         )
+
+#     # =====================================================
+#     # INVENTORY STATS
+#     # =====================================================
+
+#     inventory_stats = inventories.aggregate(
+
+#         total_inventory_value=Coalesce(
+#             Sum(
+#                 F('stock') * F('cost_price'),
+#                 output_field=DecimalField()
+#             ),
+#             0
+#         ),
+
+#         out_of_stock_count=Coalesce(
+#             Sum(
+#                 models.Case(
+#                     models.When(stock__lte=0, then=1),
+#                     default=0,
+#                     output_field=models.IntegerField()
+#                 )
+#             ),
+#             0
+#         ),
+
+#         low_stock_count=Coalesce(
+#             Sum(
+#                 models.Case(
+#                     models.When(
+#                         stock__gt=0,
+#                         stock__lte=F('min_stock_level'),
+#                         then=1
+#                     ),
+#                     default=0,
+#                     output_field=models.IntegerField()
+#                 )
+#             ),
+#             0
+#         )
+#     )
+
+#     # =====================================================
+#     # PAGINATION
+#     # =====================================================
+
+#     paginator = Paginator(inventories, 10)
+
+#     page_number = request.GET.get('page')
+
+#     inventory_page = paginator.get_page(page_number)
+
+#     # =====================================================
+#     # CONTEXT
+#     # =====================================================
+
+#     context = {
+
+#         "inventories": inventory_page,
+
+#         "categories": Category.objects.all(),
+
+#         "stock_form": StockLogForm(),
+
+#         "query": query,
+#         "selected_category": category_id,
+
+#         # Stats
+#         "total_inventory_value":
+#             inventory_stats['total_inventory_value'],
+
+#         "out_of_stock_count":
+#             inventory_stats['out_of_stock_count'],
+
+#         "low_stock_count":
+#             inventory_stats['low_stock_count'],
+#     }
+
+#     return render(
+#         request,
+#         "Product/live_inventory.html",
+#         context
+#     )
+
 
 from django.db.models import F
 
@@ -1134,6 +1649,77 @@ def restock_product(request, product_id):
                     messages.error(request, f"Form Error ({field}): {error}")
             
     return redirect('live_inventory')
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+from admin_dashboard.models import Product, ProductVariant, Shop
+from inventory.models import Inventory
+
+
+@login_required
+def inventory_assign(request):
+
+    products = Product.objects.select_related('category').prefetch_related('variants')
+    shops = Shop.objects.select_related('hub')
+
+    inventory_items = Inventory.objects.select_related(
+        'variant',
+        'variant__product',
+        'shop',
+        'shop__hub'
+    ).order_by('-updated_at')
+
+    if request.method == "POST":
+
+        product_id = request.POST.get("product")
+        variant_id = request.POST.get("variant")
+        shop_id = request.POST.get("shop")
+
+        stock = int(request.POST.get("stock") or 0)
+        cost_price = request.POST.get("cost_price") or 0
+        selling_price = request.POST.get("selling_price") or 0
+        min_stock_level = request.POST.get("min_stock_level") or 5
+
+        try:
+            variant = ProductVariant.objects.get(
+                id=variant_id,
+                product_id=product_id
+            )
+            shop = Shop.objects.get(id=shop_id)
+
+            inventory, created = Inventory.objects.get_or_create(
+                variant=variant,
+                shop=shop,
+                defaults={
+                    "stock": stock,
+                    "cost_price": cost_price,
+                    "selling_price": selling_price,
+                    "min_stock_level": min_stock_level,
+                }
+            )
+
+            if not created:
+                inventory.stock += stock
+                inventory.cost_price = cost_price
+                inventory.selling_price = selling_price
+                inventory.min_stock_level = min_stock_level
+                inventory.save()
+
+            messages.success(request, "Inventory assigned successfully!")
+            return redirect("inventory_assign")  # stay on same page
+
+        except Exception as e:
+            messages.error(request, str(e))
+
+    return render(request, "inventory/inventory_assign.html", {
+        "products": products,
+        "shops": shops,
+        "inventory_items": inventory_items,  # ✅ THIS IS THE KEY FIX
+    })
 
 @login_required
 @staff_member_required
@@ -1273,3 +1859,109 @@ def settle_rider_handover(request, wallet_id):
             messages.success(request, f"Settled account for {wallet.user.username}. Cash received!")
             
     return redirect('rider_cash_settlement_list')
+
+
+#======================================================
+
+
+from .models import Shop
+from .forms import ShopForm
+
+
+# =====================================================
+# SHOP LIST
+# =====================================================
+
+@login_required
+def shop_list(request):
+
+    shops = Shop.objects.select_related('hub').order_by('-created_at')
+
+    context = {
+        "shops": shops
+    }
+
+    return render(request, 'shops/shop_list.html', context)
+
+
+# =====================================================
+# ADD SHOP
+# =====================================================
+
+@login_required
+def add_shop(request):
+
+    if request.method == 'POST':
+
+        form = ShopForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, "Shop created successfully.")
+
+            return redirect('shop_list')
+
+    else:
+        form = ShopForm()
+
+    context = {
+        "form": form
+    }
+
+    return render(request, 'shops/shop_form.html', context)
+
+
+# =====================================================
+# EDIT SHOP
+# =====================================================
+
+@login_required
+def edit_shop(request, pk):
+
+    shop = get_object_or_404(Shop, pk=pk)
+
+    if request.method == 'POST':
+
+        form = ShopForm(request.POST, instance=shop)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, "Shop updated successfully.")
+
+            return redirect('shop_list')
+
+    else:
+        form = ShopForm(instance=shop)
+
+    context = {
+        "form": form,
+        "shop": shop
+    }
+
+    return render(request, 'shops/shop_form.html', context)
+
+
+# =====================================================
+# DELETE SHOP
+# =====================================================
+
+@login_required
+def delete_shop(request, pk):
+
+    shop = get_object_or_404(Shop, pk=pk)
+
+    if request.method == 'POST':
+
+        shop.delete()
+
+        messages.success(request, "Shop deleted successfully.")
+
+        return redirect('shop_list')
+
+    context = {
+        "shop": shop
+    }
+
+    return render(request, 'shops/shop_confirm_delete.html', context)

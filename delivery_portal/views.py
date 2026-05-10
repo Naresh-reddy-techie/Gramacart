@@ -154,49 +154,70 @@ from payments.models import FinancialWallet
 # SERIALIZER (RADAR FORMAT)
 # -----------------------------
 def serialize_delivery(d):
-    order = d.order
-    address = order.address
+
+    order = getattr(d, "order", None)
+
+    if not order:
+        return {
+            "id": d.id,
+            "order_number": None,
+            "earnings": float(d.rider_earning or 0),
+            "pickup": {"hub_name": "Hub"},
+            "drop": {},
+            "items": [],
+            "status": d.status,
+        }
+
+    address = getattr(order, "address", None)
+
+    items = list(
+        order.items.select_related("product").all()
+    )
 
     return {
         "id": d.id,
-        "order_number": order.id if order else None,
-        "earnings": float(getattr(d, "rider_earning", 0)),
+        "order_number": order.order_number,
 
         "pickup": {
             "hub_name": d.nearest_hub.name if d.nearest_hub else "Hub",
-            "lat": float(d.nearest_hub.latitude) if d.nearest_hub else None,
-            "lng": float(d.nearest_hub.longitude) if d.nearest_hub else None,
         },
 
         "drop": {
             "name": address.recipient_name if address else "Customer",
             "phone": address.phone_number if address else "",
-            "full_address": " ".join(filter(None, [
-                getattr(address, "address_line", ""),
-                getattr(address, "landmark", ""),
-                getattr(address, "city", ""),
-                getattr(address, "state", ""),
-                getattr(address, "pincode", ""),
-            ])) if address else "",
-            "lat": float(address.latitude) if address and address.latitude else None,
-            "lng": float(address.longitude) if address and address.longitude else None,
+            "full_address": (
+                f"{address.address_line or ''} {address.landmark or ''} "
+                f"{address.city or ''} {address.state or ''} {address.pincode or ''}"
+                if address else ""
+            ),
+            "lat": float(address.latitude) if address else None,
+            "lng": float(address.longitude) if address else None,
         },
 
         "items": [
             {
-                "name": getattr(i, "product_name", "Item"),
-                "qty": getattr(i, "quantity", 1),
-                "size": getattr(i, "size", "std"),
+                "name": i.product.name,
+                "qty": i.quantity,
+                "size": i.product.size,
             }
-            for i in getattr(order, "items", []).all()
-        ] if order and hasattr(order, "items") else [],
+            for i in items
+        ],
 
         "status": d.status,
     }
-
 # -----------------------------
 # DASHBOARD VIEW
 # -----------------------------
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.db.models import Sum
+from datetime import datetime, time
+
+# Assuming your decorators and models are imported correctly
+# from .models import Delivery, DeliveryStatus, FinancialWallet
+
 @login_required
 @delivery_boy_required
 def dashboard(request):
@@ -206,20 +227,28 @@ def dashboard(request):
         return redirect('login')
 
     # -------------------------
-    # DATE FILTER
+    # 1. DATE PARSING & TIMEZONE WINDOW
     # -------------------------
-    selected_date = request.GET.get('date') or localdate().isoformat()
+    selected_date_str = request.GET.get('date')
+    try:
+        if selected_date_str:
+            target_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        else:
+            target_date = timezone.localdate()
+    except (ValueError, TypeError):
+        target_date = timezone.localdate()
+
+    # Create a range from 00:00:00 to 23:59:59 in Asia/Kolkata time
+    # This solves the "0 earnings" issue caused by UTC vs IST mismatch
+    start_of_day = timezone.make_aware(datetime.combine(target_date, time.min))
+    end_of_day = timezone.make_aware(datetime.combine(target_date, time.max))
 
     # -------------------------
-    # ACTIVE TASKS
+    # 2. ACTIVE TASKS (Always Live)
     # -------------------------
     active_qs = Delivery.objects.filter(
         delivery_boy=request.user
-    ).select_related(
-        'order',
-        'order__address',
-        'nearest_hub'
-    )
+    ).select_related('order', 'order__address', 'nearest_hub')
 
     deliveries_assigned = active_qs.filter(status=DeliveryStatus.ASSIGNED)
     deliveries_out = active_qs.filter(status=DeliveryStatus.OUT)
@@ -236,89 +265,66 @@ def dashboard(request):
             d.is_overdue = False
 
     # -------------------------
-    # RADAR ORDERS (FIXED QUERY)
+    # 3. RADAR ORDERS (Marketplace)
     # -------------------------
     available_orders_qs = Delivery.objects.filter(
         status=DeliveryStatus.PACKED,
         nearest_hub=profile.hub,
         delivery_boy__isnull=True
-    ).select_related(
-        'order',
-        'order__address',
-        'nearest_hub'
-    ).order_by('-id')
-
-    available_orders = [
-        serialize_delivery(d)
-        for d in available_orders_qs
-    ]
-
-    deliveries_assigned_data = [
-        serialize_delivery(d)
-        for d in deliveries_assigned
-    ]
-
-    deliveries_out_data = [
-        serialize_delivery(d)
-        for d in deliveries_out
-    ]
+    ).select_related('order', 'order__address', 'nearest_hub').order_by('-id')
 
     # -------------------------
-    # HISTORY STATS
+    # 4. HISTORY & PERFORMANCE (Filtered by Range)
     # -------------------------
-    history_qs = Delivery.objects.filter(
+    # We use delivered_at because that's when the money is actually earned
+    delivered_history = Delivery.objects.filter(
         delivery_boy=request.user,
-        assigned_at__date=selected_date
+        status=DeliveryStatus.DELIVERED,
+        delivered_at__range=(start_of_day, end_of_day)
     )
 
-    delivered_history = history_qs.filter(status=DeliveryStatus.DELIVERED)
+    cancelled_count = Delivery.objects.filter(
+        delivery_boy=request.user,
+        status=DeliveryStatus.CANCELLED,
+        created_at__range=(start_of_day, end_of_day)
+    ).count()
 
-    stats = {
-        'delivered': delivered_history.count(),
-        'cancelled': history_qs.filter(status=DeliveryStatus.CANCELLED).count(),
-        'earnings': delivered_history.aggregate(
-            total=Sum('rider_earning')
-        )['total'] or 0,
-        'cash': delivered_history.filter(
-            cod_collected=True
-        ).aggregate(
-            total=Sum('order__total')
-        )['total'] or 0
-    }
+    # Calculate Totals
+    day_earnings = delivered_history.aggregate(total=Sum('rider_earning'))['total'] or 0
+    day_cash = delivered_history.filter(
+        cod_collected=True
+    ).aggregate(total=Sum('order__total'))['total'] or 0
+
+    from admin_dashboard.models import CompanyInfo  
+    company = CompanyInfo.objects.first()
 
     # -------------------------
-    # WALLET
+    # 5. CONTEXT & WALLET
     # -------------------------
     wallet, _ = FinancialWallet.objects.get_or_create(user=request.user)
 
-    # -------------------------
-    # CONTEXT
-    # -------------------------
     context = {
         "profile": profile,
+        "company": company,
+        # JSON Data for JS (Radar & Tasks)
+        "available_orders": [serialize_delivery(d) for d in available_orders_qs],
+        "assigned_orders_json": [serialize_delivery(d) for d in deliveries_assigned],
+        "out_orders_json": [serialize_delivery(d) for d in deliveries_out],
 
-        # RAW (fallback if needed)
-        "deliveries_assigned": deliveries_assigned,
-        "deliveries_out": deliveries_out,
-
-        # JSON (RADAR SYSTEM)
-        "available_orders": available_orders,
-        "assigned_orders_json": deliveries_assigned_data,
-        "out_orders_json": deliveries_out_data,
-
-        # STATS
+        # Performance Stats (Passed to UI Cards)
         "wallet_balance": wallet.pending_balance,
-        "day_earnings": stats["earnings"],
-        "orders_delivered": stats["delivered"],
-        "orders_cancelled": stats["cancelled"],
-        "cash_in_hand": stats["cash"],
+        "day_earnings": day_earnings,
+        "orders_delivered": delivered_history.count(),
+        "orders_cancelled": cancelled_count,
+        "cash_in_hand": day_cash,
 
-        # UI HELPERS
+        # UI Helpers
         "total_active_tasks": deliveries_assigned.count() + deliveries_out.count(),
-        "today": localdate().isoformat(),
-        "selected_date": selected_date,
+        "today": timezone.localdate().isoformat(),
+        "selected_date": target_date.isoformat(),
     }
-
+    
+  
     return render(request, "delivery_portal/dashboard.html", context)
 
 from .utils import sync_order_status
@@ -368,27 +374,67 @@ def confirm_pickup(request, delivery_id):
         messages.error(request, "System error confirming pickup. Please try again.")
         print(f"Pickup Error: {e}") # Log this to your server console
 
-    return redirect('rider_dashboard')
+    return redirect('delivery_complete', delivery_id=delivery.id)
+
+
+
+import traceback
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.utils import timezone
+from .models import Delivery, DeliveryStatus
 
 def mark_delivery_failed(request, delivery_id):
-    delivery = get_object_or_404(Delivery, id=delivery_id)
-    
-    if request.method == "POST":
-        reason = request.POST.get('reason')
+    try:
+        # 1. Fetch delivery with related order and the user profile
+        delivery = get_object_or_404(
+            Delivery.objects.select_related('order', 'delivery_boy__delivery_profile'), 
+            id=delivery_id
+        )
         
-        # 1. Update Delivery Status
-        delivery.status = 'failed'
-        delivery.failure_notes = reason
-        delivery.save()
-        
-        # 2. Update Order Status (so customer sees it)
-        order = delivery.order
-        order.status = 'failed' # Or 'out_for_delivery_failed'
-        order.save()
-        
-        messages.warning(request, "Delivery marked as failed. Please return items to hub.")
-        return redirect('rider_dashboard')
-    
+        if request.method == "POST":
+            reason = request.POST.get('reason')
+            
+            if not reason:
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'status': 'error', 'message': 'Reason is required'}, status=400)
+                messages.error(request, "Please provide a reason.")
+                return redirect('rider_dashboard')
+
+            # 2. Update Delivery status to CANCELLED (per your DeliveryStatus choices)
+            delivery.status = DeliveryStatus.CANCELLED
+            delivery.tracking_notes = f"FAILURE REASON: {reason}" 
+            delivery.save()
+            
+            # 3. Update Order status
+            if delivery.order:
+                order = delivery.order
+                order.status = 'cancelled' # Ensure 'cancelled' is in your Order model choices
+                order.save()
+            
+            # 4. Set Rider back to Online (Available for new tasks)
+            if delivery.delivery_boy and hasattr(delivery.delivery_boy, 'delivery_profile'):
+                profile = delivery.delivery_boy.delivery_profile
+                profile.is_online = True 
+                profile.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Task cancelled successfully.'
+                })
+            
+            messages.warning(request, "Task cancelled. Please return the items.")
+            return redirect('rider_dashboard')
+
+    except Exception as e:
+        print("--- GRAMACART SERVER ERROR ---")
+        print(traceback.format_exc()) 
+        return JsonResponse({
+            'status': 'error', 
+            'message': str(e)
+        }, status=500)
 
 import urllib.parse
 import base64
@@ -398,11 +444,38 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-# Ensure these imports match your project structure
-from payments.utils import generate_upi_qr_code 
-from .models import Delivery, DeliveryStatus
-from payments.models import Payment
-from .forms import ProofUploadForm
+
+
+import qrcode
+from io import BytesIO
+
+def generate_upi_qr_code(upi_id, payee_name, amount):
+    """
+    Generates a UPI QR code and returns it as a BytesIO stream
+    to match the .read() requirement in the view.
+    """
+    # Construct the UPI string
+    # pn: Payee Name, pa: Payee Address (UPI ID), am: Amount, cu: Currency
+    upi_url = f"upi://pay?pa={upi_id}&pn={payee_name}&am={amount}&cu=INR"
+    
+    # Generate the QR Code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(upi_url)
+    qr.make(fit=True)
+
+    # Create image
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Save to a BytesIO buffer so it can be .read() like a file
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)  # Reset pointer to the start
+    return buffer
 
 @login_required
 @delivery_boy_required
@@ -563,60 +636,68 @@ def complete_delivery(request, delivery_id):
     
 from django.db.models import Sum
 from django.utils.timezone import localdate, make_aware
-import datetime
+import datetime as dt_module  # Use an alias to prevent clashes
+from datetime import timedelta
 from itertools import groupby
 from .models import Delivery, DeliveryStatus
-import datetime  # Import the whole module
-from datetime import timedelta
-from django.utils.timezone import localdate, make_aware
 
 @login_required
 @delivery_boy_required
 def rider_earnings(request):
-    today = localdate()
-    selected_month_str = request.GET.get('month', today.strftime('%Y-%m'))
+    today_date = localdate()
+    selected_month_str = request.GET.get('month', today_date.strftime('%Y-%m'))
     
     try:
-        year, month = map(int, selected_month_str.split('-'))
-    except:
-        year, month = today.year, today.month
+        # We use unique names so they never match 'datetime' or 'date'
+        y_val, m_val = map(int, selected_month_str.split('-'))
+    except (ValueError, AttributeError):
+        y_val, m_val = today_date.year, today_date.month
 
-    # Create date range for the entire month to ensure coverage
-    start_date = datetime.date(year, month, 1)
-    if month == 12:
-        end_date = datetime.date(year + 1, 1, 1)
+    # Logic using the alias 'dt_module'
+    start_date = dt_module.date(y_val, m_val, 1)
+    if m_val == 12:
+        end_date = dt_module.date(y_val + 1, 1, 1)
     else:
-        end_date = datetime.date(year, month + 1, 1)
+        end_date = dt_module.date(y_val, m_val + 1, 1)
 
-    # Filter using range (start_of_month to start_of_next_month)
-    # This is more reliable than __month and __year lookups
+    # Filtering
     deliveries = Delivery.objects.filter(
         delivery_boy=request.user,
         status=DeliveryStatus.DELIVERED,
-        delivered_at__gte=make_aware(datetime.datetime.combine(start_date, datetime.time.min)),
-        delivered_at__lt=make_aware(datetime.datetime.combine(end_date, datetime.time.min))
+        delivered_at__gte=make_aware(dt_module.datetime.combine(start_date, dt_module.time.min)),
+        delivered_at__lt=make_aware(dt_module.datetime.combine(end_date, dt_module.time.min))
     ).select_related('order', 'order__address').order_by('-delivered_at')
 
-    # Manual Math to avoid QuerySet aggregation issues
-    total_balance = sum(d.rider_earning for d in deliveries)
-    today_earnings = sum(d.rider_earning for d in deliveries if d.delivered_at.date() == today)
+    # Calculations with Null-safety
+    total_balance = sum(d.rider_earning for d in deliveries if d.rider_earning)
     
-    # Weekly Logic
-    start_of_week = today - timedelta(days=today.weekday())
-    weekly_earnings = sum(d.rider_earning for d in deliveries if d.delivered_at.date() >= start_of_week)
+    # Line 587 area - Fixed by using explicit checks and alias
+    today_earnings = sum(
+        d.rider_earning for d in deliveries 
+        if d.delivered_at and d.delivered_at.date() == today_date
+    )
+    
+    start_of_week = today_date - timedelta(days=today_date.weekday())
+    weekly_earnings = sum(
+        d.rider_earning for d in deliveries 
+        if d.delivered_at and d.delivered_at.date() >= start_of_week
+    )
 
-    # Grouping for Template
+    # Grouping
     history_groups = []
-    for date, items in groupby(deliveries, lambda x: x.delivered_at.date()):
+    for date_key, items in groupby(deliveries, lambda x: x.delivered_at.date() if x.delivered_at else None):
+        if date_key is None:
+            continue
+        
         items_list = list(items)
         history_groups.append({
-            'date': date,
-            'day_total': sum(item.rider_earning for item in items_list),
+            'date': date_key,
+            'day_total': sum(item.rider_earning for item in items_list if item.rider_earning),
             'deliveries': items_list
         })
 
     context = {
-        'today': today,
+        'today': today_date,
         'current_month': selected_month_str,
         'total_balance': total_balance,
         'today_earnings': today_earnings,
@@ -624,7 +705,6 @@ def rider_earnings(request):
         'history_groups': history_groups,
     }
     return render(request, 'delivery_portal/rider_earnings.html', context)
-
 @csrf_exempt
 @login_required
 @delivery_boy_required
@@ -642,29 +722,45 @@ def update_rider_location(request, delivery_id):
             return JsonResponse({'status': 'error'}, status=400)
     return JsonResponse({'status': 'invalid method'}, status=405)
 
+from django.db import transaction
+import logging
+
+logger = logging.getLogger(__name__)
+
 @login_required
 @delivery_boy_required
 def delivery_failed(request, delivery_id):
-    """Handles cases where the rider cannot complete the drop (e.g., customer not home)."""
     delivery = get_object_or_404(Delivery, pk=delivery_id, delivery_boy=request.user)
     
     if request.method == 'POST':
-        reason = request.POST.get('reason')
-        with transaction.atomic():
-            # Update delivery status
-            delivery.status = DeliveryStatus.CANCELLED 
-            delivery.tracking_notes = f"FAILED: {reason}"
-            delivery.save()
+        reason = request.POST.get('reason', 'No reason provided')
+        
+        try:
+            with transaction.atomic():
+                # 1. Update Delivery
+                delivery.status = DeliveryStatus.CANCELLED 
+                delivery.tracking_notes = f"FAILED: {reason}"
+                delivery.save()
+                
+                # 2. Update Order (Double check if 'status' is the correct field name)
+                order = delivery.order
+                order.status = 'CANCELLED' # Use the exact string your model expects
+                order.save()
             
-            # Update main order status so customer/admin knows
-            delivery.order.status = 'cancelled'
-            delivery.order.save()
-        
-        messages.warning(request, f"Delivery for Order #{delivery.order.id} marked as failed.")
-        return redirect('rider_dashboard')
-        
-    return render(request, 'delivery_portal/delivery_failed.html', {'delivery': delivery})
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+                
+            messages.warning(request, f"Order #{delivery.order.id} marked as failed.")
+            return redirect('rider_dashboard')
 
+        except Exception as e:
+            # This will print the exact error to your terminal
+            print(f"CRITICAL ERROR IN CANCEL: {str(e)}") 
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            raise e # Re-raise for non-ajax debugging
+            
+    return render(request, 'delivery_portal/delivery_failed.html', {'delivery': delivery})
 
 @login_required
 @delivery_boy_required
@@ -862,39 +958,38 @@ def accept_order(request, delivery_id):
     messages.success(request, f"Order #{delivery.order.order_number} is now in your tasks!")
     return redirect('rider_dashboard')
 
-from django.utils.timezone import localdate
+"""
+from django.utils import timezone
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from datetime import datetime
-
-# Assuming these are your imports based on your structure
-# from .models import Delivery, DeliveryStatus
+from datetime import datetime, time
 
 @login_required
 @delivery_boy_required
 def check_new_orders(request):
-    """
-    Unified API for Rider Dashboard: 
-    - Parts A & B (Tasks/Radar) are ALWAYS LIVE.
-    - Part C (Stats) follows the CALENDAR DATE.
-    """
+    
+    #Unified API for Rider Dashboard: 
+    #- Parts A & B (Tasks/Radar) are ALWAYS LIVE.
+    #- Part C (Stats) follows the CALENDAR DATE.
+   
     profile = request.user.delivery_profile
     
-    # --- PART 0: DATE PARSING (The Fix for Weekly Activity) ---
+    # --- PART 0: DATE PARSING & TIMEZONE WINDOW ---
     selected_date_str = request.GET.get('date')
-    
-    if selected_date_str:
-        try:
-            # Explicitly parse the string 'YYYY-MM-DD' into a date object
-            # This prevents timezone mismatch issues in the query
+    try:
+        if selected_date_str:
             target_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-        except (ValueError, TypeError):
-            target_date = localdate()
-    else:
-        target_date = localdate()
-    
+        else:
+            target_date = timezone.localdate()
+    except (ValueError, TypeError):
+        target_date = timezone.localdate()
+
+    # Create the Asia/Kolkata aware time range
+    start_of_day = timezone.make_aware(datetime.combine(target_date, time.min))
+    end_of_day = timezone.make_aware(datetime.combine(target_date, time.max))
+
     # --- PART A: ACTIVE TASKS (Always Live) ---
     my_active_tasks = Delivery.objects.filter(
         delivery_boy=request.user,
@@ -937,7 +1032,7 @@ def check_new_orders(request):
         else:
             out_data.append(task_payload)
 
-    # --- PART B: THE ORDER RADAR (Marketplace - Always Live) ---
+    # --- PART B: THE ORDER RADAR (Always Live) ---
     orders_data = []
     if profile.is_online and profile.hub:
         market_orders = Delivery.objects.filter(
@@ -949,50 +1044,192 @@ def check_new_orders(request):
         for d in market_orders:
             addr = d.order.address
             hub = d.nearest_hub
+
+            radar_items = [
+            {
+                'name': i.product.name.upper(), 
+                'qty': i.quantity, 
+                'size': i.product.size if i.product.size else ""
+            } 
+            for i in d.order.items.all()
+            ]
+
             orders_data.append({
                 'id': d.id,
                 'earnings': str(d.rider_earning or "0"),
                 'village': addr.city.upper() if addr else "LOCAL",
                 'hub_name': hub.name.upper() if hub else "HUB",
                 'accept_url': reverse('accept_order', args=[d.id]),
+                'items':radar_items,
+                'pickup':{'hub_name':hub.name.upper() if hub else "HUB"},
+                'drop':{'full_address':addr.get_full_address() if addr else "Address missing",'landmark':addr.landmark if addr else " "},
+
                 'hub_lat': str(hub.latitude) if hub else "0",
                 'hub_lng': str(hub.longitude) if hub else "0",
                 'drop_lat': str(addr.latitude) if addr else "0",
                 'drop_lng': str(addr.longitude) if addr else "0",
             })
 
-    # --- PART C: PERFORMANCE STATS (Filtered by target_date) ---
-    # We query history based on the date derived from the calendar click
-    history_qs = Delivery.objects.filter(
+    # --- PART C: PERFORMANCE STATS (Using Range) ---
+    # Delivered stats use 'delivered_at'
+    delivered_history = Delivery.objects.filter(
         delivery_boy=request.user,
-        assigned_at__date=target_date
+        status=DeliveryStatus.DELIVERED,
+        delivered_at__range=(start_of_day, end_of_day)
     )
-    
-    delivered_history = history_qs.filter(status=DeliveryStatus.DELIVERED)
 
-    # Summing stats using the confirmed field names
+    # Cancelled stats use 'created_at' as they have no delivered_at timestamp
+    cancelled_count = Delivery.objects.filter(
+        delivery_boy=request.user,
+        status=DeliveryStatus.CANCELLED,
+        created_at__range=(start_of_day, end_of_day)
+    ).count()
+
+    # Calculations
     day_earnings = delivered_history.aggregate(total=Sum('rider_earning'))['total'] or 0
     day_cash = delivered_history.filter(
         cod_collected=True
     ).aggregate(total=Sum('order__total'))['total'] or 0
 
     return JsonResponse({
-        # Part A & B
         'assigned': assigned_data,
         'out_deliveries': out_data,
         'orders': orders_data,
         
-        # Part C: This feeds your Weekly Activity stats
+        # Numbers sent to JavaScript (Converted to float for JSON safety)
         'today_earnings': float(day_earnings),
         'orders_delivered': delivered_history.count(),
-        'orders_cancelled': history_qs.filter(status=DeliveryStatus.CANCELLED).count(),
+        'orders_cancelled': cancelled_count,
         'cash_to_pay': float(day_cash),
         
-        # Metadata
         'selected_date': target_date.isoformat(),
         'is_online': profile.is_online
     })
     
+
+"""
+from django.utils import timezone
+from django.db.models import Sum, Q, Prefetch
+from django.http import JsonResponse
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import logging
+
+# Set up logging to track errors in production without showing them to users
+logger = logging.getLogger(__name__)
+
+@login_required
+@delivery_boy_required
+def check_new_orders(request):
+    """
+    Final Production Version:
+    - No attribute errors.
+    - Optimized DB queries.
+    - Safe field access.
+    """
+    profile = request.user.delivery_profile
+    
+    # --- DATE PARSING ---
+    selected_date_str = request.GET.get('date')
+    try:
+        target_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date() if selected_date_str else timezone.localdate()
+    except (ValueError, TypeError):
+        target_date = timezone.localdate()
+
+    # Create time boundaries for stats
+    start_of_day = timezone.make_aware(datetime.combine(target_date, datetime.min.time()))
+    end_of_day = timezone.make_aware(datetime.combine(target_date, datetime.max.time()))
+
+    # --- PART A: ACTIVE TASKS ---
+    my_active_tasks = Delivery.objects.filter(
+        delivery_boy=request.user,
+        status__in=[DeliveryStatus.ASSIGNED, DeliveryStatus.OUT]
+    ).select_related('order__address', 'nearest_hub').prefetch_related('order__items__product')
+
+    assigned_data, out_data = [], []
+
+    for d in my_active_tasks:
+        addr = d.order.address
+        hub = d.nearest_hub
+        
+        # Build Address String Safely
+        full_addr = f"{addr.address_line or ''}, {addr.city or ''} {addr.pincode or ''}".strip(", ") if addr else "N/A"
+        
+        payload = {
+            'id': d.id,
+            'order_number': d.order.order_number,
+            'status': d.status,
+            'earnings': str(d.rider_earning or "0"),
+            'items': [{'name': i.product.name.upper(), 'qty': i.quantity} for i in d.order.items.all()],
+            'pickup': {
+                'hub_name': hub.name.upper() if hub else "HUB",
+                'lat': str(hub.latitude) if hub else "0",
+                'lng': str(hub.longitude) if hub else "0",
+            },
+            'drop': {
+                'name': addr.recipient_name.upper() if addr else "CUSTOMER",
+                'phone': addr.phone_number if addr else "",
+                'full_address': full_addr,
+                'landmark': addr.landmark if addr else "",
+                'lat': str(addr.latitude) if addr else "0",
+                'lng': str(addr.longitude) if addr else "0",
+            }
+        }
+        assigned_data.append(payload) if d.status == DeliveryStatus.ASSIGNED else out_data.append(payload)
+
+    # --- PART B: MARKET RADAR ---
+    orders_data = []
+    if profile.is_online and profile.hub:
+        market_orders = Delivery.objects.filter(
+            status__iexact=DeliveryStatus.PACKED,
+            nearest_hub=profile.hub,
+            delivery_boy__isnull=True
+        ).select_related('order__address', 'nearest_hub')
+
+        for d in market_orders:
+            addr = d.order.address
+            orders_data.append({
+                'id': d.id,
+                'earnings': str(d.rider_earning or "0"),
+                'accept_url': reverse('accept_order', args=[d.id]),
+                'items': [{'name': i.product.name.upper(), 'qty': i.quantity} for i in d.order.items.all()],
+                'pickup': {'hub_name': d.nearest_hub.name.upper() if d.nearest_hub else "HUB"},
+                'drop': {
+                    'full_address': f"{addr.address_line or ''}, {addr.city or ''}".strip(", ") if addr else "Local",
+                    'landmark': addr.landmark if addr else ""
+                }
+            })
+
+    # --- PART C: STATS ---
+    # Query performance based on the specific target date
+    history_qs = Delivery.objects.filter(delivery_boy=request.user)
+    
+    # We use assigned_at or delivered_at depending on your workflow; 
+    # using delivered_at for earnings is more accurate for payroll.
+    delivered_today = history_qs.filter(
+        status=DeliveryStatus.DELIVERED,
+        delivered_at__range=(start_of_day, end_of_day)
+    )
+
+    day_earnings = delivered_today.aggregate(total=Sum('rider_earning'))['total'] or 0
+    day_cash = delivered_today.filter(cod_collected=True).aggregate(total=Sum('order__total'))['total'] or 0
+
+    return JsonResponse({
+        'assigned': assigned_data,
+        'out_deliveries': out_data,
+        'orders': orders_data,
+        'today_earnings': float(day_earnings),
+        'orders_delivered': delivered_today.count(),
+        'orders_cancelled': history_qs.filter(
+            status=DeliveryStatus.CANCELLED,
+            last_location_update__range=(start_of_day, end_of_day)
+        ).count(),
+        'cash_to_pay': float(day_cash),
+        'selected_date': target_date.isoformat(),
+        'is_online': profile.is_online
+    })
+
 @login_required
 @delivery_boy_required
 def live_route(request, delivery_id):
@@ -1049,3 +1286,5 @@ def update_rider_location(request, delivery_id):
         
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
+
+

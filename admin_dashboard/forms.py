@@ -50,32 +50,131 @@ class CategoryForm(forms.ModelForm):
         }
 
 
-from django.forms import modelformset_factory
-from .models import Product
 
-from django import forms
-from .models import Product, StockLog
+from django.forms import inlineformset_factory
+
+from .models import (
+    Product,
+    ProductVariant,
+    ProductImage,
+    Category,
+    StockLog,
+)
+
+# =========================================================
+# PRODUCT FORM
+# =========================================================
 
 class ProductForm(forms.ModelForm):
+
     class Meta:
         model = Product
+
         fields = [
-            'name', 'description', 'category','cost_price', 'price', 'discount_price',
-            'stock_available', 'min_stock_level', 'size', 'is_active'
+            'name',
+            'description',
+            'category',
+            'is_active'
         ]
+
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Name'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe the product...'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'cost_price':forms.NumberInput(attrs={'class':'form-control','placeholder':'Purchase cost(₹)'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Base Price (₹)'}),
-            'discount_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Sale Price (Optional)'}),
-            'stock_available': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Current Quantity'}),
-            'min_stock_level': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Alert at which quantity?'}),
-            'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 1kg, 500ml'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Product Name'
+            }),
+
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Describe the product clearly...'
+            }),
+
+            'category': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
         }
-    
+
+
+# =========================================================
+# PRODUCT VARIANT FORM
+# =========================================================
+
+class ProductVariantForm(forms.ModelForm):
+
+    class Meta:
+        model = ProductVariant
+
+        fields = [
+            'unit',
+            'quantity',
+            'is_active'
+        ]
+
+        widgets = {
+
+            'unit': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Example: 250 / 500 / 1',
+                'step': '0.01',
+                'min': '0'
+            }),
+
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+
+    def clean_quantity(self):
+
+        quantity = self.cleaned_data.get('quantity')
+
+        if quantity is not None and quantity <= 0:
+            raise forms.ValidationError(
+                "Quantity must be greater than zero"
+            )
+
+        return quantity
+
+
+# =========================================================
+# PRODUCT IMAGE FORMSET
+# =========================================================
+
+
+
+ProductImageFormSet = inlineformset_factory(
+    Product,
+    ProductImage,
+    fields=['image'],
+    extra=5,
+    max_num=5,
+    validate_max=True,
+    can_delete=True
+)
+
+# =========================================================
+# PRODUCT VARIANT FORMSET
+# =========================================================
+
+ProductVariantFormSet = inlineformset_factory(
+    Product,
+    ProductVariant,
+    form=ProductVariantForm,
+    extra=3,
+    max_num=3,
+    validate_max=True,
+    can_delete=True
+)
+
 class StockLogForm(forms.ModelForm):
     class Meta:
         model = StockLog
@@ -109,15 +208,6 @@ class ProductImageForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'})
         }
 
-# Define the formset here
-ProductImageFormSet = modelformset_factory(
-    ProductImage,
-    form=ProductImageForm,
-    extra=5,      # Request up to 5 extra slots
-    max_num=5,    # But never exceed 5 total
-    can_delete=True,
-)
-
 
 
 #==========================================================
@@ -128,11 +218,13 @@ from .models import DeliveryHub
 class DeliveryHubForm(forms.ModelForm):
     class Meta:
         model = DeliveryHub
-        fields = ['name', 'latitude', 'longitude', 'max_delivery_radius_km']
+        fields = ['name', 'latitude', 'longitude',  'full_address','landmark','max_delivery_radius_km']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'latitude': forms.NumberInput(attrs={'class': 'form-control'}),
             'longitude': forms.NumberInput(attrs={'class': 'form-control'}),
+            'full_address': forms.Textarea(attrs={'class': 'form-control','rows': 3,'placeholder': 'Full pickup location for riders'}),
+            'landmark': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nearby landmark (Temple, Bus Stand, etc.)'}),
             'max_delivery_radius_km': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
@@ -236,3 +328,67 @@ class PaymentMethodForm(forms.ModelForm):
             instance.save()
         return instance
     
+
+
+from django import forms
+from .models import Shop
+
+
+class ShopForm(forms.ModelForm):
+
+    class Meta:
+        model = Shop
+
+        fields = [
+            'name',
+            'shop_type',
+            'hub',
+            'phone',
+            'address',
+            'is_internal',
+            'is_active'
+        ]
+
+        widgets = {
+
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter shop name'
+            }),
+
+            'shop_type': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'hub': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Phone number'
+            }),
+
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter address'
+            }),
+
+            'is_internal': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+
+    def clean_name(self):
+
+        name = self.cleaned_data['name'].strip()
+
+        if len(name) < 2:
+            raise forms.ValidationError("Shop name is too short")
+
+        return name

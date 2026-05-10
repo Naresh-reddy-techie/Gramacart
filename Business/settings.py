@@ -43,11 +43,15 @@ INSTALLED_APPS = [
     'shop',
     'payments',
     'delivery_portal',
+    'inventory',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    
+    'django.middleware.locale.LocaleMiddleware', # for language translation
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -84,7 +88,7 @@ WSGI_APPLICATION = 'Business.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gramacart',
+        'NAME': 'Gramackart',
         'PASSWORD':'Naresh@2001.',
         'HOST': 'localhost',
         'USER': 'root'
@@ -114,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'Asia/Kolkata'
 
@@ -122,6 +126,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('te', 'Telugu'),
+    ('hi', 'Hindi'),
+    ('kn', 'Kannada'),
+    ('ta', 'Tamil'),
+]
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

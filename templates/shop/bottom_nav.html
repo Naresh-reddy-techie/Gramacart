@@ -1,90 +1,110 @@
 <style>
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #ffffff;
-        display: flex;
-        justify-content: space-around;
-        padding: 12px 0 10px 0; /* Extra bottom padding for modern phone home-bars */
-        border-radius: 24px 24px 0 0;
-        z-index: 2000;
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.06);
-        border-top: 1px solid #f1f5f9;
-    }
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    
+    height: calc(70px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
 
-    .nav-item {
-        text-align: center;
-        text-decoration: none;
-        color: #94a3b8; /* Muted color for inactive */
-        font-size: 0.65rem;
-        font-weight: 700;
-        position: relative;
-        flex: 1;
-        transition: all 0.2s ease;
-    }
+    background: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 
-    .nav-item i {
-        font-size: 1.4rem;
-        display: block;
-        margin-bottom: 3px;
-        transition: transform 0.2s ease;
-    }
+    border-radius: 24px 24px 0 0;
+    z-index: 9999;
 
-    /* Active State styling */
-    .nav-item.active {
-        color: #00b359; /* Your Grama Cart Green */
-    }
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.06);
+    border-top: 1px solid #f1f5f9;
+}
 
-    .nav-item.active i {
-        transform: translateY(-2px);
-    }
+.nav-item {
+    text-align: center;
+    text-decoration: none;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 700;
+    position: relative;
+    flex: 1;
+    transition: all 0.2s ease;
+}
 
-    /* Cart Badge Branding */
-    .nav-badge {
-        position: absolute;
-        top: -4px;
-        right: 25%;
-        background: #ff9900; /* Your Accent Orange */
-        color: white;
-        font-size: 0.6rem;
-        min-width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid white;
-        font-weight: 800;
-    }
+.nav-item i {
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 3px;
+    transition: transform 0.2s ease;
+}
+
+/* ACTIVE STATE */
+.nav-item.active {
+    color: #10B981;
+}
+
+.nav-item.active i {
+    transform: translateY(-2px);
+}
+
+/* CART BADGE */
+.nav-badge {
+    position: absolute;
+    top: -4px;
+    right: 28%;
+    background: #ff9900;
+    color: white;
+    font-size: 0.6rem;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    font-weight: 800;
+}
 </style>
 
+{% with request.resolver_match.url_name as url_name %}
+
 <div class="bottom-nav">
-    <a href="{% url 'public_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-        <i class="bi bi-house-door{% if request.resolver_match.url_name == 'home' %}-fill{% endif %}"></i>
+
+    <!-- HOME -->
+    <a href="{% url 'public_dashboard' %}"
+       class="nav-item {% if url_name == 'public_dashboard' %}active{% endif %}">
+        <i class="bi bi-house-door{% if url_name == 'public_dashboard' %}-fill{% endif %}"></i>
         <span>Home</span>
     </a>
 
-   <a href="{% url 'orders_list' %}" class="nav-item {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">
-        {% if request.resolver_match.url_name == 'orders_list' %}
-            <i class="bi bi-truck-front-fill"></i> 
-        {% else %}
-            <i class="bi bi-truck"></i>
-        {% endif %}
+    <!-- ORDERS -->
+    <a href="{% url 'orders_list' %}"
+       class="nav-item {% if url_name == 'orders_list' %}active{% endif %}">
+        <i class="bi bi-truck{% if url_name == 'orders_list' %}-front-fill{% endif %}"></i>
         <span>Orders</span>
     </a>
 
-    <a href="{% url 'cart_view' %}" class="nav-item {% if request.resolver_match.url_name == 'cart_view' %}active{% endif %}">
-        <i class="bi bi-bag-check{% if request.resolver_match.url_name == 'cart_view' %}-fill{% endif %}"></i>
-        {% if cart_count > 0 %}
-            <span class="nav-badge">{{ cart_count }}</span>
+    <!-- CART -->
+    <a href="{% url 'cart_view' %}"
+       class="nav-item {% if url_name == 'cart_view' %}active{% endif %}">
+        <i class="bi bi-bag-check{% if url_name == 'cart_view' %}-fill{% endif %}"></i>
+
+        {% if cart_count and cart_count > 0 %}
+            <span class="nav-badge" id="cart-badge">{{ cart_count }}</span>
+        {% else %}
+            <span class="nav-badge" id="cart-badge" style="display:none;"></span>
         {% endif %}
+
         <span>Cart</span>
     </a>
 
-    <a href="{% url 'profile_view' %}" class="nav-item {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}">
-        <i class="bi bi-person{% if request.resolver_match.url_name == 'profile_view' %}-fill{% endif %}"></i>
+    <!-- PROFILE -->
+    <a href="{% url 'profile_view' %}"
+       class="nav-item {% if url_name == 'profile_view' %}active{% endif %}">
+        <i class="bi bi-person{% if url_name == 'profile_view' %}-fill{% endif %}"></i>
         <span>Profile</span>
     </a>
+
 </div>
+
+{% endwith %}

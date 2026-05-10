@@ -1,47 +1,102 @@
+{% extends "shop/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GramaCart | Add Address</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% block title %}GramaCart | Add Address{% endblock %}
 
-    <style>
-        :root { --primary: #10B981; --primary-dark: #059669; --navy: #0F172A; --bg: #F8FAFC; --danger: #EF4444; }
-        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--navy); }
-        
-        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 1000; }
-        .header h4 { margin: 0; font-size: 18px; font-weight: 800; }
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-        .form-card { background: #fff; border-radius: 28px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 15px; border: 1px solid #E2E8F0; }
-        
-        /* The Map Container */
-        #map { height: 320px; border-radius: 20px; margin-bottom: 15px; border: 2.5px solid #DCFCE7; z-index: 1; }
-        
-        .status-badge { padding: 10px 18px; border-radius: 14px; font-size: 13px; font-weight: 800; display: inline-block; margin-bottom: 15px; transition: 0.3s; width: 100%; text-align: center; }
-        .status-inside { background: #DCFCE7; color: #166534; border: 1px solid #166534; }
-        .status-outside { background: #FEE2E2; color: #991B1B; border: 1px solid #991B1B; }
-        .status-remote { background: #EFF6FF; color: #1E40AF; border: 1px solid #1E40AF; }
+<style>
+:root { --primary: #10B981; --primary-dark: #059669; --navy: #0F172A; --bg: #F8FAFC; --danger: #EF4444; }
 
-        .form-label { font-weight: 700; font-size: 13px; color: #64748B; margin-left: 5px; }
-        .form-control, .form-select { border-radius: 14px; padding: 12px 15px; border: 1.5px solid #F1F5F9; background: #F8FAFC; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        .form-control:focus { border-color: var(--primary); background: #fff; outline: none; }
+.header {
+    background: #fff;
+    padding: 15px 20px;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
 
-        .landmark-chip { cursor: pointer; font-size: 11px; background: #fff; border: 1px solid #E2E8F0; padding: 8px 12px; border-radius: 10px; font-weight: 700; color: var(--primary-dark); transition: 0.2s; }
-        .landmark-chip:hover { border-color: var(--primary); background: var(--bg); }
+.header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
 
-        .btn-save { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; width: 100%; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
-        .btn-save:disabled { background: #CBD5E1; box-shadow: none; opacity: 0.7; }
+.form-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-top: 15px;
+    border: 1px solid #E2E8F0;
+}
 
-        .remote-card { background: #F0F9FF; border: 1.5px dashed #0EA5E9; border-radius: 18px; padding: 15px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
+#map {
+    height: 320px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    border: 2.5px solid #DCFCE7;
+    z-index: 1;
+}
+
+.status-badge {
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.status-inside { background: #DCFCE7; color: #166534; border: 1px solid #166534; }
+.status-outside { background: #FEE2E2; color: #991B1B; border: 1px solid #991B1B; }
+.status-remote { background: #EFF6FF; color: #1E40AF; border: 1px solid #1E40AF; }
+
+.form-label { font-weight: 700; font-size: 13px; color: #64748B; margin-left: 5px; }
+
+.form-control, .form-select {
+    border-radius: 14px;
+    padding: 12px 15px;
+    border: 1.5px solid #F1F5F9;
+    background: #F8FAFC;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 18px;
+    font-weight: 800;
+    width: 100%;
+}
+
+.btn-save:disabled {
+    background: #CBD5E1;
+    opacity: 0.7;
+}
+
+.remote-card {
+    background: #F0F9FF;
+    border: 1.5px dashed #0EA5E9;
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
 {% if form.errors %}
 <div class="alert alert-danger">
     <strong>Form Errors:</strong><br>
@@ -50,76 +105,62 @@
 {% endif %}
 
 <div class="header">
-    <a href="{% url 'address_list' %}" class="text-dark"><i class="bi bi-arrow-left fs-4"></i></a>
-    <h4>{% if form.instance.pk %}Edit Address{% else %}Set Delivery Location{% endif %}</h4>
+    <a href="{% url 'address_list' %}" class="text-dark">
+        <i class="bi bi-arrow-left fs-4"></i>
+    </a>
+    <h4>
+        {% if form.instance.pk %}Edit Address{% else %}Set Delivery Location{% endif %}
+    </h4>
 </div>
 
 <div class="container pb-5">
+
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 border-0 rounded-4 shadow-sm" role="alert">
-                <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 border-0 rounded-4 shadow-sm">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
 
     <div class="form-card">
-        <form method="post" id="address-form" novalidate>
+        <form method="post" id="address-form">
             {% csrf_token %}
 
-            {{ form.latitude }} {{ form.longitude }}
-            {{ form.state }} {{ form.country }}
+            {{ form.latitude }}
+            {{ form.longitude }}
+            {{ form.state }}
+            {{ form.country }}
 
             <div class="remote-card">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="remote_delivery" id="id_remote_delivery" {% if form.instance.is_remote %}checked{% endif %}>
-                    <label class="form-check-label fw-800 text-primary" for="id_remote_delivery" style="font-size: 13px;">
-                        <i class="bi bi-geo-alt-fill me-1"></i> Ordering for someone else?
+                    <input class="form-check-input" type="checkbox" id="id_remote_delivery"
+                    {% if form.instance.is_remote %}checked{% endif %}>
+                    <label class="form-check-label">
+                        Ordering for someone else?
                     </label>
                 </div>
             </div>
-            <button type="button" id="btn-locate" class="btn btn-dark w-100 mb-3 py-3 rounded-4 fw-bold shadow-sm">
-                <i class="bi bi-cursor-fill me-2 text-primary"></i> Use My Current Location
+
+            <button type="button" id="btn-locate" class="btn btn-dark w-100 mb-3 py-3">
+                Use My Current Location
             </button>
 
-
             <div id="map"></div>
-            
+
             <div id="delivery-status" class="status-badge status-outside">
-                <i class="bi bi-pin-map-fill me-1"></i> Tap map to pick house
+                Tap map to pick house
             </div>
 
             <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label">Recipient's Name</label>
-                    {{ form.recipient_name }}
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Phone Number</label>
-                    {{ form.phone_number }}
-                </div>
-                <div class="col-12">
-                    <label class="form-label">House No / Apartment</label>
-                    {{ form.address_line }}
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Landmark <span class="text-danger">*</span></label>
-                    {{ form.landmark }}
-                    <div id="landmark-suggestions" class="mt-2 d-flex flex-wrap gap-2"></div>
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Village/City</label>
-                    {{ form.city }}
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Pincode</label>
-                    {{ form.pincode }}
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Label As</label>
-                    {{ form.address_type }}
-                </div>
+                <div class="col-12">{{ form.recipient_name }}</div>
+                <div class="col-12">{{ form.phone_number }}</div>
+                <div class="col-12">{{ form.address_line }}</div>
+                <div class="col-12">{{ form.landmark }}</div>
+                <div class="col-6">{{ form.city }}</div>
+                <div class="col-6">{{ form.pincode }}</div>
+                <div class="col-12">{{ form.address_type }}</div>
             </div>
 
             <div class="mt-4">
@@ -127,10 +168,14 @@
                     {% if form.instance.pk %}Update Address{% else %}Confirm Location{% endif %}
                 </button>
             </div>
+
         </form>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -316,5 +361,5 @@
         );
     });
 </script>
-</body>
-</html>
+
+{% endblock %}

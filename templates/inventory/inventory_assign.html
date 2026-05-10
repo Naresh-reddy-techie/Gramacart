@@ -1,0 +1,727 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="inventory-console-page">
+
+    <!-- ========================= -->
+    <!-- TOP HEADER -->
+    <!-- ========================= -->
+    <div class="console-header">
+
+        <div>
+            <h2 class="console-title">
+                <i class="bi bi-boxes me-2"></i>
+                Inventory Console
+            </h2>
+
+            <p class="console-subtitle">
+                Real-time stock operations across shops, dark stores & warehouses
+            </p>
+        </div>
+
+        <div class="console-actions">
+
+            <a href="{% url 'add_inventory' %}" class="btn btn-dark console-btn">
+                <i class="bi bi-plus-circle me-2"></i>
+                Add Inventory
+            </a>
+
+            <button class="btn btn-success console-btn">
+                <i class="bi bi-upload me-2"></i>
+                Bulk Upload
+            </button>
+
+            <button class="btn btn-outline-dark console-btn">
+                <i class="bi bi-download me-2"></i>
+                Export
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- ANALYTICS -->
+    <!-- ========================= -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-6 col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon bg-primary-soft">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <div>
+                    <h4>{{ total_products }}</h4>
+                    <p>Total Products</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon bg-warning-soft">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+
+                <div>
+                    <h4>{{ low_stock_count }}</h4>
+                    <p>Low Stock</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon bg-danger-soft">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+
+                <div>
+                    <h4>{{ out_of_stock_count }}</h4>
+                    <p>Out of Stock</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon bg-success-soft">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+
+                <div>
+                    <h4>₹{{ total_inventory_value }}</h4>
+                    <p>Total Inventory Value</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- FILTERS -->
+    <!-- ========================= -->
+
+    <div class="filter-card">
+
+        <form method="GET">
+
+            <div class="row g-3">
+
+                <!-- SEARCH -->
+                <div class="col-lg-3">
+                    <label class="form-label">Search</label>
+
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ request.GET.q }}"
+                            class="form-control"
+                            placeholder="Search product..."
+                        >
+                    </div>
+                </div>
+
+                <!-- HUB -->
+                <div class="col-lg-2">
+                    <label class="form-label">Hub</label>
+
+                    <select name="hub" class="form-select">
+                        <option value="">All Hubs</option>
+
+                        {% for hub in hubs %}
+                        <option value="{{ hub.id }}">
+                            {{ hub.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- SHOP -->
+                <div class="col-lg-2">
+                    <label class="form-label">Shop</label>
+
+                    <select name="shop" class="form-select">
+                        <option value="">All Shops</option>
+
+                        {% for shop in shops %}
+                        <option value="{{ shop.id }}">
+                            {{ shop.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- CATEGORY -->
+                <div class="col-lg-2">
+                    <label class="form-label">Category</label>
+
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- STATUS -->
+                <div class="col-lg-2">
+                    <label class="form-label">Status</label>
+
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        <option value="low">Low Stock</option>
+                        <option value="out">Out Of Stock</option>
+                    </select>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="col-lg-1 d-flex align-items-end">
+                    <button class="btn btn-dark w-100 filter-btn">
+                        Apply
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- INVENTORY TABLE -->
+    <!-- ========================= -->
+
+    <div class="inventory-table-card">
+
+        <div class="table-responsive">
+
+            <table class="table inventory-table align-middle">
+
+                <thead>
+                    <tr>
+
+                        <th>Product</th>
+                        <th>Variant</th>
+                        <th>Shop</th>
+                        <th>Hub</th>
+                        <th>Stock</th>
+                        <th>CP</th>
+                        <th>SP</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                        <th class="text-center">Actions</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in inventory_items %}
+
+                    <tr>
+
+                        <!-- PRODUCT -->
+                        <td>
+
+                            <div class="product-cell">
+
+                                <div class="product-image">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+
+                                <div>
+
+                                    <h6>
+                                        {{ item.variant.product.name }}
+                                    </h6>
+
+                                    <small>
+                                        SKU #{{ item.id }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- VARIANT -->
+                        <td>
+                            <span class="variant-badge">
+                                {{ item.variant }}
+                            </span>
+                        </td>
+
+                        <!-- SHOP -->
+                        <td>
+                            <div class="fw-bold">
+                                {{ item.shop.name }}
+                            </div>
+
+                            <small class="text-muted">
+                                {{ item.shop.shop_type }}
+                            </small>
+                        </td>
+
+                        <!-- HUB -->
+                        <td>
+                            {{ item.shop.hub.name }}
+                        </td>
+
+                        <!-- STOCK -->
+                        <td>
+
+                            <div class="stock-box">
+
+                                <span class="stock-number">
+                                    {{ item.stock }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <!-- CP -->
+                        <td>
+                            ₹{{ item.cost_price }}
+                        </td>
+
+                        <!-- SP -->
+                        <td>
+                            ₹{{ item.selling_price }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if item.stock <= 0 %}
+
+                                <span class="status-badge danger">
+                                    Out
+                                </span>
+
+                            {% elif item.stock <= item.min_stock_level %}
+
+                                <span class="status-badge warning">
+                                    Low
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge success">
+                                    Healthy
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- UPDATED -->
+                        <td>
+
+                            <small>
+                                {{ item.updated_at|timesince }} ago
+                            </small>
+
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <a href="{% url 'edit_inventory' item.id %}"
+                                   class="btn btn-sm btn-light">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <button class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-dash-lg"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="10">
+
+                            <div class="empty-state">
+
+                                <i class="bi bi-box"></i>
+
+                                <h5>No Inventory Found</h5>
+
+                                <p>
+                                    Start by adding products to inventory
+                                </p>
+
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.inventory-console-page{
+    padding:24px;
+    background:#f5f7fb;
+    min-height:100vh;
+}
+
+/* ======================= */
+/* HEADER */
+/* ======================= */
+
+.console-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.console-title{
+    font-weight:800;
+    margin-bottom:4px;
+    color:#111827;
+}
+
+.console-subtitle{
+    color:#6b7280;
+    margin:0;
+}
+
+.console-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.console-btn{
+    border-radius:14px;
+    padding:12px 20px;
+    font-weight:700;
+}
+
+/* ======================= */
+/* ANALYTICS */
+/* ======================= */
+
+.analytics-card{
+    background:#fff;
+    border-radius:20px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.04);
+    height:100%;
+}
+
+.analytics-card h4{
+    font-weight:800;
+    margin-bottom:4px;
+}
+
+.analytics-card p{
+    margin:0;
+    color:#6b7280;
+    font-size:14px;
+}
+
+.analytics-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+}
+
+.bg-primary-soft{
+    background:rgba(59,130,246,0.12);
+    color:#2563eb;
+}
+
+.bg-warning-soft{
+    background:rgba(245,158,11,0.12);
+    color:#d97706;
+}
+
+.bg-danger-soft{
+    background:rgba(239,68,68,0.12);
+    color:#dc2626;
+}
+
+.bg-success-soft{
+    background:rgba(16,185,129,0.12);
+    color:#059669;
+}
+
+/* ======================= */
+/* FILTERS */
+/* ======================= */
+
+.filter-card{
+    background:#fff;
+    padding:24px;
+    border-radius:24px;
+    margin-bottom:28px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.04);
+}
+
+.form-label{
+    font-weight:700;
+    color:#374151;
+    margin-bottom:10px;
+}
+
+.form-control,
+.form-select{
+    border-radius:14px;
+    min-height:52px;
+    border:1px solid #e5e7eb;
+    font-weight:600;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#111827;
+    box-shadow:none;
+}
+
+.search-box{
+    position:relative;
+}
+
+.search-box i{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9ca3af;
+}
+
+.search-box input{
+    padding-left:44px;
+}
+
+.filter-btn{
+    min-height:52px;
+    border-radius:14px;
+    font-weight:700;
+}
+
+/* ======================= */
+/* TABLE */
+/* ======================= */
+
+.inventory-table-card{
+    background:#fff;
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:0 4px 14px rgba(0,0,0,0.04);
+}
+
+.inventory-table{
+    margin:0;
+}
+
+.inventory-table thead{
+    background: linear-gradient(135deg, #0f172a, #111827);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.inventory-table thead th{
+    color: #ffffff !important;
+    padding: 16px 14px;
+    font-size: 12.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+}
+
+/* hover effect for header rows (subtle premium feel) */
+.inventory-table thead tr:hover th{
+    background: rgba(255,255,255,0.02);
+}
+
+.inventory-table tbody td{
+    padding:18px;
+    vertical-align:middle;
+    border-color:#f3f4f6;
+}
+
+.product-cell{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.product-image{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    background:#f3f4f6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.product-cell h6{
+    margin:0;
+    font-weight:700;
+}
+
+.product-cell small{
+    color:#6b7280;
+}
+
+.variant-badge{
+    background:#eef2ff;
+    color:#4338ca;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+}
+
+.stock-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.stock-number{
+    font-weight:800;
+    font-size:18px;
+}
+
+.status-badge{
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.status-badge.success{
+    background:rgba(16,185,129,0.12);
+    color:#059669;
+}
+
+.status-badge.warning{
+    background:rgba(245,158,11,0.12);
+    color:#d97706;
+}
+
+.status-badge.danger{
+    background:rgba(239,68,68,0.12);
+    color:#dc2626;
+}
+
+.action-buttons{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+}
+
+.action-buttons .btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.empty-state{
+    padding:80px 20px;
+    text-align:center;
+}
+
+.empty-state i{
+    font-size:54px;
+    color:#9ca3af;
+    margin-bottom:20px;
+}
+
+.empty-state h5{
+    font-weight:800;
+}
+
+.empty-state p{
+    color:#6b7280;
+}
+
+/* ======================= */
+/* MOBILE */
+/* ======================= */
+
+@media(max-width:991px){
+
+    .console-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .console-actions{
+        width:100%;
+    }
+
+    .console-btn{
+        flex:1;
+    }
+
+    .inventory-table{
+        min-width:1200px;
+    }
+
+}
+
+</style>
+
+{% endblock %}

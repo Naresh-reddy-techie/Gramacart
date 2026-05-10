@@ -85,6 +85,7 @@ import random
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from admin_dashboard.models import Shop,DeliveryHub
 
 def generate_order_number():
     # Returns ORD-A1B2C3D4
@@ -105,7 +106,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='orders')
     order_number = models.CharField(max_length=20, unique=True, default=generate_order_number, editable=False)
     address = models.ForeignKey('Address', on_delete=models.PROTECT)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    shop = models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,blank=True,related_name='orders')
+    hub = models.ForeignKey(DeliveryHub,on_delete=models.SET_NULL,null=True,blank=True,related_name='orders',db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending',db_index=True)
 
     # REJECTION LOGIC
     # This allows the admin to explain WHY a village delivery failed
@@ -125,12 +128,22 @@ class Order(models.Model):
     last_location_update = models.DateTimeField(null=True, blank=True)
     #New Token Field
     delivery_token = models.CharField(max_length=4,blank=True,null=True,help_text="4-digit PIN for delivery verification")
-
+    is_ledger_created = models.BooleanField(default=False)
+    
     def save(self, *args, **kwargs):
+
+        if not self.hub:
+            raise ValueError("Order must have a hub assigned")
+
+        if self.shop and self.hub:
+            if self.shop.hub_id != self.hub_id:
+                raise ValueError("Selected shop does not belong to the selected hub")
+
         #Generate token if it doesn't exist
         if not self.delivery_token:
             self.delivery_token=str(random.randint(1000,9999))
         # Automatically calculate total before saving to DB
+
         self.total = self.subtotal + self.tax + self.shipping_cost
         super().save(*args, **kwargs)
 

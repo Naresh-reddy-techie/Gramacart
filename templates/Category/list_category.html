@@ -2,113 +2,798 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4" style="background: #ffffff; min-height: 100vh;">
+
+<div class="container-fluid category-wrapper py-4">
+
+    <!-- =========================================
+         TOP HEADER
+    ========================================== -->
+
+    <div class="top-section mb-4">
+
+        <div>
+            <h2 class="main-title">
+                Category Management
+            </h2>
+
+            <p class="sub-title">
+                Manage and organize your product categories efficiently
+            </p>
+        </div>
+
+        <div class="top-actions">
+
+            <a href="{% url 'add_product' %}"
+               class="btn btn-dark-custom">
+
+                <i class="bi bi-box-seam"></i>
+                Add Product
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================
+         CREATE CATEGORY CARD
+    ========================================== -->
 
     <div class="row justify-content-center mb-5">
-        <div class="col-md-8">
-            <div class="p-4 rounded-4 border-dashed text-center" style="border: 2px dashed #e2e8f0; background: #f8fafc;">
-                <h4 class="fw-800 text-dark mb-3">Create a New Category</h4>
-                <form method="post" action="{% url 'add_category' %}" class="d-flex gap-2">
-                    {% csrf_token %}
-                    <input type="text" name="name" class="form-control form-control-lg rounded-3 shadow-sm" 
-                           placeholder="Type category name here (e.g. Fresh Milk)..." required autofocus>
-                    <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold shadow">
-                        <i class="bi bi-plus-lg"></i> ADD
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-800 mb-0"><i class="bi bi-list-stars me-2"></i>Existing Categories</h5>
-                <div class="search-box">
-                    <input type="text" id="simpleSearch" class="form-control form-control-sm rounded-pill px-3" placeholder="Search categories...">
+        <div class="col-xl-7 col-lg-8 col-md-10">
+
+            <div class="create-card">
+
+                <div class="card-icon">
+                    <i class="bi bi-grid-1x2-fill"></i>
                 </div>
+
+                <h4 class="create-title">
+                    Create New Category
+                </h4>
+
+                <p class="create-subtitle">
+                    Add categories like Grocery, Fruits, Dairy,
+                    Vegetables and more.
+                </p>
+
+                <form method="post"
+                      action="{% url 'add_category' %}">
+
+                    {% csrf_token %}
+
+                    <div class="row g-3 align-items-center">
+
+                        <div class="col-lg-9">
+
+                            <input type="text"
+                                   name="name"
+
+                                   class="form-control modern-input"
+
+                                   placeholder="Enter category name..."
+
+                                   required
+                                   autofocus>
+
+                        </div>
+
+                        <div class="col-lg-3">
+
+                            <button type="submit"
+                                    class="btn create-btn w-100">
+
+                                <i class="bi bi-plus-circle"></i>
+                                Create
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
             </div>
 
-            <div class="table-responsive shadow-sm rounded-4 border">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-dark text-white">
-                        <tr>
-                            <th class="ps-4 py-3">Category Name</th>
-                            <th class="py-3 text-center">Quick Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categoryList">
-                        {% for category in categories %}
-                        <tr>
-                            <td class="ps-4">
-                                <span class="fw-bold fs-5 text-dark">{{ category.name }}</span>
-                                <br><small class="text-muted">ID: #{{ category.id }}</small>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn btn-outline-primary btn-sm px-3 me-2 fw-bold" 
-                                        onclick="openEditModal('{{ category.id }}', '{{ category.name }}', '{% url 'edit_category' category.id %}')">
-                                    <i class="bi bi-pencil-square"></i> EDIT
-                                </button>
-                                
-                                <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold" 
-                                            onclick="return confirm('Are you 100% sure you want to delete this?');">
-                                        <i class="bi bi-trash"></i> DELETE
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            {% if categories.has_other_pages %}
-            <div class="mt-4 d-flex justify-content-center">
-                <nav>
-                    <ul class="pagination pagination-lg shadow-sm">
-                        {% if categories.has_previous %}
-                        <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ categories.previous_page_number }}">&laquo; Previous</a></li>
-                        {% endif %}
-
-                        {% for i in categories.paginator.page_range %}
-                            {% if categories.number == i %}
-                                <li class="page-item active"><span class="page-link border-0 bg-dark text-white fw-bold">{{ i }}</span></li>
-                            {% else %}
-                                <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ i }}">{{ i }}</a></li>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if categories.has_next %}
-                        <li class="page-item"><a class="page-link border-0 text-dark" href="?page={{ categories.next_page_number }}">Next &raquo;</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
-            {% endif %}
         </div>
+
     </div>
+
+    <!-- =========================================
+         CATEGORY LIST SECTION
+    ========================================== -->
+
+    <div class="category-list-card">
+
+        <!-- HEADER -->
+
+        <div class="list-header">
+
+            <div>
+
+                <h5 class="list-title">
+                    <i class="bi bi-collection me-2"></i>
+                    Existing Categories
+                </h5>
+
+                <p class="list-subtitle">
+                    Total Categories:
+                    {{ categories.paginator.count }}
+                </p>
+
+            </div>
+
+            <div class="search-wrapper">
+
+                <i class="bi bi-search search-icon"></i>
+
+                <input type="text"
+                       id="simpleSearch"
+
+                       class="form-control search-input"
+
+                       placeholder="Search category...">
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-responsive">
+
+            <table class="table category-table align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th class="text-center">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="categoryList">
+
+                    {% for category in categories %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="category-badge">
+
+                                    {{ category.name|slice:":1"|upper }}
+
+                                </div>
+
+                                <div>
+
+                                    <div class="category-name">
+                                        {{ category.name }}
+                                    </div>
+
+                                    <small class="category-id">
+                                        Category ID:
+                                        #{{ category.id }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <div class="action-buttons">
+
+                                <!-- EDIT -->
+
+                                <button class="btn btn-edit"
+
+                                    onclick="openEditModal(
+                                        '{{ category.id }}',
+                                        '{{ category.name }}',
+                                        '{% url 'edit_category' category.id %}'
+                                    )">
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                    Edit
+
+                                </button>
+
+                                <!-- DELETE -->
+
+                                <form method="post"
+                                      action="{% url 'delete_category' category.id %}"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+
+                                            class="btn btn-delete"
+
+                                            onclick="return confirm(
+                                                'Delete this category permanently?'
+                                            );">
+
+                                        <i class="bi bi-trash3"></i>
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="2">
+
+                            <div class="empty-state">
+
+                                <i class="bi bi-inboxes"></i>
+
+                                <h5>
+                                    No Categories Found
+                                </h5>
+
+                                <p>
+                                    Start by creating your first category.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================
+         PAGINATION
+    ========================================== -->
+
+    {% if categories.has_other_pages %}
+
+    <div class="pagination-wrapper">
+
+        <nav>
+
+            <ul class="pagination custom-pagination">
+
+                {% if categories.has_previous %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+
+                       href="?page={{ categories.previous_page_number }}">
+
+                        ← Previous
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+                {% for i in categories.paginator.page_range %}
+
+                    {% if categories.number == i %}
+
+                        <li class="page-item active">
+
+                            <span class="page-link">
+                                {{ i }}
+                            </span>
+
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               href="?page={{ i }}">
+
+                                {{ i }}
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if categories.has_next %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+
+                       href="?page={{ categories.next_page_number }}">
+
+                        Next →
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+    </div>
+
+    {% endif %}
+
 </div>
 
+<!-- =========================================
+     STYLES
+========================================== -->
+
 <style>
-    .fw-800 { font-weight: 800; }
-    .border-dashed { border-style: dashed !important; }
-    .page-link { margin: 0 5px; border-radius: 8px !important; }
-    .search-box input:focus { border-color: #0d6efd; box-shadow: none; }
-    table thead th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+:root{
+    --primary:#10b981;
+    --primary-dark:#059669;
+    --dark:#111827;
+    --gray:#6b7280;
+    --border:#e5e7eb;
+    --light:#f9fafb;
+}
+
+/* =========================================
+   PAGE
+========================================= */
+
+.category-wrapper{
+    background:#f5f7fb;
+    min-height:100vh;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.top-section{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.main-title{
+    font-size:2rem;
+    font-weight:800;
+    color:var(--dark);
+    margin-bottom:5px;
+}
+
+.sub-title{
+    color:var(--gray);
+    margin-bottom:0;
+}
+
+/* =========================================
+   TOP BUTTON
+========================================= */
+
+.btn-dark-custom{
+    background:var(--dark);
+    color:#fff;
+    border:none;
+    padding:13px 20px;
+    border-radius:14px;
+    font-weight:600;
+    transition:.25s ease;
+}
+
+.btn-dark-custom:hover{
+    background:#000;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+/* =========================================
+   CREATE CARD
+========================================= */
+
+.create-card{
+    background:#fff;
+    border-radius:28px;
+    padding:40px;
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.06);
+    text-align:center;
+}
+
+.card-icon{
+    width:85px;
+    height:85px;
+    margin:auto;
+    margin-bottom:20px;
+
+    border-radius:24px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d1fae5,
+            #a7f3d0
+        );
+
+    font-size:35px;
+    color:var(--primary-dark);
+}
+
+.create-title{
+    font-weight:800;
+    color:var(--dark);
+    margin-bottom:10px;
+}
+
+.create-subtitle{
+    color:var(--gray);
+    margin-bottom:30px;
+}
+
+/* =========================================
+   INPUT
+========================================= */
+
+.modern-input{
+    height:58px;
+    border-radius:18px;
+    border:1px solid var(--border);
+    padding:0 20px;
+    font-size:1rem;
+}
+
+.modern-input:focus{
+    border-color:var(--primary);
+    box-shadow:
+        0 0 0 4px rgba(16,185,129,0.12);
+}
+
+/* =========================================
+   CREATE BUTTON
+========================================= */
+
+.create-btn{
+    height:58px;
+    border:none;
+    border-radius:18px;
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color:#fff;
+    font-weight:700;
+}
+
+.create-btn:hover{
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+/* =========================================
+   LIST CARD
+========================================= */
+
+.category-list-card{
+    background:#fff;
+    border-radius:28px;
+    padding:25px;
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.05);
+}
+
+/* =========================================
+   LIST HEADER
+========================================= */
+
+.list-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.list-title{
+    font-weight:800;
+    margin-bottom:4px;
+}
+
+.list-subtitle{
+    color:var(--gray);
+    margin-bottom:0;
+}
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.search-wrapper{
+    position:relative;
+}
+
+.search-icon{
+    position:absolute;
+    top:50%;
+    left:14px;
+    transform:translateY(-50%);
+    color:#9ca3af;
+}
+
+.search-input{
+    height:48px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    padding-left:42px;
+    min-width:250px;
+}
+
+.search-input:focus{
+    border-color:var(--primary);
+    box-shadow:none;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.category-table thead th{
+    background:var(--dark);
+    color:#fff;
+    padding:18px;
+    border:none;
+    font-size:0.82rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.category-table tbody tr{
+    transition:.2s ease;
+}
+
+.category-table tbody tr:hover{
+    background:#f9fafb;
+}
+
+.category-table td{
+    padding:20px 18px;
+    vertical-align:middle;
+}
+
+/* =========================================
+   CATEGORY BADGE
+========================================= */
+
+.category-badge{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#ecfdf5;
+    color:var(--primary-dark);
+
+    font-weight:800;
+    font-size:1.1rem;
+}
+
+.category-name{
+    font-size:1rem;
+    font-weight:700;
+    color:var(--dark);
+}
+
+.category-id{
+    color:var(--gray);
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.action-buttons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn-edit,
+.btn-delete{
+    border:none;
+    padding:10px 16px;
+    border-radius:12px;
+    font-weight:600;
+    font-size:0.9rem;
+}
+
+.btn-edit{
+    background:#eff6ff;
+    color:#2563eb;
+}
+
+.btn-delete{
+    background:#fef2f2;
+    color:#dc2626;
+}
+
+.btn-edit:hover,
+.btn-delete:hover{
+    transform:translateY(-2px);
+}
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.empty-state{
+    text-align:center;
+    padding:50px 20px;
+}
+
+.empty-state i{
+    font-size:50px;
+    color:#d1d5db;
+    margin-bottom:15px;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.pagination-wrapper{
+    margin-top:30px;
+    display:flex;
+    justify-content:center;
+}
+
+.custom-pagination .page-link{
+    border:none;
+    margin:0 4px;
+    border-radius:12px !important;
+    color:var(--dark);
+    padding:12px 16px;
+}
+
+.custom-pagination .active .page-link{
+    background:var(--dark);
+    color:#fff;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .main-title{
+        font-size:1.5rem;
+    }
+
+    .create-card{
+        padding:28px 20px;
+        border-radius:24px;
+    }
+
+    .category-list-card{
+        padding:18px;
+        border-radius:24px;
+    }
+
+    .search-input{
+        min-width:100%;
+        width:100%;
+    }
+
+    .search-wrapper{
+        width:100%;
+    }
+
+    .list-header{
+        align-items:stretch;
+    }
+
+    .top-actions{
+        width:100%;
+    }
+
+    .btn-dark-custom{
+        width:100%;
+    }
+
+    .action-buttons{
+        flex-direction:column;
+    }
+
+    .btn-edit,
+    .btn-delete{
+        width:100%;
+    }
+}
+
 </style>
 
+<!-- =========================================
+     SEARCH SCRIPT
+========================================== -->
+
 <script>
-    // The simplest search possible
-    document.getElementById('simpleSearch').addEventListener('keyup', function() {
-        let value = this.value.toLowerCase();
-        let rows = document.querySelectorAll("#categoryList tr");
-        rows.forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
-        });
+
+document
+.getElementById('simpleSearch')
+
+.addEventListener('keyup', function(){
+
+    let value = this.value.toLowerCase();
+
+    let rows = document.querySelectorAll("#categoryList tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText.toLowerCase().includes(value)
+
+            ? ""
+
+            : "none";
     });
+});
+
 </script>
 
 {% include "Category/category_modals.html" %}
+
 {% endblock %}

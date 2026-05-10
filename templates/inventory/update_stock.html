@@ -1,0 +1,306 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-800 text-dark mb-1">
+                Inventory Stock Control
+            </h2>
+
+            <p class="text-muted mb-0">
+                Real-time inventory adjustment center
+            </p>
+        </div>
+
+        <a href="{% url 'inventory_list' %}"
+           class="btn btn-light border rounded-3 px-4 fw-700">
+            <i class="bi bi-arrow-left me-2"></i>
+            Back to Inventory
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+                <div class="card-header bg-dark text-white p-4 border-0">
+                    <h5 class="fw-800 mb-1">
+                        Product Information
+                    </h5>
+
+                    <small class="opacity-75">
+                        Current inventory details
+                    </small>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <!-- PRODUCT -->
+                    <div class="inventory-info-box mb-3">
+
+                        <div class="info-label">
+                            Product
+                        </div>
+
+                        <div class="info-value">
+                            {{ inventory.variant.product.name }}
+                        </div>
+
+                    </div>
+
+                    <!-- VARIANT -->
+                    <div class="inventory-info-box mb-3">
+
+                        <div class="info-label">
+                            Variant
+                        </div>
+
+                        <div class="info-value">
+                            {{ inventory.variant.quantity }}
+                            {{ inventory.variant.unit }}
+                        </div>
+
+                    </div>
+
+                    <!-- SHOP -->
+                    <div class="inventory-info-box mb-3">
+
+                        <div class="info-label">
+                            Shop
+                        </div>
+
+                        <div class="info-value">
+                            {{ inventory.shop.name }}
+                        </div>
+
+                    </div>
+
+                    <!-- CURRENT STOCK -->
+                    <div class="stock-highlight-box">
+
+                        <div class="small text-muted mb-1">
+                            Current Available Stock
+                        </div>
+
+                        <div class="display-5 fw-900 text-dark">
+                            {{ inventory.stock }}
+                        </div>
+
+                        <div class="small text-success fw-700">
+                            Units Available
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-bottom p-4">
+
+                    <h5 class="fw-800 mb-1">
+                        Adjust Inventory
+                    </h5>
+
+                    <small class="text-muted">
+                        Increase or reduce stock securely
+                    </small>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <!-- CHANGE AMOUNT -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-700">
+                                Quantity Change
+                            </label>
+
+                            <input type="number"
+                                   name="change_amount"
+                                   class="form-control custom-input"
+                                   placeholder="Example: +20 or -5"
+                                   required>
+
+                            <div class="form-help mt-2">
+                                Positive value = Add stock |
+                                Negative value = Reduce stock
+                            </div>
+
+                        </div>
+
+                        <!-- REASON -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-700">
+                                Transaction Type
+                            </label>
+
+                            <select name="reason"
+                                    class="form-select custom-input">
+
+                                <option value="RESTOCK">
+                                    Restock
+                                </option>
+
+                                <option value="WASTAGE">
+                                    Damaged / Expired
+                                </option>
+
+                                <option value="RETURN">
+                                    Customer Return
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- NOTE -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-700">
+                                Admin Note
+                            </label>
+
+                            <textarea name="note"
+                                      rows="4"
+                                      class="form-control custom-input"
+                                      placeholder="Optional stock adjustment note..."></textarea>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="d-grid d-md-flex gap-3">
+
+                            <button type="submit"
+                                    class="btn btn-dark btn-lg rounded-3 px-5 fw-800">
+
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                Update Inventory
+
+                            </button>
+
+                            <a href="{% url 'inventory_list' %}"
+                               class="btn btn-light border btn-lg rounded-3 px-4 fw-700">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.fw-700 {
+    font-weight: 700;
+}
+
+.fw-800 {
+    font-weight: 800;
+}
+
+.fw-900 {
+    font-weight: 900;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.custom-input {
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+}
+
+.custom-input:focus {
+    border-color: #111827;
+    box-shadow: 0 0 0 4px rgba(17,24,39,0.08);
+}
+
+.inventory-info-box {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.info-label {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.stock-highlight-box {
+    background: linear-gradient(
+        135deg,
+        #f8fafc,
+        #eef2ff
+    );
+    border-radius: 18px;
+    padding: 28px;
+    text-align: center;
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+@media (max-width: 768px) {
+
+    .custom-input {
+        padding: 12px 14px;
+    }
+
+    .display-5 {
+        font-size: 2.2rem;
+    }
+
+}
+
+</style>
+
+{% endblock %}

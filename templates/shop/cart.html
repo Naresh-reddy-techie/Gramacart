@@ -1,0 +1,331 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}My Basket | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --emerald:#10B981;
+    --navy:#0F172A;
+    --bg:#F8FAFC;
+}
+
+/* SAFE WRAPPER */
+.page-wrapper{
+    padding-top: 85px;
+    padding-bottom: 180px; /* space for checkout + nav */
+}
+
+/* HEADER */
+.status-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    background:#fff;
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #e2e8f0;
+    z-index:1200;
+}
+
+.header-title{
+    font-weight:800;
+    font-size:1.2rem;
+}
+
+.add-btn{
+    background:#f1f5f9;
+    padding:8px 14px;
+    border-radius:999px;
+    text-decoration:none;
+    font-weight:700;
+    color:var(--navy);
+}
+
+/* CART LIST */
+.basket-container{
+    padding: 0 15px;
+}
+
+.item-card{
+    background:#fff;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:12px;
+    border:1px solid #e2e8f0;
+    position:relative;
+    transition:0.2s ease;
+}
+
+.item-card:active{
+    transform:scale(0.98);
+}
+
+.item-main{
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.img-box{
+    width:70px;
+    height:70px;
+    border-radius:12px;
+    overflow:hidden;
+    background:#f1f5f9;
+}
+
+.img-box img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.item-name{
+    font-weight:800;
+}
+
+.item-meta{
+    font-size:0.8rem;
+    color:#64748b;
+}
+
+/* ACTION ROW */
+.action-row{
+    margin-top:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#f8fafc;
+    padding:10px 14px;
+    border-radius:14px;
+}
+
+.qty-picker{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.btn-circle{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:none;
+    background:#fff;
+    font-weight:800;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.qty-num{
+    font-weight:800;
+}
+
+.item-price{
+    font-weight:800;
+}
+
+/* DELETE */
+.delete-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:transparent;
+    border:none;
+    font-size:1.2rem;
+    color:#94a3b8;
+    z-index:5;
+}
+
+/* LOADING STATE */
+.updating{
+    opacity:0.6;
+    pointer-events:none;
+}
+
+/* CHECKOUT BAR */
+.checkout-bar{
+    position:fixed;
+    bottom:80px; /* bottom nav space */
+    left:0;
+    right:0;
+    background:#fff;
+    padding:16px;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -10px 30px rgba(0,0,0,0.08);
+    z-index:1800;
+}
+
+.total-line{
+    display:flex;
+    justify-content:space-between;
+    font-weight:800;
+    font-size:1.2rem;
+    margin-bottom:10px;
+}
+
+.btn-proceed{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px;
+    background:var(--navy);
+    color:#fff;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:800;
+}
+
+.amt-pill{
+    background:var(--emerald);
+    padding:4px 10px;
+    border-radius:10px;
+}
+
+/* EMPTY STATE */
+.empty-state{
+    text-align:center;
+    padding:80px 20px;
+    color:#64748b;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="status-header">
+    <div class="header-title">My Basket</div>
+    <a class="add-btn" href="{% url 'public_dashboard' %}">+ Add More</a>
+</div>
+
+<div class="page-wrapper">
+
+<div class="basket-container">
+
+{% if cart_items %}
+
+    {% for item in cart_items %}
+    <div class="item-card" id="item-row-{{ item.id }}">
+
+        <button class="delete-btn" onclick="deleteItem('{{ item.id }}')">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="item-main">
+            <div class="img-box">
+                <img src="{{ item.product.product_images.first.image.url }}">
+            </div>
+
+            <div>
+                <div class="item-name">{{ item.product.name }}</div>
+                <div class="item-meta">₹{{ item.product.price }} each</div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <div class="qty-picker">
+                <button class="btn-circle" onclick="updateQty('{{ item.id }}', -1)">-</button>
+                <span class="qty-num" id="qty-val-{{ item.id }}">{{ item.quantity }}</span>
+                <button class="btn-circle" onclick="updateQty('{{ item.id }}', 1)">+</button>
+            </div>
+
+            <div class="item-price" id="price-{{ item.id }}">
+                ₹{{ item.total_price }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% else %}
+    <div class="empty-state">
+        <h4>Your basket is empty</h4>
+        <p>Add some products to continue shopping</p>
+    </div>
+{% endif %}
+
+</div>
+
+</div>
+
+{% if cart_items %}
+<!-- CHECKOUT -->
+<div class="checkout-bar">
+    <div class="total-line">
+        <span>Total</span>
+        <span id="ui-grandtotal">₹{{ order_totals.sub_total }}</span>
+    </div>
+
+    <a href="{% url 'cart_checkout' %}" class="btn-proceed">
+        Proceed
+        <span class="amt-pill" id="ui-btn-amt">
+            ₹{{ order_totals.sub_total }}
+        </span>
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateTotals(val){
+    document.getElementById("ui-grandtotal").innerText = "₹"+val;
+    document.getElementById("ui-btn-amt").innerText = "₹"+val;
+}
+
+function updateQty(id, delta){
+    const qty = document.getElementById("qty-val-"+id);
+    const card = document.getElementById("item-row-"+id);
+
+    let newQty = parseInt(qty.innerText) + delta;
+
+    if(newQty < 1){
+        return deleteItem(id);
+    }
+
+    card.classList.add("updating");
+
+    fetch(`/shop/update_cart_quantity/${id}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":"{{ csrf_token }}",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({quantity:newQty})
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            qty.innerText = newQty;
+            document.getElementById("price-"+id).innerText = "₹"+d.item_total;
+            updateTotals(d.sub_total);
+        }
+    })
+    .finally(()=>card.classList.remove("updating"));
+}
+
+function deleteItem(itemId){
+    fetch(`/shop/remove_from_cart/${itemId}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":"{{ csrf_token }}",
+            "X-Requested-With":"XMLHttpRequest"
+        }
+    })
+    .then(r=>r.json())
+    .then(data=>{
+        if(data.success){
+            document.getElementById("item-row-"+itemId)?.remove();
+            updateTotals(data.sub_total);
+            GCToast.show("success","Item removed");
+        }else{
+            GCToast.show("error","Failed");
+        }
+    });
+}
+</script>
+{% endblock %}

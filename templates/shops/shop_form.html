@@ -1,0 +1,146 @@
+<!-- templates/shops/shop_form.html -->
+
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <!-- HEADER -->
+                <div class="bg-dark text-white p-4">
+
+                    <h3 class="fw-bold mb-1">
+
+                        {% if shop %}
+                            Edit Shop
+                        {% else %}
+                            Add New Shop
+                        {% endif %}
+
+                    </h3>
+
+                    <p class="mb-0 opacity-75">
+                        Manage fulfillment centers and stores.
+                    </p>
+
+                </div>
+
+                <!-- FORM -->
+                <div class="card-body p-4 p-lg-5">
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Shop Name
+                                </label>
+
+                                {{ form.name }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Shop Type
+                                </label>
+
+                                {{ form.shop_type }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Hub
+                                </label>
+
+                                {{ form.hub }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Phone
+                                </label>
+
+                                {{ form.phone }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    Address
+                                </label>
+
+                                {{ form.address }}
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-check">
+
+                                    {{ form.is_internal }}
+
+                                    <label class="form-check-label">
+                                        Internal Shop
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-check">
+
+                                    {{ form.is_active }}
+
+                                    <label class="form-check-label">
+                                        Active
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex flex-column flex-md-row gap-3 mt-5">
+
+                            <button type="submit"
+                                    class="btn btn-dark rounded-pill px-5">
+
+                                <i class="bi bi-check-circle me-2"></i>
+
+                                Save Shop
+
+                            </button>
+
+                            <a href="{% url 'shop_list' %}"
+                               class="btn btn-light border rounded-pill px-5">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

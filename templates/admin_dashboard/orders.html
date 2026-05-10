@@ -200,29 +200,37 @@ function showOrderDetails(orderNum) {
 function markAsPacked(num) {
     if(!confirm("Verify all items are in the bag. Proceed?")) return;
     
-    // This URL must match the path in urls.py exactly
-    fetch(`/admin_dashboard/orders/pack/${num}/`, { 
+    // Generate the correct URL with the language prefix included
+    const url = "{% url 'mark_as_packed' '000000' %}".replace('000000', num);
+    
+    fetch(url, { 
         method: 'POST', 
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
             'Content-Type': 'application/json'
         } 
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
     .then(data => {
         if(data.success) {
-            // Close the side drawer if it's open
+            // Close drawer
             const drawerElement = document.getElementById('orderDrawer');
             const drawer = bootstrap.Offcanvas.getInstance(drawerElement);
             if(drawer) drawer.hide();
 
-            // Open the thermal print view
-            window.open(`/admin_dashboard/orders/print/${num}/`, '_blank', 'width=400,height=600');
+            // Open thermal print
+            const printUrl = "{% url 'order_print' '000000' %}".replace('000000', num);
+            window.open(printUrl, '_blank', 'width=400,height=600');
             
-            // Refresh the grid to move the order to the 'Packed' tab
             fetchOrders(1);
+        } else {
+            alert("Error: " + data.error);
         }
-    });
+    })
+    .catch(err => console.error("Fetch error:", err));
 }
 
 function openRiderModal(orderNum) {

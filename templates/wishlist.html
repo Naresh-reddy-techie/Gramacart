@@ -1,30 +1,23 @@
+{% extends "shop/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Your Wishlist</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-body {
-    margin: 0;
-    background-color: #f9fdf9;
-    font-family: 'Roboto', sans-serif;
-    padding: 16px;
-}
 
+{% block title %}Wishlist | GramaCart{% endblock %}
+
+{% block content %}
+
+<style>
 .container {
     max-width: 720px;
     margin: auto;
+    padding: 16px;
 }
 
 h1 {
     text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 20px;
 }
 
 .wishlist-card {
@@ -32,10 +25,10 @@ h1 {
     justify-content: space-between;
     align-items: center;
     background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     flex-wrap: wrap;
 }
 
@@ -45,77 +38,65 @@ h1 {
 }
 
 .product-info strong {
-    font-size: 16px;
-    color: #2e7d32;
+    font-size: 15px;
+    color: #111827;
 }
 
 .product-info small {
     display: block;
-    color: #777;
+    color: #6B7280;
     margin-top: 4px;
 }
 
-.product-price, .added-on {
-    font-weight: 500;
-    color: #2e7d32;
-    margin: 4px 0;
+.product-price {
+    font-weight: 800;
+    color: var(--primary);
+    margin-top: 6px;
+}
+
+.added-on {
+    font-size: 12px;
+    color: #9CA3AF;
 }
 
 .actions {
     display: flex;
     gap: 8px;
-    margin-top: 8px;
-    flex-wrap: wrap;
+    margin-top: 10px;
 }
 
 .btn {
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 14px;
-    text-decoration: none;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
     cursor: pointer;
-}
-
-.btn-add {
-    background-color: #4caf50;
-    color: #fff;
     border: none;
 }
 
-.btn-add:hover {
-    background-color: #388e3c;
+.btn-add {
+    background: var(--primary);
+    color: white;
 }
 
 .btn-remove {
-    background-color: #fff;
-    color: #d32f2f;
-    border: 1px solid #d32f2f;
-}
-
-.btn-remove:hover {
-    background-color: #d32f2f;
-    color: #fff;
+    background: #fff;
+    color: #ef4444;
+    border: 1px solid #ef4444;
 }
 
 .empty-wishlist {
     text-align: center;
-    color: #558b2f;
-    font-size: 18px;
-    margin-top: 4rem;
+    color: #6B7280;
+    margin-top: 60px;
 }
 
 .empty-wishlist a {
-    color: #4caf50;
+    color: var(--primary);
+    font-weight: 700;
     text-decoration: none;
 }
-
-.empty-wishlist a:hover {
-    text-decoration: underline;
-}
 </style>
-</head>
-<body>
 
 <div class="container">
     <h1>💚 Your Wishlist</h1>
@@ -123,25 +104,90 @@ h1 {
     {% if wishlist_items %}
         {% for item in wishlist_items %}
         <div class="wishlist-card">
+
             <div class="product-info">
                 <strong>{{ item.product.name }}</strong>
                 <small>{{ item.product.description|truncatechars:60 }}</small>
-                <div class="product-price">₹{{ item.product.price }}</div>
-                <div class="added-on">Added on: {{ item.added_on|date:"M d, Y" }}</div>
+                <div class="product-price">₹{{ item.product.get_effective_price }}</div>
+                <div class="added-on">Added on {{ item.added_on|date:"d M Y" }}</div>
             </div>
+
             <div class="actions">
-                <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-add">Add to Cart</a>
-                <a href="{% url 'remove_from_wishlist' item.id %}" class="btn btn-remove">Remove</a>
+                <button class="btn btn-add add-to-cart-btn"
+                        data-url="{% url 'add_to_cart' item.product.id %}">
+                    Add to Cart
+                </button>
+
+                <button class="btn btn-remove remove-wishlist-btn"
+                        data-url="{% url 'add_to_wishlist' item.product.id %}">
+                    Remove
+                </button>
             </div>
+
         </div>
         {% endfor %}
     {% else %}
         <div class="empty-wishlist">
-            Your wishlist is empty.<br>
-            <a href="{% url 'home' %}">Browse products</a> to add your favorites!
+            <p>Your wishlist is empty</p>
+            <a href="{% url 'public_dashboard' %}">Browse products</a>
         </div>
     {% endif %}
 </div>
 
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+// CSRF
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+// ADD TO CART
+document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+
+        fetch(this.dataset.url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            // update cart badge
+            const badge = document.getElementById("cart-badge");
+            if (badge && data.cart_count !== undefined) {
+                badge.innerText = data.cart_count;
+                badge.style.display = "flex";
+            }
+
+            alert("Added to cart ✅");
+        });
+    });
+});
+
+// REMOVE FROM WISHLIST (uses toggle API)
+document.querySelectorAll(".remove-wishlist-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+
+        fetch(this.dataset.url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(res => res.json())
+        .then(() => {
+            location.reload(); // simplest UX
+        });
+
+    });
+});
+
+</script>
+{% endblock %}

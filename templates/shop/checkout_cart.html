@@ -1,0 +1,262 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}Checkout | GramaCart{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --bottom-nav-height: 80px;
+    --primary: #10B981;
+    --navy: #0F172A;
+}
+
+/* ================= HEADER ================= */
+.status-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+.header-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.back-btn {
+    text-decoration: none;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* ================= PAGE WRAPPER ================= */
+.checkout-container {
+    margin-top: 80px;
+    padding: 15px;
+
+    /* IMPORTANT: space for bottom navbar */
+    padding-bottom: calc(var(--bottom-nav-height) + 80px);
+}
+
+/* ================= CARDS ================= */
+.card-box {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #eef2f6;
+}
+
+/* ================= ADDRESS ================= */
+.address-card {
+    border: 2px solid #f1f5f9;
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s ease;
+}
+
+.address-card.active {
+    border-color: var(--primary);
+    background: #f0fdf4;
+}
+
+.check-mark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--primary);
+    display: none;
+}
+
+.address-card.active .check-mark {
+    display: block;
+}
+
+/* ================= PAYMENT ================= */
+.payment-option {
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* ================= SUMMARY ================= */
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+/* ================= FIXED BUTTON ================= */
+.checkout-bar {
+    position: fixed;
+    bottom: var(--bottom-nav-height);
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 16px;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+    z-index: 1500;
+}
+
+.btn-place {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    font-weight: 800;
+}
+
+.btn-place:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="status-header">
+    <div class="header-title">Checkout</div>
+    <a href="{% url 'cart_view' %}" class="back-btn">
+        <i class="bi bi-arrow-left"></i> Basket
+    </a>
+</div>
+
+<div class="checkout-container">
+
+<form method="POST" id="checkout-form">
+    {% csrf_token %}
+
+    <!-- ADDRESS -->
+    <div class="card-box">
+        <h6 class="fw-bold mb-3">Delivery Address</h6>
+
+        {% for address in user_addresses %}
+        <div class="address-card" data-id="{{ address.id }}">
+            <i class="bi bi-check-circle-fill check-mark"></i>
+            <strong>{{ address.recipient_name }}</strong><br>
+            <small class="text-muted">
+                {{ address.address_line }}, {{ address.city }}
+            </small>
+        </div>
+        {% endfor %}
+
+        <input type="hidden" name="address_id" id="address_id" required>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="card-box">
+        <h6 class="fw-bold mb-3">Payment Method</h6>
+
+        {% for method in payment_methods %}
+        <div class="payment-option">
+            <input type="radio" name="payment_method" value="{{ method.id }}" required>
+            <label>{{ method.name }}</label>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="card-box">
+        <h6 class="fw-bold mb-3">Price Details</h6>
+
+        <div class="summary-line">
+            <span>Subtotal</span>
+            <span id="sub_total">₹{{ order_totals.sub_total }}</span>
+        </div>
+
+        <div class="summary-line">
+            <span>Shipping</span>
+            <span id="shipping_cost">₹{{ order_totals.shipping_cost }}</span>
+        </div>
+
+        <div class="summary-line">
+            <span>Taxes</span>
+            <span id="taxes">₹{{ order_totals.taxes }}</span>
+        </div>
+
+        <div id="out-of-range-msg" class="alert alert-danger d-none mt-2">
+            Area Not Serviceable
+        </div>
+
+        <div class="total-line">
+            <span>Total</span>
+            <span id="total_amount">₹{{ order_totals.final_total }}</span>
+        </div>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="checkout-bar">
+        <button type="submit" id="place-order-btn" class="btn-place" disabled>
+            Confirm Order • <span id="btn-total">₹{{ order_totals.final_total }}</span>
+        </button>
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.address-card').forEach(card => {
+    card.addEventListener('click', function () {
+
+        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+
+        const addrId = this.dataset.id;
+        document.getElementById('address_id').value = addrId;
+
+        const btn = document.getElementById('place-order-btn');
+        const msg = document.getElementById('out-of-range-msg');
+
+        fetch("{% url 'get_shipping_cost' %}?address_id=" + addrId)
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.success) {
+                document.getElementById('sub_total').innerText = "₹" + data.sub_total;
+                document.getElementById('shipping_cost').innerText = "₹" + data.shipping_cost;
+                document.getElementById('taxes').innerText = "₹" + data.taxes;
+                document.getElementById('total_amount').innerText = "₹" + data.final_total;
+                document.getElementById('btn-total').innerText = "₹" + data.final_total;
+
+                msg.classList.add('d-none');
+                btn.disabled = false;
+            } else {
+                msg.classList.remove('d-none');
+                msg.innerText = data.message || "Not serviceable";
+                btn.disabled = true;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

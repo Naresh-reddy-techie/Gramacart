@@ -27,6 +27,8 @@ urlpatterns = [
     # 4. Wishlist & Buy Now
     path('wishlist/', views.wishlist_view, name='wishlist_view'),
     path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove_from_wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
     path('buy-now/<int:product_id>/', views.buy_now, name='buy_now'),
     path('buy-now-shipping/<int:product_id>/', views.get_buy_now_shipping_cost, name='get_buy_now_shipping_cost'),
 

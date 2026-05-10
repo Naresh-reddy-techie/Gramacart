@@ -25,12 +25,14 @@ urlpatterns = [
     path('list_product/',views.list_product,name='list_product'),
     path('edit_product/<slug:slug>/', views.edit_product, name='edit_product'),
     path('delete_product/<slug:slug>/', views.delete_product, name='delete_product'),
-    path('duplicate_product/<slug:slug>/', views.duplicate_product, name='duplicate_product'),
+    # path('duplicate_product/<slug:slug>/', views.duplicate_product, name='duplicate_product'),
     
     path('hubs/', views.list_delivery_hubs, name='list_delivery_hubs'),
     path('hubs/add/', views.add_delivery_hub, name='add_delivery_hub'),
     path('hubs/edit/<int:pk>/', views.edit_delivery_hub, name='edit_delivery_hub'),
     path('hubs/delete/<int:pk>/', views.delete_delivery_hub, name='delete_delivery_hub'),
+
+    path("inventory/assign/", views.inventory_assign, name="inventory_assign"),
 
     path('shipping-costs/', views.shipping_cost_list, name='shipping_cost_list'),
     path('shipping-costs/add/', views.add_shipping_cost, name='add_shipping_cost'),
@@ -49,7 +51,7 @@ urlpatterns = [
     path('orders/json/', views.admin_order_list_json, name='admin_orders_json'),
     path('orders/json/<str:order_number>/', views.admin_order_list_json, name='admin_order_detail_json'),
 
-    # --- ADD THIS LINE TO FIX THE 404 ---
+    
     path('orders/pack/<str:order_number>/', views.mark_order_as_packed, name='mark_as_packed'),
     # ------------------------------------
 
@@ -61,7 +63,6 @@ urlpatterns = [
     path('order/invoice/<int:order_id>/', views.generate_invoice_pdf, name='generate_invoice'),
 
     #Live inventory
-    path('inventory/live/', views.live_inventory, name='live_inventory'),
     path('inventory/restock/<int:product_id>/', views.restock_product, name='restock_product'),
     path('inventory/update-min-stock/<int:product_id>/', views.update_min_stock, name='update_min_stock'),
     
@@ -74,6 +75,15 @@ urlpatterns = [
     
     # ADMIN: Actions to clear debt
     path('admin/settle-rider/<int:wallet_id>/', views.settle_rider_handover, name='settle_rider_handover'),
-    
+
+
+
+    path('shops/', views.shop_list, name='shop_list'),
+
+    path('shops/add/', views.add_shop, name='add_shop'),
+
+    path('shops/<int:pk>/edit/', views.edit_shop, name='edit_shop'),
+
+    path('shops/<int:pk>/delete/', views.delete_shop, name='delete_shop'),
 ]
 

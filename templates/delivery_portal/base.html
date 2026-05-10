@@ -138,8 +138,14 @@
 
     <header class="app-header">
         <div class="logo-box">
-            <div class="logo-icon">G</div>
-            <span style="color:var(--ui-text)">Grama<span style="color:var(--brand-primary)">Cart</span></span>
+            {% if company.logo %}
+                <img src="{{ company.logo.url }}" alt="{{ company.name }}" style="height: 40px; width: auto; object-fit: contain;">
+            {% else %}
+                <div class="logo-icon">G</div>
+                <span style="color:var(--ui-text)">
+                    {{ company.name|default:"Grama"|slice:":5" }}<span style="color:var(--brand-primary)">{{ company.name|default:"Cart"|slice:"5:" }}</span>
+                </span>
+            {% endif %}
         </div>
 
         <div id="duty-pill" 
@@ -217,6 +223,7 @@
                 console.error("Duty toggle failed", err);
             }
         }
+        
     </script>
     {% block page_scripts %}{% endblock %}
 </body>

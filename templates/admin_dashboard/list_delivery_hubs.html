@@ -41,6 +41,8 @@
                         <th class="py-3 border-0 text-uppercase small fw-bold text-muted">Village / Cluster Name</th>
                         <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Location (Lat, Lng)</th>
                         <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Service Reach</th>
+                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Full Address</th>
+                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Land Mark</th>
                         <th class="pe-4 py-3 border-0 text-uppercase small fw-bold text-muted text-end">Manage</th>
                     </tr>
                 </thead>
@@ -70,6 +72,18 @@
                             <div class="fw-900 text-success">{{ hub.max_delivery_radius_km }} <small>KM</small></div>
                             <div class="progress mt-1 mx-auto" style="height: 4px; width: 60px;">
                                 <div class="progress-bar bg-success" style="width: 100%"></div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>
+                                    <span class="d-block fw-muted text-dark fs-6">{{ hub.full_address}}</span>
+                                    
+                            </div>
+                        </td>
+                          <td class="text-center">
+                            <div>
+                                    <span class="d-block fw-muted text-dark fs-6">{{ hub.landmark}}</span>
+                                    
                             </div>
                         </td>
                         <td class="pe-4 text-end">

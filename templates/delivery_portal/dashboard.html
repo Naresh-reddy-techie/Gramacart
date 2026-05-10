@@ -96,10 +96,15 @@
     <div class="calendar-strip mb-4" id="calendar-strip"></div>
 
     <div id="stats-container">
-        <div class="wallet-card mb-3">
-            <span class="small opacity-75 fw-bold text-uppercase" id="date-label">Today's Earnings</span>
-            <h1 class="fw-900 mb-0 mt-1" id="wallet-display">₹0</h1>
-        </div>
+        <a href="{% url 'rider_earnings' %}" style="text-decoration: none; color: inherit;">
+            <div class="wallet-card mb-3">
+                <span class="small opacity-75 fw-bold text-uppercase" id="date-label">Today's Earnings</span>
+                <h1 class="fw-900 mb-0 mt-1" id="wallet-display">₹{{ today_earnings|default:0 }}</h1>
+                <div class="text-end mt-1">
+                    <span style="font-size: 10px; opacity: 0.6;">Show All Transactions</span><i class="fa-solid fa-chevron-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
 
         <div class="row g-2 mb-4">
             <div class="col-4">
@@ -111,7 +116,7 @@
             <div class="col-4">
                 <div class="stat-box shadow-sm">
                     <span class="stat-val text-danger" id="stat-cancelled">0</span>
-                    <span class="stat-lbl">Rejected</span>
+                    <span class="stat-lbl">Cancelled</span>
                 </div>
             </div>
             <div class="col-4">
@@ -145,135 +150,445 @@
 
 {% block page_scripts %}
 <script>
-    let currentSelectedDate = new Date().toISOString().split('T')[0];
-
-    // 1. Initialize Calendar
-    function renderCalendar() {
-        const strip = document.getElementById('calendar-strip');
-        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-        const today = new Date();
-        let html = '';
-
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(today.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            const isToday = i === 0;
-
-            html += `
-                <div class="date-card ${isToday ? 'active' : ''}" 
-                     data-date="${dateStr}" 
-                     onclick="handleDateClick(this, '${dateStr}')">
-                    <span class="day-name">${days[d.getDay()]}</span>
-                    <span class="day-num">${d.getDate()}</span>
-                </div>`;
-        }
-        strip.innerHTML = html;
-    }
-
-    // 2. Click Handler
-    function handleDateClick(element, dateString) {
-        document.querySelectorAll('.date-card').forEach(card => card.classList.remove('active'));
-        element.classList.add('active');
-        currentSelectedDate = dateString;
-
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('date-label').innerText = (dateString === todayStr) ? "Today's Earnings" : "Earnings for " + dateString;
-        
-        fetchDashboardData();
-    }
-
-    // 3. Core Data Fetching
-    async function fetchDashboardData() {
-        try {
-            // FIXED: Removed extra quote and ensured correct template tag usage
-            const res = await fetch("{% url 'check_new_orders' %}?date=" + currentSelectedDate);
-            const data = await res.json();
-
-            // Update Header Stats
-            document.getElementById('wallet-display').innerText = `₹${data.today_earnings}`;
-            document.getElementById('stat-delivered').innerText = data.orders_delivered;
-            document.getElementById('stat-cancelled').innerText = data.orders_cancelled;
-            document.getElementById('stat-cash').innerText = `₹${data.cash_to_pay}`;
-
-            renderRadar(data.orders);
-            renderTasks(data.assigned, data.out_deliveries);
-            
-            document.getElementById('duty-count').innerText = data.assigned.length + data.out_deliveries.length;
-
-        } catch (e) {
-            console.error("Dashboard Sync Error:", e);
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
     }
+    return cookieValue;
+}
 
-    function renderRadar(orders) {
-        const container = document.getElementById('radar-list');
-        if (!orders || orders.length === 0) {
-            container.innerHTML = `
-                <div class="scanning-wrapper">
-                    <div class="radar-pulse"><i class="fa-solid fa-satellite-dish text-success fs-4"></i></div>
-                    <p class="fw-bold text-muted small">No new orders found in your hub.</p>
-                </div>`;
-            return;
-        }
+let currentSelectedDate = new Date().toISOString().split('T')[0];
 
-        let html = '';
-        orders.forEach(order => {
-            html += `
-                <div class="order-card shadow-sm border-start border-success border-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge bg-light text-dark mb-1">${order.hub_name}</span>
-                            <h6 class="fw-900 mb-0">TO: ${order.village}</h6>
-                        </div>
-                        <div class="text-end">
-                            <span class="d-block fw-900 text-success">₹${order.earnings}</span>
-                            <a href="${order.accept_url}" class="btn btn-success btn-sm fw-bold rounded-pill px-3 py-1 mt-1">ACCEPT</a>
-                        </div>
-                    </div>
-                </div>`;
-        });
-        container.innerHTML = html;
+
+// ===============================
+// 1. CALENDAR
+// ===============================
+function renderCalendar() {
+    const strip = document.getElementById('calendar-strip');
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const today = new Date();
+
+    let html = '';
+
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(today.getDate() - i);
+
+        const dateStr = d.toISOString().split('T')[0];
+        const isToday = i === 0;
+
+        html += `
+            <div class="date-card ${isToday ? 'active' : ''}" 
+                 data-date="${dateStr}" 
+                 onclick="handleDateClick(this, '${dateStr}')">
+                <span class="day-name">${days[d.getDay()]}</span>
+                <span class="day-num">${d.getDate()}</span>
+            </div>
+        `;
     }
 
-    function renderTasks(assigned, out) {
-        const container = document.getElementById('duty-list');
-        const total = [...assigned, ...out];
-        
-        if (total.length === 0) {
-            container.innerHTML = `<p class="text-center text-muted mt-5 small">No active tasks. Go to Radar to accept orders.</p>`;
-            return;
-        }
+    strip.innerHTML = html;
+}
 
-        let html = '';
-        total.forEach(task => {
-            const isOut = task.status === 'out_for_delivery';
-            html += `
-                <div class="order-card shadow-sm border-start border-${isOut ? 'info' : 'primary'} border-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-800 text-muted">#${task.order_number}</span>
-                        <span class="badge ${isOut ? 'bg-info text-dark' : 'bg-primary'}">${task.status.replace(/_/g, ' ').toUpperCase()}</span>
-                    </div>
-                    <h6 class="fw-900">${task.drop.name}</h6>
-                    <p class="small text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i> ${task.drop.village}</p>
-                    <div class="d-grid">
-                        <a href="/delivery_portal/pickup/${task.id}/" class="btn btn-dark btn-sm rounded-pill fw-bold">PROCEED TO PICKUP</a>
-                    </div>
-                </div>`;
-        });
-        container.innerHTML = html;
-    }
 
-    function switchView(view) {
-        document.getElementById('view-radar').style.display = view === 'radar' ? 'block' : 'none';
-        document.getElementById('view-duty').style.display = view === 'duty' ? 'block' : 'none';
-        document.getElementById('tab-radar').classList.toggle('active', view === 'radar');
-        document.getElementById('tab-duty').classList.toggle('active', view === 'duty');
-    }
+// ===============================
+// 2. DATE CLICK
+// ===============================
+function handleDateClick(element, dateString) {
+    document.querySelectorAll('.date-card')
+        .forEach(card => card.classList.remove('active'));
 
-    // Run
-    renderCalendar();
+    element.classList.add('active');
+    currentSelectedDate = dateString;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    document.getElementById('date-label').innerText =
+        (dateString === todayStr)
+            ? "Today's Earnings"
+            : "Earnings for " + dateString;
+
     fetchDashboardData();
-    setInterval(fetchDashboardData, 5000);
+}
+
+
+// ===============================
+// 3. MAIN DATA FETCH
+// ===============================
+async function fetchDashboardData() {
+    try {
+        const res = await fetch(
+            "{% url 'check_new_orders' %}?date=" + currentSelectedDate
+        );
+
+        const data = await res.json();
+
+        // 1. Update the Big Earnings Card (Part C in View)
+        // Redirect logic remains in the HTML <a> tag
+        document.getElementById('wallet-display').innerText = 
+            `₹${data.today_earnings || 0}`;
+
+        // 2. Update the three Stat Boxes (Part C in View)
+        document.getElementById('stat-delivered').innerText = 
+            data.orders_delivered || 0;
+
+        document.getElementById('stat-cancelled').innerText = 
+            data.orders_cancelled || 0;
+
+        document.getElementById('stat-cash').innerText = 
+            `₹${data.cash_to_pay || 0}`;
+
+        // 3. Update the Lists (Parts A & B in View)
+        // 'orders' = Radar, 'assigned' + 'out_deliveries' = My Tasks
+        renderRadar(data.orders || []);
+        renderTasks(data.assigned || [], data.out_deliveries || []);
+
+        // 4. Update the Task Count badge
+        const totalActive = (data.assigned?.length || 0) + (data.out_deliveries?.length || 0);
+        document.getElementById('duty-count').innerText = totalActive;
+
+    } catch (err) {
+        console.error("Dashboard Sync Error:", err);
+    }
+}
+
+
+// ===============================
+// 4. RADAR ORDERS
+// ===============================
+function renderRadar(orders) {
+    const container = document.getElementById('radar-list');
+
+    if (!orders || !orders.length) {
+        container.innerHTML = `
+            <div class="scanning-wrapper">
+                <div class="radar-pulse">
+                    <i class="fa-solid fa-satellite-dish text-success fs-4"></i>
+                </div>
+                <p class="fw-bold text-muted small">
+                    No new orders found in your hub.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+
+    orders.forEach(order => {
+
+        // ITEMS
+        let itemsHtml = '';
+
+        if (order.items?.length) {
+            itemsHtml = `
+                <div class="d-flex flex-column gap-1">
+                    ${order.items.map(item => `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-800 small text-dark">
+                                ${item.name}
+                                <span class="text-muted fw-600">
+                                    ${item.size ? `• ${item.size}` : ''}
+                                </span>
+                            </div>
+                            <span class="badge bg-dark text-white">
+                                x${item.qty}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        html += `
+        <div class="order-card shadow-sm mb-3 p-3"
+             style="border-radius:18px; border-left:5px solid #10B981;">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-light text-dark fw-800">
+                    ${order.pickup?.hub_name || 'Hub'}
+                </span>
+
+                <span class="fw-900 text-success">
+                    ₹${order.earnings || 0}
+                </span>
+            </div>
+
+            <!-- ROUTE -->
+            <div class="d-flex gap-2 mb-3">
+
+                <!-- DOT LINE -->
+                <div class="d-flex flex-column align-items-center pt-1">
+                    <div style="width:10px;height:10px;background:#2563EB;border-radius:50%;"></div>
+                    <div style="width:2px;height:38px;background:#e2e8f0;"></div>
+                    <div style="width:10px;height:10px;background:#10B981;border-radius:50%;"></div>
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="flex-grow-1">
+
+                    <!-- PICKUP -->
+                    <div class="mb-2">
+                        <div class="small text-muted fw-700">PICKUP</div>
+                        <div class="fw-800 text-dark small">
+                            ${order.pickup?.hub_name || 'Hub'}
+                        </div>
+                    </div>
+
+                    <!-- DROP -->
+                    <div>
+                        <div class="small text-muted fw-700">DELIVERY</div>
+
+                        ${order.drop?.full_address ? `
+                            <div class="fw-800 text-dark small">
+                                ${order.drop.full_address}
+                            </div>
+                        ` : `
+                            <div class="text-danger small fw-800">
+                                ⚠ Address missing - check order details
+                            </div>
+                        `}
+
+                        ${order.drop?.landmark ? `
+                            <div class="small text-primary fw-700 mt-1">
+                                📍 ${order.drop.landmark}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ITEMS -->
+            <div class="bg-light rounded-3 p-2 mb-3">
+                <div class="small fw-900 text-muted mb-1">
+                    ORDER ITEMS
+                </div>
+
+                ${itemsHtml || `<div class="small text-muted">No items found</div>`}
+            </div>
+
+            <!-- ACCEPT -->
+            <a href="${order.accept_url}"
+               class="btn btn-success w-100 rounded-pill fw-900">
+                ACCEPT ORDER
+            </a>
+
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// ===============================
+// 5. MY TASKS (IMPORTANT PART)
+// ===============================
+function renderTasks(assigned, out) {
+    const container = document.getElementById('duty-list');
+    const tasks = [...assigned, ...out];
+
+    if (!tasks.length) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fa-solid fa-box-open text-light-emphasis" style="font-size: 3rem;"></i>
+                </div>
+                <p class="text-muted small fw-bold">No active tasks.<br>Check the Radar for new orders.</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+
+    tasks.forEach(task => {
+        const status = task.status;
+        let actions = '';
+        
+        // --- Items HTML (Optimized for counting) ---
+        let itemsHtml = '';
+        if (task.items && task.items.length > 0) {
+            itemsHtml = `
+                <div class="bg-light rounded-3 p-2 mb-3" style="border: 1px solid #edf2f7;">
+                    <div class="small fw-900 text-muted mb-2" style="font-size: 9px; letter-spacing: 0.5px; opacity: 0.7;">CHECKLIST</div>
+                    <div class="d-flex flex-column gap-2">
+                        ${task.items.map(item => `
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-dark text-white me-2" style="font-size: 10px; min-width: 25px;">${item.qty}x</span>
+                                <div class="fw-800 text-dark" style="font-size: 11px; line-height: 1.2;">
+                                    ${item.name}
+                                    ${item.size ? `<span class="text-muted fw-600"> (${item.size})</span>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Logic for Buttons ---
+        if (status === 'assigned') {
+            actions = `
+                <a href="/delivery_portal/delivery/pickup/${task.id}/"
+                   class="btn btn-primary btn-sm rounded-pill fw-900 w-100 py-2 shadow-sm">
+                   START PICKUP
+                </a>
+            `;
+        } 
+        else {
+            // FIX: Corrected Maps Deep Link and Layout
+            actions = `
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <a href="tel:${task.drop?.phone || ''}" 
+                           class="btn btn-outline-success btn-sm rounded-pill fw-900 w-100">
+                           <i class="fa-solid fa-phone me-1"></i> CALL
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <button onclick="handleCancel('${task.id}')" 
+                                id="cancel-btn-${task.id}" 
+                                class="btn btn-outline-danger btn-sm rounded-pill fw-900 w-100">
+                            <i class="fa-solid fa-xmark me-1"></i> CANCEL
+                        </button>
+                    </div>
+                </div>
+
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${task.drop?.lat},${task.drop?.lng}"
+                   target="_blank"
+                   class="btn btn-warning btn-sm rounded-pill fw-900 w-100 mb-2 py-2 shadow-sm">
+                   <i class="fa-solid fa-location-arrow me-1"></i> NAVIGATE TO DROP
+                </a>
+
+                <a href="/delivery_portal/rider/complete/${task.id}/"
+                    class="btn btn-success btn-sm rounded-pill fw-900 w-100 py-2 shadow-sm">
+                    COMPLETE DELIVERY
+                </a>
+            `;
+        }
+
+        // --- Final Card Assembly ---
+        html += `
+            <div class="order-card shadow-sm border-start border-primary border-4 mb-3" id="task-card-${task.id}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-800 text-muted" style="font-size: 10px;">#${task.order_number || task.id}</span>
+                    <span class="badge ${status === 'assigned' ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'} border border-opacity-10 text-uppercase" style="font-size: 9px; letter-spacing: 0.3px;">
+                        ${status === 'out_for_delivery' ? 'ON THE WAY' : status.replace(/_/g, ' ')}
+                    </span>
+                </div>
+                
+                <h6 class="fw-900 mb-0 text-dark">${task.drop?.name || 'Customer'}</h6>
+                
+                <p class="small text-muted mb-2 text-capitalize">
+                    <i class="fa-solid fa-location-dot text-danger me-1"></i> 
+                    ${task.drop?.village || task.drop?.city || 'No Location'}
+                </p>
+
+                ${itemsHtml}
+
+                <div class="d-grid">${actions}</div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+// ===============================
+//6.HANDLE CANCELLATION OF DELIVERY
+// ===============================
+async function handleCancel(taskId) {
+    const reason = prompt("Enter reason for cancellation:");
+    if (!reason) return;
+
+    const btn = document.getElementById(`cancel-btn-${taskId}`);
+    const card = document.getElementById(`task-card-${taskId}`);
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    }
+
+    // --- GET TOKEN FROM COOKIE ---
+    const csrftoken = getCookie('csrftoken');
+
+    if (!csrftoken) {
+        alert("Security session expired. Please refresh the page.");
+        if (btn) btn.disabled = false;
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('reason', reason);
+
+        const response = await fetch(`/delivery_portal/rider/failed/${taskId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken // Use the cookie-sourced token
+            }
+        });
+
+        // Safety check: ensure we didn't get another HTML error page
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server error (403/500). Check the console.");
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+            if (card) {
+                card.style.transition = '0.4s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(30px)';
+                setTimeout(() => card.remove(), 400);
+            }
+        } else {
+            throw new Error(data.message || "Failed to process.");
+        }
+    } catch (err) {
+        console.error("GramaCart Error:", err);
+        alert("Error: " + err.message);
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-xmark me-1"></i> CANCEL';
+        }
+    }
+}
+
+// ===============================
+// 6. VIEW SWITCH
+// ===============================
+function switchView(view) {
+    document.getElementById('view-radar').style.display =
+        view === 'radar' ? 'block' : 'none';
+
+    document.getElementById('view-duty').style.display =
+        view === 'duty' ? 'block' : 'none';
+
+    document.getElementById('tab-radar').classList.toggle('active', view === 'radar');
+    document.getElementById('tab-duty').classList.toggle('active', view === 'duty');
+}
+
+
+// ===============================
+// INIT
+// ===============================
+renderCalendar();
+fetchDashboardData();
+setInterval(fetchDashboardData, 5000);
 </script>
 {% endblock %}

@@ -2,224 +2,565 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-11">
-            
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="action-icon-circle shadow-sm bg-white">
-                        <i class="bi bi-pencil-square text-emerald"></i>
-                    </div>
-                    <div>
-                        <h2 class="fw-800 text-navy mb-0">Modify Product</h2>
-                        <p class="text-muted small fw-600 mb-0">Editing: <span class="text-emerald">{{ product.name }}</span></p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{% url 'list_product' %}" class="btn btn-light border px-4 rounded-pill fw-700 small text-navy shadow-sm">
-                        <i class="bi bi-arrow-left me-1"></i> Back to Catalog
-                    </a>
-                </div>
-            </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show border-0 shadow-sm mb-4 rounded-4 fw-700" role="alert">
-                    <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
-
-            <form method="post" enctype="multipart/form-data" novalidate>
-                {% csrf_token %}
-                
-                {{ formset.management_form }}
-
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-header bg-white py-3 border-bottom border-light">
-                                <h5 class="mb-0 fw-800 text-navy">Product Information</h5>
-                            </div>
-                            <div class="card-body p-4">
-                                <div class="mb-4">
-                                    <label class="form-label-custom">Product Name</label>
-                                    <div class="input-group-custom">
-                                        <i class="bi bi-tag"></i>
-                                        {{ form.name }}
-                                    </div>
-                                    {% if form.name.errors %}<div class="error-msg text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
-                                </div>
-                                <div class="mb-0">
-                                    <label class="form-label-custom">Detailed Description</label>
-                                    {{ form.description }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card border-0 shadow-sm rounded-4">
-                            <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0 fw-800 text-navy">Product Gallery</h5>
-                                <span class="badge bg-light text-muted border fw-700 px-3 py-2 rounded-pill">Total Capacity: 5</span>
-                            </div>
-                            <div class="card-body p-4">
-                                <div class="row g-3">
-                                    {% for img_form in formset %}
-                                    <div class="col-md-6 col-xl-4">
-                                        <div class="image-edit-wrapper bg-light rounded-4 p-3 border-2 border-dashed">
-                                            
-                                            {% for hidden in img_form.hidden_fields %}
-                                                {{ hidden }}
-                                            {% endfor %}
-
-                                            <div class="preview-box mb-3 position-relative" style="height: 150px;">
-                                                {% if img_form.instance.pk and img_form.instance.image %}
-                                                    <img src="{{ img_form.instance.image.url }}" class="w-100 h-100 rounded-3 shadow-sm object-fit-cover border" id="preview-{{ forloop.index }}">
-                                                    <div class="delete-overlay rounded-3">
-                                                        <div class="form-check">
-                                                            {{ img_form.DELETE }}
-                                                            <label class="form-check-label text-white fw-800 small" for="{{ img_form.DELETE.id_for_label }}">
-                                                                <i class="bi bi-trash3 me-1"></i> REMOVE
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                {% else %}
-                                                    <div class="upload-placeholder h-100 d-flex flex-column align-items-center justify-content-center text-muted border rounded-3 bg-white" id="placeholder-{{ forloop.index }}">
-                                                        <i class="bi bi-cloud-arrow-up fs-2 mb-1"></i>
-                                                        <span class="extra-small fw-700 uppercase">Empty Slot {{ forloop.counter }}</span>
-                                                    </div>
-                                                    <div id="js-preview-container-{{ forloop.index }}" class="d-none w-100 h-100">
-                                                        <img src="" class="w-100 h-100 rounded-3 shadow-sm object-fit-cover border">
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-
-                                            <div class="file-input-wrapper">
-                                                {{ img_form.image }}
-                                            </div>
-                                            
-                                            {% if img_form.errors %}
-                                                <div class="text-danger extra-small fw-700 mt-2"><i class="bi bi-info-circle"></i> File Error</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-navy text-white overflow-hidden">
-                            <div class="card-body p-4">
-                                <h5 class="fw-800 mb-4 text-emerald">Commercials</h5>
-                                <div class="mb-4">
-                                    <label class="small fw-800 opacity-75">LIST PRICE (₹)</label>
-                                    <div class="input-group-custom dark">
-                                        <i class="bi bi-currency-rupee text-emerald"></i>
-                                        {{ form.price }}
-                                    </div>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="small fw-800 opacity-75">DISCOUNT PRICE (₹)</label>
-                                    <div class="input-group-custom dark">
-                                        <i class="bi bi-percent text-emerald"></i>
-                                        {{ form.discount_price }}
-                                    </div>
-                                </div>
-                                <div class="mb-0">
-                                    <label class="small fw-800 opacity-75">STOCK (Units/Weight)</label>
-                                    <div class="input-group-custom dark">
-                                        <i class="bi bi-box-seam text-emerald"></i>
-                                        {{ form.stock_available }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-body p-4">
-                                <h5 class="fw-800 text-navy mb-4">Status & Logistics</h5>
-                                <div class="mb-4">
-                                    <label class="form-label-custom">Category</label>
-                                    {{ form.category }}
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label-custom">Size/Pack Type</label>
-                                    {{ form.size }}
-                                </div>
-                                <hr class="my-4">
-                                <div class="form-check form-switch p-0 d-flex align-items-center justify-content-between">
-                                    <label class="fw-800 text-navy mb-0 small">ACTIVE ON STORE</label>
-                                    {{ form.is_active }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-emerald w-100 py-3 rounded-4 shadow-emerald fw-800 text-uppercase mb-3">
-                            <i class="bi bi-check2-all me-2"></i> Confirm Updates
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.querySelectorAll('input[type="file"]').forEach((input, index) => {
-        input.addEventListener('change', function() {
-            const file = this.files[0];
-            const idx = index + 1;
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const placeholder = document.getElementById(`placeholder-${idx}`);
-                    const jsPreview = document.getElementById(`js-preview-container-${idx}`);
-                    
-                    if(placeholder) placeholder.classList.add('d-none');
-                    if(jsPreview) {
-                        jsPreview.classList.remove('d-none');
-                        jsPreview.querySelector('img').src = e.target.result;
-                    }
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    });
-</script>
 
 <style>
-    :root { --emerald: #00c853; --navy: #0f172a; }
-    .bg-navy { background-color: var(--navy); }
-    .text-emerald { color: var(--emerald) !important; }
-    .btn-emerald { background-color: var(--emerald); color: white; border: none; transition: 0.3s; }
-    .btn-emerald:hover { background-color: #00a344; color: white; transform: translateY(-3px); }
-    .shadow-emerald { box-shadow: 0 10px 20px rgba(0, 200, 83, 0.2); }
-    
-    .action-icon-circle { width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-    .form-label-custom { font-weight: 800; font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 0.05rem; }
-    
-    .input-group-custom { position: relative; }
-    .input-group-custom i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 5; }
-    .input-group-custom input, .input-group-custom select, textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 15px 12px 42px; font-size: 14px; font-weight: 600; color: #1e293b; }
-    textarea { padding-left: 15px; min-height: 120px; }
-    .input-group-custom.dark input { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); color: white; }
 
-    .image-edit-wrapper { transition: 0.3s; }
-    .image-edit-wrapper:hover { border-color: var(--emerald); }
-    .delete-overlay { position: absolute; inset: 0; background: rgba(239, 68, 68, 0.9); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; z-index: 10; }
-    .preview-box:hover .delete-overlay { opacity: 1; }
-    .delete-overlay input[type="checkbox"] { display: none; }
-    
-    .form-switch .form-check-input { width: 3rem; height: 1.5rem; cursor: pointer; }
-    .form-switch .form-check-input:checked { background-color: var(--emerald); border-color: var(--emerald); }
-    
-    .fw-800 { font-weight: 800; }
-    .extra-small { font-size: 10px; }
-    .uppercase { text-transform: uppercase; }
+/* ================= GLOBAL ================= */
+
+body{
+    background:#f6f8fb;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    color:#0f172a;
+}
+
+.container-fluid{
+    max-width:1400px;
+}
+
+/* ================= HEADERS ================= */
+
+.page-title{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+}
+
+.sub-title{
+    font-size:13px;
+    color:#64748b;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+    border:none;
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 4px 20px rgba(15,23,42,.04);
+    transition:.2s ease;
+}
+
+.card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px rgba(15,23,42,.08);
+}
+
+.card-body{
+    padding:1.5rem;
+}
+
+/* ================= LABELS ================= */
+
+.form-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#64748b;
+    margin-bottom:6px;
+}
+
+/* ================= INPUTS ================= */
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    font-size:14px;
+    transition:.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#22c55e;
+    box-shadow:0 0 0 4px rgba(34,197,94,.12);
+}
+
+/* ================= BUTTONS ================= */
+
+.btn-success{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+}
+
+.btn-success:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(34,197,94,.25);
+}
+
+.btn-light{
+    border-radius:999px;
+}
+
+/* ================= IMAGE BOX ================= */
+
+.image-box{
+    border:2px dashed #dbe4ee;
+    border-radius:16px;
+    padding:16px;
+    text-align:center;
+    background:#fafafa;
+    transition:.2s;
+    position:relative;
+}
+
+.image-box:hover{
+    border-color:#22c55e;
+    background:#f0fdf4;
+}
+
+.image-box i{
+    font-size:30px;
+    color:#94a3b8;
+}
+
+.image-preview{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+    border-radius:12px;
+    margin-bottom:12px;
+    border:1px solid #e2e8f0;
+}
+
+/* ================= VARIANT BOX ================= */
+
+.variant-box{
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    padding:16px;
+    background:#fafafa;
+}
+
+/* ================= INFO ================= */
+
+.info-box{
+    background:#eff6ff;
+    border:1px solid #dbeafe;
+    color:#1e40af;
+    border-radius:14px;
+    font-size:13px;
+}
+
+/* ================= SWITCH ================= */
+
+.form-check-input:checked{
+    background-color:#22c55e;
+    border-color:#22c55e;
+}
+
+/* ================= DELETE ================= */
+
+.delete-check{
+    margin-top:10px;
+    font-size:13px;
+    color:#dc2626;
+}
+
+/* ================= ERRORS ================= */
+
+.errorlist{
+    list-style:none;
+    padding:0;
+    margin-top:6px;
+    color:#dc2626;
+    font-size:13px;
+}
+
 </style>
+
+<div class="container-fluid py-5">
+
+    <!-- HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <div class="page-title">
+                Edit Product
+            </div>
+
+            <div class="sub-title">
+                Update product information, variants & images
+            </div>
+
+        </div>
+
+        <a href="{% url 'list_product' %}"
+           class="btn btn-light border px-4">
+
+            Back
+
+        </a>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form method="post" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{ variant_formset.management_form }}
+        {{ image_formset.management_form }}
+
+        <div class="row g-4">
+
+            <!-- LEFT -->
+
+            <div class="col-lg-8">
+
+                <!-- BASIC INFO -->
+
+                <div class="card mb-4">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-4">
+                            Basic Information
+                        </h5>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Product Name
+                            </label>
+
+                            {{ form.name }}
+
+                            {{ form.name.errors }}
+
+                        </div>
+
+                        <div>
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {{ form.description.errors }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- VARIANTS -->
+
+                <div class="card mb-4">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+
+                            <h5 class="fw-bold mb-0">
+                                Product Variants
+                            </h5>
+
+                            <span class="badge bg-light text-dark border">
+                                Example:
+                                250ml / 500ml / 1L
+                            </span>
+
+                        </div>
+
+                        <div class="row g-3">
+
+                            {% for variant_form in variant_formset %}
+
+                            <div class="col-md-4">
+
+                                <div class="variant-box">
+
+                                    {% for hidden in variant_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Quantity
+                                        </label>
+
+                                        {{ variant_form.quantity }}
+
+                                        {{ variant_form.quantity.errors }}
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Unit
+                                        </label>
+
+                                        {{ variant_form.unit }}
+
+                                        {{ variant_form.unit.errors }}
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+
+                                        <div class="form-check form-switch">
+
+                                            {{ variant_form.is_active }}
+
+                                            <label class="ms-2 small">
+                                                Active
+                                            </label>
+
+                                        </div>
+
+                                        {% if variant_form.instance.pk %}
+
+                                        <div class="delete-check">
+                                            {{ variant_form.DELETE }}
+                                            Delete
+                                        </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- IMAGES -->
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-4">
+                            Product Images
+                        </h5>
+
+                        <div class="row g-3">
+
+                            {% for image_form in image_formset %}
+
+                            <div class="col-md-4">
+
+                                <div class="image-box">
+
+                                    {% for hidden in image_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+
+                                    {% if image_form.instance.pk and image_form.instance.image %}
+
+                                        <img src="{{ image_form.instance.image.url }}"
+                                             class="image-preview">
+
+                                    {% else %}
+
+                                        <i class="bi bi-image"></i>
+
+                                    {% endif %}
+
+                                    <div class="mt-3">
+
+                                        {{ image_form.image }}
+
+                                        {{ image_form.image.errors }}
+
+                                    </div>
+
+                                    {% if image_form.instance.pk %}
+
+                                    <div class="delete-check">
+
+                                        {{ image_form.DELETE }}
+                                        Remove Image
+
+                                    </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="col-lg-4">
+
+                <!-- CLASSIFICATION -->
+
+                <div class="card mb-4">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <h5 class="fw-bold mb-0">
+                                Classification
+                            </h5>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-success rounded-pill"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#addCategoryModal">
+
+                                + Add
+
+                            </button>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Category
+                            </label>
+
+                            {{ form.category }}
+
+                            {{ form.category.errors }}
+
+                        </div>
+
+                        <div class="form-check form-switch d-flex justify-content-between align-items-center">
+
+                            <label class="fw-bold">
+                                Active Product
+                            </label>
+
+                            {{ form.is_active }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- INFO -->
+
+                <div class="info-box p-3 mb-4">
+
+                    <b>Inventory Architecture:</b><br>
+
+                    Pricing, stock,
+                    warehouse quantities,
+                    and shop-level inventory
+                    are managed separately
+                    inside the Inventory module.
+
+                </div>
+
+                <!-- SUBMIT -->
+
+                <button type="submit"
+                        class="btn btn-success w-100 py-3">
+
+                    Update Product
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- CATEGORY MODAL -->
+
+<div class="modal fade"
+     id="addCategoryModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content rounded-4 border-0">
+
+            <div class="modal-header border-0">
+
+                <h5 class="modal-title fw-bold">
+                    Add Category
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form method="post"
+                  action="{% url 'add_category' %}">
+
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <label class="form-label">
+                        Category Name
+                    </label>
+
+                    <input type="text"
+                           name="name"
+                           class="form-control"
+                           required>
+
+                </div>
+
+                <div class="modal-footer border-0">
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Save
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
 {% endblock %}

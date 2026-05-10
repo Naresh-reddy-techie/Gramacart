@@ -39,56 +39,153 @@ def get_category_product_map(products):
         category_product_map[product.category].append(product)
     return category_product_map
 
+
+from django.db.models import Avg, Count
+from inventory.models import Inventory 
+
+from django.db.models import Q, Prefetch
+
+from admin_dashboard.models import Product
+
+
+def get_hub_products(query=None, category_slug=None, hub=None):
+    """
+    Returns PRODUCTS based on INVENTORY availability in a HUB
+    """
+
+    # =========================
+    # STEP 1: Base inventory filter
+    # =========================
+    inventory_qs = Inventory.objects.select_related(
+        'variant__product',
+        'shop__hub',
+        'shop'
+    ).filter(
+        stock__gt=0,
+        shop__is_active=True,
+    )
+
+    # =========================
+    # STEP 2: Hub filter (MOST IMPORTANT)
+    # =========================
+    if hub:
+        inventory_qs = inventory_qs.filter(shop__hub=hub)
+
+    # =========================
+    # STEP 3: Category filter
+    # =========================
+    if category_slug:
+        inventory_qs = inventory_qs.filter(
+            variant__product__category__slug=category_slug
+        )
+
+    # =========================
+    # STEP 4: Search filter
+    # =========================
+    if query:
+        inventory_qs = inventory_qs.filter(
+            Q(variant__product__name__icontains=query) |
+            Q(variant__product__description__icontains=query)
+        )
+
+    # =========================
+    # STEP 5: Extract PRODUCTS
+    # (important: DISTINCT products only)
+    # =========================
+    products = Product.objects.filter(
+        id__in=inventory_qs.values_list('variant__product_id', flat=True)
+    ).distinct()
+
+    return products
+
 def public_dashboard(request, category_slug=None):
-    """
-    Dashboard view to display products, categories, search, and cart info.
-    """
-    # Get search query from URL
     query = request.GET.get('q', '').strip()
-    
-    # For star ratings (1 to 5)
     star_range = range(1, 6)
 
-    # Fetch company info and categories
     company_info = CompanyInfo.objects.first()
     categories = Category.objects.all()
 
-    # Fetch filtered products
-    products = get_filtered_products(query=query, category_slug=category_slug)
-    print(f"Total products (after filters applied): {products.count()}")
+    # ==============================
+    # 1. ACTIVE HUB DETECTION
+    # ==============================
+    active_hub = None
 
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.customer_profile
+            address = profile.addresses.filter(
+                is_default=True,
+                is_active=True
+            ).first()
+
+            if address:
+                active_hub = DeliveryHub.objects.filter(
+                    is_active=True,
+                    city__iexact=address.city
+                ).first()
+
+        except Exception:
+            active_hub = None
+
+    # ==============================
+    # 2. HUB-BASED PRODUCTS (NEW CORE)
+    # ==============================
+    products = get_hub_products(
+        query=query,
+        category_slug=category_slug,
+        hub=active_hub
+    ).annotate(
+        avg_rating_value=Avg('ratings__score'),
+        rating_count_value=Count('ratings')
+    )
+
+    # ==============================
+    # 3. CATEGORY VIEW (OPTIONAL)
+    # ==============================
     selected_category = None
-    selected_products = None
     category_product_map = None
 
     if category_slug:
         selected_category = get_object_or_404(Category, slug=category_slug)
 
-    if query or category_slug:
-        # If searching or filtering by category, show filtered products
-        selected_products = products
-    else:
-        # If no filters, group products by category
+    if not (query or category_slug):
         category_product_map = get_category_product_map(products)
 
-    # Cart count for authenticated users
+    # ==============================
+    # 4. CART COUNT
+    # ==============================
     cart_count = 0
     if request.user.is_authenticated:
         cart_count = CartItem.objects.filter(user=request.user).count()
 
+    # ==============================
+    # 5. WISHLIST IDS
+    # ==============================
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_ids = list(
+            WishlistItem.objects.filter(user=request.user)
+            .values_list('product_id', flat=True)
+        )
+
+    # ==============================
+    # 6. CONTEXT
+    # ==============================
     context = {
         'categories': categories,
-        'selected_category': categories,
         'selected_products': products,
         'category_product_map': category_product_map,
         'company': company_info,
         'cart_count': cart_count,
         'search_query': query,
         'star_range': star_range,
+        'wishlist_ids': wishlist_ids,
+
+        # 🔥 IMPORTANT FOR UI
+        'active_hub': active_hub,
     }
 
     return render(request, 'Public_view/dashboard.html', context)
-
 
 #----------my profile------------------------
 
@@ -117,20 +214,37 @@ def manage_profile(request):
     return render(request, 'profile/manage_profile.html', {'form': form})
 
 
+
 @login_required
 def profile_view(request):
     try:
         profile = request.user.customer_profile
     except CustomerProfile.DoesNotExist:
-        # Optional: redirect to profile creation if profile doesn't exist
         return redirect('manage_profile')
+
+    # ✅ Use CustomerProfile everywhere (IMPORTANT)
+    orders_count = Order.objects.filter(user=request.user).count()
+    address_count = Address.objects.filter(customer=profile).count()
+
+    # Status logic
+    if orders_count == 0:
+        status = "New"
+    elif orders_count < 10:
+        status = "Active"
+    elif orders_count < 30:
+        status = "Regular"
+    else:
+        status = "Premium"
 
     context = {
         'user': request.user,
         'profile': profile,
+        'orders_count': orders_count,
+        'address_count': address_count,
+        'user_status': status
     }
-    return render(request, 'profile/profile_view.html', context)
 
+    return render(request, 'profile/profile_view.html', context)
 #=================================================================
 from decimal import Decimal
 
@@ -435,9 +549,19 @@ def buy_now(request, product_id):
         subtotal = product.price * quantity
         default_address = user_addresses.first()
         shipping_fee = Decimal('0')
+        shipping_fee = Decimal('0')
+        is_serviceable = True
+
         if default_address:
             ship_res = calculate_shipping_cost(default_address)
-            shipping_fee = Decimal(ship_res.get('customer_fee', 0))
+
+            raw_fee = ship_res.get("customer_fee")
+            is_serviceable = not ship_res.get("error") and raw_fee is not None
+
+            if is_serviceable:
+                shipping_fee = Decimal(str(raw_fee))
+            else:
+                shipping_fee = Decimal('0')
 
         totals = {
             'sub_total': subtotal,
@@ -445,12 +569,13 @@ def buy_now(request, product_id):
             'final_total': subtotal + shipping_fee
         }
 
-        return render(request, 'checkout.html', {
+        return render(request, 'shop/checkout.html', {
             'product': product,
             'quantity': quantity,
             'user_addresses': user_addresses,
             'payment_methods': payment_methods,
             'order_totals': totals,
+            'is_serviceable': is_serviceable,
         })
 
     # ---------------- POST (Processing the Instant Buy) ----------------
@@ -465,7 +590,18 @@ def buy_now(request, product_id):
     payment_method = get_object_or_404(PaymentMethod, id=payment_method_id, is_active=True)
 
     shipping_res = calculate_shipping_cost(selected_address)
-    customer_fee = Decimal(shipping_res.get('customer_fee', 0))
+
+    raw_fee = shipping_res.get("customer_fee")
+    is_serviceable = not shipping_res.get("error") and raw_fee is not None
+
+    if not is_serviceable:
+        messages.error(
+            request,
+            "Sorry, we are not delivering to this address. Please select another address."
+        )
+        return redirect('buy_now', product_id=product.id)
+
+    customer_fee = Decimal(str(raw_fee))
     subtotal = product.price * quantity
     final_total = subtotal + customer_fee
 
@@ -555,7 +691,7 @@ def get_buy_now_shipping_cost(request, product_id):
     if not is_serviceable:
         return JsonResponse({
             "success": False,
-            "message": "We don't deliver to this location yet. Please select another address.",
+            "message": "Sorry currently we are not serving this area .Please select another address.",
             "shipping_cost": 0,
             "distance": float(shipping_info.get("distance_km") or 0)
         })
@@ -571,29 +707,29 @@ def get_buy_now_shipping_cost(request, product_id):
     })
 #=================================
 
-from django.db.models import Avg
-from shop.models import Rating, Product
+from django.shortcuts import get_object_or_404
+from shop.models import Rating, WishlistItem  # 👈 add Wishlist
 
 def product_detail(request, slug):
-    # Fetch the product
     product = get_object_or_404(Product, slug=slug)
 
-    # Calculate average rating
-    average_rating = product.ratings.aggregate(avg=Avg('score'))['avg'] or 0
-    average_rating = round(average_rating, 1)  # Round to 1 decimal
+    average_rating = product.avg_rating
+    reviews = product.ratings.select_related('user').order_by('-created_at')
 
-    # Fetch all reviews for this product
-    reviews = product.ratings.select_related('user').all().order_by('-created_at')
-
-    # Check if the logged-in user has already rated this product
     user_rating = None
     if request.user.is_authenticated:
         user_rating = reviews.filter(user=request.user).first()
 
-    # Fetch related products (same category, excluding current)
     related_products = Product.objects.filter(
         category=product.category
     ).exclude(id=product.id)[:6]
+
+    # ✅ 🔥 ADD THIS BLOCK
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_ids = WishlistItem.objects.filter(
+            user=request.user
+        ).values_list('product_id', flat=True)
 
     context = {
         'product': product,
@@ -602,10 +738,13 @@ def product_detail(request, slug):
         'average_rating': average_rating,
         'reviews': reviews,
         'user_rating': user_rating,
+        'rating_count': product.rating_count,
+
+        # ✅ 👇 IMPORTANT
+        'wishlist_ids': list(wishlist_ids),
     }
 
     return render(request, 'Public_view/product_detail.html', context)
-
 
 from django.views.decorators.http import require_POST
 # =================== CART VIEW ===================
@@ -634,10 +773,10 @@ def get_cart_totals(user):
 def cart_view(request):
     cart_items = CartItem.objects.filter(user=request.user)
     if not cart_items.exists():
-        return render(request, 'cart.html', {'cart_items': cart_items, 'order_totals': None})
+        return render(request, 'shop/cart.html', {'cart_items': cart_items, 'order_totals': None})
     
     order_totals = get_cart_totals(request.user)
-    return render(request, 'cart.html', {
+    return render(request, 'shop/cart.html', {
         'cart_items': cart_items,
         'order_totals': order_totals
     })
@@ -734,6 +873,7 @@ from shop.utils import calculate_shipping_cost, calculate_order_totals
 from .models import CartItem, Order, OrderItem, Address
 from payments.models import PaymentMethod
 from payments.models import Payment
+
 @login_required
 def cart_checkout(request):
     user = request.user
@@ -751,7 +891,7 @@ def cart_checkout(request):
         
         totals = calculate_order_totals(cart_items, address=None)
         
-        return render(request, 'checkout_cart.html', {
+        return render(request, 'shop/checkout_cart.html', {
             'cart_items': cart_items,
             'user_addresses': user_addresses,
             'payment_methods': payment_methods,
@@ -841,7 +981,7 @@ def cart_checkout(request):
 
 from shop.models import Address
 
-
+"""
 @login_required
 def get_shipping_cost(request):
     user = request.user
@@ -872,12 +1012,58 @@ def get_shipping_cost(request):
         "taxes": float(order_totals["taxes"]),
         "final_total": float(order_totals["final_total"])
     })
+"""
+
+@login_required
+def get_shipping_cost(request):
+    user = request.user
+    address_id = request.GET.get("address_id")
+
+    if not address_id:
+        return JsonResponse({"success": False, "error": "Address not provided"}, status=400)
+
+    try:
+        address = Address.objects.get(customer__user=user, id=address_id)
+    except Address.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Address not found"}, status=404)
+
+    # Get cart items
+    cart_items = CartItem.objects.filter(user=user)
+    if not cart_items.exists():
+        return JsonResponse({"success": False, "error": "Cart is empty"}, status=400)
+
+    # 🔥 SAME LOGIC AS BUY NOW
+    shipping_info = calculate_shipping_cost(address)
+
+    raw_fee = shipping_info.get("customer_fee")
+    is_serviceable = not shipping_info.get("error") and raw_fee is not None
+
+    if not is_serviceable:
+        return JsonResponse({
+            "success": False,
+            "message": "Sorry currently we are not serving this area. Please select another address.",
+            "shipping_cost": 0,
+            "distance": float(shipping_info.get("distance_km") or 0)
+        })
+
+    # ✅ VALID AREA → continue calculations
+    order_totals = calculate_order_totals(cart_items, address)
+
+    return JsonResponse({
+        "success": True,
+        "shipping_cost": float(raw_fee),
+        "sub_total": float(order_totals["sub_total"]),
+        "taxes": float(order_totals["taxes"]),
+        "final_total": float(order_totals["final_total"]),
+        "distance": float(shipping_info.get("distance_km") or 0),
+        "hub": shipping_info.get("hub_name", "Unknown")
+    })
 #===========================================================
 @login_required
 def order_list(request):
     orders = Order.objects.filter(user=request.user).order_by('-placed_at')  # Assuming the user is authenticated
     order_items = OrderItem.objects.all()
-    return render(request, 'order/order_list.html', {'orders': orders,'order_items': order_items,})
+    return render(request, 'shop/order_list.html', {'orders': orders,'order_items': order_items,})
 
 #==================================================================
 
@@ -923,6 +1109,8 @@ def order_success(request, order_id):
         'message': "Your order has been placed successfully!",
         'next_step': "The village hub is now reviewing your items."
     })
+
+from .forms import RatingForm
 
 @login_required
 def rate_product(request, id):

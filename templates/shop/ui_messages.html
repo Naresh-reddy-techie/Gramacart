@@ -1,0 +1,85 @@
+{% if messages %}
+<div id="gc-toast-container"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    {% for message in messages %}
+        GCToast.show("{{ message.tags }}", "{{ message|escapejs }}");
+    {% endfor %}
+});
+
+const GCToast = {
+    show(type, text) {
+        const container = document.getElementById("gc-toast-container");
+
+        const toast = document.createElement("div");
+        toast.className = `gc-toast ${type}`;
+
+        let icon = "bi-info-circle";
+        if (type === "success") icon = "bi-check-circle-fill";
+        if (type === "error") icon = "bi-x-circle-fill";
+        if (type === "warning") icon = "bi-exclamation-triangle-fill";
+
+        toast.innerHTML = `
+            <div class="gc-left">
+                <i class="bi ${icon}"></i>
+                <span>${text}</span>
+            </div>
+            <button onclick="this.parentElement.remove()">×</button>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateY(-10px)";
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+};
+</script>
+
+<style>
+#gc-toast-container{
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    width: 92%;
+    max-width: 420px;
+}
+
+.gc-toast{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    margin-bottom:10px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:0.9rem;
+    background:white;
+    border:1px solid #e2e8f0;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    transition: all .3s ease;
+}
+
+.gc-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.gc-toast.success{ border-left:4px solid #10b981; }
+.gc-toast.error{ border-left:4px solid #ef4444; }
+.gc-toast.warning{ border-left:4px solid #f59e0b; }
+
+.gc-toast button{
+    background:transparent;
+    border:none;
+    font-size:1.2rem;
+    cursor:pointer;
+}
+</style>
+{% endif %}

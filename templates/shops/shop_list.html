@@ -1,0 +1,186 @@
+<!-- templates/shops/shop_list.html -->
+
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Shops & Warehouses</h2>
+            <p class="text-muted mb-0">
+                Manage kirana stores, dark stores, and warehouses.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'add_shop' %}" class="btn btn-dark rounded-pill px-4">
+                <i class="bi bi-plus-circle me-2"></i>Add Shop
+            </a>
+        </div>
+
+    </div>
+
+    <!-- SEARCH -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    id="shopSearch"
+                    class="form-control border-start-0"
+                    placeholder="Search shops..."
+                >
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle mb-0">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Shop</th>
+                        <th>Type</th>
+                        <th>Hub</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="shopTable">
+
+                    {% for shop in shops %}
+
+                    <tr>
+
+                        <td class="ps-4 py-3">
+
+                            <div class="fw-bold">
+                                {{ shop.name }}
+                            </div>
+
+                            <small class="text-muted">
+                                {{ shop.phone|default:"No phone" }}
+                            </small>
+
+                        </td>
+
+                        <td>
+
+                            {% if shop.shop_type == 'KIRANA' %}
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                                    Kirana
+                                </span>
+
+                            {% elif shop.shop_type == 'DARK_STORE' %}
+                                <span class="badge bg-dark rounded-pill px-3 py-2">
+                                    Dark Store
+                                </span>
+
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                                    Warehouse
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ shop.hub.name }}
+                        </td>
+
+                        <td>
+
+                            {% if shop.is_active %}
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2">
+                                    Inactive
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-end pe-4">
+
+                            <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+                                <a href="{% url 'edit_shop' shop.id %}"
+                                   class="btn btn-sm btn-outline-dark rounded-pill px-3">
+
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
+                                <a href="{% url 'delete_shop' shop.id %}"
+                                   class="btn btn-sm btn-outline-danger rounded-pill px-3">
+
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="5" class="text-center py-5">
+
+                            <div class="text-muted">
+                                No shops found.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.getElementById('shopSearch').addEventListener('keyup', function () {
+
+    let value = this.value.toLowerCase();
+
+    let rows = document.querySelectorAll('#shopTable tr');
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText.toLowerCase().includes(value)
+            ? ''
+            : 'none';
+    });
+});
+</script>
+
+{% endblock %}

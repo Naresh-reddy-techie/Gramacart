@@ -11,13 +11,13 @@ from admin_dashboard.models import DeliveryHub
 
 class DeliveryStatus(models.TextChoices):
     """Using TextChoices for better Django integration and readability."""
+
     PENDING = 'pending', 'Order Placed'
     PACKED = 'packed', 'Packed'
     ASSIGNED = 'assigned', 'Assigned'
     OUT = 'out_for_delivery', 'Out for Delivery'
     DELIVERED = 'delivered', 'Delivered'
     CANCELLED = 'cancelled', 'Cancelled'
-
 # ------------------- Delivery Profile -------------------
 
 class DeliveryProfile(models.Model):

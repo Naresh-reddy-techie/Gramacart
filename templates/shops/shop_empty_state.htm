@@ -1,0 +1,30 @@
+<!-- templates/shops/shop_empty_state.html -->
+
+<div class="card border-0 shadow-sm rounded-4">
+
+    <div class="card-body text-center py-5">
+
+        <div class="display-4 mb-3 text-muted">
+            <i class="bi bi-shop"></i>
+        </div>
+
+        <h4 class="fw-bold mb-2">
+            No Shops Yet
+        </h4>
+
+        <p class="text-muted mb-4">
+            Create your first dark store, warehouse, or kirana partner.
+        </p>
+
+        <a href="{% url 'add_shop' %}"
+           class="btn btn-dark rounded-pill px-4">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Shop
+
+        </a>
+
+    </div>
+
+</div>

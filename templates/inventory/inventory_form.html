@@ -1,0 +1,510 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4 inventory-page">
+
+    <!-- TOP HEADER -->
+    <div class="inventory-header mb-4">
+
+        <div>
+            <h2 class="page-title">
+                <i class="bi bi-box-seam-fill me-2"></i>
+
+                {% if form.instance.pk %}
+                    Update Inventory
+                {% else %}
+                    Add Inventory Item
+                {% endif %}
+            </h2>
+
+            <p class="page-subtitle">
+                Assign product variants to shops, warehouses, and dark stores with real-time stock management.
+            </p>
+        </div>
+
+        <div class="header-actions">
+
+            <a href="{% url 'list_product' %}" class="btn btn-light-custom">
+                <i class="bi bi-box me-2"></i>
+                Products
+            </a>
+
+            <a href="{% url 'shop_list' %}" class="btn btn-light-custom">
+                <i class="bi bi-shop me-2"></i>
+                Shops
+            </a>
+
+            <a href="{% url 'inventory_list' %}" class="btn btn-dark-custom">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card inventory-card border-0">
+
+        <div class="card-body p-4 p-lg-5">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <!-- SECTION -->
+                <div class="section-title mb-4">
+                    <div class="section-icon">
+                        <i class="bi bi-diagram-3-fill"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-1 fw-bold">Inventory Assignment</h5>
+                        <p class="text-muted small mb-0">
+                            Connect a product variant to a fulfillment center.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- VARIANT -->
+                    <div class="col-lg-6">
+                        <label class="form-label custom-label">
+                            Product Variant
+                        </label>
+
+                        {{ form.variant }}
+
+                        {% if form.variant.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.variant.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- SHOP -->
+                    <div class="col-lg-6">
+                        <label class="form-label custom-label">
+                            Shop / Dark Store / Warehouse
+                        </label>
+
+                        {{ form.shop }}
+
+                        {% if form.shop.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.shop.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- SECTION -->
+                <div class="section-title mt-5 mb-4">
+
+                    <div class="section-icon emerald-bg">
+                        <i class="bi bi-stack"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-1 fw-bold">Stock Configuration</h5>
+                        <p class="text-muted small mb-0">
+                            Configure stock limits and inventory quantities.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- STOCK -->
+                    <div class="col-md-4">
+                        <label class="form-label custom-label">
+                            Current Stock
+                        </label>
+
+                        {{ form.stock }}
+
+                        <small class="helper-text">
+                            Available units in this location.
+                        </small>
+                    </div>
+
+                    <!-- MIN STOCK -->
+                    <div class="col-md-4">
+                        <label class="form-label custom-label">
+                            Minimum Stock Alert
+                        </label>
+
+                        {{ form.min_stock_level }}
+
+                        <small class="helper-text">
+                            Alert threshold for low stock.
+                        </small>
+                    </div>
+
+                    <!-- MAX ORDER -->
+                    <div class="col-md-4">
+
+                        <label class="form-label custom-label">
+                            Max Order Quantity
+                        </label>
+
+                        <input 
+                            type="number"
+                            name="max_order_quantity"
+                            class="form-control custom-input"
+                            value="{{ form.instance.max_order_quantity|default:10 }}"
+                            min="1"
+                        >
+
+                        <small class="helper-text">
+                            Max units customer can order.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- SECTION -->
+                <div class="section-title mt-5 mb-4">
+
+                    <div class="section-icon warning-bg">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-1 fw-bold">Pricing Configuration</h5>
+                        <p class="text-muted small mb-0">
+                            Maintain profit margins and fulfillment pricing.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- COST -->
+                    <div class="col-md-6">
+
+                        <label class="form-label custom-label">
+                            Cost Price
+                        </label>
+
+                        <div class="input-group custom-group">
+                            <span class="input-group-text">₹</span>
+                            {{ form.cost_price }}
+                        </div>
+
+                        <small class="helper-text">
+                            Purchase cost from supplier/vendor.
+                        </small>
+
+                    </div>
+
+                    <!-- SELLING -->
+                    <div class="col-md-6">
+
+                        <label class="form-label custom-label">
+                            Selling Price
+                        </label>
+
+                        <div class="input-group custom-group">
+                            <span class="input-group-text">₹</span>
+                            {{ form.selling_price }}
+                        </div>
+
+                        <small class="helper-text">
+                            Final customer-facing price.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- INFO PANEL -->
+                <div class="info-panel mt-5">
+
+                    <div class="d-flex align-items-start gap-3">
+
+                        <div class="info-icon">
+                            <i class="bi bi-info-circle-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <h6 class="fw-bold mb-2">
+                                Real-Time Inventory Logic
+                            </h6>
+
+                            <p class="mb-0 small text-muted">
+                                Every inventory entry is linked to a specific product variant and fulfillment location.
+                                Orders automatically deduct stock from assigned shops or dark stores during delivery processing.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="d-flex flex-wrap gap-3 mt-5">
+
+                    <button type="submit" class="btn btn-save">
+
+                        <i class="bi bi-check-circle-fill me-2"></i>
+
+                        {% if form.instance.pk %}
+                            Update Inventory
+                        {% else %}
+                            Save Inventory
+                        {% endif %}
+
+                    </button>
+
+                    <a href="{% url 'inventory_list' %}" class="btn btn-cancel">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.inventory-page{
+    background:#f8fafc;
+    min-height:100vh;
+}
+
+/* HEADER */
+
+.inventory-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.page-title{
+    font-size:2rem;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:6px;
+}
+
+.page-subtitle{
+    color:#64748b;
+    font-weight:500;
+    margin-bottom:0;
+}
+
+.header-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+/* CARD */
+
+.inventory-card{
+    border-radius:24px;
+    overflow:hidden;
+    background:white;
+    box-shadow:0 10px 40px rgba(15,23,42,.06);
+}
+
+/* SECTION */
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.section-icon{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    background:#eff6ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+}
+
+.emerald-bg{
+    background:#ecfdf5;
+    color:#059669;
+}
+
+.warning-bg{
+    background:#fffbeb;
+    color:#d97706;
+}
+
+/* LABELS */
+
+.custom-label{
+    font-weight:700;
+    margin-bottom:10px;
+    color:#0f172a;
+}
+
+/* INPUTS */
+
+.custom-input,
+.form-control,
+.form-select{
+
+    border-radius:16px !important;
+    border:1px solid #e2e8f0 !important;
+
+    padding:14px 16px !important;
+
+    min-height:56px;
+
+    font-weight:600;
+    font-size:.95rem;
+
+    background:#fff;
+
+    transition:all .2s ease;
+}
+
+.custom-input:focus,
+.form-control:focus,
+.form-select:focus{
+
+    border-color:#10b981 !important;
+
+    box-shadow:0 0 0 4px rgba(16,185,129,.12) !important;
+}
+
+.input-group-text{
+    border-radius:16px 0 0 16px !important;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    padding:0 18px;
+    font-weight:700;
+}
+
+.custom-group .form-control{
+    border-radius:0 16px 16px 0 !important;
+}
+
+.helper-text{
+    display:block;
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:.8rem;
+}
+
+/* INFO PANEL */
+
+.info-panel{
+    background:linear-gradient(135deg,#eff6ff,#f8fafc);
+    border:1px solid #dbeafe;
+    border-radius:20px;
+    padding:22px;
+}
+
+.info-icon{
+    color:#2563eb;
+    font-size:1.2rem;
+}
+
+/* BUTTONS */
+
+.btn-save{
+
+    background:linear-gradient(135deg,#10b981,#059669);
+
+    border:none;
+    color:white;
+
+    border-radius:16px;
+
+    padding:14px 30px;
+
+    font-weight:800;
+
+    transition:.25s;
+}
+
+.btn-save:hover{
+    transform:translateY(-2px);
+    color:white;
+    box-shadow:0 10px 20px rgba(16,185,129,.2);
+}
+
+.btn-cancel,
+.btn-light-custom,
+.btn-dark-custom{
+
+    border-radius:16px;
+    padding:14px 24px;
+    font-weight:700;
+}
+
+.btn-cancel{
+    background:white;
+    border:1px solid #e2e8f0;
+    color:#0f172a;
+}
+
+.btn-light-custom{
+    background:white;
+    border:1px solid #e2e8f0;
+    color:#0f172a;
+}
+
+.btn-dark-custom{
+    background:#0f172a;
+    color:white;
+}
+
+.btn-dark-custom:hover{
+    color:white;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .page-title{
+        font-size:1.5rem;
+    }
+
+    .inventory-card .card-body{
+        padding:24px !important;
+    }
+
+    .btn-save,
+    .btn-cancel,
+    .btn-light-custom,
+    .btn-dark-custom{
+        width:100%;
+        justify-content:center;
+    }
+
+    .header-actions{
+        width:100%;
+    }
+}
+
+</style>
+
+{% endblock %}

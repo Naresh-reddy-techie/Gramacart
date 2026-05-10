@@ -1,5 +1,6 @@
 import math
 from .models import ShippingCost
+from decimal import Decimal
 
 def haversine(lat1, lon1, lat2, lon2):
     """
@@ -32,3 +33,12 @@ def get_rider_payout(hub, distance):
         return Decimal('20.00') # Or your default base fare
     
     return pricing.rider_earning
+
+from inventory.models import Inventory
+
+def get_inventory(product, shop=None):
+    """
+    Always fetch inventory safely.
+    If shop is not provided, you can pass default shop later.
+    """
+    return Inventory.objects.filter(product=product).first()

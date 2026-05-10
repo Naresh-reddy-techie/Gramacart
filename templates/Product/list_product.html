@@ -2,197 +2,652 @@
 {% load static %}
 
 {% block content %}
+
+<style>
+
+:root{
+    --emerald:#10b981;
+    --emerald-dark:#059669;
+    --navy:#0f172a;
+    --gray:#64748b;
+    --border:#e2e8f0;
+    --bg:#f8fafc;
+}
+
+/* =======================================================
+GLOBAL
+======================================================= */
+
+body{
+    background:var(--bg);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    color:var(--navy);
+}
+
+.container-fluid{
+    max-width:1450px;
+}
+
+/* =======================================================
+HEADER
+======================================================= */
+
+.page-title{
+    font-size:30px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+    margin-bottom:4px;
+}
+
+.page-subtitle{
+    color:var(--gray);
+    font-size:14px;
+    font-weight:500;
+}
+
+/* =======================================================
+BUTTONS
+======================================================= */
+
+.btn-emerald{
+    background:linear-gradient(135deg,var(--emerald),var(--emerald-dark));
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:12px 20px;
+    font-weight:700;
+    transition:.25s;
+}
+
+.btn-emerald:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(16,185,129,.25);
+    color:#fff;
+}
+
+.btn-action{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
+
+.btn-action:hover{
+    transform:translateY(-2px);
+}
+
+/* =======================================================
+CARD
+======================================================= */
+
+.catalog-card{
+    border:none;
+    border-radius:24px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 10px 35px rgba(15,23,42,.05);
+}
+
+/* =======================================================
+TABLE
+======================================================= */
+
+.table{
+    margin:0;
+}
+
+.table thead th{
+    background:#f8fafc;
+    border-bottom:1px solid var(--border);
+    padding:18px 16px;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    color:#64748b;
+    white-space:nowrap;
+}
+
+.table tbody td{
+    padding:18px 16px;
+    vertical-align:middle;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.table tbody tr{
+    transition:.2s;
+}
+
+.table tbody tr:hover{
+    background:#fafafa;
+}
+
+/* =======================================================
+PRODUCT IMAGE
+======================================================= */
+
+.product-image-wrapper{
+    display:flex;
+    gap:6px;
+    align-items:center;
+}
+
+.product-thumb{
+    width:72px;
+    height:72px;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid #e2e8f0;
+    background:#fff;
+    flex-shrink:0;
+}
+
+.product-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* =======================================================
+PRODUCT INFO
+======================================================= */
+
+.product-name{
+    font-size:15px;
+    font-weight:800;
+    margin-bottom:6px;
+    color:var(--navy);
+}
+
+.category-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#ecfdf5;
+    color:#047857;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+}
+
+/* =======================================================
+VARIANTS
+======================================================= */
+
+.variant-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.variant-pill{
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    color:#334155;
+    border-radius:999px;
+    padding:5px 10px;
+    font-size:11px;
+    font-weight:700;
+}
+
+/* =======================================================
+PRICE
+======================================================= */
+
+.price{
+    font-size:14px;
+    font-weight:800;
+    color:var(--navy);
+}
+
+/* =======================================================
+STATUS
+======================================================= */
+
+.stock-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.stock-good{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+.stock-low{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.stock-out{
+    background:#fef2f2;
+    color:#b91c1c;
+}
+
+/* =======================================================
+EMPTY
+======================================================= */
+
+.empty-state{
+    padding:80px 20px;
+    text-align:center;
+}
+
+.empty-state img{
+    width:90px;
+    opacity:.55;
+}
+
+.empty-state h5{
+    margin-top:20px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.empty-state p{
+    color:#64748b;
+}
+
+/* =======================================================
+PAGINATION
+======================================================= */
+
+.pagination .page-link{
+    border:none;
+    border-radius:12px;
+    margin:0 3px;
+    color:#0f172a;
+    font-weight:700;
+    padding:8px 14px;
+    transition:.2s;
+}
+
+.pagination .page-link:hover{
+    background:#10b981;
+    color:#fff;
+}
+
+.pagination .active .page-link{
+    background:#10b981;
+    color:#fff;
+}
+
+/* =======================================================
+RESPONSIVE
+======================================================= */
+
+@media(max-width:991px){
+
+    .table{
+        min-width:1200px;
+    }
+
+}
+
+</style>
+
 <div class="container-fluid py-4">
+
+    <!-- ===================================================
+    HEADER
+    ==================================================== -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-            <h2 class="fw-800 text-navy mb-1">Product Inventory</h2>
-            <p class="text-muted small fw-600">Manage your village-sourced catalog</p>
+
+            <div class="page-title">
+                Product Inventory
+            </div>
+
+            <div class="page-subtitle">
+                Manage products, variants, images & inventory visibility
+            </div>
+
         </div>
-        <a href="{% url 'add_product' %}" class="btn btn-emerald shadow-sm px-4 fw-800">
-            <i class="bi bi-plus-lg me-2"></i>Add New Product
+
+        <a href="{% url 'add_product' %}"
+           class="btn btn-emerald">
+
+            <i class="bi bi-plus-lg me-2"></i>
+            Add Product
+
         </a>
+
     </div>
+
+    <!-- ===================================================
+    ALERTS
+    ==================================================== -->
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm rounded-4">
+
+            {{ message }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
         {% endfor %}
     {% endif %}
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <!-- ===================================================
+    TABLE CARD
+    ==================================================== -->
+
+    <div class="catalog-card">
+
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+
+            <table class="table align-middle">
+
+                <thead>
+
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase extra-small fw-800 text-muted">Product Images</th>
-                        <th class="py-3 text-uppercase extra-small fw-800 text-muted">Name & Category</th>
-                        <th class="py-3 text-uppercase extra-small fw-800 text-muted">Size</th>
-                        <th class="py-3 text-uppercase extra-small fw-800 text-muted">Price</th>
-                        <th class="py-3 text-uppercase extra-small fw-800 text-muted">Stock Status</th>
-                        <th class="py-3 text-uppercase extra-small fw-800 text-muted text-center">Actions</th>
+
+                        <th class="ps-4">
+                            Product
+                        </th>
+
+                        <th>
+                            Variants
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th class="text-center">
+                            Actions
+                        </th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     {% for product in products %}
+
                     <tr>
+
+                        <!-- PRODUCT -->
+
                         <td class="ps-4">
-                            {% if product.product_images.all %}
-                                <div id="carousel{{ product.id }}" class="carousel slide product-thumb-carousel" data-bs-ride="carousel">
-                                    <div class="carousel-inner rounded-3">
-                                        {% for image in product.product_images.all %}
-                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                            <img src="{{ image.image.url }}" class="d-block w-100 object-fit-cover" style="height: 60px; width: 60px;" alt="{{ product.name }}">
-                                        </div>
-                                        {% endfor %}
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="product-thumb">
+
+                                    {% with first_image=product.product_images.first %}
+
+                                        {% if first_image %}
+
+                                            <img src="{{ first_image.image.url }}"
+                                                 alt="{{ product.name }}">
+
+                                        {% else %}
+
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+
+                                                <i class="bi bi-image text-muted"></i>
+
+                                            </div>
+
+                                        {% endif %}
+
+                                    {% endwith %}
+
+                                </div>
+
+                                <div>
+
+                                    <div class="product-name">
+                                        {{ product.name }}
                                     </div>
-                                    {% if product.product_images.count > 1 %}
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon small" aria-hidden="true"></span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon small" aria-hidden="true"></span>
-                                        </button>
-                                    {% endif %}
+
+                                    <div class="small text-muted">
+
+                                        {{ product.product_images.count }} image{{ product.product_images.count|pluralize }}
+
+                                    </div>
+
                                 </div>
-                            {% else %}
-                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 60px; width: 60px;">
-                                    <i class="bi bi-image text-muted"></i>
-                                </div>
-                            {% endif %}
+
+                            </div>
+
                         </td>
+
+                        <!-- VARIANTS -->
 
                         <td>
-                            <div class="fw-800 text-navy mb-0">{{ product.name }}</div>
-                            <span class="badge bg-emerald-light text-emerald extra-small fw-700">{{ product.category.name }}</span>
+
+                            <div class="variant-wrap">
+
+                                {% for variant in product.variants.all %}
+
+                                    <div class="variant-pill">
+
+                                        {{ variant.quantity }}{{ variant.unit }}
+
+                                    </div>
+
+                                {% empty %}
+
+                                    <span class="text-muted small">
+                                        No variants
+                                    </span>
+
+                                {% endfor %}
+
+                            </div>
+
                         </td>
 
-                        <td class="fw-600 text-muted small">{{ product.size }}</td>
-
-                        <td class="fw-800 text-navy">₹{{ product.price }}</td>
+                        <!-- CATEGORY -->
 
                         <td>
-                            {% if product.stock_available > 10 %}
-                                <span class="text-success small fw-700"><i class="bi bi-check-circle-fill me-1"></i>{{ product.stock_available }} In Stock</span>
-                            {% elif product.stock_available > 0 %}
-                                <span class="text-warning small fw-700"><i class="bi bi-exclamation-triangle-fill me-1"></i>Low: {{ product.stock_available }}</span>
-                            {% else %}
-                                <span class="text-danger small fw-700"><i class="bi bi-x-circle-fill me-1"></i>Out of Stock</span>
-                            {% endif %}
+
+                            <span class="category-badge">
+
+                                <i class="bi bi-grid"></i>
+
+                                {{ product.category.name }}
+
+                            </span>
+
                         </td>
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if product.is_active %}
+
+                                <span class="stock-badge stock-good">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="stock-badge stock-out">
+
+                                    <i class="bi bi-x-circle-fill"></i>
+
+                                    Inactive
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACTIONS -->
 
                         <td class="text-center">
+
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="{% url 'edit_product' slug=product.slug %}" class="btn btn-sm btn-outline-primary border-0 rounded-3">
+
+                                <a href="{% url 'edit_product' slug=product.slug %}"
+                                   class="btn btn-light btn-action border">
+
                                     <i class="bi bi-pencil-square"></i>
+
                                 </a>
-                                <a href="{% url 'delete_product' slug=product.slug %}" class="btn btn-sm btn-outline-danger border-0 rounded-3" onclick="return confirm('Archive this product?')">
-                                    <i class="bi bi-trash3-fill"></i>
+
+                                <a href="{% url 'delete_product' slug=product.slug %}"
+                                   class="btn btn-light btn-action border text-danger"
+                                   onclick="return confirm('Delete this product?')">
+
+                                    <i class="bi bi-trash3"></i>
+
                                 </a>
+
                             </div>
+
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
-                        <td colspan="6" class="py-5 text-center">
-                            <img src="{% static 'images/empty-box.png' %}" alt="Empty" style="width: 80px; opacity: 0.5;">
-                            <p class="text-muted mt-3 fw-600">Your village catalog is empty.</p>
+
+                        <td colspan="5">
+
+                            <div class="empty-state">
+
+                                <img src="{% static 'images/empty-box.png' %}"
+                                     alt="Empty">
+
+                                <h5>
+                                    No Products Found
+                                </h5>
+
+                                <p>
+                                    Start building your village commerce catalog.
+                                </p>
+
+                            </div>
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
-            <!-- Pagination -->
-            {% if products.has_other_pages %}
-            <div class="d-flex justify-content-end mt-3">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        <!-- Previous page link -->
-                        {% if products.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
-                            </li>
-                        {% endif %}
 
-                        <!-- Page numbers -->
-                        {% for num in products.paginator.page_range %}
-                            {% if products.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        <!-- Next page link -->
-                        {% if products.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
-            {% endif %}
         </div>
+
+        <!-- ===================================================
+        PAGINATION
+        ==================================================== -->
+
+        {% if products.has_other_pages %}
+
+        <div class="d-flex justify-content-end p-4">
+
+            <nav>
+
+                <ul class="pagination mb-0">
+
+                    {% if products.has_previous %}
+
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               href="?page={{ products.previous_page_number }}">
+
+                                &laquo;
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+
+                        {% if products.number == num %}
+
+                            <li class="page-item active">
+
+                                <span class="page-link">
+
+                                    {{ num }}
+
+                                </span>
+
+                            </li>
+
+                        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+
+                            <li class="page-item">
+
+                                <a class="page-link"
+                                   href="?page={{ num }}">
+
+                                    {{ num }}
+
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                    {% if products.has_next %}
+
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               href="?page={{ products.next_page_number }}">
+
+                                &raquo;
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+        {% endif %}
+
     </div>
+
 </div>
 
-<style>
-    /* Styling for the table inside the GramaCart dashboard */
-    .bg-emerald-light { background-color: rgba(0, 200, 83, 0.1); }
-    .text-navy { color: #0f172a; }
-    .btn-emerald { background-color: #00c853; color: white; border: none; }
-    .btn-emerald:hover { background-color: #00a344; color: white; transform: translateY(-1px); }
-    
-    .product-thumb-carousel { width: 60px; height: 60px; }
-    .carousel-control-prev-icon, .carousel-control-next-icon { 
-        width: 1rem; height: 1rem; background-color: rgba(15, 23, 42, 0.5); border-radius: 50%; 
-    }
-    
-    .table thead th { border-bottom: none; }
-    .extra-small { font-size: 11px; }
-    .fw-800 { font-weight: 800; }
-    .pagination .page-link {
-    color: #0f172a;
-    border-radius: 0.5rem;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.85rem;
-    margin: 0 2px;
-    border: none;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #00c853;
-    color: white;
-    font-weight: 700;
-}
-
-.pagination .page-link:hover {
-    background-color: #00c853;
-    color: white;
-    transition: 0.2s;
-}
-
-.pagination .page-item.disabled .page-link {
-    color: #adb5bd;
-}
-</style>
-{% endblock content %}
+{% endblock %}

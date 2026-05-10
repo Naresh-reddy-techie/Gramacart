@@ -18,8 +18,7 @@ urlpatterns = [
     # Delivery Actions
     path('delivery/pickup/<int:delivery_id>/', views.confirm_pickup, name='delivery_pickup'),
     path('rider/complete/<int:delivery_id>/', views.complete_delivery, name='delivery_complete'),
-    path('rider/failed/<int:delivery_id>/', views.delivery_failed, name='delivery_cancel'),
-    
+    path('rider/failed/<int:delivery_id>/', views.mark_delivery_failed, name='mark_delivery_failed'),    
     # Tracking & Stats
     path('rider/active/', views.rider_active_deliveries, name='active_deliveries'),
     path('rider/earnings/', views.rider_earnings, name='rider_earnings'),
