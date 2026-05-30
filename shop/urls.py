@@ -2,6 +2,11 @@ from django.urls import path
 from .import views
 
 urlpatterns = [
+
+    path( 'where-we-deliver/', views.where_should_we_deliver, name='where_we_deliver' ), 
+    path( 'check-delivery-availability/', views.check_delivery_availability, name='check_delivery_availability' ),
+
+
     # 1. Dashboards & Profiles
     path('public_dashboard/', views.public_dashboard, name='public_dashboard'),
     path('category/<slug:category_slug>/', views.public_dashboard, name='public_dashboard_by_category'), 
@@ -14,7 +19,7 @@ urlpatterns = [
     path('addresses/create/', views.address_form, name='address_create'),
     path('addresses/update/<int:pk>/', views.address_form, name='address_update'),
     path('addresses/delete/<int:pk>/', views.address_delete, name='address_delete'),
-    path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),
+    # path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),
     
     # 3. Cart & Checkout (ALIGNED WITH JAVASCRIPT)
     path('cart/', views.cart_view, name='cart_view'),

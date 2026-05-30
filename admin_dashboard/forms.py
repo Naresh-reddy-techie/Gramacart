@@ -214,18 +214,96 @@ class ProductImageForm(forms.ModelForm):
 
 
 
+
 from .models import DeliveryHub
+
+
 class DeliveryHubForm(forms.ModelForm):
+
     class Meta:
+
         model = DeliveryHub
-        fields = ['name', 'latitude', 'longitude',  'full_address','landmark','max_delivery_radius_km']
+
+        fields = [
+
+            'name',
+
+            'state',
+            'district',
+            'mandal',
+            'village',
+
+            'latitude',
+            'longitude',
+
+            'full_address',
+            'landmark',
+
+            'max_delivery_radius_km',
+
+            'is_active',
+            'is_accepting_orders',
+        ]
+
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'latitude': forms.NumberInput(attrs={'class': 'form-control'}),
-            'longitude': forms.NumberInput(attrs={'class': 'form-control'}),
-            'full_address': forms.Textarea(attrs={'class': 'form-control','rows': 3,'placeholder': 'Full pickup location for riders'}),
-            'landmark': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nearby landmark (Temple, Bus Stand, etc.)'}),
-            'max_delivery_radius_km': forms.NumberInput(attrs={'class': 'form-control'}),
+
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Example: GramaCart Kaza'
+            }),
+
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'State'
+            }),
+
+            'district': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'District'
+            }),
+
+            'mandal': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Mandal'
+            }),
+
+            'village': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Village'
+            }),
+
+            'latitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': 'any'
+            }),
+
+            'longitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': 'any'
+            }),
+
+            'full_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Full pickup location for riders'
+            }),
+
+            'landmark': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nearby landmark'
+            }),
+
+            'max_delivery_radius_km': forms.NumberInput(attrs={
+                'class': 'form-control'
+            }),
+
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+
+            'is_accepting_orders': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
         }
 
 from .models import ShippingCost

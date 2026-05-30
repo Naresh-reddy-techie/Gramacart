@@ -5,216 +5,672 @@
 
 {% block extra_css %}
 <style>
-:root {
-    --bottom-nav-height: 80px;
-    --primary: #10B981;
-    --navy: #0F172A;
+
+:root{
+    --primary:#10B981;
+    --navy:#0F172A;
+    --bg:#F8FAFC;
+    --border:#E2E8F0;
+    --muted:#64748B;
+    --danger:#EF4444;
+    --bottom-nav-height:80px;
 }
 
-/* ================= HEADER ================= */
-.status-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    padding: 16px 18px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
+/* =========================================
+   GLOBAL
+========================================= */
+
+body{
+    background:var(--bg);
+    padding-bottom:220px;
 }
 
-.header-title {
-    font-weight: 800;
-    font-size: 1.2rem;
+/* =========================================
+   HEADER
+========================================= */
+
+.checkout-header{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:1200;
+
+    background:rgba(255,255,255,0.96);
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid var(--border);
+
+    padding:14px 16px;
 }
 
-.back-btn {
-    text-decoration: none;
-    font-weight: 700;
-    color: var(--navy);
+.checkout-header-inner{
+    max-width:920px;
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 }
 
-/* ================= PAGE WRAPPER ================= */
-.checkout-container {
-    margin-top: 80px;
-    padding: 15px;
-
-    /* IMPORTANT: space for bottom navbar */
-    padding-bottom: calc(var(--bottom-nav-height) + 80px);
+.header-title{
+    font-size:1.15rem;
+    font-weight:900;
+    color:var(--navy);
 }
 
-/* ================= CARDS ================= */
-.card-box {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #eef2f6;
+.back-btn{
+    text-decoration:none;
+    color:var(--navy);
+    font-weight:800;
+    font-size:0.9rem;
 }
 
-/* ================= ADDRESS ================= */
-.address-card {
-    border: 2px solid #f1f5f9;
-    padding: 14px;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    position: relative;
-    transition: 0.2s ease;
+/* =========================================
+   PAGE
+========================================= */
+
+.checkout-page{
+    max-width:920px;
+    margin:auto;
+
+    padding:16px;
+    padding-top:90px;
 }
 
-.address-card.active {
-    border-color: var(--primary);
-    background: #f0fdf4;
+/* =========================================
+   SECTION CARD
+========================================= */
+
+.section-card{
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:18px;
+
+    margin-bottom:16px;
+
+    border:1px solid rgba(0,0,0,0.05);
+
+    box-shadow:0 6px 24px rgba(15,23,42,0.05);
 }
 
-.check-mark {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: var(--primary);
-    display: none;
+.section-title{
+    font-size:1rem;
+    font-weight:900;
+    color:var(--navy);
+
+    margin-bottom:16px;
 }
 
-.address-card.active .check-mark {
-    display: block;
+/* =========================================
+   ADDRESS
+========================================= */
+
+.address-card{
+    border:2px solid #F1F5F9;
+
+    border-radius:18px;
+
+    padding:16px;
+
+    cursor:pointer;
+
+    margin-bottom:12px;
+
+    position:relative;
+
+    transition:0.2s ease;
 }
 
-/* ================= PAYMENT ================= */
-.payment-option {
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
+.address-card:last-child{
+    margin-bottom:0;
 }
 
-/* ================= SUMMARY ================= */
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #64748b;
+.address-card.active{
+    border-color:var(--primary);
+    background:#ECFDF5;
 }
 
-.total-line {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 800;
-    font-size: 1.2rem;
-    margin-top: 10px;
+.address-name{
+    font-weight:900;
+    color:var(--navy);
+    margin-bottom:6px;
 }
 
-/* ================= FIXED BUTTON ================= */
-.checkout-bar {
-    position: fixed;
-    bottom: var(--bottom-nav-height);
-    left: 0;
-    right: 0;
-    background: white;
-    padding: 16px;
-    border-top: 1px solid #e2e8f0;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
-    z-index: 1500;
+.address-text{
+    color:var(--muted);
+    font-size:0.9rem;
+    line-height:1.5;
 }
 
-.btn-place {
-    width: 100%;
-    padding: 15px;
-    border-radius: 14px;
-    background: var(--navy);
-    color: white;
-    border: none;
-    font-weight: 800;
+.check-icon{
+    position:absolute;
+    top:14px;
+    right:14px;
+
+    color:var(--primary);
+
+    font-size:1.1rem;
+
+    display:none;
 }
 
-.btn-place:disabled {
-    background: #cbd5e1;
-    cursor: not-allowed;
+.address-card.active .check-icon{
+    display:block;
 }
+
+/* =========================================
+   PAYMENT
+========================================= */
+
+.payment-option{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:14px 0;
+
+    border-bottom:1px solid #F1F5F9;
+}
+
+.payment-option:last-child{
+    border-bottom:none;
+}
+
+.payment-option label{
+    font-weight:700;
+    color:var(--navy);
+    cursor:pointer;
+}
+
+/* =========================================
+   ORDER ITEMS
+========================================= */
+
+.checkout-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:10px 0;
+
+    border-bottom:1px solid #F8FAFC;
+}
+
+.checkout-item:last-child{
+    border-bottom:none;
+}
+
+.item-left{
+    display:flex;
+    flex-direction:column;
+}
+
+.item-name{
+    font-weight:800;
+    color:var(--navy);
+}
+
+.item-meta{
+    font-size:0.85rem;
+    color:var(--muted);
+}
+
+.item-price{
+    font-weight:900;
+    color:var(--primary);
+}
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.summary-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+
+    font-size:0.95rem;
+}
+
+.summary-label{
+    color:var(--muted);
+    font-weight:700;
+}
+
+.summary-value{
+    color:var(--navy);
+    font-weight:800;
+}
+
+.total-row{
+    border-top:1px dashed var(--border);
+
+    padding-top:14px;
+    margin-top:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.total-label{
+    font-size:1rem;
+    font-weight:900;
+    color:var(--navy);
+}
+
+.total-value{
+    font-size:1.3rem;
+    font-weight:900;
+    color:var(--navy);
+}
+
+/* =========================================
+   ALERT
+========================================= */
+
+.service-alert{
+    display:none;
+
+    margin-top:14px;
+
+    background:#FEF2F2;
+
+    color:#B91C1C;
+
+    border-radius:14px;
+
+    padding:12px 14px;
+
+    font-size:0.9rem;
+    font-weight:700;
+}
+
+.service-alert.show{
+    display:block;
+}
+
+/* =========================================
+   FIXED BAR
+========================================= */
+
+.place-order-bar{
+    position:fixed;
+
+    left:0;
+    right:0;
+
+    bottom:var(--bottom-nav-height);
+
+    z-index:1500;
+
+    background:rgba(255,255,255,0.96);
+
+    backdrop-filter:blur(12px);
+
+    border-top:1px solid var(--border);
+
+    padding:16px;
+}
+
+.place-order-inner{
+    max-width:920px;
+    margin:auto;
+}
+
+.place-btn{
+    width:100%;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:var(--navy);
+    color:#fff;
+
+    padding:16px 18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    font-size:1rem;
+    font-weight:900;
+
+    transition:0.2s ease;
+}
+
+.place-btn:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+.place-btn:active{
+    transform:scale(0.99);
+}
+
+.place-amt{
+    background:var(--primary);
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    font-size:0.92rem;
+}
+/* =========================================
+   ADD ADDRESS BUTTON
+========================================= */
+
+.add-address-btn{
+    text-decoration:none;
+
+    background:#ECFDF5;
+    color:#047857;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:0.82rem;
+    font-weight:800;
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    transition:0.2s ease;
+}
+
+.add-address-btn:hover{
+    background:#D1FAE5;
+    color:#065F46;
+}
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .checkout-page{
+        padding:12px;
+        padding-top:84px;
+    }
+
+    .section-card{
+        border-radius:20px;
+        padding:16px;
+    }
+
+    .place-btn{
+        border-radius:18px;
+        padding:15px;
+        font-size:0.95rem;
+    }
+
+    .place-amt{
+        font-size:0.85rem;
+    }
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- HEADER -->
-<div class="status-header">
-    <div class="header-title">Checkout</div>
-    <a href="{% url 'cart_view' %}" class="back-btn">
-        <i class="bi bi-arrow-left"></i> Basket
-    </a>
+<div class="checkout-header">
+
+    <div class="checkout-header-inner">
+
+        <div class="header-title">
+            Checkout
+        </div>
+
+        <a href="{% url 'cart_view' %}" class="back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Basket
+        </a>
+
+    </div>
+
 </div>
 
-<div class="checkout-container">
+<div class="checkout-page">
 
 <form method="POST" id="checkout-form">
+
     {% csrf_token %}
 
-    <!-- ADDRESS -->
-    <div class="card-box">
-        <h6 class="fw-bold mb-3">Delivery Address</h6>
+    <!-- =====================================
+         DELIVERY ADDRESS
+    ====================================== -->
 
-        {% for address in user_addresses %}
-        <div class="address-card" data-id="{{ address.id }}">
-            <i class="bi bi-check-circle-fill check-mark"></i>
-            <strong>{{ address.recipient_name }}</strong><br>
-            <small class="text-muted">
-                {{ address.address_line }}, {{ address.city }}
-            </small>
+    <div class="section-card">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div class="section-title mb-0">
+                Delivery Address
+            </div>
+
+            <a
+                href="{% url 'address_create' %}"
+                class="add-address-btn">
+
+                <i class="bi bi-plus-circle"></i>
+                Add New
+
+            </a>
+
         </div>
+
+        <!-- ADDRESS LIST -->
+        {% for address in user_addresses %}
+
+        <div
+            class="address-card"
+            data-id="{{ address.id }}">
+
+            <i class="bi bi-check-circle-fill check-icon"></i>
+
+            <div class="address-name">
+                {{ address.recipient_name }}
+            </div>
+
+            <div class="address-text">
+                {{ address.address_line }},
+                {{ address.city }}
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="text-muted">
+            No saved addresses available.
+        </div>
+
         {% endfor %}
 
-        <input type="hidden" name="address_id" id="address_id" required>
+        <input
+            type="hidden"
+            name="address_id"
+            id="address_id"
+            required>
+
     </div>
 
-    <!-- PAYMENT -->
-    <div class="card-box">
-        <h6 class="fw-bold mb-3">Payment Method</h6>
+    <!-- =====================================
+         PAYMENT
+    ====================================== -->
+
+    <div class="section-card">
+
+        <div class="section-title">
+            Payment Method
+        </div>
 
         {% for method in payment_methods %}
+
         <div class="payment-option">
-            <input type="radio" name="payment_method" value="{{ method.id }}" required>
-            <label>{{ method.name }}</label>
+
+            <input
+                type="radio"
+                name="payment_method"
+                value="{{ method.id }}"
+                id="payment_{{ method.id }}"
+                required>
+
+            <label for="payment_{{ method.id }}">
+                {{ method.name }}
+            </label>
+
         </div>
+
         {% endfor %}
+
     </div>
 
-    <!-- SUMMARY -->
-    <div class="card-box">
-        <h6 class="fw-bold mb-3">Price Details</h6>
+    <!-- =====================================
+         ITEMS
+    ====================================== -->
 
-        <div class="summary-line">
-            <span>Subtotal</span>
-            <span id="sub_total">₹{{ order_totals.sub_total }}</span>
+    <div class="section-card">
+
+        <div class="section-title">
+            Basket Items
         </div>
 
-        <div class="summary-line">
-            <span>Shipping</span>
-            <span id="shipping_cost">₹{{ order_totals.shipping_cost }}</span>
+        {% for item in cart_items %}
+
+        <div class="checkout-item">
+
+            <div class="item-left">
+
+                <div class="item-name">
+                    {{ item.product.name }}
+                </div>
+
+                <div class="item-meta">
+                    {{ item.variant.display_name }}
+                    × {{ item.quantity }}
+                </div>
+
+            </div>
+
+            <div class="item-price">
+                ₹{{ item.line_total }}
+            </div>
+
         </div>
 
-        <div class="summary-line">
-            <span>Taxes</span>
-            <span id="taxes">₹{{ order_totals.taxes }}</span>
-        </div>
+        {% endfor %}
 
-        <div id="out-of-range-msg" class="alert alert-danger d-none mt-2">
-            Area Not Serviceable
-        </div>
-
-        <div class="total-line">
-            <span>Total</span>
-            <span id="total_amount">₹{{ order_totals.final_total }}</span>
-        </div>
     </div>
 
-    <!-- BUTTON -->
-    <div class="checkout-bar">
-        <button type="submit" id="place-order-btn" class="btn-place" disabled>
-            Confirm Order • <span id="btn-total">₹{{ order_totals.final_total }}</span>
-        </button>
+    <!-- =====================================
+         PRICE DETAILS
+    ====================================== -->
+
+    <div class="section-card">
+
+        <div class="section-title">
+            Price Details
+        </div>
+
+        <div class="summary-row">
+
+            <div class="summary-label">
+                Subtotal
+            </div>
+
+            <div
+                class="summary-value"
+                id="sub_total">
+
+                ₹{{ order_totals.sub_total }}
+
+            </div>
+
+        </div>
+
+        <div class="summary-row">
+
+            <div class="summary-label">
+                Shipping
+            </div>
+
+            <div
+                class="summary-value"
+                id="shipping_cost">
+
+                ₹{{ order_totals.shipping_cost }}
+
+            </div>
+
+        </div>
+
+        <div class="total-row">
+
+            <div class="total-label">
+                Total
+            </div>
+
+            <div
+                class="total-value"
+                id="final_total">
+
+                ₹{{ order_totals.final_total }}
+
+            </div>
+
+        </div>
+
+        <div
+            id="service-alert"
+            class="service-alert">
+
+            Unable to calculate delivery fee.
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         PLACE ORDER BAR
+    ====================================== -->
+
+    <div class="place-order-bar">
+
+        <div class="place-order-inner">
+
+            <button
+                type="submit"
+                class="place-btn"
+                id="place-order-btn"
+                disabled>
+
+                Confirm Order
+
+                <span
+                    class="place-amt"
+                    id="btn-total">
+
+                    ₹{{ order_totals.final_total }}
+
+                </span>
+
+            </button>
+
+        </div>
+
     </div>
 
 </form>
@@ -224,39 +680,172 @@
 {% endblock %}
 
 {% block extra_js %}
+
 <script>
-document.querySelectorAll('.address-card').forEach(card => {
-    card.addEventListener('click', function () {
 
-        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
+/* =========================================
+   STATE
+========================================= */
 
-        const addrId = this.dataset.id;
-        document.getElementById('address_id').value = addrId;
+let selectedAddress = null;
+let shippingValid = false;
 
-        const btn = document.getElementById('place-order-btn');
-        const msg = document.getElementById('out-of-range-msg');
+/* =========================================
+   DOM
+========================================= */
 
-        fetch("{% url 'get_shipping_cost' %}?address_id=" + addrId)
-        .then(res => res.json())
+const addressInput = document.getElementById(
+    "address_id"
+);
+
+const placeBtn = document.getElementById(
+    "place-order-btn"
+);
+
+const serviceAlert = document.getElementById(
+    "service-alert"
+);
+
+/* =========================================
+   UPDATE BUTTON
+========================================= */
+
+function updateButtonState(){
+
+    const paymentSelected = document.querySelector(
+        'input[name="payment_method"]:checked'
+    );
+
+    placeBtn.disabled = !(
+        selectedAddress &&
+        paymentSelected &&
+        shippingValid
+    );
+}
+
+/* =========================================
+   PAYMENT CHANGE
+========================================= */
+
+document.querySelectorAll(
+    'input[name="payment_method"]'
+).forEach(input => {
+
+    input.addEventListener("change", () => {
+        updateButtonState();
+    });
+
+});
+
+/* =========================================
+   ADDRESS SELECT
+========================================= */
+
+document.querySelectorAll(
+    ".address-card"
+).forEach(card => {
+
+    card.addEventListener("click", function(){
+
+        document.querySelectorAll(
+            ".address-card"
+        ).forEach(c => {
+            c.classList.remove("active");
+        });
+
+        this.classList.add("active");
+
+        const addressId = this.dataset.id;
+
+        selectedAddress = addressId;
+
+        addressInput.value = addressId;
+
+        placeBtn.disabled = true;
+
+        fetch(
+            "{% url 'get_shipping_cost' %}?address_id=" + addressId,
+            {
+                headers:{
+                    "X-Requested-With":"XMLHttpRequest"
+                }
+            }
+        )
+
+        .then(response => response.json())
+
         .then(data => {
 
-            if (data.success) {
-                document.getElementById('sub_total').innerText = "₹" + data.sub_total;
-                document.getElementById('shipping_cost').innerText = "₹" + data.shipping_cost;
-                document.getElementById('taxes').innerText = "₹" + data.taxes;
-                document.getElementById('total_amount').innerText = "₹" + data.final_total;
-                document.getElementById('btn-total').innerText = "₹" + data.final_total;
+            if(data.success){
 
-                msg.classList.add('d-none');
-                btn.disabled = false;
-            } else {
-                msg.classList.remove('d-none');
-                msg.innerText = data.message || "Not serviceable";
-                btn.disabled = true;
+                shippingValid = true;
+
+                document.getElementById(
+                    "shipping_cost"
+                ).innerText =
+                    "₹" + Number(data.shipping_cost).toFixed(2);
+
+                document.getElementById(
+                    "final_total"
+                ).innerText =
+                    "₹" + Number(data.final_total).toFixed(2);
+
+                document.getElementById(
+                    "btn-total"
+                ).innerText =
+                    "₹" + Number(data.final_total).toFixed(2);
+
+                serviceAlert.classList.remove("show");
+
+            }else{
+
+                shippingValid = false;
+
+                serviceAlert.innerText =
+                    data.message ||
+                    "Delivery unavailable for selected address.";
+
+                serviceAlert.classList.add("show");
             }
+
+            updateButtonState();
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            shippingValid = false;
+
+            serviceAlert.innerText =
+                "Unable to calculate delivery fee.";
+
+            serviceAlert.classList.add("show");
+
+            updateButtonState();
+
         });
+
     });
+
 });
+
+/* =========================================
+   SUBMIT LOCK
+========================================= */
+
+document.getElementById(
+    "checkout-form"
+).addEventListener("submit", function(){
+
+    placeBtn.disabled = true;
+
+    placeBtn.innerHTML =
+        "Processing Order...";
+
+});
+
 </script>
+
 {% endblock %}

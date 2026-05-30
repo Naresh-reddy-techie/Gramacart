@@ -56,6 +56,69 @@
 
                                 <div class="text-danger small">{{ form.name.errors }}</div>
                             </div>
+                            <!-- STATE -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    State
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="state"
+                                    id="id_state"
+                                    class="form-control border-2"
+                                    value="Andhra Pradesh"
+                                    required
+                                >
+                            </div>
+
+                            <!-- DISTRICT -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    District
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="district"
+                                    id="id_district"
+                                    class="form-control border-2"
+                                    placeholder="Krishna"
+                                    required
+                                >
+                            </div>
+
+                            <!-- MANDAL -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    Mandal
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="mandal"
+                                    id="id_mandal"
+                                    class="form-control border-2"
+                                    placeholder="Movva"
+                                    required
+                                >
+                            </div>
+
+                            <!-- VILLAGE -->
+                            <div class="mb-4">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    Village
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="village"
+                                    id="id_village"
+                                    class="form-control border-2"
+                                    placeholder="Kaza"
+                                    required
+                                >
+                            </div>
 
                             <!-- LAT / LNG -->
                             <div class="row">
@@ -128,7 +191,42 @@
 
                                 <div class="text-danger small">{{ form.max_delivery_radius_km.errors }}</div>
                             </div>
+                            <!-- HUB STATUS -->
+                            <div class="row mb-4">
 
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="is_active"
+                                            id="id_is_active"
+                                            checked
+                                        >
+
+                                        <label class="form-check-label fw-bold" for="id_is_active">
+                                            Active Hub
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="is_accepting_orders"
+                                            id="id_is_accepting_orders"
+                                            checked
+                                        >
+
+                                        <label class="form-check-label fw-bold" for="id_is_accepting_orders">
+                                            Accept Orders
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
                             <!-- SUBMIT -->
                             <button type="submit"
                                 class="btn btn-dark btn-lg w-100 fw-900 rounded-pill py-3 shadow">
@@ -162,80 +260,293 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-var map = L.map('map').setView([16.5061, 80.6480], 12);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // =========================================
+    // DEFAULT MAP
+    // =========================================
 
-var marker = L.marker([16.5061, 80.6480], { draggable: true }).addTo(map);
+    var defaultLat = 16.5061;
+    var defaultLng = 80.6480;
 
-var circle = L.circle([16.5061, 80.6480], {
-    color: '#198754',
-    fillColor: '#198754',
-    fillOpacity: 0.15,
-    radius: 7000
-}).addTo(map);
+    var map = L.map('map').setView(
+        [defaultLat, defaultLng],
+        12
+    );
 
-function updateForm(lat, lng, name = "") {
-    document.getElementById('id_latitude').value = lat.toFixed(6);
-    document.getElementById('id_longitude').value = lng.toFixed(6);
+    // =========================================
+    // TILE LAYER
+    // =========================================
 
-    if (name) document.getElementById('id_name').value = name;
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    ).addTo(map);
 
-    marker.setLatLng([lat, lng]);
-    circle.setLatLng([lat, lng]);
-    map.panTo([lat, lng]);
-}
+    // =========================================
+    // MARKER
+    // =========================================
 
-document.getElementById('fetchLocationBtn').addEventListener('click', function () {
-    const btn = this;
-    const status = document.getElementById('loadingStatus');
+    var marker = L.marker(
+        [defaultLat, defaultLng],
+        {
+            draggable: true
+        }
+    ).addTo(map);
 
-    btn.disabled = true;
-    status.classList.remove('d-none');
+    // =========================================
+    // DELIVERY RADIUS
+    // =========================================
 
-    navigator.geolocation.getCurrentPosition(position => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+    var circle = L.circle(
+        [defaultLat, defaultLng],
+        {
+            color: '#198754',
+            fillColor: '#198754',
+            fillOpacity: 0.15,
+            radius: 7000
+        }
+    ).addTo(map);
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-            .then(res => res.json())
-            .then(data => {
-                const vName =
-                    data.address.village ||
-                    data.address.town ||
-                    data.address.suburb ||
-                    "New Cluster";
+    // =========================================
+    // UPDATE FORM
+    // =========================================
 
-                updateForm(lat, lng, vName);
+    function updateForm(lat, lng) {
+
+        document.getElementById('id_latitude').value =
+            lat.toFixed(6);
+
+        document.getElementById('id_longitude').value =
+            lng.toFixed(6);
+
+        marker.setLatLng([lat, lng]);
+
+        circle.setLatLng([lat, lng]);
+
+        map.panTo([lat, lng]);
+    }
+
+    // =========================================
+    // FETCH CURRENT LOCATION
+    // =========================================
+
+    document.getElementById(
+        'fetchLocationBtn'
+    ).addEventListener('click', function () {
+
+        const btn =
+            document.getElementById(
+                'fetchLocationBtn'
+            );
+
+        const status =
+            document.getElementById(
+                'loadingStatus'
+            );
+
+        btn.disabled = true;
+
+        status.classList.remove('d-none');
+
+        navigator.geolocation.getCurrentPosition(
+
+            // SUCCESS
+            function(position){
+
+                const lat =
+                    position.coords.latitude;
+
+                const lng =
+                    position.coords.longitude;
+
+                updateForm(lat, lng);
+
+                // =================================
+                // REVERSE GEOCODING
+                // =================================
+
+                fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+                )
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    const address =
+                        data.address || {};
+
+                    // =============================
+                    // AUTO FILL LOCATION FIELDS
+                    // =============================
+
+                    document.getElementById(
+                        'id_state'
+                    ).value =
+                        address.state || '';
+
+                    document.getElementById(
+                        'id_district'
+                    ).value =
+                        address.state_district || '';
+
+                    document.getElementById(
+                        'id_mandal'
+                    ).value =
+                        address.county || '';
+
+                    document.getElementById(
+                        'id_village'
+                    ).value =
+
+                        address.village ||
+
+                        address.town ||
+
+                        address.suburb ||
+
+                        address.hamlet ||
+
+                        '';
+
+                    // =============================
+                    // AUTO HUB NAME
+                    // =============================
+
+                    const villageName =
+
+                        address.village ||
+
+                        address.town ||
+
+                        address.suburb ||
+
+                        address.hamlet ||
+
+                        'New Hub';
+
+                    document.getElementById(
+                        'id_name'
+                    ).value =
+                        `GramaCart ${villageName}`;
+
+                    // =============================
+                    // AUTO FULL ADDRESS
+                    // =============================
+
+                    document.getElementById(
+                        'id_full_address'
+                    ).value =
+                        data.display_name || '';
+
+                    btn.disabled = false;
+
+                    status.classList.add('d-none');
+
+                })
+
+                .catch(() => {
+
+                    alert(
+                        "Unable to fetch address details."
+                    );
+
+                    btn.disabled = false;
+
+                    status.classList.add('d-none');
+                });
+
+            },
+
+            // ERROR
+            function(){
+
+                alert(
+                    "Please enable location access."
+                );
 
                 btn.disabled = false;
+
                 status.classList.add('d-none');
-            });
+            },
 
-    }, () => {
-        alert("Enable location access");
-        btn.disabled = false;
-        status.classList.add('d-none');
+            // OPTIONS
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
     });
-});
 
-document.getElementById('id_max_delivery_radius_km').addEventListener('input', function () {
-    circle.setRadius(this.value * 1000);
-    document.getElementById('radius-preview').innerText = this.value;
-});
+    // =========================================
+    // RADIUS UPDATE
+    // =========================================
 
-map.on('click', e => updateForm(e.latlng.lat, e.latlng.lng));
-marker.on('dragend', e => {
-    const pos = marker.getLatLng();
-    updateForm(pos.lat, pos.lng);
-});
+    document.getElementById(
+        'id_max_delivery_radius_km'
+    ).addEventListener('input', function () {
+
+        const radius =
+            this.value * 1000;
+
+        circle.setRadius(radius);
+
+        document.getElementById(
+            'radius-preview'
+        ).innerText =
+            this.value;
+    });
+
+    // =========================================
+    // MAP CLICK
+    // =========================================
+
+    map.on('click', function(e){
+
+        updateForm(
+            e.latlng.lat,
+            e.latlng.lng
+        );
+
+    });
+
+    // =========================================
+    // MARKER DRAG
+    // =========================================
+
+    marker.on('dragend', function(){
+
+        const pos =
+            marker.getLatLng();
+
+        updateForm(
+            pos.lat,
+            pos.lng
+        );
+
+    });
+
 </script>
 
 <style>
-.fw-900 { font-weight: 900; }
-#map { border-radius: 0 1rem 1rem 0; }
-.form-control:focus { border-color: #198754; box-shadow: none; }
-.z-index-1000 { z-index: 1000; }
+
+    .fw-900{
+        font-weight:900;
+    }
+
+    #map{
+        border-radius:0 1rem 1rem 0;
+    }
+
+    .form-control:focus{
+        border-color:#198754;
+        box-shadow:none;
+    }
+
+    .z-index-1000{
+        z-index:1000;
+    }
+
 </style>
 
 {% endblock %}

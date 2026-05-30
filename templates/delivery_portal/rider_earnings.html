@@ -1,213 +1,1133 @@
 {% extends "delivery_portal/base.html" %}
 {% load static %}
 
-{% block title %}Earnings | GramaCart{% endblock %}
+{% block title %}
+Earnings & Settlements | GramaCart
+{% endblock %}
 
 {% block extra_css %}
+
 <style>
-    :root {
-        --brand-accent: #00cc66;
-        --ui-dark: #0f172a;
-        --ui-muted: #64748b;
+
+:root{
+
+    --primary:#10B981;
+    --primary-dark:#059669;
+
+    --dark:#0F172A;
+    --dark-soft:#1E293B;
+
+    --text:#0F172A;
+    --sub:#64748B;
+
+    --border:#E2E8F0;
+
+    --surface:#FFFFFF;
+    --soft:#F8FAFC;
+
+    --warning:#F59E0B;
+    --success:#10B981;
+    --danger:#EF4444;
+
+    --shadow:
+        0 12px 30px rgba(15,23,42,.06);
+
+    --shadow-lg:
+        0 24px 60px rgba(15,23,42,.12);
+
+    --radius:30px;
+
+    --gradient:
+        linear-gradient(
+            135deg,
+            #0F172A 0%,
+            #1E293B 45%,
+            #0F766E 100%
+        );
+}
+
+/* =========================================================
+BASE
+========================================================= */
+
+html,
+body{
+
+    background:
+        linear-gradient(
+            180deg,
+            #F8FAFC 0%,
+            #F1F5F9 100%
+        ) !important;
+}
+
+.earnings-page{
+
+    max-width:920px;
+
+    margin:auto;
+
+    padding:
+        20px
+        0
+        150px;
+}
+
+/* =========================================================
+MONTH PICKER
+========================================================= */
+
+.month-filter{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    padding:18px 20px;
+
+    border-radius:24px;
+
+    background:rgba(255,255,255,.75);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(226,232,240,.8);
+
+    margin-bottom:20px;
+
+    box-shadow:var(--shadow);
+}
+
+.filter-label{
+
+    font-size:12px;
+
+    font-weight:900;
+
+    color:var(--sub);
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+}
+
+.month-input{
+
+    border:none;
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:12px 16px;
+
+    font-size:14px;
+
+    font-weight:800;
+
+    color:var(--dark);
+
+    border:1px solid var(--border);
+
+    outline:none;
+}
+
+/* =========================================================
+HERO
+========================================================= */
+
+.wallet-hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:var(--gradient);
+
+    border-radius:36px;
+
+    padding:28px;
+
+    color:#fff;
+
+    margin-bottom:22px;
+
+    box-shadow:var(--shadow-lg);
+}
+
+.wallet-hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:280px;
+    height:280px;
+
+    top:-140px;
+    right:-120px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.16),
+            transparent 70%
+        );
+}
+
+.wallet-hero::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:240px;
+    height:240px;
+
+    left:-120px;
+    bottom:-120px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(16,185,129,.28),
+            transparent 70%
+        );
+}
+
+.hero-content{
+
+    position:relative;
+
+    z-index:2;
+}
+
+.hero-top{
+
+    display:flex;
+
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:20px;
+}
+
+.wallet-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:10px 16px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.10);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    font-size:11px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+}
+
+.live-dot{
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#10B981;
+
+    box-shadow:0 0 14px #10B981;
+
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+
+    0%{transform:scale(1)}
+    50%{transform:scale(1.4)}
+    100%{transform:scale(1)}
+}
+
+.wallet-title{
+
+    margin-top:20px;
+
+    font-size:14px;
+
+    font-weight:800;
+
+    color:rgba(255,255,255,.75);
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+.wallet-balance{
+
+    margin-top:8px;
+
+    font-size:52px;
+
+    font-weight:900;
+
+    line-height:1;
+}
+
+.wallet-sub{
+
+    margin-top:14px;
+
+    color:rgba(255,255,255,.75);
+
+    font-size:14px;
+
+    line-height:1.8;
+
+    max-width:540px;
+
+    font-weight:600;
+}
+
+.wallet-icon{
+
+    width:72px;
+    height:72px;
+
+    border-radius:24px;
+
+    background:rgba(255,255,255,.12);
+
+    border:1px solid rgba(255,255,255,.14);
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:32px;
+}
+
+.hero-grid{
+
+    margin-top:28px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:16px;
+}
+
+.hero-stat{
+
+    border-radius:24px;
+
+    padding:18px;
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(14px);
+}
+
+.hero-stat-label{
+
+    font-size:11px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+    color:rgba(255,255,255,.7);
+
+    font-weight:900;
+}
+
+.hero-stat-value{
+
+    margin-top:10px;
+
+    font-size:28px;
+
+    font-weight:900;
+}
+
+/* =========================================================
+SECTIONS
+========================================================= */
+
+.section-card{
+
+    background:#fff;
+
+    border-radius:30px;
+
+    padding:24px;
+
+    border:1px solid rgba(226,232,240,.8);
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:20px;
+}
+
+.section-header{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    margin-bottom:22px;
+}
+
+.section-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+}
+
+.section-icon{
+
+    width:52px;
+    height:52px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ECFDF5,
+            #D1FAE5
+        );
+
+    color:#10B981;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:22px;
+}
+
+.section-title h3{
+
+    margin:0;
+
+    font-size:18px;
+
+    font-weight:900;
+
+    color:var(--dark);
+}
+
+.section-title p{
+
+    margin:4px 0 0;
+
+    color:var(--sub);
+
+    font-size:12px;
+
+    font-weight:700;
+}
+
+/* =========================================================
+SETTLEMENT STATUS
+========================================================= */
+
+.status-box{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:18px;
+
+    padding:22px;
+
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(245,158,11,.10),
+            rgba(251,191,36,.06)
+        );
+
+    border:1px solid rgba(245,158,11,.18);
+}
+
+.status-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+}
+
+.status-icon{
+
+    width:58px;
+    height:58px;
+
+    border-radius:18px;
+
+    background:#fff;
+
+    color:#F59E0B;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+}
+
+.status-title{
+
+    font-size:16px;
+
+    font-weight:900;
+
+    color:#92400E;
+}
+
+.status-sub{
+
+    margin-top:6px;
+
+    color:#A16207;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+    font-weight:700;
+}
+
+.pending-amount{
+
+    font-size:34px;
+
+    font-weight:900;
+
+    color:#0F172A;
+}
+
+/* =========================================================
+TRANSACTIONS
+========================================================= */
+
+.day-header{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    margin:28px 0 14px;
+
+    padding:0 6px;
+}
+
+.day-title{
+
+    font-size:12px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+
+    text-transform:uppercase;
+
+    color:var(--sub);
+}
+
+.day-total{
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:#ECFDF5;
+
+    color:#065F46;
+
+    font-size:12px;
+
+    font-weight:900;
+}
+
+.transaction-card{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:18px;
+
+    padding:18px;
+
+    border-radius:24px;
+
+    background:#fff;
+
+    border:1px solid #EEF2F7;
+
+    margin-bottom:14px;
+
+    transition:.2s ease;
+}
+
+.transaction-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.05);
+}
+
+.transaction-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    min-width:0;
+}
+
+.transaction-icon{
+
+    width:58px;
+    height:58px;
+
+    border-radius:18px;
+
+    background:#F8FAFC;
+
+    color:#10B981;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+
+    flex-shrink:0;
+}
+
+.transaction-order{
+
+    font-size:15px;
+
+    font-weight:900;
+
+    color:var(--dark);
+}
+
+.transaction-meta{
+
+    margin-top:6px;
+
+    color:var(--sub);
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    font-weight:700;
+}
+
+.transaction-right{
+
+    text-align:right;
+}
+
+.transaction-amount{
+
+    font-size:20px;
+
+    font-weight:900;
+
+    color:#10B981;
+}
+
+.transaction-status{
+
+    margin-top:6px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:6px 10px;
+
+    border-radius:999px;
+
+    background:#ECFDF5;
+
+    color:#065F46;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    letter-spacing:.6px;
+}
+
+/* =========================================================
+EMPTY STATE
+========================================================= */
+
+.empty-box{
+
+    text-align:center;
+
+    padding:60px 20px;
+}
+
+.empty-icon{
+
+    width:100px;
+    height:100px;
+
+    margin:auto auto 20px;
+
+    border-radius:50%;
+
+    background:#F8FAFC;
+
+    color:#CBD5E1;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:42px;
+}
+
+.empty-title{
+
+    font-size:18px;
+
+    font-weight:900;
+
+    color:var(--dark);
+}
+
+.empty-sub{
+
+    margin-top:10px;
+
+    color:var(--sub);
+
+    line-height:1.8;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+/* =========================================================
+MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+    .wallet-balance{
+
+        font-size:42px;
     }
 
-    /* 1. Month Picker Bar */
-    .month-picker-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f1f5f9;
-        padding: 10px 16px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-        border: 1px solid #e2e8f0;
+    .hero-grid{
+
+        grid-template-columns:1fr;
     }
 
-    .calendar-input {
-        border: none;
-        background: transparent;
-        font-weight: 800;
-        font-size: 0.9rem;
-        color: var(--ui-dark);
-        text-transform: uppercase;
-        outline: none;
+    .hero-top{
+
+        flex-direction:column;
     }
 
-    /* 2. Enhanced Wallet Card */
-    .wallet-hero {
-        background: linear-gradient(135deg, var(--ui-dark) 0%, #1e293b 100%);
-        border-radius: 28px;
-        padding: 28px;
-        color: rgb(239, 79, 5);
-        box-shadow: 0 15px 30px rgba(15, 23, 42, 0.2);
-        position: relative;
-        overflow: hidden;
+    .transaction-card{
+
+        align-items:flex-start;
+
+        flex-direction:column;
     }
 
-    .balance-label {
-        color: rgba(252, 4, 4, 0.6);
-        font-size: 0.7rem;
-        font-weight: 800;
-        letter-spacing: 1px;
+    .transaction-right{
+
+        width:100%;
+
+        text-align:left;
     }
 
-    .balance-main {
-        font-size: 2.8rem;
-        font-weight: 900;
-        letter-spacing: -1.5px;
-        margin-bottom: 0;
-        color: #120d0d;
-    }
+    .status-box{
 
-    /* 3. Stats Grid */
-    .stat-box {
-        background: white;
-        border-radius: 20px;
-        padding: 15px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    }
+        flex-direction:column;
 
-    /* 4. Day-Wise Grouping UI */
-    .day-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 25px 0 12px;
-        padding: 0 4px;
+        align-items:flex-start;
     }
+}
 
-    .day-label {
-        font-size: 0.7rem;
-        font-weight: 900;
-        color: var(--ui-muted);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .day-sum {
-        font-size: 0.8rem;
-        font-weight: 900;
-        color: var(--brand-accent);
-        background: rgba(0, 204, 102, 0.1);
-        padding: 4px 12px;
-        border-radius: 50px;
-    }
-
-    /* 5. Transaction Item */
-    .trx-item {
-        background: white;
-        border-radius: 20px;
-        padding: 16px;
-        margin-bottom: 10px;
-        border: 1px solid #f8fafc;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: transform 0.1s ease;
-    }
-
-    .trx-item:active {
-        transform: scale(0.97); /* Haptic feel on click */
-        background: #fdfdfd;
-    }
-
-    .trx-icon {
-        width: 40px; height: 40px;
-        background: #f1f5f9;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--brand-accent);
-    }
 </style>
+
 {% endblock %}
 
 {% block content %}
-<div class="container px-3 pb-5">
-    
-    <div class="month-picker-container mt-3">
-        <div class="fw-900 small text-muted">SELECT MONTH</div>
-        <form method="GET" id="monthForm">
-            <input type="month" name="month" class="calendar-input" 
-                   value="{{ current_month }}" 
-                   onchange="this.form.submit()">
+
+<div class="earnings-page">
+
+    <!-- MONTH FILTER -->
+
+    <div class="month-filter">
+
+        <div>
+
+            <div class="filter-label">
+                Earnings Period
+            </div>
+
+            <div class="fw-bold text-dark mt-1">
+                Monthly Settlement Overview
+            </div>
+
+        </div>
+
+        <form method="GET">
+
+            <input
+                type="month"
+                name="month"
+                class="month-input"
+                value="{{ current_month }}"
+                onchange="this.form.submit()">
+
         </form>
+
     </div>
 
-    <div class="wallet-hero mb-4">
-        <div class="d-flex justify-content-between align-items-start mb-4">
-            <div>
-                <p class="balance-label text-uppercase mb-1">Total Month Earnings</p>
-                <h1 class="balance-main">₹{{ total_balance }}</h1>
-            </div>
-            <div class="p-2 bg-success bg-opacity-25 rounded-circle text-success">
-                <i class="bi bi-wallet2 fs-4"></i>
-            </div>
-        </div>
-        
-        <button class="btn btn-primary w-100 py-3 rounded-4 fw-900 shadow-sm border-0" >
-            WITHDRAW EARNINGS
-        </button>
-    </div>
+    <!-- HERO -->
 
-    <div class="row g-3 mb-5">
-        <div class="col-6">
-            <div class="stat-box">
-                <p class="extra-small fw-900 text-muted mb-1 text-uppercase">Today</p>
-                <h4 class="fw-900 m-0 text-dark">₹{{ today_earnings }}</h4>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="stat-box">
-                <p class="extra-small fw-900 text-muted mb-1 text-uppercase">Weekly</p>
-                <h4 class="fw-900 m-0 text-dark">₹{{ weekly_earnings }}</h4>
-            </div>
-        </div>
-    </div>
+    <section class="wallet-hero">
 
-    <div class="history-section">
-        <h6 class="fw-900 text-uppercase letter-spacing-1 mb-3 text-muted" style="font-size: 0.7rem;">Transactions</h6>
-        
+        <div class="hero-content">
+
+            <div class="hero-top">
+
+                <div>
+
+                    <div class="wallet-badge">
+
+                        <div class="live-dot"></div>
+
+                        DAILY SETTLEMENT ENABLED
+
+                    </div>
+
+                    <div class="wallet-title">
+                        Total Monthly Earnings
+                    </div>
+
+                    <div class="wallet-balance">
+                        ₹{{ total_balance }}
+                    </div>
+
+                    <div class="wallet-sub">
+
+                        Your delivery earnings are settled
+                        daily by GramaCart admin after
+                        successful order verification and
+                        COD confirmation.
+
+                    </div>
+
+                </div>
+
+                <div class="wallet-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+            </div>
+
+            <div class="hero-grid">
+
+                <div class="hero-stat">
+
+                    <div class="hero-stat-label">
+                        Today Earnings
+                    </div>
+
+                    <div class="hero-stat-value">
+                        ₹{{ today_earnings }}
+                    </div>
+
+                </div>
+
+                <div class="hero-stat">
+
+                    <div class="hero-stat-label">
+                        Weekly Earnings
+                    </div>
+
+                    <div class="hero-stat-value">
+                        ₹{{ weekly_earnings }}
+                    </div>
+
+                </div>
+
+                <div class="hero-stat">
+
+                    <div class="hero-stat-label">
+                        Pending Settlement
+                    </div>
+
+                    <div class="hero-stat-value">
+                        ₹{{ pending_settlement|default:0 }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SETTLEMENT STATUS -->
+
+    <section class="section-card">
+
+        <div class="section-header">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+
+                <div>
+
+                    <h3>Settlement Status</h3>
+
+                    <p>
+                        Admin managed payout tracking
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="status-box">
+
+            <div class="status-left">
+
+                <div class="status-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+
+                    <div class="status-title">
+                        Pending Daily Settlement
+                    </div>
+
+                    <div class="status-sub">
+
+                        Earnings are verified and settled
+                        by admin every day after COD
+                        confirmation and order completion.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="pending-amount">
+                ₹{{ pending_settlement|default:0 }}
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- HISTORY -->
+
+    <section class="section-card">
+
+        <div class="section-header">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+
+                    <h3>Delivery Earnings History</h3>
+
+                    <p>
+                        Daily completed delivery records
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
         {% for group in history_groups %}
-            <div class="day-header">
-                <span class="day-label">
-                    {% if group.date == today %} 
-                        <span class="text-success">●</span> TODAY, {{ group.date|date:"d M" }}
-                    {% else %} 
-                        {{ group.date|date:"D, d M Y" }} 
-                    {% endif %}
-                </span>
-                <span class="day-sum">₹{{ group.day_total }}</span>
+
+        <div class="day-header">
+
+            <div class="day-title">
+
+                {% if group.date == today %}
+
+                    ● TODAY • {{ group.date|date:"d M Y" }}
+
+                {% else %}
+
+                    {{ group.date|date:"D, d M Y" }}
+
+                {% endif %}
+
             </div>
 
-            {% for item in group.deliveries %}
-            <div class="trx-item shadow-sm">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="trx-icon">
-                        <i class="bi bi-bicycle"></i>
-                    </div>
-                    <div>
-                        <div class="fw-900 small text-dark">#{{ item.order.order_number|default:item.id }}</div>
-                        <div class="extra-small text-muted fw-bold">
-                            {{ item.delivered_at|date:"h:i A" }} • 
-                            <span class="text-uppercase">{{ item.order.address.village|default:"LOCAL" }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <div class="fw-900 text-success" style="font-size: 0.95rem;">+₹{{ item.rider_earning }}</div>
-                    <div class="extra-small text-muted fw-900" style="font-size: 0.5rem;">SETTLED</div>
-                </div>
+            <div class="day-total">
+                ₹{{ group.day_total }}
             </div>
-            {% endfor %}
-        {% empty %}
-            <div class="text-center py-5">
-                <i class="bi bi-calendar2-x text-muted opacity-25" style="font-size: 4rem;"></i>
-                <p class="fw-800 text-muted mt-3">No activity found for this month</p>
+
+        </div>
+
+        {% for item in group.deliveries %}
+
+        <div class="transaction-card">
+
+            <div class="transaction-left">
+
+                <div class="transaction-icon">
+                    <i class="bi bi-bicycle"></i>
+                </div>
+
+                <div>
+
+                    <div class="transaction-order">
+
+                        Order
+                        #{{ item.order.order_number|default:item.id }}
+
+                    </div>
+
+                    <div class="transaction-meta">
+
+                        {{ item.delivered_at|date:"h:i A" }}
+
+                        •
+
+                        {{ item.order.address.village|default:"LOCAL AREA" }}
+
+                        <br>
+
+                        Payment:
+
+                        {% if item.is_cod %}
+                            COD
+                        {% else %}
+                            ONLINE
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
             </div>
+
+            <div class="transaction-right">
+
+                <div class="transaction-amount">
+                    +₹{{ item.rider_earning }}
+                </div>
+
+                <div class="transaction-status">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    VERIFIED
+
+                </div>
+
+            </div>
+
+        </div>
+
         {% endfor %}
-    </div>
+
+        {% empty %}
+
+        <div class="empty-box">
+
+            <div class="empty-icon">
+                <i class="bi bi-wallet2"></i>
+            </div>
+
+            <div class="empty-title">
+                No Earnings Found
+            </div>
+
+            <div class="empty-sub">
+
+                No delivery earnings available
+                for the selected month.
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </section>
+
 </div>
+
 {% endblock %}

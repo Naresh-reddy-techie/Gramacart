@@ -5,327 +5,866 @@
 
 {% block extra_css %}
 <style>
+
 :root{
-    --emerald:#10B981;
+    --primary:#10B981;
     --navy:#0F172A;
     --bg:#F8FAFC;
+    --border:#E2E8F0;
+    --muted:#64748B;
+    --danger:#EF4444;
 }
 
-/* SAFE WRAPPER */
-.page-wrapper{
-    padding-top: 85px;
-    padding-bottom: 180px; /* space for checkout + nav */
+/* =========================================
+   GLOBAL
+========================================= */
+
+body{
+    background:var(--bg);
+    padding-bottom:190px;
+    -webkit-font-smoothing:antialiased;
 }
 
-/* HEADER */
-.status-header{
+.cart-page{
+    max-width:920px;
+    margin:auto;
+    padding:16px;
+    padding-top:90px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.cart-header{
     position:fixed;
-    top:0; left:0; right:0;
-    background:#fff;
-    padding:16px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #e2e8f0;
+    top:0;
+    left:0;
+    right:0;
     z-index:1200;
+
+    background:rgba(255,255,255,0.96);
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid var(--border);
+
+    padding:14px 16px;
 }
 
-.header-title{
-    font-weight:800;
+.cart-header-inner{
+    max-width:920px;
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.cart-title{
     font-size:1.2rem;
-}
-
-.add-btn{
-    background:#f1f5f9;
-    padding:8px 14px;
-    border-radius:999px;
-    text-decoration:none;
-    font-weight:700;
+    font-weight:900;
     color:var(--navy);
 }
 
-/* CART LIST */
-.basket-container{
-    padding: 0 15px;
+.add-more-btn{
+    background:#ECFDF5;
+    color:#047857;
+
+    text-decoration:none;
+
+    padding:10px 14px;
+    border-radius:999px;
+
+    font-size:0.85rem;
+    font-weight:800;
 }
 
-.item-card{
+/* =========================================
+   ITEM CARD
+========================================= */
+
+.cart-card{
     background:#fff;
-    border-radius:18px;
+
+    border-radius:24px;
+
     padding:16px;
-    margin-bottom:12px;
-    border:1px solid #e2e8f0;
+
+    margin-bottom:16px;
+
+    border:1px solid rgba(0,0,0,0.05);
+
+    box-shadow:0 6px 24px rgba(15,23,42,0.05);
+
     position:relative;
+
     transition:0.2s ease;
 }
 
-.item-card:active{
-    transform:scale(0.98);
+.cart-card.updating{
+    opacity:0.6;
+    pointer-events:none;
 }
 
-.item-main{
+.cart-main{
     display:flex;
-    gap:12px;
-    align-items:center;
+    gap:14px;
 }
 
-.img-box{
-    width:70px;
-    height:70px;
-    border-radius:12px;
+.product-image{
+    width:92px;
+    height:92px;
+
+    border-radius:18px;
+
     overflow:hidden;
-    background:#f1f5f9;
+
+    background:#F1F5F9;
+
+    flex-shrink:0;
 }
 
-.img-box img{
+.product-image img{
     width:100%;
     height:100%;
     object-fit:cover;
 }
 
-.item-name{
+/* =========================================
+   PRODUCT DETAILS
+========================================= */
+
+.product-details{
+    flex:1;
+    min-width:0;
+}
+
+.product-name{
+    font-size:1rem;
+    font-weight:900;
+    color:var(--navy);
+    line-height:1.4;
+}
+
+.variant-chip{
+    display:inline-flex;
+    align-items:center;
+
+    background:#F0FDF4;
+    color:#047857;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-size:0.78rem;
     font-weight:800;
+
+    margin-top:8px;
 }
 
-.item-meta{
-    font-size:0.8rem;
-    color:#64748b;
-}
-
-/* ACTION ROW */
-.action-row{
+.price-row{
     margin-top:12px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#f8fafc;
-    padding:10px 14px;
-    border-radius:14px;
 }
 
-.qty-picker{
-    display:flex;
-    align-items:center;
-    gap:10px;
+.price-label{
+    font-size:0.8rem;
+    color:var(--muted);
 }
 
-.btn-circle{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:none;
-    background:#fff;
-    font-weight:800;
-    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+.price-value{
+    font-size:1.1rem;
+    font-weight:900;
+    color:var(--primary);
 }
 
-.qty-num{
-    font-weight:800;
-}
+/* =========================================
+   DELETE BUTTON
+========================================= */
 
-.item-price{
-    font-weight:800;
-}
-
-/* DELETE */
 .delete-btn{
     position:absolute;
-    top:10px;
-    right:10px;
-    background:transparent;
+
+    top:14px;
+    right:14px;
+
+    width:36px;
+    height:36px;
+
     border:none;
-    font-size:1.2rem;
-    color:#94a3b8;
-    z-index:5;
+
+    border-radius:50%;
+
+    background:#F8FAFC;
+
+    color:#64748B;
+
+    transition:0.2s ease;
 }
 
-/* LOADING STATE */
-.updating{
-    opacity:0.6;
-    pointer-events:none;
+.delete-btn:hover{
+    background:#FEE2E2;
+    color:var(--danger);
 }
 
-/* CHECKOUT BAR */
+/* =========================================
+   ACTION BAR
+========================================= */
+
+.action-bar{
+    margin-top:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:#F8FAFC;
+
+    padding:12px 14px;
+
+    border-radius:18px;
+}
+
+/* =========================================
+   QUANTITY
+========================================= */
+
+.qty-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.qty-btn{
+    width:36px;
+    height:36px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    font-weight:900;
+    font-size:1rem;
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+
+    transition:0.2s ease;
+}
+
+.qty-btn:active{
+    transform:scale(0.95);
+}
+
+.qty-number{
+    min-width:22px;
+
+    text-align:center;
+
+    font-weight:900;
+    font-size:1rem;
+}
+
+/* =========================================
+   TOTAL
+========================================= */
+
+.line-total{
+    text-align:right;
+}
+
+.line-total small{
+    display:block;
+    color:var(--muted);
+    font-size:0.78rem;
+}
+
+.line-total strong{
+    font-size:1.1rem;
+    color:var(--navy);
+}
+
+/* =========================================
+   CHECKOUT BAR
+========================================= */
+
 .checkout-bar{
     position:fixed;
-    bottom:80px; /* bottom nav space */
+
     left:0;
     right:0;
-    background:#fff;
+
+    bottom:78px;
+
+    z-index:1400;
+
+    background:rgba(255,255,255,0.96);
+
+    backdrop-filter:blur(12px);
+
+    border-top:1px solid var(--border);
+
     padding:16px;
-    border-radius:20px 20px 0 0;
-    box-shadow:0 -10px 30px rgba(0,0,0,0.08);
-    z-index:1800;
 }
 
-.total-line{
-    display:flex;
-    justify-content:space-between;
-    font-weight:800;
-    font-size:1.2rem;
-    margin-bottom:10px;
+.checkout-inner{
+    max-width:920px;
+    margin:auto;
 }
 
-.btn-proceed{
-    width:100%;
+.checkout-top{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    padding:14px;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+.checkout-label{
+    color:var(--muted);
+    font-size:0.92rem;
+    font-weight:700;
+}
+
+.checkout-total{
+    font-size:1.45rem;
+    font-weight:900;
+    color:var(--navy);
+}
+
+/* =========================================
+   CHECKOUT BUTTON
+========================================= */
+
+.checkout-btn{
+    width:100%;
+
+    border:none;
+
+    border-radius:20px;
+
     background:var(--navy);
     color:#fff;
-    border-radius:14px;
+
+    padding:16px 18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
     text-decoration:none;
+
+    font-size:1rem;
+    font-weight:900;
+
+    transition:0.2s ease;
+}
+
+.checkout-btn:active{
+    transform:scale(0.99);
+}
+
+.amount-pill{
+    background:var(--primary);
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    font-size:0.92rem;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-wrap{
+    min-height:70vh;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.empty-card{
+    text-align:center;
+
+    padding:40px 20px;
+}
+
+.empty-icon{
+    font-size:4.5rem;
+    color:#CBD5E1;
+}
+
+.empty-title{
+    margin-top:16px;
+
+    font-size:1.4rem;
+    font-weight:900;
+
+    color:var(--navy);
+}
+
+.empty-sub{
+    margin-top:10px;
+
+    color:var(--muted);
+
+    line-height:1.6;
+}
+
+.shop-btn{
+    display:inline-block;
+
+    margin-top:24px;
+
+    background:var(--navy);
+    color:#fff;
+
+    text-decoration:none;
+
+    padding:14px 22px;
+
+    border-radius:16px;
+
     font-weight:800;
 }
 
-.amt-pill{
-    background:var(--emerald);
-    padding:4px 10px;
-    border-radius:10px;
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .cart-page{
+        padding:12px;
+        padding-top:84px;
+    }
+
+    .cart-card{
+        border-radius:20px;
+        padding:14px;
+    }
+
+    .product-image{
+        width:78px;
+        height:78px;
+    }
+
+    .product-name{
+        font-size:0.95rem;
+    }
+
+    .checkout-total{
+        font-size:1.25rem;
+    }
+
+    .checkout-btn{
+        border-radius:18px;
+        padding:15px;
+        font-size:0.95rem;
+    }
+
+    .amount-pill{
+        font-size:0.85rem;
+    }
 }
 
-/* EMPTY STATE */
-.empty-state{
-    text-align:center;
-    padding:80px 20px;
-    color:#64748b;
-}
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- HEADER -->
-<div class="status-header">
-    <div class="header-title">My Basket</div>
-    <a class="add-btn" href="{% url 'public_dashboard' %}">+ Add More</a>
+<div class="cart-header">
+
+    <div class="cart-header-inner">
+
+        <div class="cart-title">
+            My Basket
+        </div>
+
+        <a href="{% url 'public_dashboard' %}" class="add-more-btn">
+            + Add More
+        </a>
+
+    </div>
+
 </div>
 
-<div class="page-wrapper">
-
-<div class="basket-container">
+<div class="cart-page">
 
 {% if cart_items %}
 
     {% for item in cart_items %}
-    <div class="item-card" id="item-row-{{ item.id }}">
 
-        <button class="delete-btn" onclick="deleteItem('{{ item.id }}')">
-            <i class="bi bi-x-lg"></i>
+    <div class="cart-card" id="item-row-{{ item.id }}">
+
+        <!-- REMOVE -->
+        <button
+            type="button"
+            class="delete-btn"
+            onclick="deleteItem('{{ item.id }}')">
+
+            <i class="bi bi-trash3"></i>
+
         </button>
 
-        <div class="item-main">
-            <div class="img-box">
-                <img src="{{ item.product.product_images.first.image.url }}">
+        <!-- MAIN -->
+        <div class="cart-main">
+
+            <!-- IMAGE -->
+            <div class="product-image">
+
+                {% if item.product.product_images.first %}
+                    <img src="{{ item.product.product_images.first.image.url }}">
+                {% else %}
+                    <img src="{% static 'images/default-product.png' %}">
+                {% endif %}
+
             </div>
 
-            <div>
-                <div class="item-name">{{ item.product.name }}</div>
-                <div class="item-meta">₹{{ item.product.price }} each</div>
+            <!-- DETAILS -->
+            <div class="product-details">
+
+                <div class="product-name">
+                    {{ item.product.name }}
+                </div>
+
+                <div class="variant-chip">
+                    {{ item.variant.display_name }}
+                </div>
+
+                <div class="price-row">
+
+                    <div class="price-label">
+                        Price
+                    </div>
+
+                    <div class="price-value">
+                        ₹{{ item.unit_price }}
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
 
-        <div class="action-row">
-            <div class="qty-picker">
-                <button class="btn-circle" onclick="updateQty('{{ item.id }}', -1)">-</button>
-                <span class="qty-num" id="qty-val-{{ item.id }}">{{ item.quantity }}</span>
-                <button class="btn-circle" onclick="updateQty('{{ item.id }}', 1)">+</button>
+        <!-- ACTION -->
+        <div class="action-bar">
+
+            <!-- QUANTITY -->
+            <div class="qty-box">
+
+                <button
+                    type="button"
+                    class="qty-btn"
+                    onclick="updateQty('{{ item.id }}', -1)">
+
+                    −
+
+                </button>
+
+                <span
+                    class="qty-number"
+                    id="qty-val-{{ item.id }}">
+
+                    {{ item.quantity }}
+
+                </span>
+
+                <button
+                    type="button"
+                    class="qty-btn"
+                    onclick="updateQty('{{ item.id }}', 1)">
+
+                    +
+
+                </button>
+
             </div>
 
-            <div class="item-price" id="price-{{ item.id }}">
-                ₹{{ item.total_price }}
+            <!-- TOTAL -->
+            <div class="line-total">
+
+                <small>Total</small>
+
+                <strong id="price-{{ item.id }}">
+                    ₹{{ item.item_total }}
+                </strong>
+
             </div>
+
         </div>
+
     </div>
+
     {% endfor %}
 
 {% else %}
-    <div class="empty-state">
-        <h4>Your basket is empty</h4>
-        <p>Add some products to continue shopping</p>
+
+<div class="empty-wrap">
+
+    <div class="empty-card">
+
+        <div class="empty-icon">
+            <i class="bi bi-basket"></i>
+        </div>
+
+        <div class="empty-title">
+            Your Basket is Empty
+        </div>
+
+        <div class="empty-sub">
+            Add products from nearby village hubs
+            and continue shopping.
+        </div>
+
+        <a href="{% url 'public_dashboard' %}" class="shop-btn">
+            Start Shopping
+        </a>
+
     </div>
+
+</div>
+
 {% endif %}
 
 </div>
 
-</div>
-
 {% if cart_items %}
+
 <!-- CHECKOUT -->
 <div class="checkout-bar">
-    <div class="total-line">
-        <span>Total</span>
-        <span id="ui-grandtotal">₹{{ order_totals.sub_total }}</span>
+
+    <div class="checkout-inner">
+
+        <div class="checkout-top">
+
+            <div class="checkout-label">
+                Basket Total
+            </div>
+
+            <div
+                class="checkout-total"
+                id="ui-grandtotal">
+
+                ₹{{ order_totals.sub_total }}
+
+            </div>
+
+        </div>
+
+        <a
+            href="{% url 'cart_checkout' %}"
+            class="checkout-btn">
+
+            Proceed to Checkout
+
+            <span
+                class="amount-pill"
+                id="ui-btn-amt">
+
+                ₹{{ order_totals.sub_total }}
+
+            </span>
+
+        </a>
+
     </div>
 
-    <a href="{% url 'cart_checkout' %}" class="btn-proceed">
-        Proceed
-        <span class="amt-pill" id="ui-btn-amt">
-            ₹{{ order_totals.sub_total }}
-        </span>
-    </a>
 </div>
+
 {% endif %}
 
 {% endblock %}
 
 {% block extra_js %}
+
 <script>
-function updateTotals(val){
-    document.getElementById("ui-grandtotal").innerText = "₹"+val;
-    document.getElementById("ui-btn-amt").innerText = "₹"+val;
+
+/* =========================================
+   UPDATE TOTALS
+========================================= */
+
+function updateTotals(total){
+
+    total = parseFloat(total || 0).toFixed(2);
+
+    const totalUI = document.getElementById(
+        "ui-grandtotal"
+    );
+
+    const pillUI = document.getElementById(
+        "ui-btn-amt"
+    );
+
+    if(totalUI){
+        totalUI.innerText = "₹" + total;
+    }
+
+    if(pillUI){
+        pillUI.innerText = "₹" + total;
+    }
 }
 
-function updateQty(id, delta){
-    const qty = document.getElementById("qty-val-"+id);
-    const card = document.getElementById("item-row-"+id);
+function updateQty(itemId, delta){
 
-    let newQty = parseInt(qty.innerText) + delta;
+    const qtyEl = document.getElementById(
+        "qty-val-" + itemId
+    );
 
+    if(!qtyEl) return;
+
+    let currentQty = parseInt(
+        qtyEl.innerText
+    );
+
+    let newQty = currentQty + delta;
+
+    // =================================================
+    // MINIMUM QUANTITY = 1
+    // =================================================
     if(newQty < 1){
-        return deleteItem(id);
+
+        alert("Minimum quantity is 1");
+
+        return;
     }
+
+    const card = document.getElementById(
+        "item-row-" + itemId
+    );
 
     card.classList.add("updating");
 
-    fetch(`/shop/update_cart_quantity/${id}/`,{
+    fetch(`/shop/update_cart_quantity/${itemId}/`,{
+
         method:"POST",
+
         headers:{
             "X-CSRFToken":"{{ csrf_token }}",
             "Content-Type":"application/json"
         },
-        body:JSON.stringify({quantity:newQty})
+
+        body:JSON.stringify({
+            quantity:newQty
+        })
+
     })
-    .then(r=>r.json())
-    .then(d=>{
-        if(d.success){
-            qty.innerText = newQty;
-            document.getElementById("price-"+id).innerText = "₹"+d.item_total;
-            updateTotals(d.sub_total);
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if(data.success){
+
+            qtyEl.innerText = newQty;
+
+            document.getElementById(
+                "price-" + itemId
+            ).innerText = "₹" + data.item_total;
+
+            updateTotals(data.sub_total);
+
+            // OPTIONAL:
+            // update cart badge
+            const badge = document.getElementById("cart-badge");
+
+            if(badge && data.cart_count !== undefined){
+
+                if(data.cart_count > 0){
+
+                    badge.style.display = "flex";
+                    badge.innerText = data.cart_count;
+
+                } else {
+
+                    badge.style.display = "none";
+
+                }
+            }
+
+        } else {
+
+            alert(data.message || "Unable to update quantity");
+
         }
+
     })
-    .finally(()=>card.classList.remove("updating"));
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Something went wrong");
+
+    })
+
+    .finally(() => {
+
+        card.classList.remove("updating");
+
+    });
 }
 
+/* =========================================
+   DELETE ITEM
+========================================= */
+
 function deleteItem(itemId){
+
     fetch(`/shop/remove_from_cart/${itemId}/`,{
+
         method:"POST",
+
         headers:{
             "X-CSRFToken":"{{ csrf_token }}",
             "X-Requested-With":"XMLHttpRequest"
         }
+
     })
-    .then(r=>r.json())
-    .then(data=>{
+
+    .then(res => res.json())
+
+    .then(data => {
+
         if(data.success){
-            document.getElementById("item-row-"+itemId)?.remove();
+
+            const row = document.getElementById(
+                "item-row-" + itemId
+            );
+
+            if(row){
+                row.remove();
+            }
+
             updateTotals(data.sub_total);
-            GCToast.show("success","Item removed");
-        }else{
-            GCToast.show("error","Failed");
+
+            if(data.cart_empty){
+                location.reload();
+            }
+
+        } else {
+
+            alert(data.message || "Failed to remove item");
+
         }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Something went wrong");
+
     });
 }
+
 </script>
+
 {% endblock %}

@@ -10,83 +10,192 @@ class CustomerProfileForm(forms.ModelForm):
         }
         
 
+# =========================================================
+# FORMS.py (PRODUCTION READY)
+# =========================================================
 
 import re
+
 from django import forms
+
 from .models import Address
 
+
+# =========================================================
+# ADDRESS FORM
+# =========================================================
+
 class AddressForm(forms.ModelForm):
-    # Explicitly set required=False so Django doesn't block the empty hidden fields
-    state = forms.CharField(required=False, widget=forms.HiddenInput())
-    country = forms.CharField(required=False, widget=forms.HiddenInput())
-    latitude = forms.DecimalField(required=False, widget=forms.HiddenInput())
-    longitude = forms.DecimalField(required=False, widget=forms.HiddenInput())
+
+    # =====================================================
+    # HIDDEN FIELDS
+    # =====================================================
+
+    state = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    country = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    latitude = forms.DecimalField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    longitude = forms.DecimalField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    is_remote = forms.BooleanField(
+        required=False
+    )
+
+    # =====================================================
+    # META
+    # =====================================================
 
     class Meta:
+
         model = Address
+
         fields = [
-            'recipient_name', 'phone_number', 'address_line', 
-            'landmark', 'city', 'state', 'country', 
-            'pincode', 'address_type', 'latitude', 'longitude'
+            "recipient_name",
+            "phone_number",
+            "address_line",
+            "landmark",
+            "city",
+            "state",
+            "country",
+            "pincode",
+            "address_type",
+            "latitude",
+            "longitude",
+            "is_remote",
+            "is_default",
         ]
+
         widgets = {
-            'recipient_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g. Rama Rao'
+
+            "recipient_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Full Name"
             }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '10-digit mobile number',
-                'type': 'tel'
+
+            "phone_number": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "10 digit mobile number"
             }),
-            'address_line': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'House No, Building, Street'
+
+            "address_line": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "House no, street"
             }),
-            'landmark': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Near Temple / School (Required)'
+
+            "landmark": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Nearby landmark"
             }),
-            'city': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Village/Town'
+
+            "city": forms.TextInput(attrs={
+                "class": "form-control"
             }),
-            'pincode': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '6-digit PIN'
+
+            "pincode": forms.TextInput(attrs={
+                "class": "form-control"
             }),
-            'address_type': forms.Select(attrs={
-                'class': 'form-select'
+
+            "address_type": forms.Select(attrs={
+                "class": "form-select"
             }),
         }
 
+    # =====================================================
+    # PHONE VALIDATION
+    # =====================================================
+
     def clean_phone_number(self):
-        phone = self.cleaned_data.get('phone_number')
-        phone = re.sub(r'[\s\-]', '', str(phone))
-        
-        if not phone.isdigit():
-            raise forms.ValidationError("Phone number must contain only digits.")
-        
-        if len(phone) not in [10, 12]:
-            raise forms.ValidationError("Please enter a valid 10 or 12 digit phone number.")
-            
+
+        phone = re.sub(
+            r"[\s\-]",
+            "",
+            str(
+                self.cleaned_data.get(
+                    "phone_number",
+                    ""
+                )
+            )
+        )
+
+        if not re.match(
+            r"^[6-9]\d{9}$",
+            phone
+        ):
+
+            raise forms.ValidationError(
+                "Enter valid mobile number."
+            )
+
         return phone
 
-    def clean(self):
-        cleaned_data = super().clean()
-        lat = cleaned_data.get('latitude')
-        lon = cleaned_data.get('longitude')
+    # =====================================================
+    # PINCODE VALIDATION
+    # =====================================================
 
-        # Custom validation: Ensure the user actually tapped the map
-        if not lat or not lon:
-            raise forms.ValidationError("Please select a location on the map before saving.")
-        
-        # Safety Net: Fill in defaults if the JavaScript geocoder didn't respond in time
-        if not cleaned_data.get('state'):
-            cleaned_data['state'] = "Andhra Pradesh"
-        if not cleaned_data.get('country'):
-            cleaned_data['country'] = "India"
-            
+    def clean_pincode(self):
+
+        pincode = str(
+            self.cleaned_data.get(
+                "pincode",
+                ""
+            )
+        ).strip()
+
+        if not pincode.isdigit():
+
+            raise forms.ValidationError(
+                "Pincode must contain digits only."
+            )
+
+        if len(pincode) != 6:
+
+            raise forms.ValidationError(
+                "Enter valid 6 digit pincode."
+            )
+
+        return pincode
+
+    # =====================================================
+    # GLOBAL VALIDATION
+    # =====================================================
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        lat = cleaned_data.get("latitude")
+        lon = cleaned_data.get("longitude")
+
+        if lat is None or lon is None:
+
+            raise forms.ValidationError(
+                "Please select location on map."
+            )
+
+        cleaned_data["state"] = (
+            cleaned_data.get("state")
+            or "Andhra Pradesh"
+        )
+
+        cleaned_data["country"] = (
+            cleaned_data.get("country")
+            or "India"
+        )
+
         return cleaned_data
 # =======================================================
 

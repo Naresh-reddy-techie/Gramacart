@@ -1,283 +1,689 @@
 {% extends "shop/base.html" %}
 {% load static %}
 
-{% block title %}Account | GramaCart{% endblock %}
+{% block title %}
+My Account | GramaCart
+{% endblock %}
 
 {% block extra_css %}
+
 <style>
-:root {
-    --primary: #10B981;
-    --danger: #EF4444;
-    --navy: #0F172A;
-    --slate: #64748B;
-    --bg: #F8FAFC;
-    --border: #EDF2F7;
+
+:root{
+    --primary:#10B981;
+    --primary-dark:#059669;
+
+    --navy:#0F172A;
+    --slate:#64748B;
+
+    --danger:#EF4444;
+
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
+    --border:#E2E8F0;
+
+    --shadow:
+        0 10px 30px rgba(15,23,42,0.04);
+
+    --radius:24px;
 }
 
-body {
-    background: var(--bg);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: var(--navy);
-    -webkit-tap-highlight-color: transparent;
+body{
+    background:var(--bg);
+    color:var(--navy);
+    font-family:'Plus Jakarta Sans',sans-serif;
 }
 
-/* NAV */
-.top-nav {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: #fff;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
+.profile-page{
+    max-width:860px;
+    margin:auto;
+    padding-bottom:140px;
 }
 
-.back-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #F1F5F9;
-    text-decoration: none;
-    color: var(--navy);
-    transition: 0.2s;
-}
-.back-btn:active { transform: scale(0.92); }
+/* =========================================================
+NAV
+========================================================= */
 
-/* PROFILE */
-.profile {
-    background: #fff;
-    padding: 28px 20px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
+.top-nav{
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(16px);
+
+    border-bottom:1px solid rgba(226,232,240,0.7);
 }
 
-.avatar {
-    width: 92px;
-    height: 92px;
-    margin: 0 auto 14px;
-    border-radius: 26px;
-    background: var(--primary);
-    color: #fff;
-    font-size: 32px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(16,185,129,0.2);
+.top-nav-inner{
+    max-width:860px;
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    padding:14px 16px;
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.back-btn{
+    width:44px;
+    height:44px;
+
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    border:1px solid var(--border);
+    background:#fff;
+
+    color:var(--navy);
 }
 
-.profile h1 {
-    font-size: 20px;
-    font-weight: 800;
-    margin: 6px 0 2px;
+.nav-title{
+    font-size:20px;
+    font-weight:800;
+    margin:0;
 }
 
-.profile p {
-    font-size: 13px;
-    color: var(--slate);
+/* =========================================================
+PROFILE HERO
+========================================================= */
+
+.profile-hero{
+    margin:18px 14px;
+    padding:26px 22px;
+
+    border-radius:32px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #10B981,
+            #059669
+        );
+
+    color:#fff;
+
+    position:relative;
+    overflow:hidden;
 }
 
-/* STATS */
-.stats {
-    display: flex;
-    gap: 12px;
-    padding: 18px;
-    overflow-x: auto;
+.profile-hero::after{
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+    height:220px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,0.08);
+
+    right:-80px;
+    top:-80px;
 }
 
-.stat {
-    min-width: 130px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.hero-content{
+    position:relative;
+    z-index:2;
 }
 
-.stat i {
-    font-size: 18px;
+.avatar{
+    width:92px;
+    height:92px;
+
+    border-radius:28px;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,0.14);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:34px;
+    font-weight:800;
+
+    margin-bottom:16px;
+
+    border:3px solid rgba(255,255,255,0.15);
 }
 
-.stat strong {
-    display: block;
-    font-size: 15px;
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-.stat small {
-    font-size: 11px;
-    color: var(--slate);
+.profile-name{
+    font-size:24px;
+    font-weight:800;
 }
 
-/* MENU */
-.section {
-    background: #fff;
-    margin-bottom: 18px;
+.profile-email{
+    font-size:13px;
+    opacity:0.9;
+    margin-top:4px;
 }
 
-.menu-item {
-    display: flex;
-    align-items: center;
-    padding: 16px 18px;
-    border-bottom: 1px solid #F8FAFC;
-    text-decoration: none;
-    color: var(--navy);
+.profile-phone{
+    font-size:13px;
+    opacity:0.9;
+    margin-top:2px;
 }
 
-.menu-item:last-child {
-    border-bottom: none;
+.location-chip{
+    margin-top:16px;
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    background:rgba(255,255,255,0.14);
+
+    padding:10px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:700;
 }
 
-.icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    background: #F1F5F9;
+/* =========================================================
+STATS
+========================================================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+
+    padding:0 14px;
+    margin-bottom:18px;
 }
 
-.label {
-    flex: 1;
-    font-weight: 600;
-    font-size: 14px;
+.stat-card{
+    background:#fff;
+
+    border-radius:24px;
+
+    border:1px solid var(--border);
+
+    padding:16px;
+
+    box-shadow:var(--shadow);
 }
 
-.arrow {
-    color: #CBD5E1;
+.stat-icon{
+    width:42px;
+    height:42px;
+
+    border-radius:14px;
+
+    background:#F0FDF4;
+
+    color:var(--primary);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:18px;
+
+    margin-bottom:12px;
 }
 
-/* LOGOUT */
-.logout {
-    padding: 24px 18px;
+.stat-value{
+    font-size:20px;
+    font-weight:800;
 }
 
-.btn-logout {
-    width: 100%;
-    padding: 14px;
-    border-radius: 16px;
-    border: 2px solid #FEE2E2;
-    background: #FFF5F5;
-    color: var(--danger);
-    font-weight: 700;
+.stat-label{
+    font-size:12px;
+    color:var(--slate);
+    margin-top:4px;
+    font-weight:600;
 }
 
-.version {
-    text-align: center;
-    margin-top: 12px;
-    font-size: 11px;
-    color: #94A3B8;
+/* =========================================================
+SECTION
+========================================================= */
+
+.section-wrapper{
+    padding:0 14px;
+    margin-bottom:18px;
 }
+
+.section-title{
+    font-size:13px;
+    font-weight:800;
+
+    color:var(--slate);
+
+    margin-bottom:10px;
+    padding-left:4px;
+
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+}
+
+.section-card{
+    background:#fff;
+
+    border-radius:28px;
+
+    border:1px solid var(--border);
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+}
+
+/* =========================================================
+MENU
+========================================================= */
+
+.menu-item{
+    display:flex;
+    align-items:center;
+
+    padding:18px;
+
+    text-decoration:none;
+
+    color:var(--navy);
+
+    border-bottom:1px solid #F8FAFC;
+}
+
+.menu-item:last-child{
+    border-bottom:none;
+}
+
+.menu-icon{
+    width:46px;
+    height:46px;
+
+    border-radius:16px;
+
+    background:#F8FAFC;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-right:14px;
+
+    font-size:18px;
+
+    flex-shrink:0;
+}
+
+.menu-content{
+    flex:1;
+}
+
+.menu-label{
+    font-size:14px;
+    font-weight:700;
+}
+
+.menu-subtitle{
+    font-size:12px;
+    color:var(--slate);
+    margin-top:2px;
+}
+
+.menu-arrow{
+    color:#CBD5E1;
+}
+
+/* =========================================================
+LOGOUT
+========================================================= */
+
+.logout-wrapper{
+    padding:0 14px 30px;
+}
+
+.btn-logout{
+    width:100%;
+    min-height:58px;
+
+    border:none;
+
+    border-radius:24px;
+
+    background:#FFF1F2;
+
+    border:1px solid #FECACA;
+
+    color:var(--danger);
+
+    font-weight:800;
+}
+
+.version{
+    text-align:center;
+    margin-top:14px;
+
+    font-size:11px;
+    color:#94A3B8;
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media(max-width:640px){
+
+    .stats-grid{
+        grid-template-columns:1fr;
+    }
+}
+
 </style>
+
 {% endblock %}
 
 {% block content %}
 
-<header class="top-nav">
-    <a href="javascript:history.back()" class="back-btn">
-        <i class="bi bi-chevron-left"></i>
-    </a>
-    <h2 class="ms-3 mb-0 fw-bold">Account</h2>
-</header>
+<div class="profile-page">
 
-<section class="profile">
-    <div class="avatar">
-        {% if user.profile.avatar %}
-            <img src="{{ user.profile.avatar.url }}" alt="avatar">
-        {% else %}
-            {{ user.username|slice:":1"|upper }}
-        {% endif %}
-    </div>
+    <!-- NAV -->
 
-    <h1>{{ user.username }}</h1>
-    <p>{{ user.email }}</p>
-</section>
+    <header class="top-nav">
 
-<section class="stats">
-    <div class="stat">
-        <i class="bi bi-box-seam"></i>
-        <div>
-            <strong>{{ orders_count|default:"0" }}</strong>
-            <small>Orders</small>
+        <div class="top-nav-inner">
+
+            <a
+                href="javascript:history.back()"
+                class="back-btn"
+            >
+                <i class="bi bi-chevron-left"></i>
+            </a>
+
+            <h1 class="nav-title">
+                Account
+            </h1>
+
         </div>
-    </div>
 
-    <div class="stat">
-        <i class="bi bi-geo-alt"></i>
-        <div>
-            <strong>{{ address_count|default:"0" }}</strong>
-            <small>Addresses</small>
+    </header>
+
+    <!-- HERO -->
+
+    <section class="profile-hero">
+
+        <div class="hero-content">
+
+            <div class="avatar">
+
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}">
+                {% else %}
+                    {{ user.username|slice:":1"|upper }}
+                {% endif %}
+
+            </div>
+
+            <div class="profile-name">
+                {{ user.username }}
+            </div>
+
+            {% if user.email %}
+            <div class="profile-email">
+                {{ user.email }}
+            </div>
+            {% endif %}
+
+            {% if profile.phone_number %}
+            <div class="profile-phone">
+                {{ profile.phone_number }}
+            </div>
+            {% endif %}
+
+            <div class="location-chip">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+                {% if default_address %}
+                    Delivering to {{ default_address.city }}
+                {% else %}
+                    Delivery location not set
+                {% endif %}
+
+            </div>
+
         </div>
-    </div>
 
-    <div class="stat">
-        <i class="bi bi-lightning-charge"></i>
-        <div>
-            <strong>Pro</strong>
-            <small>Status</small>
+    </section>
+
+    <!-- STATS -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-bag-check"></i>
+            </div>
+
+            <div class="stat-value">
+                {{ orders_count|default:"0" }}
+            </div>
+
+            <div class="stat-label">
+                Orders
+            </div>
+
         </div>
-    </div>
-</section>
 
-<section class="section">
-    <a href="{% url 'manage_profile' %}" class="menu-item">
-        <div class="icon"><i class="bi bi-person-circle"></i></div>
-        <div class="label">Personal Information</div>
-        <i class="bi bi-chevron-right arrow"></i>
-    </a>
+        <div class="stat-card">
 
-    <a href="{% url 'address_list' %}" class="menu-item">
-        <div class="icon"><i class="bi bi-geo-fill"></i></div>
-        <div class="label">Saved Addresses</div>
-        <i class="bi bi-chevron-right arrow"></i>
-    </a>
+            <div class="stat-icon">
+                <i class="bi bi-heart"></i>
+            </div>
 
-    <a href="{% url 'orders_list' %}" class="menu-item">
-        <div class="icon"><i class="bi bi-receipt"></i></div>
-        <div class="label">My Orders</div>
-        <i class="bi bi-chevron-right arrow"></i>
-    </a>
+            <div class="stat-value">
+                {{ wishlist_count|default:"0" }}
+            </div>
 
-    <a href="{% url 'wishlist_view' %}" class="menu-item">
-        <div class="icon"><i class="bi bi-heart-fill"></i></div>
-        <div class="label">Wishlist</div>
-        <i class="bi bi-chevron-right arrow"></i>
-    </a>
-</section>
+            <div class="stat-label">
+                Wishlist
+            </div>
 
-<section class="section">
-    <a href="{% url 'password_reset' %}" class="menu-item">
-        <div class="icon"><i class="bi bi-shield-lock"></i></div>
-        <div class="label">Security Settings</div>
-        <i class="bi bi-chevron-right arrow"></i>
-    </a>
-</section>
+        </div>
 
-<section class="logout">
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button class="btn-logout">
-            <i class="bi bi-power"></i> Logout
-        </button>
-    </form>
+        <div class="stat-card">
 
-    <div class="version">
-        Version 2.0.4 (Stable)
-    </div>
-</section>
+            <div class="stat-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+
+            <div class="stat-value">
+                {{ address_count|default:"0" }}
+            </div>
+
+            <div class="stat-label">
+                Addresses
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ACCOUNT -->
+
+    <section class="section-wrapper">
+
+        <div class="section-title">
+            Account
+        </div>
+
+        <div class="section-card">
+
+            <a href="{% url 'manage_profile' %}" class="menu-item">
+
+                <div class="menu-icon">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+
+                <div class="menu-content">
+
+                    <div class="menu-label">
+                        Personal Information
+                    </div>
+
+                    <div class="menu-subtitle">
+                        Manage your profile
+                    </div>
+
+                </div>
+
+                <i class="bi bi-chevron-right menu-arrow"></i>
+
+            </a>
+
+            <a href="{% url 'address_list' %}" class="menu-item">
+
+                <div class="menu-icon">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+
+                <div class="menu-content">
+
+                    <div class="menu-label">
+                        Saved Addresses
+                    </div>
+
+                    <div class="menu-subtitle">
+                        Manage delivery locations
+                    </div>
+
+                </div>
+
+                <i class="bi bi-chevron-right menu-arrow"></i>
+
+            </a>
+
+            <a href="{% url 'wishlist_view' %}" class="menu-item">
+
+                <div class="menu-icon">
+                    <i class="bi bi-heart-fill"></i>
+                </div>
+
+                <div class="menu-content">
+
+                    <div class="menu-label">
+                        Wishlist
+                    </div>
+
+                    <div class="menu-subtitle">
+                        Saved products
+                    </div>
+
+                </div>
+
+                <i class="bi bi-chevron-right menu-arrow"></i>
+
+            </a>
+
+            <a href="{% url 'orders_list' %}" class="menu-item">
+
+                <div class="menu-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <div class="menu-content">
+
+                    <div class="menu-label">
+                        My Orders
+                    </div>
+
+                    <div class="menu-subtitle">
+                        Track and manage orders
+                    </div>
+
+                </div>
+
+                <i class="bi bi-chevron-right menu-arrow"></i>
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- SECURITY -->
+
+    <section class="section-wrapper">
+
+        <div class="section-title">
+            Security
+        </div>
+
+        <div class="section-card">
+
+            <a href="{% url 'password_reset' %}" class="menu-item">
+
+                <div class="menu-icon">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+
+                <div class="menu-content">
+
+                    <div class="menu-label">
+                        Security Settings
+                    </div>
+
+                    <div class="menu-subtitle">
+                        Password and account security
+                    </div>
+
+                </div>
+
+                <i class="bi bi-chevron-right menu-arrow"></i>
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- LOGOUT -->
+
+    <section class="logout-wrapper">
+
+        <form
+            method="POST"
+            action="{% url 'logout' %}"
+        >
+
+            {% csrf_token %}
+
+            <button class="btn-logout">
+
+                <i class="bi bi-power"></i>
+                Logout
+
+            </button>
+
+        </form>
+
+        <div class="version">
+            GramaCart v2.0
+        </div>
+
+    </section>
+
+</div>
 
 {% endblock %}

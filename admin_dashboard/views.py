@@ -6,77 +6,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from delivery_portal.models import Delivery, DeliveryProfile
 # -------------- DASHBOARD -----------------------
-"""
-from django.contrib.auth.models import User
-from django.utils import timezone
-from django.db.models import Count, Sum, Q
-from shop.models import Order, Product 
-from payments.models import Payment
-from admin_dashboard.models import CompanyInfo
-from delivery_portal.models import Delivery, DeliveryProfile
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
-@login_required
-def dashboard(request):
-    today = timezone.now().date()
-
-    # 1. Company & User Context
-    company_info = CompanyInfo.objects.first()
-    
-    # 2. Orders Stats
-    orders = Order.objects.all()
-    # Note: Using your status choices from the choice list
-    pending_orders = orders.filter(status='pending').count()
-    completed_orders = orders.filter(status='delivered').count()
-    
-    # 3. Live Village Logistics (FIXED: Using placed_at instead of created_at)
-    active_orders = Order.objects.filter(
-        status__in=['pending', 'processing', 'shipped']
-    ).select_related('user', 'address').order_by('-placed_at')[:10] 
-
-    # 4. Inventory Intelligence
-    all_products = Product.objects.all()
-    total_products = all_products.count()
-    # Assuming Product has a stock field; adjust 'stock' to your actual field name if needed
-    low_stock_count = all_products.filter(stock_available__lte=5, stock_available__gt=0).count()
-    out_of_stock_count = all_products.filter(stock_available=0).count()
-
-    # 5. Financial Core (FIXED: Check your Payment model field for date)
-    total_revenue = Payment.objects.filter(status='success').aggregate(total=Sum('amount'))['total'] or 0
-    
-    # Assuming Payment has 'created_at'. If it crashes there, check the Payment model fields!
-    revenue_today = Payment.objects.filter(
-        status='success', 
-        created_at__date=today # Change to timestamp__date if Payment uses timestamp
-    ).aggregate(total=Sum('amount'))['total'] or 0
-
-    # 6. Delivery Fleet Status
-    delivery_profiles = DeliveryProfile.objects.select_related('user', 'hub')
-    active_riders = delivery_profiles.filter(is_active=True).count()
-    
-    # 7. Customer Intelligence
-    total_customers = User.objects.exclude(is_staff=True).count()
-    new_customers_today = User.objects.filter(date_joined__date=today).count()
-
-    context = {
-        'company_info': company_info,
-        'last_login': request.user.last_login,
-        'pending_orders': pending_orders,
-        'completed_orders': completed_orders,
-        'low_stock_count': low_stock_count,
-        'active_riders': active_riders,
-        'active_orders': active_orders,
-        'total_products': total_products,
-        'out_of_stock_count': out_of_stock_count,
-        'total_revenue': total_revenue,
-        'revenue_today': revenue_today,
-        'total_customers': total_customers,
-        'new_customers_today': new_customers_today,
-    }
-
-    return render(request, 'admin_dashboard/dashboard.html', context)
-"""
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
@@ -1000,38 +930,7 @@ def delete_shipping_cost(request, id):
 
 
 #=====================================
-"""
-from .utils import haversine
-from .utils import haversine
 
-def is_delivery_available(customer_lat, customer_lng):
-    hubs = DeliveryHub.objects.all()
-    for hub in hubs:
-        distance = haversine(
-            float(customer_lat),
-            float(customer_lng),
-            float(hub.latitude),
-            float(hub.longitude)
-        )
-        if distance <= hub.max_delivery_radius_km:
-            return True
-    return False
-
-
-
-def check_pincode_delivery(request):
-    delivery_available = None
-
-    if request.method == 'POST':
-        customer_lat = float(request.POST.get('latitude'))
-        customer_lng = float(request.POST.get('longitude'))
-        delivery_available = is_delivery_available(customer_lat, customer_lng)
-
-    return render(request, 'admin_dashboard/check_delivery.html', {
-        'delivery_available': delivery_available,
-    })
-"""
-#----------------------------------------------------------------
 
 from payments.models import PaymentMethod
 from .forms import PaymentMethodForm
@@ -1082,575 +981,521 @@ def payment_method_delete(request, pk):
     return render(request, 'admin_dashboard/payment_method_confirm_delete.html', {'object': method})
 
 #===============================================================
+import json
 
-from django.utils.timezone import now
-from django.db.models import Q
-from django.http import JsonResponse
-from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.http import require_POST
-import json
-import json
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.timezone import now
+from django.views.decorators.http import require_POST
 from django.db.models import Q, Sum
+from django.utils.timezone import now
 from django.core.paginator import Paginator
+from django.core.cache import cache
 
-# Import your models here
-# from .models import Order, Delivery, DeliveryProfile
+from shop.models import Order
+from delivery_portal.models import DeliveryProfile
+
+from .services.order_service import OrderService, InvoiceService, PDFService
 
 @staff_member_required
 def live_orders_admin(request):
-    """
-    VIEW 1: The UI Skeleton
-    Renders the main dashboard page.
-    """
-    delivery_boys = DeliveryProfile.objects.filter(is_active=True).select_related('user')
+
+    hubs = DeliveryHub.objects.all()
+    delivery_boys = DeliveryProfile.objects.select_related('user').filter(is_active=True)
+
     return render(request, 'admin_dashboard/orders.html', {
+        'hubs':hubs,
         'delivery_boys': delivery_boys
     })
-@staff_member_required
-def admin_order_list_json(request, order_number=None):
-    # 1. SINGLE ORDER DETAIL (Deep Dive)
-    if order_number:
-        order = get_object_or_404(Order.objects.select_related('user', 'address'), order_number=order_number)
-        return JsonResponse({
-            'order_number': order.order_number,
-            'items': [
-                {
-                    'product_name': item.product.name,
-                    'product_size': item.product.size,
-                    'quantity': item.quantity,
-                    'image_url': item.product.product_images.first().image.url if item.product.product_images.exists() else None,
-                    'item_total': float(item.price * item.quantity)
-                } for item in order.items.all()
-            ]
-        })
 
-    # 2. THE OPERATIONAL BUCKETS
-    status_filter = request.GET.get('status', 'live') 
-    search_query = request.GET.get('search', '')
-    page_number = request.GET.get('page', 1)
 
-    # Base Query: Select related/prefetch to avoid N+1 database queries
-    order_list = Order.objects.select_related('user', 'address', 'delivery').prefetch_related('items__product').order_by('-placed_at')
+STATUS_PIPELINE = {
+    "new": ["pending"],
+    "packed": ["packed"],
+    "assigned": ["assigned"],
+    "out_for_delivery": ["out_for_delivery"],
+    "delivered": ["delivered"],
+    "cancelled": ["cancelled", "declined"],
+}
 
-    # --- UPDATED FILTERING LOGIC ---
-    if status_filter == 'live':
-        # STAGE 1: New Customer Orders (Must show 'pending' so Admin can see them first)
-        order_list = order_list.filter(status='pending')
+from django.utils.timezone import localtime
 
-    elif status_filter == 'packed':
-        # STAGE 2: Packed & Ready (The Radar)
-        # Show orders that are packed but don't have a rider assigned yet
-        order_list = order_list.filter(status='packed', delivery__delivery_boy__isnull=True)
-    
-    elif status_filter == 'tracking':
-        # STAGE 3: In Transit
-        order_list = order_list.filter(status='out_for_delivery')
-    
-    elif status_filter == 'history':
-        # STAGE 4: Completed or Dead
-        order_list = order_list.filter(status__in=['delivered', 'cancelled', 'rejected'])
+def serialize_order(order):
 
-    # Search Logic
-    if search_query:
-        order_list = order_list.filter(
-            Q(order_number__icontains=search_query) |
-            Q(user__first_name__icontains=search_query) |
-            Q(address__phone_number__icontains=search_query)
-        )
+    return {
 
-    # Pagination
-    paginator = Paginator(order_list, 12)
-    page_obj = paginator.get_page(page_number)
+        "order_number": order.order_number,
 
-    # Build Response Data
-    data = []
-    for order in page_obj:
-        data.append({
-            'order_number': order.order_number,
-            'customer': order.user.get_full_name() if order.user else 'Guest',
-            'status': order.get_status_display(),
-            'status_code': order.status,
-            'total': float(order.total),
-            'village_cluster': order.address.city if order.address else 'Direct Hub',
-            'address': {
-                'address_line': order.address.address_line if order.address else 'N/A',
-                'landmark': getattr(order.address, 'landmark', 'N/A'),
-                'phone': order.address.phone_number if order.address else 'N/A'
-            },
-            'items': [
-                {
-                    'product_name': i.product.name,
-                    'product_size': i.product.size,
-                    'quantity': i.quantity,
-                    'image_url': i.product.product_images.first().image.url if i.product.product_images.exists() else None
-                } for i in order.items.all()
-            ]
-        })
+        "status": order.status,
 
-    # Top HUD Stats
-    today = now().date()
-    return JsonResponse({
-        'orders': data,
-        'total_pages': paginator.num_pages,
-        'live_count': Order.objects.filter(status='pending').count(),
-        'packed_count': Order.objects.filter(status='packed', delivery__delivery_boy__isnull=True).count(),
-        'tracking_count': Order.objects.filter(status='out_for_delivery').count(),
-        'today_revenue': float(Order.objects.filter(placed_at__date=today, status='delivered').aggregate(s=Sum('total'))['s'] or 0)
-    })
+        "status_label": order.display_status,
+
+        "status_code": order.status,
+
+        # =====================================================
+        # CUSTOMER
+        # =====================================================
+
+        "customer": (
+            order.address.recipient_name
+            if order.address and order.address.recipient_name
+            else (
+                order.user.get_full_name()
+                if order.user else "Guest"
+            )
+        ),
+
+        "phone": (
+            order.address.phone_number
+            if order.address else None
+        ),
+        "address": (
+            order.address.full_address
+            if order.address else ""
+        ),
+        # =====================================================
+        # HUB
+        # =====================================================
+
+        "hub": (
+            order.hub.name
+            if order.hub else "N/A"
+        ),
+
+        # =====================================================
+        # ORDER TOTALS
+        # =====================================================
+
+        "subtotal": float(order.subtotal),
+
+        "tax": float(order.tax),
+
+        "shipping_cost": float(order.shipping_cost),
+
+        "total": float(order.total),
+
+        # =====================================================
+        # ETA + LIVE TRACKING
+        # =====================================================
+
+        "eta_minutes": order.estimated_eta_minutes,
+
+        "eta_text": order.estimated_delivery_text,
+
+        "distance_km": float(
+            order.estimated_distance_km or 0
+        ),
+
+        "current_lat": (
+            float(order.current_lat)
+            if order.current_lat else None
+        ),
+
+        "current_lng": (
+            float(order.current_lng)
+            if order.current_lng else None
+        ),
+
+        "can_track": order.can_track,
+
+        "show_otp": order.show_otp,
+
+        "delivery_token": (
+            order.delivery_token
+            if order.show_otp else None
+        ),
+
+        # =====================================================
+        # TIMESTAMPS
+        # =====================================================
+
+        "created_at": localtime(
+            order.placed_at
+        ).strftime("%d %b %Y • %I:%M %p"),
+
+        "updated_at": localtime(
+            order.updated_at
+        ).strftime("%d %b %Y • %I:%M %p"),
+
+        # =====================================================
+        # ITEMS
+        # =====================================================
+
+        "items": [
+
+            {
+
+                "product_name": i.product.name,
+
+                "variant_name": i.variant_name,
+
+                "quantity": i.quantity,
+
+                "price": float(i.price),
+
+                "total": float(i.get_total),
+
+                "image_url": (
+
+                    i.product.product_images.first().image.url
+
+                    if (
+                        hasattr(i.product, "product_images")
+                        and i.product.product_images.exists()
+                    )
+
+                    else None
+                )
+
+            }
+
+            for i in order.items.all()
+        ]
+    }
 
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
-from shop.models import Order
-"""
-@staff_member_required
-def mark_order_as_packed(request, order_number):
-    if request.method == 'POST':
-        # 1. Get the order or return 404
-        order = get_object_or_404(Order, order_number=order_number)
-        
-        # 2. Update the status
-        order.status = 'packed'
-        order.save()
-        
-        # 3. Return success to the JavaScript
-        return JsonResponse({
-            'success': True, 
-            'message': f'Order {order_number} marked as packed.'
-        })
-    
-    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
-
-"""
-from decimal import Decimal
-from django.db import transaction
-from .utils import haversine  # We need this to find which slab to use
+from django.db.models import Q, Sum
+from django.core.paginator import Paginator
+from django.utils.timezone import now
+from datetime import timedelta
 
 @staff_member_required
-def mark_order_as_packed(request, order_number):
-    if request.method == 'POST':
-        order = get_object_or_404(Order, order_number=order_number)
-        
-        with transaction.atomic():
-            order.status = 'PACKED'
-            order.save()
-            
-            delivery, created = Delivery.objects.get_or_create(order=order)
-            delivery.status = DeliveryStatus.PACKED
-            
-            if order.address:
-                from admin_dashboard.models import DeliveryHub, ShippingCost
-                
-                # 1. STRONGER HUB SEARCH
-                # Clean the city name to remove accidental spaces
-                clean_city = order.address.city.strip()
-                hub = DeliveryHub.objects.filter(name__icontains=clean_city).first()
-                
-                # FALLBACK: If city name doesn't match, grab the first active hub
-                # This ensures the order IS NOT NULL so it shows up on the radar
-                if not hub:
-                    hub = DeliveryHub.objects.filter(is_active=True).first()
+def admin_order_list_json(request, order_number=None):
 
-                if hub:
-                    delivery.nearest_hub = hub
-                    
-                    # 2. GET DISTANCE
-                    dist = haversine(hub.latitude, hub.longitude, 
-                                     order.address.latitude, order.address.longitude)
-                    delivery.distance_km = Decimal(str(round(dist, 2)))
+    # =====================================================
+    # BASE QUERYSET
+    # =====================================================
+    qs = Order.objects.select_related(
+        "user",
+        "address",
+        "hub"
+    ).prefetch_related(
+        "items__product__product_images"
+    )
 
-                    # 3. DYNAMIC PRICING FROM ADMIN TABLE
-                    # Find the exact slab the admin set for this hub and distance
-                    pricing_tier = ShippingCost.objects.filter(
-                        delivery_hub=hub,
-                        min_distance_km__lte=dist,
-                        max_distance_km__gte=dist
-                    ).first()
+    # =====================================================
+    # TIME FILTER ENGINE (SCALABLE)
+    # =====================================================
+    from django.utils import timezone
+    from datetime import timedelta
 
-                    if pricing_tier:
-                        delivery.rider_earning = pricing_tier.rider_earning
-                    else:
-                        # If admin forgot to add a slab, we use 0 or a base rate 
-                        # so the order is still visible
-                        delivery.rider_earning = 0 
+    def apply_time_filter(qs, time_filter):
 
-            delivery.save()
-        
-        return JsonResponse({'success': True})
-    
-from django.db import transaction
-from django.utils import timezone
-from decimal import Decimal
-import json
-from delivery_portal.models import DeliveryStatus
+        time_filter = (time_filter or "").lower()
+        now_utc = timezone.now()
+
+        if time_filter in ["day", "today"]:
+            start = timezone.make_aware(
+                timezone.datetime.combine(
+                    timezone.localdate(),
+                    timezone.datetime.min.time()
+                )
+            )
+            end = timezone.make_aware(
+                timezone.datetime.combine(
+                    timezone.localdate(),
+                    timezone.datetime.max.time()
+                )
+            )
+            return qs.filter(placed_at__range=(start, end))
+
+        elif time_filter == "week":
+            start = now_utc - timedelta(days=7)
+            return qs.filter(placed_at__gte=start)
+
+        elif time_filter == "month":
+            start = now_utc - timedelta(days=30)
+            return qs.filter(placed_at__gte=start)
+
+        return qs
+
+    time_filter = request.GET.get("time", "day")
+    qs = apply_time_filter(qs, time_filter)
+
+    # =====================================================
+    # SINGLE ORDER VIEW
+    # =====================================================
+    if order_number:
+        order = get_object_or_404(qs, order_number=order_number)
+        return JsonResponse(serialize_order(order))
+
+    # =====================================================
+    # FILTER PARAMETERS
+    # =====================================================
+    status_key = request.GET.get("status", "new")
+    search = request.GET.get("search", "").strip()
+    hub_id = request.GET.get("hub_id")
+
+    # =====================================================
+    # HUB FILTER (MULTI-TENANT READY)
+    # =====================================================
+    if hub_id:
+        qs = qs.filter(hub_id=hub_id)
+
+    # =====================================================
+    # STATUS PIPELINE FILTER
+    # =====================================================
+    if status_key in STATUS_PIPELINE:
+        qs = qs.filter(status__in=STATUS_PIPELINE[status_key])
+    else:
+        qs = qs.filter(status="pending")
+
+    # =====================================================
+    # SEARCH FILTER (SCALABLE EXTENSION POINT)
+    # =====================================================
+    if search:
+        qs = qs.filter(
+            Q(order_number__icontains=search) |
+            Q(user__first_name__icontains=search) |
+            Q(address__phone_number__icontains=search)
+        )
+
+    # =====================================================
+    # ORDERING (IMPORTANT FOR CONSISTENCY)
+    # =====================================================
+    qs = qs.order_by("-placed_at")
+
+    # =====================================================
+    # PAGINATION (PRODUCTION SAFE)
+    # =====================================================
+    page_number = int(request.GET.get("page", 1))
+    page_size = int(request.GET.get("page_size", 10))
+
+    paginator = Paginator(qs, page_size)
+    page_obj = paginator.get_page(page_number)
+
+    # =====================================================
+    # SERIALIZATION
+    # =====================================================
+    orders = [serialize_order(o) for o in page_obj.object_list]
+
+    # =====================================================
+    # METRICS BASE QUERY (REUSES SAME FILTER LOGIC)
+    # =====================================================
+    metrics_qs = Order.objects
+
+    # apply same hub filter
+    if hub_id:
+        metrics_qs = metrics_qs.filter(hub_id=hub_id)
+
+    # apply same time filter
+    metrics_qs = apply_time_filter(metrics_qs, time_filter)
+
+    def count_status(status_list):
+        return metrics_qs.filter(status__in=status_list).count()
+
+    # revenue
+    revenue = metrics_qs.filter(status="delivered").aggregate(
+        total=Sum("total")
+    )["total"] or 0
+
+    # =====================================================
+    # RESPONSE
+    # =====================================================
+    return JsonResponse({
+        "orders": orders,
+
+        "pagination": {
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_orders": paginator.count,
+            "has_next": page_obj.has_next(),
+            "has_previous": page_obj.has_previous(),
+        },
+
+        "metrics": {
+            "new_orders": count_status(STATUS_PIPELINE["new"]),
+            "packed_orders": count_status(STATUS_PIPELINE["packed"]),
+            "assigned_orders": count_status(STATUS_PIPELINE["assigned"]),
+            "out_orders": count_status(STATUS_PIPELINE["out_for_delivery"]),
+            "delivered_orders": count_status(STATUS_PIPELINE["delivered"]),
+            "cancelled_orders": count_status(STATUS_PIPELINE["cancelled"]),
+        },
+
+        "today_revenue": float(revenue)
+    })
+
+
+@staff_member_required
 @require_POST
+def mark_order_as_packed(request, order_number):
+
+    order = get_object_or_404(
+        Order,
+        order_number=order_number
+    )
+
+    # ==========================================
+    # ORDER STATUS
+    # ==========================================
+
+    order.status = "packed"
+
+    order.save(
+        update_fields=[
+            "status",
+            "updated_at"
+        ]
+    )
+
+    # ==========================================
+    # DELIVERY PREPARATION
+    # ==========================================
+
+    from delivery_portal.models import Delivery
+    from delivery_portal.utils import prepare_delivery_for_radar
+
+    delivery, created = Delivery.objects.get_or_create(
+        order=order
+    )
+
+    success = prepare_delivery_for_radar(
+        delivery.id
+    )
+
+    if not success:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Delivery radar preparation failed"
+        }, status=400)
+
+    return JsonResponse({
+        "success": True,
+        "message": "Order packed successfully"
+    })
+
+
+
+from shop.utils import get_route_data
 @staff_member_required
-def update_order_status_ajax(request):
+@require_POST
+def assign_rider_ajax(request):
+
+    data = json.loads(request.body or "{}")
+
+    order = get_object_or_404(
+        Order,
+        order_number=data["order_number"]
+    )
+
+    profile = get_object_or_404(
+        DeliveryProfile,
+        id=data["delivery_boy_id"]
+    )
+
+    delivery = OrderService.assign_rider(
+        order,
+        profile
+    )
+
+    # =====================================================
+    # ETA CALCULATION
+    # =====================================================
+
+    route_data = None
+
     try:
-        data = json.loads(request.body)
-        order_num = data.get('order_number')
-        rider_id = data.get('delivery_boy_id')
 
-        # 1. Fetch the Order 
-        # (This order already has the 'shipping_cost' set by the Admin)
-        order = get_object_or_404(Order, order_number=order_num)
+        # HUB LOCATION
+        start_lat = order.hub.latitude
+        start_lng = order.hub.longitude
 
-        with transaction.atomic():
-            if rider_id:
-                # 2. Identify the Rider and their Hub
-                profile = get_object_or_404(DeliveryProfile, id=rider_id)
-                hub = profile.hub
-                
-                # 3. Get or Create the Delivery record
-                delivery, created = Delivery.objects.get_or_create(order=order)
-                
-                # 4. LOOKUP THE ADMIN'S PRICING TIER
-                # We find the tier in this Hub where the 'cost' matches the 
-                # 'shipping_cost' the Admin assigned to the order.
-                pricing_tier = ShippingCost.objects.filter(
-                    delivery_hub=hub,
-                    cost=order.shipping_cost
-                ).first()
+        # CUSTOMER LOCATION
+        end_lat = order.address.latitude
+        end_lng = order.address.longitude
 
-                # 5. Update Delivery Logistics
-                delivery.delivery_boy = profile.user
-                delivery.status = DeliveryStatus.ASSIGNED
-                delivery.assigned_at = timezone.now()
-                delivery.nearest_hub = hub
-                
-                # 6. SET DYNAMIC FINANCIALS FROM THE TIER
-                if pricing_tier:
-                    # This ensures the rider earns exactly what the Admin defined for this cost bracket
-                    delivery.rider_earning = pricing_tier.rider_earning
-                    # Optional: Store the distance range for the rider's info
-                    delivery.distance_km = Decimal(str(pricing_tier.max_distance_km)) 
-                else:
-                    # Fallback: if no tier matches exactly, use a percentage
-                    delivery.rider_earning = order.shipping_cost * Decimal('0.70')
+        route_data = get_route_data(
+            start_lat=start_lat,
+            start_lng=start_lng,
+            end_lat=end_lat,
+            end_lng=end_lng
+        )
 
-                delivery.save()
-                
-                # 7. Finalize Order Status
-                order.status = 'out_for_delivery'
-                order.save()
+    except Exception:
+        pass
 
-        return JsonResponse({
-            'success': True, 
-            'message': f'Assigned to {profile.user.username}. Rider Earning: ₹{delivery.rider_earning}'
-        })
+    # =====================================================
+    # UPDATE ORDER
+    # =====================================================
 
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
-    
-@require_POST
+    order.status = "assigned"
+
+    if route_data:
+
+        order.estimated_distance_km = route_data["distance_km"]
+
+        order.estimated_eta_minutes = route_data["eta_minutes"]
+
+    order.save(update_fields=[
+        "status",
+        "estimated_distance_km",
+        "estimated_eta_minutes",
+        "updated_at"
+    ])
+
+    return JsonResponse({
+        "success": True,
+        "earning": float(delivery.rider_earning),
+        "eta_minutes": order.estimated_eta_minutes,
+        "distance_km": float(order.estimated_distance_km or 0)
+    })
+
+"""
 @staff_member_required
+@require_POST
+def assign_rider_ajax(request):
+
+    data = json.loads(request.body or "{}")
+
+    order = get_object_or_404(Order, order_number=data["order_number"])
+    profile = get_object_or_404(DeliveryProfile, id=data["delivery_boy_id"])
+
+    delivery = OrderService.assign_rider(order, profile)
+
+    order.status = "assigned"
+    order.save(update_fields=["status", "updated_at"])
+
+    return JsonResponse({
+        "success": True,
+        "earning": float(delivery.rider_earning)
+    })
+""" 
+@staff_member_required
+@require_POST
 def reject_order_ajax(request):
-    """
-    VIEW 4: The Cancellation Handler
-    Safely cancels orders with a reason.
-    """
-    try:
-        data = json.loads(request.body)
-        order_num = data.get('order_number')
-        reason = data.get('reason', 'Out of Stock')
 
-        order = get_object_or_404(Order, order_number=order_num)
-        order.status = 'cancelled'
-        order.rejection_reason = reason # Make sure this field exists in your Order model
-        order.save()
+    data = json.loads(request.body or "{}")
 
-        return JsonResponse({'success': True})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
-    
+    order = get_object_or_404(Order, order_number=data.get("order_number"))
+
+    order.status = "declined"
+    order.rejection_reason = data.get("reason", "No reason provided")
+    order.save(update_fields=["status", "rejection_reason", "updated_at"])
+
+    return JsonResponse({"success": True})
+
+from .services.order_service import InvoiceService,PDFService
+from django.http import FileResponse
+
 @staff_member_required
 def order_print_view(request, order_number):
-    """Renders printable slip."""
-    order = get_object_or_404(Order.objects.select_related('address', 'user'), order_number=order_number)
-    return render(request, 'admin_dashboard/order_print.html', {'order': order})
 
-import io
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.units import inch
+    order = get_object_or_404(Order, order_number=order_number)
+
+    context = InvoiceService.get_invoice_data(order)
+
+    return render(request, "admin_dashboard/order_print.html", context)
 
 def generate_invoice_pdf(request, order_id):
+
     order = get_object_or_404(Order, id=order_id)
-    
-    # Create a file-like buffer to receive PDF data
-    buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
 
-    # --- Header & Branding ---
-    p.setFont("Helvetica-Bold", 24)
-    p.setFillColor(colors.hexColor("#00b359")) # GramaCart Green
-    p.drawString(1*inch, height - 1*inch, "GramaCart")
-    
-    p.setFont("Helvetica", 10)
-    p.setFillColor(colors.black)
-    p.drawString(1*inch, height - 1.25*inch, "All essentials one cart.")
+    pdf = PDFService.generate_invoice_pdf(order)
 
-    # --- Invoice Info ---
-    p.setFont("Helvetica-Bold", 12)
-    p.drawRightString(width - 1*inch, height - 1*inch, f"INVOICE: #{order.order_number}")
-    p.setFont("Helvetica", 10)
-    p.drawRightString(width - 1*inch, height - 1.2*inch, f"Date: {order.created_at.strftime('%d %b %Y')}")
+    return FileResponse(pdf, filename=f"{order.order_number}.pdf")
 
-    # --- Bill To Section ---
-    p.line(1*inch, height - 1.6*inch, width - 1*inch, height - 1.6*inch)
-    p.setFont("Helvetica-Bold", 11)
-    p.drawString(1*inch, height - 1.9*inch, "DELIVERY TO:")
-    p.setFont("Helvetica", 10)
-    p.drawString(1*inch, height - 2.1*inch, f"{order.address.full_name}")
-    p.drawString(1*inch, height - 2.25*inch, f"{order.address.address_line_1}")
-    p.drawString(1*inch, height - 2.4*inch, f"{order.address.city}, {order.address.state} - {order.address.pincode}")
-
-    # --- Table Header ---
-    y = height - 3.2*inch
-    p.setFillColor(colors.hexColor("#f8fafc"))
-    p.rect(1*inch, y - 5, width - 2*inch, 20, fill=1, stroke=0)
-    p.setFillColor(colors.black)
-    p.setFont("Helvetica-Bold", 10)
-    p.drawString(1.1*inch, y, "Item Description")
-    p.drawString(3.5*inch, y, "Qty")
-    p.drawString(4.2*inch, y, "Price")
-    p.drawRightString(width - 1.1*inch, y, "Total")
-
-    # --- Items ---
-    y -= 25
-    p.setFont("Helvetica", 10)
-    for item in order.orderitem_set.all():
-        p.drawString(1.1*inch, y, f"{item.product.name[:35]}")
-        p.drawString(3.5*inch, y, f"{item.quantity}")
-        p.drawString(4.2*inch, y, f"Rs.{item.price}")
-        p.drawRightString(width - 1.1*inch, y, f"Rs.{item.get_total()}")
-        y -= 20
-        if y < 1*inch: # Simple page break check
-            p.showPage()
-            y = height - 1*inch
-
-    # --- Summary ---
-    y -= 20
-    p.line(4*inch, y, width - 1*inch, y)
-    y -= 20
-    p.drawString(4.2*inch, y, "Subtotal:")
-    p.drawRightString(width - 1.1*inch, y, f"Rs.{order.subtotal}")
-    y -= 15
-    p.drawString(4.2*inch, y, "Delivery:")
-    p.drawRightString(width - 1.1*inch, y, f"Rs.{order.shipping_cost}")
-    y -= 25
-    p.setFont("Helvetica-Bold", 12)
-    p.setFillColor(colors.hexColor("#00b359"))
-    p.drawString(4.2*inch, y, "Total Paid:")
-    p.drawRightString(width - 1.1*inch, y, f"Rs.{order.total}")
-
-    # --- Footer ---
-    p.setFont("Helvetica-Oblique", 8)
-    p.setFillColor(colors.gray)
-    p.drawCentredString(width/2, 0.5*inch, "Thank you for shopping with GramaCart - Empowering Rural Delivery.")
-
-    p.showPage()
-    p.save()
-
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename=f"GramaCart_Invoice_{order.order_number}.pdf")
-    
-
-# from django.shortcuts import render
-# from django.core.paginator import Paginator
-# from django.db.models import Q, Sum, F, DecimalField
-# from django.db.models.functions import Coalesce
-
-# from inventory.models import Inventory
-# from admin_dashboard.models import Category
-# from .forms import StockLogForm
-
-
-# def live_inventory(request):
-
-#     query = request.GET.get('q', '').strip()
-#     category_id = request.GET.get('category')
-
-#     # =====================================================
-#     # BASE INVENTORY QUERY
-#     # =====================================================
-
-#     inventories = (
-#         Inventory.objects
-#         .select_related(
-#             'variant',
-#             'variant__product',
-#             'shop'
-#         )
-#         .order_by('-updated_at')
-#     )
-
-#     # =====================================================
-#     # SEARCH
-#     # =====================================================
-
-#     if query:
-#         inventories = inventories.filter(
-#             Q(variant__product__name__icontains=query) |
-#             Q(variant__product__description__icontains=query) |
-#             Q(shop__name__icontains=query) |
-#             Q(variant__unit__icontains=query)
-#         )
-
-#     # =====================================================
-#     # CATEGORY FILTER
-#     # =====================================================
-
-#     if category_id:
-#         inventories = inventories.filter(
-#             variant__product__category_id=category_id
-#         )
-
-#     # =====================================================
-#     # INVENTORY STATS
-#     # =====================================================
-
-#     inventory_stats = inventories.aggregate(
-
-#         total_inventory_value=Coalesce(
-#             Sum(
-#                 F('stock') * F('cost_price'),
-#                 output_field=DecimalField()
-#             ),
-#             0
-#         ),
-
-#         out_of_stock_count=Coalesce(
-#             Sum(
-#                 models.Case(
-#                     models.When(stock__lte=0, then=1),
-#                     default=0,
-#                     output_field=models.IntegerField()
-#                 )
-#             ),
-#             0
-#         ),
-
-#         low_stock_count=Coalesce(
-#             Sum(
-#                 models.Case(
-#                     models.When(
-#                         stock__gt=0,
-#                         stock__lte=F('min_stock_level'),
-#                         then=1
-#                     ),
-#                     default=0,
-#                     output_field=models.IntegerField()
-#                 )
-#             ),
-#             0
-#         )
-#     )
-
-#     # =====================================================
-#     # PAGINATION
-#     # =====================================================
-
-#     paginator = Paginator(inventories, 10)
-
-#     page_number = request.GET.get('page')
-
-#     inventory_page = paginator.get_page(page_number)
-
-#     # =====================================================
-#     # CONTEXT
-#     # =====================================================
-
-#     context = {
-
-#         "inventories": inventory_page,
-
-#         "categories": Category.objects.all(),
-
-#         "stock_form": StockLogForm(),
-
-#         "query": query,
-#         "selected_category": category_id,
-
-#         # Stats
-#         "total_inventory_value":
-#             inventory_stats['total_inventory_value'],
-
-#         "out_of_stock_count":
-#             inventory_stats['out_of_stock_count'],
-
-#         "low_stock_count":
-#             inventory_stats['low_stock_count'],
-#     }
-
-#     return render(
-#         request,
-#         "Product/live_inventory.html",
-#         context
-#     )
-
-
-from django.db.models import F
-
-def restock_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    
-    if request.method == 'POST':
-        # Create form but we'll handle the logic carefully
-        form = StockLogForm(request.POST)
-        
-        if form.is_valid():
-            try:
-                with transaction.atomic():
-                    # 1. Get the adjustment amount (e.g., -20 for expired milk)
-                    log = form.save(commit=False)
-                    adjustment = log.change_amount 
-                    
-                    # 2. SAFETY CHECK: Don't allow stock to go below zero
-                    # If current is 20 and admin enters -25, set it to 0 instead of -5
-                    current_stock = product.stock_available
-                    if (current_stock + adjustment) < 0:
-                        # Optional: Force it to exactly 0 if they try to subtract too much
-                        adjustment = -current_stock 
-                        log.change_amount = adjustment
-                    
-                    # 3. Save the Log Entry
-                    log.product = product
-                    log.user = request.user # Track WHO made the change
-                    log.save()
-                    
-                    # 4. Update Product Stock using F() expressions for accuracy
-                    product.stock_available = F('stock_available') + adjustment
-                    product.save()
-                    
-                    # 5. Refresh to check if it's now 0 to show correct message
-                    product.refresh_from_db()
-                    status_msg = f"Inventory updated. New balance: {product.stock_available}"
-                    if product.stock_available == 0:
-                        status_msg += " (Product is now Out of Stock)"
-                        
-                    messages.success(request, status_msg)
-                    
-            except Exception as e:
-                messages.error(request, f"System Error: {str(e)}")
-        else:
-            # This is where your "Invalid Data" error was coming from
-            # We show exactly what is wrong (e.g., "Must be greater than 0")
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Form Error ({field}): {error}")
-            
-    return redirect('live_inventory')
-
-
+#===============================
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required

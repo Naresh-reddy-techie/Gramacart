@@ -1,230 +1,306 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#10B981">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
     <title>{% block title %}GramaCart Partner{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --brand-primary: #10b981;
-            --brand-deep: #008F47;
-            --ui-bg: #F8F9FA;
-            --ui-card: #FFFFFF;
-            --ui-text: #1a1a1a;
-            --ui-subtext: #6c757d;
-            --ui-border: #EEEEEE;
-            --header-height: 64px;
-            --dock-height: 75px;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
-        }
+    :root {
+        /* BRAND IDENTITY */
+        --brand-primary: #10B981;
+        --brand-primary-light: rgba(16, 185, 129, 0.1);
+        --brand-primary-dark: #059669;
+        --brand-danger: #EF4444;
+        --brand-warning: #F59E0B;
 
-        body.dark-mode {
-            --ui-bg: #0F172A;
-            --ui-card: #1E293B;
-            --ui-text: #F8FAF8;
-            --ui-subtext: #94A3B8;
-            --ui-border: #334155;
-        }
+        /* PREMIUM LIGHT PALETTE (SaaS Minimalist) */
+        --bg-global: #F4F6F9;          /* Subtle light grey, feels modern */
+        --bg-surface: #FFFFFF;         /* Pure white for structural cards */
+        --bg-surface-secondary: #F8FAFC; 
+        
+        --text-main: #0F172A;          /* Deep Slate Blue (Never pure black) */
+        --text-muted: #64748B;         /* Cool Grey for supporting details */
+        --border-subtle: #E2E8F0;      /* Razor sharp divider lines */
+        
+        /* APP RADIUS SYSTEM */
+        --radius-app-card: 20px;
+        --radius-app-pill: 14px;
+        
+        /* APP ANIMATION GRAPH */
+        --app-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --app-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-speed: 0.22s;
+    }
 
-        body {
-            background-color: var(--ui-bg);
-            color: var(--ui-text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
-            overscroll-behavior-y: contain;
-            transition: background 0.3s ease;
-        }
+    html[data-theme="dark"] {
+        --bg-global: #020617;          /* Sleek black-hole blue */
+        --bg-surface: #0F172A;         /* Slate deep blue-grey */
+        --bg-surface-secondary: #1E293B;
+        
+        --text-main: #F8FAFC;          /* Premium off-white text */
+        --text-muted: #94A3B8;
+        --border-subtle: #1E293B;
+    }
 
-        /* HEADER & BRANDING */
-        .app-header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: calc(var(--header-height) + var(--safe-top));
-            padding-top: var(--safe-top);
-            background: var(--ui-card);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-inline: 20px;
-            border-bottom: 1px solid var(--ui-border);
-            z-index: 1040; /* Lower than modal z-index */
-        }
+    /* GLOBAL APP RESET & NATIVE LOCKS */
+    * {
+        box-sizing: border-box;
+        -webkit-user-select: none; /* Prevents awkward text selection highlights like an app */
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
 
-        .logo-box { display: flex; align-items: center; font-size: 1.1rem; font-weight: 800; }
-        .logo-icon {
-            background: var(--brand-primary); color: white;
-            width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 8px; margin-right: 8px; font-size: 14px;
-        }
+    /* Allow reading/inputs to copy text if needed */
+    input, textarea, p, h1, h2, h3, h4, span {
+        -webkit-user-select: text;
+        user-select: text;
+    }
 
-        .duty-pill {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--ui-bg);
-            padding: 8px 16px;
-            border-radius: 100px;
-            border: 2px solid var(--ui-border);
-            cursor: pointer;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .duty-pill.is-online {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--brand-primary);
-        }
-        .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #cbd5e1;
-            transition: 0.3s;
-        }
-        .is-online .status-dot {
-            background: var(--brand-primary);
-            box-shadow: 0 0 10px var(--brand-primary);
-            animation: pulse 2s infinite;
-        }
+    html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        background-color: #0B0F19; /* Desktop canvas background background */
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow: hidden; /* Prevent native window bounce/rubber-banding */
+    }
 
-        /* NAVIGATION DOCK */
-        .app-dock {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: calc(var(--dock-height) + var(--safe-bottom));
-            padding-bottom: var(--safe-bottom);
-            background: var(--ui-card);
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border-top: 1px solid var(--ui-border);
-            z-index: 1040;
-        }
-        .dock-link {
-            text-decoration: none; color: var(--ui-subtext);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 800;
-            text-transform: uppercase;
-        }
-        .dock-link.active { color: var(--brand-primary); }
-        .dock-link i { font-size: 1.5rem; margin-bottom: 2px; }
+    /* THE APP FRAME SYSTEM (Centers mobile viewport beautifully on big desktop screens) */
+    .app-viewport {
+        width: 100%;
+        height: 100%;
+        max-width: 480px; /* Golden mobile width constraint */
+        margin: 0 auto;
+        background-color: var(--bg-global);
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0 0 50px rgba(0,0,0,0.3);
+        transition: background-color var(--transition-speed) var(--app-smooth);
+    }
 
-        .app-shell {
-            margin-top: calc(var(--header-height) + var(--safe-top));
-            margin-bottom: calc(var(--dock-height) + var(--safe-bottom));
-            padding: 16px;
-            min-height: 100vh;
-        }
+    /* SCROLLABLE CENTRAL HOUSING */
+    .app-scroll-container {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: calc(70px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom)) 16px;
+        -webkit-overflow-scrolling: touch; /* Butter-smooth scrolling momentum on iOS */
+    }
 
-        /* MODAL FIX: Ensure modal is on top of header/dock */
-        .modal { z-index: 1060 !important; }
-        .modal-backdrop { z-index: 1050 !important; }
+    /* Hide standard scrollbars for visual clarity */
+    .app-scroll-container::-webkit-scrollbar {
+        width: 0px; height: 0px;
+    }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+    /* CRITICAL VULNERABILITY FIX: ANTI-COLOR OVERRIDE FOR CARDS */
+    .card, .bg-card-premium {
+        background-color: var(--bg-surface) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: var(--radius-app-card) !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03) !important;
+        padding: 16px;
+        transition: background-color var(--transition-speed) var(--app-smooth);
+    }
 
-        {% block extra_css %}{% endblock %}
+    /* Utility text overrides to prevent white text leaks */
+    .text-premium-main { color: var(--text-main) !important; }
+    .text-premium-muted { color: var(--text-muted) !important; }
+
+    /* NATIVE BUTTON INTERACTION FEEL */
+    .btn-premium-action {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+        color: #FFFFFF !important;
+        font-weight: 700; font-size: 14px;
+        padding: 14px 20px; border-radius: var(--radius-app-pill);
+        border: none; width: 100%;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+        transition: transform 0.1s ease, opacity 0.2s ease;
+    }
+
+    .btn-premium-action:active {
+        transform: scale(0.96); /* Micro-interaction scale down on tap */
+        opacity: 0.9;
+    }
+
+    /* APP TRANSLUCENT HEADER BAR */
+    .app-top-nav {
+        position: absolute; top: 0; left: 0; right: 0;
+        height: calc(70px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-subtle);
+        z-index: 1000;
+        display: flex; align-items: center; justify-content: space-between;
+        padding-inline: 20px;
+    }
+
+    html[data-theme="dark"] .app-top-nav {
+        background: rgba(15, 23, 42, 0.85);
+    }
+
+    .brand-logo-badge {
+        width: 38px; height: 38px; border-radius: 10px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+        display: flex; align-items: center; justify-content: center;
+        color: #FFFFFF; font-weight: 800; font-size: 16px;
+    }
+
+    /* NATIVE APP DOCK (FIXED AT BOTTOM) */
+    .app-bottom-dock {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: calc(76px + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border-subtle);
+        z-index: 1000;
+        display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dock-tab {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: var(--text-muted); text-decoration: none !important;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+        gap: 3px; position: relative;
+        transition: color var(--transition-speed) var(--app-smooth);
+    }
+
+    .dock-tab.active {
+        color: var(--brand-primary);
+    }
+
+    .dock-tab i { font-size: 22px; }
+
+    /* ACTIVE TAB GLOW TICK */
+    .dock-tab.active::after {
+        content: ''; position: absolute; top: 0; width: 24px; height: 3px;
+        background: var(--brand-primary); border-radius: 0 0 4px 4px;
+    }
+
+    /* INTERNET MONITOR BANNER */
+    .network-alert-banner {
+        position: absolute;
+        top: calc(70px + env(safe-area-inset-top)); left: 16px; right: 16px;
+        background-color: var(--brand-danger); color: #FFFFFF;
+        text-align: center; border-radius: 12px; padding: 8px;
+        font-size: 12px; font-weight: 700; z-index: 999;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        display: none; transform: translateY(-10px); animation: slideIn 0.3s var(--app-bounce) forwards;
+    }
+
+    @keyframes slideIn { to { transform: translateY(0); } }
+
+    {% block extra_css %}{% endblock %}
     </style>
 </head>
-<body class="{% if request.COOKIES.theme == 'dark' %}dark-mode{% endif %}">
+<body>
 
-    <header class="app-header">
-        <div class="logo-box">
-            {% if company.logo %}
-                <img src="{{ company.logo.url }}" alt="{{ company.name }}" style="height: 40px; width: auto; object-fit: contain;">
-            {% else %}
-                <div class="logo-icon">G</div>
-                <span style="color:var(--ui-text)">
-                    {{ company.name|default:"Grama"|slice:":5" }}<span style="color:var(--brand-primary)">{{ company.name|default:"Cart"|slice:"5:" }}</span>
-                </span>
-            {% endif %}
-        </div>
-
-        <div id="duty-pill" 
-             class="duty-pill {% if request.user.delivery_profile.is_online %}is-online{% endif %}" 
-             onclick="toggleDuty()">
-            <div class="status-dot"></div>
-            <span id="duty-label" style="font-size: 11px; font-weight: 800;">
-                {% if request.user.delivery_profile.is_online %}ONLINE{% else %}OFFLINE{% endif %}
-            </span>
-        </div>
-
-        <button onclick="toggleTheme()" class="btn btn-link text-decoration-none p-0">
-            <i class="bi {% if request.COOKIES.theme == 'dark' %}bi-moon-stars-fill{% else %}bi-brightness-high-fill{% endif %} fs-5" 
-               id="theme-icon" style="color: var(--ui-subtext)"></i>
-        </button>
-    </header>
-
-    <main class="app-shell">
-        {% block content %}{% endblock %}
-    </main>
-
-    <nav class="app-dock">
-        <a href="{% url 'rider_dashboard' %}" class="dock-link {% if 'dashboard' in request.path %}active{% endif %}">
-            <i class="bi bi-broadcast"></i><span>Radar</span>
-        </a>
-        <a href="{% url 'active_deliveries' %}" class="dock-link {% if 'active' in request.path %}active{% endif %}">
-            <i class="bi bi-bicycle"></i><span>Tasks</span>
-        </a>
-        <a href="{% url 'rider_earnings' %}" class="dock-link {% if 'earnings' in request.path %}active{% endif %}">
-            <i class="bi bi-wallet2"></i><span>Wallet</span>
-        </a>
-        <a href="{% url 'rider_profile' %}" class="dock-link {% if 'profile' in request.path %}active{% endif %}">
-            <i class="bi bi-person-circle"></i><span>Profile</span>
-        </a>
-    </nav>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        const haptic = (n = 40) => { if("vibrate" in navigator) navigator.vibrate(n); };
-
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark-mode');
-            document.getElementById('theme-icon').className = isDark ? 'bi bi-moon-stars-fill fs-5' : 'bi bi-brightness-high-fill fs-5';
-            document.cookie = `theme=${isDark ? 'dark' : 'light'};path=/;max-age=31536000`;
-            haptic(20);
-        }
-
-        async function toggleDuty() {
-            const pill = document.getElementById('duty-pill');
-            const label = document.getElementById('duty-label');
-            const currentState = pill.classList.contains('is-online');
-            
-            haptic(60);
-
-            try {
-                const response = await fetch("{% url 'toggle_duty' %}", {
-                    method: 'POST',
-                    headers: { 
-                        'X-CSRFToken': '{{ csrf_token }}', 
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({ is_online: !currentState })
-                });
-                const data = await response.json();
-
-                if(data.status === 'success') {
-                    const online = data.is_online;
-                    pill.classList.toggle('is-online', online);
-                    label.innerText = online ? "ONLINE" : "OFFLINE";
-                    window.dispatchEvent(new CustomEvent('dutyStatusChanged', { detail: { online } }));
-                    haptic([30, 50, 30]);
-                }
-            } catch (err) {
-                console.error("Duty toggle failed", err);
-            }
-        }
+    <div class="app-viewport">
         
+        <div id="network-banner" class="network-alert-banner">
+            <i class="bi bi-wifi-off me-2"></i> No Connection. Retrying real-time link...
+        </div>
+
+        <header class="app-top-nav">
+            <div class="d-flex align-items-center gap-2">
+                <div class="brand-logo-badge">
+                    {% if company.logo %}<img src="{{ company.logo.url }}" style="width:100%;height:100%;object-fit:cover;" alt="Logo">{% else %}G{% endif %}
+                </div>
+                <div>
+                    <div class="fw-extrabold text-premium-main" style="font-size: 14px; line-height: 1.1; font-weight:800;">{{ company.name|default:"GramaCart" }}</div>
+                    <span class="text-premium-muted" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Rider Engine</span>
+                </div>
+            </div>
+            
+            <button class="btn p-2 border-0 text-premium-main" id="theme-shifter" aria-label="Toggle App Theme" style="font-size:20px;">
+                <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+            </button>
+        </header>
+
+        <div class="app-scroll-container">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <nav class="app-bottom-dock">
+            <a href="{% url 'rider_dashboard' %}" class="dock-tab {% if 'dashboard' in request.path %}active{% endif %}">
+                <i class="bi bi-fullscreen"></i>
+                <span>Radar</span>
+            </a>
+            <a href="{% url 'active_deliveries' %}" class="dock-tab {% if 'active' in request.path %}active{% endif %}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span>Tasks</span>
+            </a>
+            <a href="{% url 'rider_earnings' %}" class="dock-tab {% if 'earnings' in request.path %}active{% endif %}">
+                <i class="bi bi-wallet2"></i>
+                <span>Earnings</span>
+            </a>
+            <a href="{% url 'rider_profile' %}" class="dock-tab {% if 'profile' in request.path %}active{% endif %}">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Reactive Context Globals
+        window.GramaApp = {
+            themeKey: "gramacart_premium_theme",
+            bannerEl: document.getElementById('network-banner')
+        };
+
+        // Enforce Theme States Flawlessly
+        const syncThemeUI = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.className = "bi bi-brightness-high-fill";
+            } else {
+                icon.className = "bi bi-moon-stars-fill";
+            }
+        };
+
+        document.getElementById('theme-shifter').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(window.GramaApp.themeKey, nextTheme);
+            syncThemeUI(nextTheme);
+        });
+
+        // Initialize Native Theme Properties immediately
+        const savedTheme = localStorage.getItem(window.GramaApp.themeKey) || 'light';
+        syncThemeUI(savedTheme);
+
+        // Track and surface live operational dropouts
+        const toggleNetworkStatus = () => {
+            window.GramaApp.bannerEl.style.display = navigator.onLine ? 'none' : 'block';
+        };
+        window.addEventListener('online', toggleNetworkStatus);
+        window.addEventListener('offline', toggleNetworkStatus);
+        toggleNetworkStatus(); // Check on init
     </script>
+
     {% block page_scripts %}{% endblock %}
 </body>
 </html>

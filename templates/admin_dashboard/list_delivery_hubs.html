@@ -2,155 +2,490 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4" style="background-color: #f8fafc; min-height: 100vh;">
-    
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h2 class="fw-900 text-dark mb-1">Village Cluster Hubs</h2>
-            <p class="text-muted">Manage your 7KM delivery zones and active service points.</p>
+
+<div class="container-fluid py-4" style="background:#f8fafc; min-height:100vh;">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-900 text-dark mb-1">
+                Delivery Hub Network
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage GramaCart hyperlocal village delivery clusters.
+            </p>
         </div>
-        <div class="col-md-6 text-md-end">
-            <a href="{% url 'add_delivery_hub' %}" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm fw-bold">
-                <i class="bi bi-plus-circle me-2"></i> Add New Cluster
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'add_delivery_hub' %}"
+               class="btn btn-success btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                Add New Hub
             </a>
         </div>
+
     </div>
 
+    <!-- STATS -->
     <div class="row g-3 mb-4">
+
+        <!-- TOTAL HUBS -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
-                <div class="d-flex align-items-center">
-                    <div class="bg-success-subtle text-success p-3 rounded-3 me-3">
-                        <i class="bi bi-geo-alt-fill fs-3"></i>
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="stat-icon bg-success-subtle text-success me-3">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+
+                        <div>
+                            <small class="text-muted fw-bold d-block mb-1">
+                                TOTAL HUBS
+                            </small>
+
+                            <h3 class="fw-900 mb-0">
+                                {{ hubs|length }}
+                            </h3>
+                        </div>
+
                     </div>
-                    <div>
-                        <small class="text-muted fw-bold d-block">Active Centers</small>
-                        <h3 class="fw-900 mb-0">{{ hubs|length }}</h3>
-                    </div>
+
                 </div>
             </div>
         </div>
+
+        <!-- ACTIVE HUBS -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="stat-icon bg-primary-subtle text-primary me-3">
+                            <i class="bi bi-broadcast-pin"></i>
+                        </div>
+
+                        <div>
+                            <small class="text-muted fw-bold d-block mb-1">
+                                ACTIVE DELIVERY HUBS
+                            </small>
+
+                            <h3 class="fw-900 mb-0">
+                                {{ hubs|length }}
+                            </h3>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
         </div>
 
+        <!-- SERVICE -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="stat-icon bg-warning-subtle text-warning me-3">
+                            <i class="bi bi-truck"></i>
+                        </div>
+
+                        <div>
+                            <small class="text-muted fw-bold d-block mb-1">
+                                DELIVERY MODEL
+                            </small>
+
+                            <h5 class="fw-900 mb-0">
+                                Hyperlocal
+                            </h5>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE CARD -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <!-- TABLE HEADER -->
+        <div class="card-header bg-white border-0 p-4">
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+                <div>
+                    <h5 class="fw-900 mb-1">
+                        Hub Management
+                    </h5>
+
+                    <p class="text-muted mb-0 small">
+                        All delivery clusters across villages and mandals.
+                    </p>
+                </div>
+
+                <!-- SEARCH -->
+                <div style="max-width:320px; width:100%;">
+                    <input type="text"
+                           id="hubSearch"
+                           class="form-control rounded-pill border-2"
+                           placeholder="Search village / mandal / district">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
         <div class="table-responsive">
+
             <table class="table align-middle mb-0">
-                <thead class="bg-light">
+
+                <thead class="table-light">
+
                     <tr>
-                        <th class="ps-4 py-3 border-0 text-uppercase small fw-bold text-muted">ID</th>
-                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted">Village / Cluster Name</th>
-                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Location (Lat, Lng)</th>
-                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Service Reach</th>
-                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Full Address</th>
-                        <th class="py-3 border-0 text-uppercase small fw-bold text-muted text-center">Land Mark</th>
-                        <th class="pe-4 py-3 border-0 text-uppercase small fw-bold text-muted text-end">Manage</th>
+
+                        <th class="ps-4 py-3 small text-muted text-uppercase fw-bold">
+                            Hub
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold">
+                            Location
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold text-center">
+                            Coordinates
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold text-center">
+                            Radius
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold">
+                            Address
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold text-center">
+                            Status
+                        </th>
+
+                        <th class="pe-4 py-3 small text-muted text-uppercase fw-bold text-end">
+                            Actions
+                        </th>
+
                     </tr>
+
                 </thead>
-                <tbody>
+
+                <tbody id="hubTable">
+
                     {% for hub in hubs %}
-                    <tr class="border-top">
+
+                    <tr class="hub-row">
+
+                        <!-- HUB -->
                         <td class="ps-4">
-                            <span class="text-muted">#{{ forloop.counter }}</span>
-                        </td>
-                        <td>
+
                             <div class="d-flex align-items-center">
+
                                 <div class="hub-avatar bg-success text-white me-3">
                                     {{ hub.name|slice:":1"|upper }}
                                 </div>
+
                                 <div>
-                                    <span class="d-block fw-bold text-dark fs-6">{{ hub.name }}</span>
-                                    <small class="text-muted">Krishna District Area</small>
+
+                                    <div class="fw-bold text-dark">
+                                        {{ hub.name }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        ID: HUB-{{ hub.id }}
+                                    </small>
+
                                 </div>
+
                             </div>
+
                         </td>
+
+                        <!-- LOCATION -->
+                        <td>
+
+                            <div class="fw-semibold text-dark">
+                                {{ hub.village }}
+                            </div>
+
+                            <small class="text-muted">
+                                {{ hub.mandal }},
+                                {{ hub.district }},
+                                {{ hub.state }}
+                            </small>
+
+                        </td>
+
+                        <!-- COORDINATES -->
                         <td class="text-center">
+
                             <span class="badge bg-light text-primary border px-3 py-2 font-monospace">
-                                {{ hub.latitude|floatformat:4 }}, {{ hub.longitude|floatformat:4 }}
+
+                                {{ hub.latitude|floatformat:4 }},
+                                {{ hub.longitude|floatformat:4 }}
+
                             </span>
+
                         </td>
+
+                        <!-- RADIUS -->
                         <td class="text-center">
-                            <div class="fw-900 text-success">{{ hub.max_delivery_radius_km }} <small>KM</small></div>
-                            <div class="progress mt-1 mx-auto" style="height: 4px; width: 60px;">
-                                <div class="progress-bar bg-success" style="width: 100%"></div>
+
+                            <div class="fw-900 text-success fs-5">
+                                {{ hub.max_delivery_radius_km }} KM
                             </div>
+
+                            <div class="progress radius-progress mx-auto mt-1">
+
+                                <div class="progress-bar bg-success"
+                                     style="width:100%">
+                                </div>
+
+                            </div>
+
                         </td>
+
+                        <!-- ADDRESS -->
+                        <td style="min-width:240px;">
+
+                            <div class="small text-dark">
+
+                                {{ hub.full_address|default:"No address added" }}
+
+                            </div>
+
+                            {% if hub.landmark %}
+                            <small class="text-muted">
+                                Landmark: {{ hub.landmark }}
+                            </small>
+                            {% endif %}
+
+                        </td>
+
+                        <!-- STATUS -->
                         <td class="text-center">
-                            <div>
-                                    <span class="d-block fw-muted text-dark fs-6">{{ hub.full_address}}</span>
-                                    
-                            </div>
+
+                            {% if hub.is_active %}
+                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                                    Inactive
+                                </span>
+                            {% endif %}
+
                         </td>
-                          <td class="text-center">
-                            <div>
-                                    <span class="d-block fw-muted text-dark fs-6">{{ hub.landmark}}</span>
-                                    
-                            </div>
-                        </td>
+
+                        <!-- ACTIONS -->
                         <td class="pe-4 text-end">
+
                             <div class="btn-group">
-                                <a href="{% url 'edit_delivery_hub' hub.id %}" class="btn btn-outline-primary btn-sm rounded-start-3" title="Edit Hub">
+
+                                <a href="{% url 'edit_delivery_hub' hub.id %}"
+                                   class="btn btn-outline-primary btn-sm rounded-start-pill px-3"
+                                   title="Edit Hub">
+
                                     <i class="bi bi-pencil-square"></i>
+
                                 </a>
-                                <a href="{% url 'delete_delivery_hub' hub.id %}" class="btn btn-outline-danger btn-sm rounded-end-3" title="Delete Hub">
+
+                                <a href="{% url 'delete_delivery_hub' hub.id %}"
+                                   class="btn btn-outline-danger btn-sm rounded-end-pill px-3"
+                                   title="Delete Hub">
+
                                     <i class="bi bi-trash3"></i>
+
                                 </a>
+
                             </div>
+
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="bi bi-geo-fill display-1 opacity-25"></i>
-                                <h5 class="mt-3">No village clusters added yet</h5>
-                                <p>Click the "Add New Cluster" button to start your delivery network.</p>
+
+                        <td colspan="7" class="text-center py-5">
+
+                            <div class="py-4">
+
+                                <i class="bi bi-geo-alt display-1 text-muted opacity-25"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    No Delivery Hubs Found
+                                </h5>
+
+                                <p class="text-muted mb-4">
+                                    Start building your rural delivery network.
+                                </p>
+
+                                <a href="{% url 'add_delivery_hub' %}"
+                                   class="btn btn-success rounded-pill px-4 fw-bold">
+
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Create First Hub
+
+                                </a>
+
                             </div>
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </div>
 
-<style>
-    .fw-900 { font-weight: 900; }
-    .hub-avatar {
-        width: 40px; height: 40px; border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: bold; font-size: 1.1rem;
-    }
-    .table-hover tbody tr:hover {
-        background-color: #f1f5f9;
-        transition: 0.2s;
-    }
-    .btn-group .btn {
-        padding: 0.5rem 0.8rem;
-    }
-    .font-monospace {
-        font-family: 'Courier New', Courier, monospace;
-    }
-</style>
-
+<!-- SUCCESS / ERROR MODAL -->
 {% if messages %}
 <div class="modal fade" id="msgModal" tabindex="-1">
+
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow rounded-4">
+
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+
             <div class="modal-body text-center p-4">
-                {% with messages.0 as msg %}
+
+                {% for msg in messages %}
+
                     <i class="bi {% if msg.tags == 'success' %}bi-check-circle-fill text-success{% else %}bi-exclamation-triangle-fill text-danger{% endif %} display-4 mb-3 d-block"></i>
-                    <h5 class="fw-bold">{{ msg }}</h5>
-                {% endwith %}
-                <button type="button" class="btn btn-dark w-100 rounded-pill mt-3" data-bs-dismiss="modal">Okay</button>
+
+                    <h6 class="fw-bold">
+                        {{ msg }}
+                    </h6>
+
+                {% endfor %}
+
+                <button type="button"
+                        class="btn btn-dark rounded-pill w-100 mt-3"
+                        data-bs-dismiss="modal">
+
+                    Okay
+
+                </button>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 <script>
-    var myModal = new bootstrap.Modal(document.getElementById('msgModal'));
-    myModal.show();
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = new bootstrap.Modal(document.getElementById('msgModal'));
+    modal.show();
+});
 </script>
 {% endif %}
+
+<!-- SEARCH FILTER -->
+<script>
+document.getElementById("hubSearch").addEventListener("keyup", function () {
+
+    const value = this.value.toLowerCase();
+
+    document.querySelectorAll(".hub-row").forEach(row => {
+
+        const text = row.innerText.toLowerCase();
+
+        row.style.display = text.includes(value) ? "" : "none";
+
+    });
+
+});
+</script>
+
+<style>
+
+.fw-900{
+    font-weight:900;
+}
+
+.card{
+    border:none;
+}
+
+.hub-avatar{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.1rem;
+    font-weight:800;
+}
+
+.stat-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+}
+
+.table tbody tr{
+    transition:all .2s ease;
+}
+
+.table tbody tr:hover{
+    background:#f8fafc;
+}
+
+.radius-progress{
+    width:70px;
+    height:5px;
+}
+
+.form-control:focus{
+    box-shadow:none;
+    border-color:#198754;
+}
+
+.badge{
+    font-weight:600;
+}
+
+.btn{
+    font-weight:600;
+}
+
+.table td,
+.table th{
+    vertical-align:middle;
+}
+
+</style>
 
 {% endblock %}

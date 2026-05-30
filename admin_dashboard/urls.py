@@ -55,15 +55,15 @@ urlpatterns = [
     path('orders/pack/<str:order_number>/', views.mark_order_as_packed, name='mark_as_packed'),
     # ------------------------------------
 
-    path('orders/assign/', views.update_order_status_ajax, name='assign_delivery_ajax'),
+    path('orders/assign/', views.assign_rider_ajax, name='assign_delivery_ajax'),
     path('orders/reject/', views.reject_order_ajax, name='reject_order_ajax'),
-    path('orders/update-status/', views.update_order_status_ajax, name='update_order_status_ajax'),
+    path('orders/update-status/', views.assign_rider_ajax, name='update_order_status_ajax'),
     path('orders/print/<str:order_number>/', views.order_print_view, name='order_print'),
 
     path('order/invoice/<int:order_id>/', views.generate_invoice_pdf, name='generate_invoice'),
 
     #Live inventory
-    path('inventory/restock/<int:product_id>/', views.restock_product, name='restock_product'),
+    # path('inventory/restock/<int:product_id>/', views.restock_product, name='restock_product'),
     path('inventory/update-min-stock/<int:product_id>/', views.update_min_stock, name='update_min_stock'),
     
     #Registered customers list

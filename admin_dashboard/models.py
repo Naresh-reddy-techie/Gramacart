@@ -36,87 +36,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
-"""
 
-from django.urls import reverse
-
-from django.db import models
-from django.utils.text import slugify
-from django.urls import reverse
-from django.db.models import Avg, Count
-
-class Product(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=200)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    cost_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00, help_text="What we pay the shopkeeper")
-    size = models.CharField(max_length=50, default='N/A', help_text='e.g. 500 ml, 1 kg, 1 piece')
-    
-    # --- Inventory Cycle Fields ---
-    stock_available = models.IntegerField(default=0)
-    min_stock_level = models.PositiveIntegerField(default=5, help_text="Alert threshold for reordering")
-    updated_at = models.DateTimeField(auto_now=True) # Tracks the last time stock was touched
-    
-    slug = models.SlugField(unique=True, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    discount_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-    # --- Logic Improvements ---
-    @property
-    def is_in_stock(self):
-        return self.stock_available > 0
-    
-    @property
-    def discount_amount(self):
-        if self.discount_price:
-            return int(self.price - self.discount_price)
-        return 0
-
-    def get_effective_price(self):
-        #TEMPLATE USES THIS: To show the lower price if on sale
-        return self.discount_price if self.discount_price else self.price
-    
-    @property
-    def needs_restock(self):
-        return self.stock_available <= self.min_stock_level
-
-    @property
-    def stock_status(self):
-        if self.stock_available == 0:
-            return "OUT_OF_STOCK"
-        elif self.needs_restock:
-            return "LOW_STOCK"
-        return "IN_STOCK"
-
-    @property
-    def margin_per_unit(self):
-        return self.get_effective_price() - self.cost_price
-    
-    @property
-    def avg_rating(self):
-        return self.ratings.aggregate(avg=Avg('score'))['avg'] or 0
-
-    @property
-    def rating_count(self):
-        return self.ratings.count()
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            super().save(*args, **kwargs)
-            self.slug = slugify(f"{self.name}-{self.id}")
-            kwargs.pop('force_insert', None) 
-        super().save(*args, **kwargs)
-
-"""  
 from django.db import models
 from django.utils.text import slugify
 from django.db.models import Avg
+from django.db.models import Min
 
 class Product(models.Model):
 
@@ -144,6 +68,8 @@ class Product(models.Model):
     @property
     def rating_count(self):
         return self.ratings.count()
+
+    
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -207,9 +133,15 @@ class StockLog(models.Model):
     reason = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
     timestamp = models.DateTimeField(auto_now_add=True)
     note = models.TextField(blank=True) # "Restocked for Village Festival"
+
+  
 #============================================================
 class DeliveryHub(models.Model):
     name = models.CharField(max_length=100)
+    state = models.CharField(max_length=100,default="Andhra Pradesh",db_index=True)
+    district = models.CharField(max_length=100,db_index=True)
+    mandal = models.CharField(max_length=100,db_index=True)
+    village = models.CharField(max_length=100,db_index=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     
@@ -228,16 +160,42 @@ class DeliveryHub(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+
         verbose_name = "Delivery Hub"
+
         verbose_name_plural = "Delivery Hubs"
-        # Indexing coordinates makes distance calculations faster in the database
+
         indexes = [
+
             models.Index(fields=['latitude', 'longitude']),
+
+            models.Index(fields=['state', 'district']),
+
+            models.Index(fields=['district', 'mandal']),
+
+            models.Index(fields=['village']),
+        ]
+        ordering = [
+            'state',
+            'district',
+            'mandal',
+            'village'
         ]
 
+        unique_together = (
+            'name',
+            'state',
+            'district',
+            'mandal',
+            'village'
+        )
+
     def __str__(self):
-        return f"{self.name} ({'Active' if self.is_active else 'Inactive'})"
-    
+        return (
+            f"{self.name} | "
+            f"{self.village}, "
+            f"{self.mandal}"
+        )
 
 class ShippingCost(models.Model):
     delivery_hub = models.ForeignKey(DeliveryHub, related_name='shipping_costs', on_delete=models.CASCADE)

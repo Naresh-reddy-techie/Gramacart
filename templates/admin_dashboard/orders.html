@@ -1,325 +1,854 @@
-{% extends 'admin_dashboard/base.html' %}
+{% extends "admin_dashboard/base.html" %}
 {% load static %}
 
-{% block content %}
-<div class="admin-wrapper" style="background: #f4f7f6; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif;">
-    
-    <div class="container-fluid px-3 pt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-900 text-dark mb-0">GramaCart Hub</h2>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="pulse-icon"></span>
-                    <span class="text-muted smaller fw-bold">REAL-TIME MONITOR</span>
-                </div>
-            </div>
-            <div class="text-end">
-                <div class="badge bg-white text-dark shadow-sm border rounded-pill px-3 py-2 fw-bold">
-                    <i class="bi bi-cash-stack text-success me-1"></i> Today: <span id="stat-total-rev">₹0</span>
-                </div>
-            </div>
-        </div>
+{% block title %}Operations Center | GramaCart{% endblock %}
 
-        <div class="bg-white p-2 rounded-4 shadow-sm mb-4 border d-flex flex-column gap-2">
-            <div class="filter-pills d-flex gap-2 overflow-auto no-scrollbar py-1">
-                <button class="pill active" data-status="live">Live Feed</button>
-                <button class="pill" data-status="packed">Packed</button>
-                <button class="pill" data-status="tracking">In Transit</button>
-                <button class="pill" data-status="history">History</button>
-            </div>
-            <div class="input-group border-top border-light pt-2 mt-1">
-                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search"></i></span>
-                <input type="text" id="orderSearch" class="form-control border-0 shadow-none ps-0" placeholder="Search orders..." onkeyup="debounceSearch()">
-            </div>
-        </div>
-
-        <div class="row g-3" id="ordersContainer"></div>
-        
-        <div id="loadingSpinner" class="text-center py-5 d-none">
-            <div class="spinner-border text-primary" role="status"></div>
-        </div>
-    </div>
-</div>
-
-<div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="orderDrawer" style="width: 100%; max-width: 500px; border-radius: 30px 0 0 30px;">
-    <div class="offcanvas-header border-bottom p-4">
-        <div>
-            <h5 class="offcanvas-title fw-900 h4 mb-0" id="drawerOrderID">#ORDER-000</h5>
-            <span class="badge bg-primary-subtle text-primary rounded-pill fw-bold mt-2" id="drawerStatus">PENDING</span>
-        </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body p-4" id="drawerContent">
-        </div>
-    <div class="offcanvas-footer p-4 border-top bg-light" id="drawerFooter">
-        </div>
-</div>
-
-<div class="modal fade" id="riderModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered mx-3">
-        <div class="modal-content rounded-5 border-0">
-            <div class="modal-body p-4 text-center">
-                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-3">
-                    <i class="bi bi-bicycle h3 mb-0"></i>
-                </div>
-                <h5 class="fw-800 mb-4">Assign Delivery Partner</h5>
-                <select id="riderSelect" class="form-select rounded-4 p-3 mb-4 border-light">
-                    <option value="">Choose Rider...</option>
-                    {% for boy in delivery_boys %}
-                        <option value="{{ boy.id }}">{{ boy.user.get_full_name }} ({{ boy.hub }})</option>
-                    {% endfor %}
-                </select>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-dark py-3 rounded-4 fw-bold" onclick="executeAssignRider()">Dispatch Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
-    .fw-900 { font-weight: 900; } .fw-800 { font-weight: 800; }
-    .smaller { font-size: 11px; } .no-scrollbar::-webkit-scrollbar { display: none; }
-    .pulse-icon { width: 10px; height: 10px; background: #10b981; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-    
-    .pill { border: none; background: #fff; color: #64748b; padding: 10px 20px; border-radius: 14px; font-weight: 700; border: 1px solid #eee; transition: 0.2s; }
-    .pill.active { background: #000; color: #fff; border-color: #000; }
 
-    .summary-card { background: white; border-radius: 25px; border: 1px solid #eee; transition: 0.3s; }
-    .summary-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
-    
-    .item-row { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #f8f9fa; }
-    .item-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f8f9fa; }
-</style>
+/* =========================================================
+OPS DESIGN SYSTEM (SWIGGY / ZOMATO STYLE - ENHANCED)
+========================================================= */
 
-<script>
-let currentStatus = 'live';
-let ordersCache = [];
-let activeOrderNum = null; //
+:root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
 
-function fetchOrders(page = 1) {
-    document.getElementById('loadingSpinner').classList.remove('d-none');
-    fetch(`{% url 'admin_orders_json' %}?page=${page}&status=${currentStatus}&search=${document.getElementById('orderSearch').value}`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('loadingSpinner').classList.add('d-none');
-            document.getElementById('stat-total-rev').innerText = `₹${data.today_revenue}`;
-            ordersCache = data.orders;
-            renderSummaryGrid(data.orders);
-        });
+    --green:#16a34a;
+    --orange:#f59e0b;
+    --blue:#2563eb;
+    --purple:#7c3aed;
+    --red:#dc2626;
 }
 
-function renderSummaryGrid(orders) {
-    const container = document.getElementById('ordersContainer');
-    if (!orders.length) {
-        container.innerHTML = `<div class="col-12 text-center py-5 text-muted">No orders in this queue</div>`;
+.ops{
+    background:var(--bg);
+    min-height:100vh;
+    padding:14px;
+}
+
+/* =========================================================
+HEADER
+========================================================= */
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+}
+
+.header h2{
+    font-size:1.15rem;
+    font-weight:900;
+}
+
+.live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.75rem;
+    font-weight:800;
+    color:var(--green);
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(22,163,74,.4);}
+    100%{box-shadow:0 0 0 10px transparent;}
+}
+
+/* =========================================================
+METRICS
+========================================================= */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.metric{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+}
+
+.metric h4{
+    font-size:.7rem;
+    color:var(--muted);
+    font-weight:800;
+}
+
+.metric .val{
+    font-size:1.3rem;
+    font-weight:900;
+}
+
+/* =========================================================
+FILTER BAR (IMPORTANT UPGRADE)
+========================================================= */
+
+.toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.search{
+    flex:1;
+    min-width:180px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px;
+}
+
+.search input{
+    width:100%;
+    border:none;
+    outline:none;
+    font-weight:700;
+}
+
+.filter{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px;
+    font-weight:800;
+    min-width:140px;
+}
+
+/* =========================================================
+PIPELINE
+========================================================= */
+
+.pipeline{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin-bottom:10px;
+}
+
+.chip{
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:#fff;
+    font-size:.72rem;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.chip.active{
+    background:#111827;
+    color:#fff;
+}
+
+/* =========================================================
+GRID
+========================================================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:10px;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.order{
+    font-weight:900;
+}
+
+.time{
+    font-size:.7rem;
+    color:var(--muted);
+}
+
+.badge{
+    font-size:.68rem;
+    font-weight:900;
+    padding:5px 9px;
+    border-radius:999px;
+    text-transform:uppercase;
+}
+
+.new{background:#fff7ed;color:#c2410c;}
+.assigned{background:#eef2ff;color:#3730a3;}
+.out_for_delivery{background:#eff6ff;color:#1d4ed8;}
+.delivered{background:#ecfdf5;color:#166534;}
+.cancelled{background:#fef2f2;color:#991b1b;}
+.packed{background:#fef3c7;color:#92400e;}
+
+.customer{
+    margin-top:8px;
+    font-weight:800;
+}
+
+.meta{
+    font-size:.72rem;
+    color:var(--muted);
+}
+
+.eta{
+    font-size:.7rem;
+    font-weight:800;
+    color:#2563eb;
+    margin-top:3px;
+}
+
+.items{
+    margin-top:10px;
+    background:#f9fafb;
+    padding:8px;
+    border-radius:10px;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    font-size:.78rem;
+    margin-bottom:4px;
+}
+
+.footer{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    align-items:center;
+}
+
+.total{
+    font-weight:900;
+}
+
+.actions{
+    display:flex;
+    gap:6px;
+}
+
+.btn{
+    padding:6px 9px;
+    font-size:.7rem;
+    border-radius:8px;
+    font-weight:800;
+    border:none;
+    cursor:pointer;
+}
+
+.acc{background:var(--green);color:#fff;}
+.rej{background:var(--red);color:#fff;}
+.view{background:#e5e7eb;}
+.assign{background:var(--blue);color:#fff;}
+
+/* =========================================================
+PAGINATION
+========================================================= */
+
+.pagination{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-top:14px;
+    flex-wrap:wrap;
+}
+
+.page{
+    padding:6px 10px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.page.active{
+    background:#111827;
+    color:#fff;
+}
+
+.pagination{
+    margin-top:16px;
+    display:flex;
+    justify-content:center;
+}
+
+.pagination-wrap{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#ffffff;
+    padding:8px;
+    border-radius:14px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+.pg-btn{
+    padding:6px 12px;
+    border-radius:10px;
+    border:1px solid #e5e7eb;
+    background:#f9fafb;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.pg-btn:hover{
+    background:#111827;
+    color:#fff;
+}
+
+.pg-btn:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+}
+
+.pg-num{
+    min-width:34px;
+    height:34px;
+    border-radius:10px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.pg-num:hover{
+    background:#f3f4f6;
+}
+
+.pg-num.active{
+    background:#111827;
+    color:#fff;
+    border-color:#111827;
+}
+
+.dots{
+    padding:0 6px;
+    color:#6b7280;
+    font-weight:700;
+}
+
+@media(max-width:768px){
+    .grid{grid-template-columns:1fr;}
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="ops">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>Operations Center</h2>
+        <div class="live"><span class="dot"></span> LIVE</div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+        <div class="metric"><h4>Revenue</h4><div class="val">₹<span id="revenue">0</span></div></div>
+        <div class="metric"><h4>New</h4><div class="val" id="new">0</div></div>
+        <div class="metric"><h4>Assigned</h4><div class="val" id="assigned">0</div></div>
+        <div class="metric"><h4>Out</h4><div class="val" id="out">0</div></div>
+        <div class="metric"><h4>Cancelled</h4><div class="val" id="cancel">0</div></div>
+    </div>
+
+    <!-- FILTERS (ENHANCED: HUB + TIME + SEARCH) -->
+    <div class="toolbar">
+
+        <select class="filter" id="hub">
+            <option value="">All Hubs</option>
+            {% for hub in hubs %}
+            <option value="{{ hub.id }}">{{ hub.name }} - {{ hub.village }}</option>
+            {% endfor %}
+        </select>
+
+        <select class="filter" id="time">
+            <option value="day">Today</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+        </select>
+
+        <div class="search">
+            <input id="search" placeholder="Search orders...">
+        </div>
+
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="pipeline">
+        <div class="chip active" data-status="new">New</div>
+        <div class="chip" data-status="packed">Packed</div>
+        <div class="chip" data-status="assigned">Assigned</div>
+        <div class="chip" data-status="out_for_delivery">Out</div>
+        <div class="chip" data-status="delivered">Delivered</div>
+        <div class="chip" data-status="cancelled">Cancelled</div>
+    </div>
+
+    <!-- GRID -->
+    <div id="grid" class="grid"></div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" id="pagination"></div>
+
+</div>
+
+<script>
+
+let status="new";
+let page=1;
+let search="";
+
+async function load(){
+
+    const hub=document.getElementById("hub").value;
+    const time=document.getElementById("time").value;
+    search=document.getElementById("search").value;
+
+    const res=await fetch(`/admin_dashboard/orders/json/?status=${status}&page=${page}&hub_id=${hub}&time=${time}&search=${search}`);
+    const data=await res.json();
+
+    document.getElementById("revenue").innerText=data.today_revenue||0;
+    document.getElementById("new").innerText=data.new_orders||0;
+    document.getElementById("assigned").innerText=data.assigned_orders||0;
+    document.getElementById("out").innerText=data.out_orders||0;
+    document.getElementById("cancel").innerText=data.cancelled_orders||0;
+
+    render(data.orders||[]);
+    renderPagination(data.pagination?.total_pages || 1);
+    
+    if(reset){
+        page = data.pagination?.page || 1;
+    }
+}
+
+function render(list){
+
+    const g=document.getElementById("grid");
+
+    if(!list.length){
+        g.innerHTML="<p>No Orders Found</p>";
         return;
     }
 
-    container.innerHTML = orders.map(o => `
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="summary-card p-4 shadow-sm">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="text-primary smaller fw-800 text-uppercase"><i class="bi bi-geo-alt"></i> ${o.village_cluster}</span>
-                        <h5 class="fw-800 mb-0 mt-1">${o.customer}</h5>
-                    </div>
-                    <div class="badge bg-light text-dark border">#${o.order_number}</div>
+    g.innerHTML=list.map(o=>`
+
+        <div class="card">
+
+            <div class="top">
+                <div>
+                    <div class="order">#${o.order_number}</div>
+                    <div class="time">${o.created_at||""}</div>
                 </div>
-                <div class="text-muted smaller fw-bold mb-3">${o.items.length} Items • Total: ₹${o.total}</div>
-                <button class="btn btn-outline-dark w-100 rounded-pill fw-bold py-2" onclick="showOrderDetails('${o.order_number}')">
-                    Manage Order <i class="bi bi-arrow-right ms-1"></i>
-                </button>
+
+                <div class="badge ${o.status_code}">${o.status_label}</div>
             </div>
+
+            <div class="customer">${o.customer||""}</div>
+            <div class="meta">${o.phone||""} • ${o.hub||"No Hub"}</div>
+            <div class="meta">📍 ${o.address||""}</div>
+            <div class="eta">
+
+                ${
+                    o.status_code === "pending"
+
+                    ? "🛒 Waiting For Confirmation"
+
+                    : o.status_code === "packed"
+
+                    ? "📦 Ready For Rider Assignment"
+
+                    : o.status_code === "assigned"
+
+                    ? (
+                        o.eta_minutes
+                        ? `🚴 ETA: ${o.eta_minutes} mins • ${o.distance_km} km`
+                        : "⏳ Calculating Route..."
+                    )
+
+                    : o.status_code === "out_for_delivery"
+
+                    ? (
+                        o.eta_minutes
+                        ? `🛵 Arriving in ${o.eta_minutes} mins`
+                        : "🚚 On The Way"
+                    )
+
+                    : o.status_code === "delivered"
+
+                    ? "✅ Delivered"
+
+                    : "❌ Cancelled"
+                }
+
+            </div>
+
+            <div class="items">
+                ${(o.items||[]).map(i=>`
+                    <div class="item">
+                        <span>${i.product_name} ${i.variant?"("+i.variant+")":""}</span>
+                        <b>₹${i.price} x ${i.quantity}</b>
+                    </div>
+                `).join("")}
+            </div>
+
+            <div class="footer">
+                <div class="total">₹${o.total}</div>
+                <div class="actions">
+
+                    ${
+                        o.status_code === "pending"
+
+                        ? `
+                            <button
+                                class="btn acc"
+                                onclick="markPacked('${o.order_number}')"
+                            >
+                                Packed
+                            </button>
+
+                            <button
+                                class="btn rej"
+                                onclick="rejectOrder('${o.order_number}')"
+                            >
+                                Reject
+                            </button>
+                        `
+                        : ""
+                    }
+
+                    ${
+                        o.status_code === "packed"
+
+                        ? `
+                            <button
+                                class="btn assign"
+                                onclick="assignRider('${o.order_number}')"
+                            >
+                                Assign
+                            </button>
+                        `
+                        : ""
+                    }
+
+                    <button
+                        class="btn view"
+                        onclick="viewOrder('${o.order_number}')"
+                    >
+                        View
+                    </button>
+
+                </div>
+            </div>
+
         </div>
-    `).join('');
+
+    `).join("");
 }
 
-function showOrderDetails(orderNum) {
-    const order = ordersCache.find(o => o.order_number === orderNum);
-    if(!order) return;
+function renderPagination(total){
 
-    document.getElementById('drawerOrderID').innerText = `#${order.order_number}`;
-    document.getElementById('drawerStatus').innerText = order.status.toUpperCase();
-    
-    let content = `
-        <div class="customer-info mb-4">
-            <p class="text-muted smaller fw-bold mb-2">CUSTOMER DETAILS</p>
-            <h6 class="fw-bold mb-1">${order.customer}</h6>
-            <p class="small mb-2"><i class="bi bi-telephone"></i> ${order.address.phone}</p>
-            <div class="bg-light p-3 rounded-4 border">
-                <p class="small mb-1 fw-bold">${order.address.address_line}</p>
-                <p class="smaller text-muted mb-0">Landmark: ${order.address.landmark}</p>
-            </div>
-        </div>
-        
-        <div class="packing-list">
-            <p class="text-muted smaller fw-bold mb-2">PACKING LIST</p>
-            ${order.items.map(i => `
-                <div class="item-row">
-                    <img src="${i.image_url || '/static/img/no-prod.png'}" class="item-img border">
-                    <div class="flex-grow-1">
-                        <span class="fw-bold d-block mb-0" style="font-size:14px;">${i.product_name}</span>
-                        <span class="text-muted smaller fw-bold">${i.product_size}</span>
-                    </div>
-                    <div class="text-end">
-                        <span class="badge bg-dark rounded-pill">x${i.quantity}</span>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-        
-        <div class="mt-4 d-flex justify-content-between align-items-center bg-dark text-white p-3 rounded-4">
-            <span class="fw-bold">Total Bill</span>
-            <span class="h4 fw-900 mb-0">₹${order.total}</span>
+    const container = document.getElementById("pagination");
+
+    if(total <= 1){
+        container.innerHTML = "";
+        return;
+    }
+
+    let html = `
+        <div class="pagination-wrap">
+            <button class="pg-btn" onclick="go(${page-1})" ${page<=1?'disabled':''}>
+                ← Prev
+            </button>
+    `;
+
+    // smart window pagination (not all pages)
+    const start = Math.max(1, page - 2);
+    const end = Math.min(total, page + 2);
+
+    if(start > 1){
+        html += `<button class="pg-num" onclick="go(1)">1</button>`;
+        if(start > 2){
+            html += `<span class="dots">...</span>`;
+        }
+    }
+
+    for(let i=start;i<=end;i++){
+        html += `
+            <button class="pg-num ${i===page?'active':''}" onclick="go(${i})">
+                ${i}
+            </button>
+        `;
+    }
+
+    if(end < total){
+        if(end < total-1){
+            html += `<span class="dots">...</span>`;
+        }
+        html += `<button class="pg-num" onclick="go(${total})">${total}</button>`;
+    }
+
+    html += `
+            <button class="pg-btn" onclick="go(${page+1})" ${page>=total?'disabled':''}>
+                Next →
+            </button>
         </div>
     `;
 
-    document.getElementById('drawerContent').innerHTML = content;
-    
-    // Inject Buttons based on state
-    let footer = '';
-    if (order.status_code === 'pending' || order.status_code === 'confirmed') {
-        footer = `
-            <div class="d-grid gap-2 w-100">
-                <button class="btn btn-warning py-3 rounded-4 fw-bold text-white shadow-sm" onclick="markAsPacked('${order.order_number}')">Confirm & Pack Order</button>
-                <button class="btn btn-link text-danger smaller fw-bold text-decoration-none" onclick="rejectOrder('${order.order_number}')">Reject Order</button>
-            </div>
-        `;
-    } else if (order.status_code === 'packed') {
-        footer = `<button class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm" onclick="openRiderModal('${order.order_number}')">Assign Delivery Partner</button>`;
-    } else {
-        footer = `<button class="btn btn-outline-dark w-100 py-3 rounded-4 fw-bold" onclick="window.open('/admin/print/${order.order_number}/')">Print Invoice</button>`;
-    }
-
-    document.getElementById('drawerFooter').innerHTML = footer;
-    new bootstrap.Offcanvas(document.getElementById('orderDrawer')).show();
+    container.innerHTML = html;
 }
 
-function markAsPacked(num) {
-    if(!confirm("Verify all items are in the bag. Proceed?")) return;
-    
-    // Generate the correct URL with the language prefix included
-    const url = "{% url 'mark_as_packed' '000000' %}".replace('000000', num);
-    
-    fetch(url, { 
-        method: 'POST', 
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        } 
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-    })
-    .then(data => {
-        if(data.success) {
-            // Close drawer
-            const drawerElement = document.getElementById('orderDrawer');
-            const drawer = bootstrap.Offcanvas.getInstance(drawerElement);
-            if(drawer) drawer.hide();
+function go(p){page=p;load();}
 
-            // Open thermal print
-            const printUrl = "{% url 'order_print' '000000' %}".replace('000000', num);
-            window.open(printUrl, '_blank', 'width=400,height=600');
-            
-            fetchOrders(1);
-        } else {
-            alert("Error: " + data.error);
+async function markPacked(orderNumber){
+
+    try{
+
+        const response = await fetch(
+            `/admin_dashboard/orders/pack/${orderNumber}/`,
+            {
+                method:"POST",
+
+                headers:{
+                    "X-CSRFToken":getCookie("csrftoken")
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            alert("Order Packed Successfully");
+
+            load();
+
+        }else{
+
+            alert("Failed To Update Order");
         }
-    })
-    .catch(err => console.error("Fetch error:", err));
-}
 
-function openRiderModal(orderNum) {
-    activeOrderNum = orderNum; // 2. SET THE ACTIVE ORDER HERE
-    
-    // First, close the side drawer so it doesn't overlap
-    const drawerElement = document.getElementById('orderDrawer');
-    const drawer = bootstrap.Offcanvas.getInstance(drawerElement);
-    if(drawer) drawer.hide();
+    }catch(error){
 
-    // Now show the rider modal
-    const riderModal = new bootstrap.Modal(document.getElementById('riderModal'));
-    riderModal.show();
-}
-function executeAssignRider() {
-    const riderId = document.getElementById('riderSelect').value;
-    const orderNum = activeOrderNum; 
+        console.error(error);
 
-    if(!riderId || !orderNum) {
-        alert("Please select a rider and ensure an order is selected.");
-        return;
+        alert("Something went wrong");
     }
+}
 
-    fetch(`/admin_dashboard/orders/update-status/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({
-            'order_number': orderNum,
-            'delivery_boy_id': riderId  // FIX: Match this to the data.get() in your view
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            alert("Order Assigned!");
-            // Hide modal and refresh
-            bootstrap.Modal.getInstance(document.getElementById('riderModal')).hide();
-            fetchOrders(1);
-        } else {
-            console.error("Server Error:", data.error);
-            alert("Assignment failed: " + data.error);
+
+async function rejectOrder(orderNumber){
+
+    const reason = prompt(
+        "Enter rejection reason"
+    );
+
+    if(!reason) return;
+
+    try{
+
+        const response = await fetch(
+            `/admin_dashboard/orders/reject/`,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":getCookie("csrftoken")
+                },
+
+                body:JSON.stringify({
+                    order_number:orderNumber,
+                    reason:reason
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            alert("Order Rejected");
+
+            load();
+
+        }else{
+
+            alert("Failed");
         }
-    })
-    .catch(err => {
-        console.error("Network Error:", err);
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Something went wrong");
+    }
+}
+
+
+async function assignRider(orderNumber){
+
+    const riderId = prompt(
+        "Enter Delivery Boy ID"
+    );
+
+    if(!riderId) return;
+
+    try{
+
+        const response = await fetch(
+            `/admin_dashboard/orders/assign/`,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":getCookie("csrftoken")
+                },
+
+                body:JSON.stringify({
+                    order_number:orderNumber,
+                    delivery_boy_id:riderId
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            alert("Rider Assigned Successfully");
+
+            load();
+
+        }else{
+
+            alert("Assignment Failed");
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Something went wrong");
+    }
+}
+
+
+async function viewOrder(orderNumber){
+
+    try{
+
+        const response = await fetch(
+            `/admin_dashboard/orders/json/${orderNumber}/`
+        );
+
+        const data = await response.json();
+
+        alert(
+            `Order: ${data.order_number}\n` +
+            `Customer: ${data.customer}\n` +
+            `Phone: ${data.phone}\n` +
+            `Total: ₹${data.total}`
+        );
+
+    }catch(error){
+
+        console.error(error);
+    }
+}
+
+// EVENTS
+
+["hub","time","search"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",()=>{
+        page=1;
+        load();
     });
-}
-
-function rejectOrder(orderNum) {
-    const reason = prompt("Please enter the reason for rejection:");
-    
-    if (reason === null) return; // User cancelled the prompt
-
-    fetch(`/admin_dashboard/orders/reject/`, { // Ensure this URL matches your urls.py
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}' // CRITICAL: Ensure this is present
-        },
-        body: JSON.stringify({
-            'order_number': orderNum,
-            'reason': reason
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Order Rejected Successfully");
-            location.reload(); // Or call your fetchOrders() function
-        } else {
-            alert("Error: " + data.error);
-        }
-    })
-    .catch(err => console.error("Rejection failed:", err));
-}
-
-// Logic for pills and search... (same as previous)
-document.querySelectorAll('.pill').forEach(btn => {
-    btn.onclick = function() {
-        document.querySelector('.pill.active').classList.remove('active');
-        this.classList.add('active');
-        currentStatus = this.dataset.status;
-        fetchOrders(1);
-    };
 });
 
-fetchOrders(1);
+// PIPELINE
+
+document.querySelectorAll(".chip").forEach(c=>{
+    c.onclick=()=>{
+        document.querySelector(".chip.active").classList.remove("active");
+        c.classList.add("active");
+        status=c.dataset.status;
+        page=1;
+        load();
+    }
+});
+
+setInterval(() => {
+    load(false);
+}, 5000);
+
+load();
+
+function getCookie(name){
+
+    let cookieValue = null;
+
+    if(document.cookie && document.cookie !== ''){
+
+        const cookies = document.cookie.split(';');
+
+        for(let i = 0; i < cookies.length; i++){
+
+            const cookie = cookies[i].trim();
+
+            if(
+                cookie.substring(
+                    0,
+                    name.length + 1
+                ) === (name + '=')
+            ){
+
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
 </script>
+
 {% endblock %}

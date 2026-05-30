@@ -2,7 +2,7 @@ import logging
 from django.db import transaction
 from django.db.models import Count, Q
 from django.utils import timezone
-
+from decimal import Decimal
 from .models import Delivery, DeliveryProfile, DeliveryStatus
 from admin_dashboard.models import ShippingCost
 from shop.utils import check_address_within_hub
@@ -19,56 +19,116 @@ def get_shipping_slab(hub, distance_km):
     ).first()
 
 # ------------------- 2. Delivery Processing Logic -------------------
-
 def prepare_delivery_for_radar(delivery_id):
-    """
-    Called when Admin marks an order as PACKED.
-    Calculates logistics and pushes to the Rider Radar.
-    """
+
     try:
+
         with transaction.atomic():
-            # select_for_update prevents concurrent status changes
-            delivery = Delivery.objects.select_for_update().get(pk=delivery_id)
-            
+
+            delivery = (
+                Delivery.objects
+                .select_for_update()
+                .select_related("order__address")
+                .get(pk=delivery_id)
+            )
+
             if delivery.delivery_boy:
-                return False # Already assigned, cannot go back to radar
+                return False
 
             order = delivery.order
+
             if not order.address:
-                logger.error(f"Delivery {delivery_id} missing address.")
+                logger.error(
+                    f"Delivery {delivery_id} missing address."
+                )
                 return False
 
-            # Geography & Hub Check
-            loc_data = check_address_within_hub(order.address)
-            hub = loc_data.get('nearest_hub')
-            distance = loc_data.get('distance_km', 0)
+            # ==========================================
+            # HUB RESOLUTION
+            # ==========================================
+
+            loc_data = check_address_within_hub(
+                order.address
+            )
+
+            if not loc_data.deliverable:
+                logger.warning(
+                    f"Address not deliverable for "
+                    f"Order #{order.order_number}"
+                )
+                return False
+
+            hub = loc_data.delivery_hub
+
+            distance = (
+                loc_data.distance_km or Decimal("0.00")
+            )
 
             if not hub:
-                logger.warning(f"No hub coverage for Order #{order.order_number}")
+                logger.warning(
+                    f"No hub found for "
+                    f"Order #{order.order_number}"
+                )
                 return False
 
-            # Freeze Financials & Logistics
+            # ==========================================
+            # SHIPPING SLAB
+            # ==========================================
+
+            slab = get_shipping_slab(
+                hub,
+                distance
+            )
+
+            if not slab:
+
+                logger.error(
+                    f"No slab found for "
+                    f"{distance}km at {hub.name}"
+                )
+
+                return False
+
+            # ==========================================
+            # FREEZE DELIVERY DATA
+            # ==========================================
+
             delivery.nearest_hub = hub
-            delivery.distance_km = distance
-            
-            slab = get_shipping_slab(hub, distance)
-            if slab:
-                delivery.delivery_fee = slab.cost
-                delivery.rider_earning = slab.rider_earning
-                delivery.platform_fee = slab.platform_fee
-            else:
-                logger.error(f"Pricing Error: No slab for {distance}km at {hub.name}")
-                return False
 
-            # Push to Radar
+            delivery.distance_km = distance
+
+            delivery.delivery_fee = slab.cost
+
+            delivery.rider_earning = slab.rider_earning
+
+            delivery.platform_fee = slab.platform_fee
+
             delivery.status = DeliveryStatus.PACKED
+
             delivery.save()
-            
-            sync_order_status(order, DeliveryStatus.PACKED)
+
+            # ==========================================
+            # ORDER STATUS
+            # ==========================================
+
+            sync_order_status(
+                order,
+                DeliveryStatus.PACKED
+            )
+
+            logger.info(
+                f"Delivery #{delivery.id} "
+                f"ready for rider radar."
+            )
+
             return True
 
     except Exception as e:
-        logger.error(f"Radar Preparation Failure: {str(e)}")
+
+        logger.exception(
+            f"Radar preparation failed: {str(e)}"
+        )
+
         return False
 
 def manual_assign_rider(delivery_id, rider_user):
@@ -107,8 +167,8 @@ def sync_order_status(order, delivery_status):
     mapping = {
         DeliveryStatus.PENDING: 'pending',
         DeliveryStatus.PACKED: 'packed',
-        DeliveryStatus.ASSIGNED: 'confirmed', 
-        DeliveryStatus.OUT: 'out_for_delivery',
+        DeliveryStatus.ASSIGNED: 'assigned', 
+        DeliveryStatus.OUT_FOR_DELIVERY: 'out_for_delivery',
         DeliveryStatus.DELIVERED: 'delivered',
         DeliveryStatus.CANCELLED: 'cancelled',
     }

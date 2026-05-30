@@ -53,7 +53,7 @@ def user_signin(request):
                 return redirect("rider_dashboard")
 
             else:
-                return redirect("public_dashboard")
+                return redirect("where_we_deliver")
 
         else:
             messages.error(request, "Invalid username or password.")

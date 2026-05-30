@@ -1,353 +1,2060 @@
 {% extends "delivery_portal/base.html" %}
-{% block title %}Verify Delivery #{{ delivery.order.order_number }}{% endblock %}
+{% load static %}
+
+{% block title %}
+Complete Delivery • #{{ delivery.order.order_number }}
+{% endblock %}
 
 {% block extra_css %}
+
 <style>
-    :root {
-        --gc-primary: #10b981;
-        --gc-dark: #0f172a;
-        --gc-danger: #ef4444;
-        --gc-warning: #f59e0b;
-        --gc-soft-bg: #f8fafc;
+
+:root{
+
+    --primary:#10B981;
+    --primary-dark:#059669;
+
+    --blue:#2563EB;
+
+    --danger:#EF4444;
+    --warning:#F59E0B;
+
+    --dark:#0F172A;
+    --dark-soft:#1E293B;
+
+    --card:#FFFFFF;
+    --soft:#F8FAFC;
+
+    --border:#E2E8F0;
+
+    --text:#0F172A;
+    --sub:#64748B;
+
+    --radius:32px;
+
+    --shadow:
+        0 12px 40px rgba(15,23,42,.08);
+
+    --shadow-lg:
+        0 20px 70px rgba(15,23,42,.14);
+
+    --gradient:
+        linear-gradient(
+            135deg,
+            #0F172A 0%,
+            #1E3A8A 45%,
+            #2563EB 100%
+        );
+}
+
+/* =========================================================
+PAGE THEME FIX
+========================================================= */
+
+.delivery-page{
+
+    --page-surface:#FFFFFF;
+
+    --page-surface-2:#F1F5F9;
+
+    --page-border:#CBD5E1;
+
+    --page-text:#0F172A;
+
+    --page-muted:#475569;
+
+    --page-shadow:
+        0 10px 30px rgba(15,23,42,.08);
+
+    --page-shadow-lg:
+        0 20px 60px rgba(15,23,42,.14);
+}
+
+/* DARK MODE SUPPORT */
+
+html[data-theme="dark"] .delivery-page{
+
+    --card:#111827;
+
+    --soft:#1E293B;
+
+    --border:#334155;
+
+    --text:#F8FAFC;
+
+    --sub:#CBD5E1;
+
+    --dark:#F8FAFC;
+
+    --dark-soft:#CBD5E1;
+
+    --shadow:
+        0 12px 40px rgba(0,0,0,.45);
+
+    --shadow-lg:
+        0 20px 70px rgba(0,0,0,.55);
+}
+
+/* FORCE TEXT VISIBILITY */
+
+.delivery-page .section-card,
+.delivery-page .item-card,
+.delivery-page .pay-box,
+.delivery-page .upi-box,
+.delivery-page .cash-box,
+.delivery-page .photo-box{
+
+    color:var(--text) !important;
+}
+
+/* FIX WHITE BUTTONS */
+
+.delivery-page button,
+.delivery-page .payment-btn,
+.delivery-page .qr-btn,
+.delivery-page .complete-btn{
+
+    color:#fff;
+}
+
+/* FIX INPUTS */
+
+.delivery-page input,
+.delivery-page textarea{
+
+    background:var(--card) !important;
+
+    color:var(--text) !important;
+
+    border-color:var(--border) !important;
+}
+
+/* FIX LIGHT MODE WASHOUT */
+
+.delivery-page .section-card{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.98),
+            rgba(248,250,252,.98)
+        ) !important;
+
+    border:
+        1px solid rgba(203,213,225,.9) !important;
+}
+
+/* FIX ITEM CARDS */
+
+.delivery-page .item-card{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.95),
+            rgba(241,245,249,.95)
+        ) !important;
+}
+
+/* FIX PAYMENT TOGGLE */
+
+.delivery-page .payment-toggle{
+
+    background:#CBD5E1 !important;
+}
+
+html[data-theme="dark"] .delivery-page .payment-toggle{
+
+    background:#334155 !important;
+}
+
+/* FIX NON ACTIVE PAYMENT BUTTON */
+
+.delivery-page .payment-btn{
+
+    color:#475569 !important;
+}
+
+.delivery-page .payment-btn.active{
+
+    color:#0F172A !important;
+}
+
+/* DARK ACTIVE BUTTON */
+
+html[data-theme="dark"] .delivery-page .payment-btn.active{
+
+    background:#F8FAFC !important;
+
+    color:#0F172A !important;
+}
+
+/* FIX HERO STATS */
+
+.hero-stat{
+
+    background:
+        rgba(255,255,255,.12) !important;
+
+    border:
+        1px solid rgba(255,255,255,.14) !important;
+}
+
+/* FIX BOTTOM ACTION */
+
+.bottom-action{
+
+    background:
+        rgba(255,255,255,.92) !important;
+}
+
+html[data-theme="dark"] .bottom-action{
+
+    background:
+        rgba(15,23,42,.92) !important;
+}
+
+html,
+body{
+    min-height:100%;
+    background:
+        linear-gradient(
+            180deg,
+            #eb2cbe 0%,
+            #a1c3e5 35%,
+            #f1d819 100%
+        ) !important;
+
+    margin:0;
+    padding:0;
+}
+.main-content,
+.content-wrapper,
+.page-wrapper{
+    background:transparent !important;
+}
+/* ========================================================= */
+/* LAYOUT */
+/* ========================================================= */
+
+.delivery-page{
+
+    width:100%;
+    max-width:860px;
+
+    margin:auto;
+
+    padding:
+        0
+        0
+        calc(260px + env(safe-area-inset-bottom));
+}
+
+.section-card{
+
+    position:relative;
+
+    background:var(--card);
+
+    border-radius:34px;
+
+    padding:24px;
+
+    margin-bottom:18px;
+
+    border:1px solid rgba(226,232,240,.9);
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+}
+
+/* ========================================================= */
+/* HERO */
+/* ========================================================= */
+
+.hero-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:40px;
+
+    padding:28px;
+
+    background:var(--gradient);
+
+    color:#fff;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow-lg);
+}
+
+.hero-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-120px;
+    right:-80px;
+
+    width:260px;
+    height:260px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.18),
+            transparent 70%
+        );
+}
+.hero-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:-120px;
+    bottom:-120px;
+
+    width:260px;
+    height:260px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(59,130,246,.28),
+            transparent 70%
+        );
+}
+.delivery-page{
+    padding-top:22px;
+}
+.hero-top{
+
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:16px;
+}
+
+.back-btn{
+
+    width:52px;
+    height:52px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.12);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:20px;
+
+    transition:.25s ease;
+}
+
+.back-btn:hover{
+
+    background:rgba(255,255,255,.18);
+
+    color:#fff;
+}
+
+.hero-badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    padding:10px 16px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.10);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    font-size:11px;
+    font-weight:900;
+
+    letter-spacing:.8px;
+}
+
+.live-dot{
+
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:#10B981;
+
+    box-shadow:0 0 14px #10B981;
+
+    animation:pulse 1.3s infinite;
+}
+
+@keyframes pulse{
+
+    0%{transform:scale(1)}
+    50%{transform:scale(1.35)}
+    100%{transform:scale(1)}
+}
+
+.hero-title{
+
+    margin-top:18px;
+
+    font-size:34px;
+
+    line-height:1.1;
+
+    font-weight:900;
+}
+
+.hero-sub{
+
+    margin-top:12px;
+
+    
+    color:rgba(255,255,255,.82);
+
+
+    font-size:14px;
+
+    line-height:1.8;
+
+    font-weight:600;
+
+    max-width:540px;
+}
+
+.hero-grid{
+
+    margin-top:26px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:14px;
+}
+
+.hero-stat{
+
+    border-radius:24px;
+
+    padding:18px;
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(10px);
+}
+
+.hero-label{
+
+    font-size:10px;
+
+    color:rgba(255,255,255,.7);
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+    font-weight:900;
+}
+
+.hero-value{
+
+    margin-top:10px;
+
+    font-size:24px;
+
+    font-weight:900;
+}
+
+/* ========================================================= */
+/* TITLES */
+/* ========================================================= */
+
+.section-title{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:20px;
+}
+
+.section-icon{
+
+    width:48px;
+    height:48px;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ECFDF5,
+            #D1FAE5
+        );
+
+    color:#10B981;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:20px;
+}
+
+.section-title h3{
+
+    margin:0;
+
+    font-size:18px;
+
+    font-weight:900;
+
+    color:var(--text);
+}
+
+.section-title p{
+
+    margin:4px 0 0;
+
+    color:var(--sub);
+
+    font-size:12px;
+
+    font-weight:700;
+}
+
+/* ========================================================= */
+/* CUSTOMER */
+/* ========================================================= */
+
+.customer-box{
+
+    display:grid;
+
+    grid-template-columns:64px 1fr;
+
+    gap:18px;
+}
+
+.customer-avatar{
+
+    width:64px;
+    height:64px;
+
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #10B981,
+            #059669
+        );
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:26px;
+
+    font-weight:900;
+}
+
+.customer-name{
+
+    font-size:18px;
+
+    font-weight:900;
+
+    color:var(--text);
+}
+
+.customer-address{
+
+    margin-top:10px;
+
+    color:var(--sub);
+
+    line-height:1.8;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+/* ========================================================= */
+/* ITEMS */
+/* ========================================================= */
+
+.items-wrap{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:14px;
+}
+
+.item-card{
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    padding:18px;
+
+    border-radius:26px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #FFFFFF,
+            #F8FAFC
+        );
+
+    border:1px solid var(--border);
+}
+
+.item-left{
+
+    display:flex;
+    align-items:center;
+
+    gap:14px;
+
+    min-width:0;
+}
+
+.item-image{
+
+    width:70px;
+    height:70px;
+
+    border-radius:20px;
+
+    background:#F1F5F9;
+
+    overflow:hidden;
+
+    flex-shrink:0;
+}
+
+.item-image img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+.item-image-placeholder{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#94A3B8;
+
+    font-size:24px;
+}
+
+.item-name{
+
+    font-size:15px;
+
+    font-weight:900;
+
+    color:var(--text);
+
+    line-height:1.5;
+}
+
+.item-meta{
+
+    margin-top:6px;
+
+    color:var(--sub);
+
+    font-size:12px;
+
+    font-weight:700;
+}
+
+.item-price{
+
+    margin-top:8px;
+
+    color:#10B981;
+
+    font-size:14px;
+
+    font-weight:900;
+}
+
+.qty-badge{
+
+    min-width:56px;
+
+    height:56px;
+
+    border-radius:18px;
+
+    background:#0F172A;
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:15px;
+
+    font-weight:900;
+}
+
+/* ========================================================= */
+/* PAYMENT */
+/* ========================================================= */
+
+.payment-summary{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:14px;
+
+    margin-bottom:22px;
+}
+
+.pay-box{
+
+    border-radius:24px;
+
+    padding:18px;
+
+    background:#F8FAFC;
+
+    border:1px solid var(--border);
+}
+
+.pay-label{
+
+    font-size:11px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+    color:var(--sub);
+
+    font-weight:900;
+}
+
+.pay-value{
+
+    margin-top:10px;
+
+    font-size:26px;
+
+    font-weight:900;
+
+    color:var(--text);
+}
+
+.payment-toggle{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:10px;
+
+    background:#E2E8F0;
+
+    padding:6px;
+
+    border-radius:22px;
+}
+
+.payment-btn{
+
+    height:58px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:transparent;
+
+    font-size:14px;
+
+    font-weight:900;
+
+    color:#64748B;
+
+    transition:.2s ease;
+}
+
+.payment-btn.active{
+
+    background:#fff;
+
+    color:#0F172A;
+
+    box-shadow:
+        0 10px 24px rgba(15,23,42,.08);
+}
+
+.cash-box{
+
+    margin-top:18px;
+
+    border-radius:28px;
+
+    padding:26px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(245,158,11,.10),
+            rgba(251,191,36,.08)
+        );
+
+    border:2px dashed rgba(245,158,11,.45);
+
+    text-align:center;
+}
+
+.cash-title{
+
+    color:#92400E;
+
+    font-size:13px;
+
+    font-weight:900;
+
+    letter-spacing:.5px;
+}
+
+.cash-amount{
+
+    margin-top:10px;
+
+    font-size:42px;
+
+    font-weight:900;
+
+    color:#0F172A;
+}
+
+.upi-box{
+
+    margin-top:18px;
+
+    border-radius:28px;
+
+    padding:24px;
+
+    background:#F8FAFC;
+
+    border:1px solid var(--border);
+}
+
+.upi-total{
+
+    text-align:center;
+
+    font-size:42px;
+
+    font-weight:900;
+
+    color:#0F172A;
+}
+
+.qr-btn{
+
+    width:100%;
+
+    height:58px;
+
+    border:none;
+
+    border-radius:20px;
+
+    margin-top:18px;
+
+    background:#0F172A;
+
+    color:#fff;
+
+    font-size:14px;
+
+    font-weight:900;
+}
+
+.utr-label{
+
+    margin-top:20px;
+    margin-bottom:10px;
+
+    font-size:11px;
+
+    color:var(--sub);
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+    font-weight:900;
+}
+
+.utr-input{
+
+    width:100%;
+
+    height:64px;
+
+    border-radius:22px;
+
+    border:2px solid var(--border);
+
+    background:#fff;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:900;
+
+    letter-spacing:3px;
+
+    color:#0F172A;
+
+    transition:.2s ease;
+}
+
+.utr-input:focus{
+
+    outline:none;
+
+    border-color:#10B981;
+}
+
+.confirm-box{
+
+    margin-top:18px;
+
+    display:flex;
+    align-items:flex-start;
+
+    gap:14px;
+
+    border-radius:24px;
+
+    background:#ECFDF5;
+
+    border:1px solid #A7F3D0;
+
+    padding:18px;
+}
+
+.confirm-box input{
+
+    width:22px;
+    height:22px;
+
+    accent-color:#10B981;
+
+    margin-top:2px;
+}
+
+.confirm-box label{
+
+    color:#065F46;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+    font-weight:800;
+}
+
+/* ========================================================= */
+/* PHOTO */
+/* ========================================================= */
+
+.photo-box{
+
+    border-radius:32px;
+
+    border:2px dashed #CBD5E1;
+
+    background:#F8FAFC;
+
+    padding:34px 20px;
+
+    text-align:center;
+
+    transition:.25s ease;
+
+    cursor:pointer;
+}
+
+.photo-box.active{
+
+    border-color:#10B981;
+
+    background:#ECFDF5;
+}
+
+.camera-circle{
+
+    width:90px;
+    height:90px;
+
+    border-radius:50%;
+
+    margin:auto auto 18px;
+
+    background:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:34px;
+
+    color:#2563EB;
+
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.08);
+}
+
+.upload-title{
+
+    font-size:18px;
+
+    font-weight:900;
+
+    color:#0F172A;
+}
+
+.upload-sub{
+
+    margin-top:10px;
+
+    color:#64748B;
+
+    line-height:1.8;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+.preview-image{
+
+    width:100%;
+
+    height:260px;
+
+    object-fit:cover;
+
+    border-radius:24px;
+}
+
+/* ========================================================= */
+/* OTP */
+/* ========================================================= */
+
+.otp-wrap{
+
+    display:flex;
+    justify-content:center;
+
+    gap:14px;
+
+    margin-top:22px;
+}
+
+.otp-input{
+
+    width:72px;
+    height:84px;
+
+    border-radius:24px;
+
+    border:2px solid var(--border);
+
+    background:#fff;
+
+    text-align:center;
+
+    font-size:36px;
+
+    font-weight:900;
+
+    color:#0F172A;
+
+    transition:.2s ease;
+}
+
+.otp-input:focus{
+
+    outline:none;
+
+    border-color:#10B981;
+
+    transform:translateY(-2px);
+}
+
+/* ========================================================= */
+/* BOTTOM ACTION */
+/* ========================================================= */
+
+.bottom-action{
+
+    position:fixed;
+
+    left:0;
+    right:0;
+
+    bottom:84px;
+
+    z-index:1200;
+
+    padding:
+        16px
+        18px
+        calc(16px + env(safe-area-inset-bottom));
+
+    background:
+        rgba(255,255,255,.94);
+
+    backdrop-filter:blur(18px);
+
+    border-top:
+        1px solid rgba(226,232,240,.9);
+
+    box-shadow:
+        0 -12px 40px rgba(15,23,42,.08);
+}
+
+.complete-btn{
+
+    width:100%;
+
+    height:68px;
+
+    border:none;
+
+    border-radius:26px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #10B981,
+            #059669
+        );
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:900;
+
+    letter-spacing:.5px;
+
+    box-shadow:
+        0 18px 40px rgba(16,185,129,.28);
+
+    transition:.2s ease;
+}
+
+.complete-btn:disabled{
+
+    opacity:.5;
+
+    box-shadow:none;
+}
+
+.complete-btn:not(:disabled):active{
+
+    transform:scale(.98);
+}
+
+/* ========================================================= */
+/* QR */
+/* ========================================================= */
+
+.modal-content{
+
+    border:none;
+
+    border-radius:34px;
+}
+
+.qr-image{
+
+    width:100%;
+
+    border-radius:24px;
+}
+
+/* ========================================================= */
+/* MOBILE */
+/* ========================================================= */
+
+@media(max-width:768px){
+
+    .hero-grid,
+    .payment-summary{
+
+        grid-template-columns:1fr;
     }
 
-    /* --- HIGH-END FLOATING MESSAGES --- */
-    .message-container {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 9999;
-        width: 90%;
-        max-width: 400px;
+    .hero-title{
+
+        font-size:28px;
     }
 
-    .alert-toast {
-        background: white;
-        padding: 16px 20px;
-        border-radius: 20px;
-        margin-bottom: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border-left: 5px solid transparent;
-        animation: toastIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    .otp-input{
+
+        width:60px;
+        height:74px;
+
+        font-size:28px;
     }
 
-    .alert-error { border-left-color: var(--gc-danger); color: #7f1d1d; }
-    .alert-success { border-left-color: var(--gc-primary); color: #064e3b; }
-    .alert-warning { border-left-color: var(--gc-warning); color: #78350f; }
+    .bottom-action{
 
-    @keyframes toastIn {
-        from { transform: translateY(-100px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+        bottom:82px;
     }
-    .fw-800 { font-weight: 800; }
-    .fw-900 { font-weight: 900; }
+}
 
-    /* Optional: Subtle pulse for the checklist to remind them to check the bag */
-    .items-checklist-pulse {
-        border-color: var(--gc-primary) !important;
-        animation: borderPulse 2s infinite;
-    }
-
-    @keyframes borderPulse {
-        0% { border-color: #f1f5f9; }
-        50% { border-color: #10b981; }
-        100% { border-color: #f1f5f9; }
-    }
-        /* --- UI WRAPPER --- */
-    .mission-wrapper {
-        background: #ffffff;
-        border-radius: 40px 40px 0 0;
-        margin-top: -25px;
-        padding: 30px 24px 120px;
-        min-height: 95vh;
-        box-shadow: 0 -15px 50px rgba(0,0,0,0.1);
-    }
-
-    /* --- REQUIRED FIELD INDICATOR --- */
-    .field-label {
-        font-size: 11px;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        margin-bottom: 8px;
-    }
-
-    .required-dot {
-        width: 6px;
-        height: 6px;
-        background-color: var(--gc-danger);
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    /* --- INTERACTIVE TOGGLE --- */
-    .payment-toggle {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        background: #f1f5f9;
-        padding: 6px;
-        border-radius: 22px;
-        margin-bottom: 25px;
-    }
-
-    .toggle-btn {
-        border: none;
-        padding: 14px;
-        border-radius: 18px;
-        font-weight: 900;
-        font-size: 0.75rem;
-        color: #64748b;
-        background: transparent;
-        transition: 0.3s;
-    }
-
-    .toggle-btn.active {
-        background: white;
-        color: var(--gc-dark);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    /* --- INPUT STYLES --- */
-    .utr-field {
-        background: #ffffff;
-        border: 2px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 18px;
-        font-weight: 800;
-        text-align: center;
-        letter-spacing: 3px;
-        font-size: 1.2rem;
-        width: 100%;
-        transition: 0.3s;
-    }
-
-    .utr-field:focus { border-color: var(--gc-primary); outline: none; }
-
-    .otp-field {
-        width: 62px;
-        height: 78px;
-        border-radius: 18px;
-        border: 2px solid #e2e8f0;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 900;
-        background: #fff;
-    }
-
-    .btn-action {
-        background: var(--gc-dark);
-        color: white;
-        border-radius: 28px;
-        padding: 24px;
-        width: 100%;
-        font-weight: 900;
-        border: none;
-        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
-        transition: 0.3s;
-    }
-
-    .btn-action:disabled { background: #cbd5e1; box-shadow: none; opacity: 0.7; }
 </style>
+
 {% endblock %}
 
 {% block content %}
-<div class="message-container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert-toast alert-{{ message.tags }}">
-                <i class="bi {% if message.tags == 'error' %}bi-exclamation-octagon{% else %}bi-check-circle-fill{% endif %} fs-5"></i>
-                <span class="flex-grow-1">{{ message }}</span>
-                <i class="bi bi-x-lg opacity-50" style="cursor:pointer" onclick="this.parentElement.remove()"></i>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
 
-<div style="background: var(--gc-dark); height: 80px;" class="d-flex align-items-center px-4">
-    <a href="javascript:history.back()" class="text-white text-decoration-none small fw-bold opacity-75">
-        <i class="bi bi-arrow-left me-2"></i> CANCEL
-    </a>
-</div>
+<div class="delivery-page">
 
-<div class="mission-wrapper">
-    <div class="text-center mb-5">
-        <h5 class="fw-900 m-0 text-dark">Confirm Delivery</h5>
-        <p class="text-muted small fw-bold">Order #{{ delivery.order.order_number }}</p>
-        <div class="bg-light rounded-4 p-3 mb-4 border border-2" style="border-style: solid !important; border-color: #f1f5f9 !important;">
-        <div class="field-label mb-2" style="font-size: 10px;">Items Checklist</div>
-        <div class="d-flex flex-column gap-2">
-            {% for item in delivery.order.items.all %}
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="fw-800 text-dark" style="font-size: 13px;">
-                    {{ item.product.name }}
-                    {% if item.product.size %}
-                    <span class="text-muted fw-600" style="font-size: 11px;">• {{ item.product.size }}</span>
-                    {% endif %}
+    <!-- HERO -->
+
+    <section class="hero-card">
+
+        <div class="hero-top">
+
+            <div>
+
+                <div class="hero-badge">
+
+                    <div class="live-dot"></div>
+
+                    DELIVERY VERIFICATION
+
                 </div>
-                <span class="badge bg-white text-dark border fw-900" style="font-size: 11px; border-radius: 8px;">x{{ item.quantity }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    </div>
 
-    <form method="post" enctype="multipart/form-data" id="mainForm">
+                <div class="hero-title">
+                    Complete Delivery
+                </div>
+
+                <div class="hero-sub">
+
+                    Verify payment, confirm OTP,
+                    upload delivery proof and successfully
+                    complete the order securely.
+
+                </div>
+
+            </div>
+
+            <a
+                href="javascript:history.back()"
+                class="back-btn">
+
+                <i class="bi bi-arrow-left"></i>
+
+            </a>
+
+        </div>
+
+        <div class="hero-grid">
+
+            <div class="hero-stat">
+
+                <div class="hero-label">
+                    Order ID
+                </div>
+
+                <div class="hero-value">
+                    #{{ delivery.order.order_number }}
+                </div>
+
+            </div>
+
+            <div class="hero-stat">
+
+                <div class="hero-label">
+                    Order Total
+                </div>
+
+                <div class="hero-value">
+                    ₹{{ delivery.order.total|floatformat:0 }}
+                </div>
+
+            </div>
+
+            <div class="hero-stat">
+
+                <div class="hero-label">
+                    Payment
+                </div>
+
+                <div class="hero-value">
+
+                    {% if delivery.is_cod %}
+                        COD
+                    {% else %}
+                        ONLINE
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CUSTOMER -->
+
+    <section class="section-card">
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+
+            <div>
+
+                <h3>Delivery Destination</h3>
+
+                <p>Customer delivery information</p>
+
+            </div>
+
+        </div>
+
+        <div class="customer-box">
+
+            <div class="customer-avatar">
+
+                {{ delivery.order.address.full_name|slice:":1" }}
+
+            </div>
+
+            <div>
+
+                <div class="customer-name">
+                    {{ delivery.order.address.full_name }}
+                </div>
+
+                <div class="customer-address">
+
+                    {{ delivery.order.address.address_line_1 }}
+
+                    {% if delivery.order.address.address_line_2 %}
+                        <br>
+                        {{ delivery.order.address.address_line_2 }}
+                    {% endif %}
+
+                    <br>
+
+                    {{ delivery.order.address.city }}
+
+                    {% if delivery.order.address.landmark %}
+                        <br>
+                        Landmark: {{ delivery.order.address.landmark }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ITEMS -->
+
+    <section class="section-card">
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                <i class="bi bi-bag-check-fill"></i>
+            </div>
+
+            <div>
+
+                <h3>Ordered Items</h3>
+
+                <p>
+                    {{ delivery.order.items.count }} item{{ delivery.order.items.count|pluralize }}
+                    in this order
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="items-wrap">
+
+            {% for item in delivery.order.items.all %}
+
+            <div class="item-card">
+
+                <div class="item-left">
+
+                    <div class="item-image">
+
+                        {% if item.product.image %}
+
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product.name }}">
+
+                        {% else %}
+
+                        <div class="item-image-placeholder">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <div class="item-name">
+                            {{ item.product.name }}
+                        </div>
+
+                        <div class="item-meta">
+
+                            {% if item.product.size %}
+                                Variant: {{ item.product.size }}
+                            {% else %}
+                                Standard Variant
+                            {% endif %}
+
+                        </div>
+
+                        <div class="item-price">
+                            ₹{{ item.price }} each
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="qty-badge">
+                    x{{ item.quantity }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        id="delivery-form">
+
         {% csrf_token %}
 
-        {% if upi_uri %}
-        <div class="mb-4">
-            <label class="field-label">Payment Mode <span class="required-dot"></span></label>
+        {% if delivery.is_cod %}
+
+        <!-- PAYMENT -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+                <div>
+
+                    <h3>Payment Collection</h3>
+
+                    <p>Confirm customer payment collection</p>
+
+                </div>
+
+            </div>
+
+            <div class="payment-summary">
+
+                <div class="pay-box">
+
+                    <div class="pay-label">
+                        Collect Amount
+                    </div>
+
+                    <div class="pay-value">
+                        ₹{{ delivery.order.total|floatformat:0 }}
+                    </div>
+
+                </div>
+
+                <div class="pay-box">
+
+                    <div class="pay-label">
+                        Rider Earnings
+                    </div>
+
+                    <div class="pay-value">
+                        ₹{{ delivery.rider_earning|default:0 }}
+                    </div>
+
+                </div>
+
+            </div>
+
             <div class="payment-toggle">
-                <button type="button" class="toggle-btn active" id="btn-upi" onclick="setMode('upi')">UPI / ONLINE</button>
-                <button type="button" class="toggle-btn" id="btn-cash" onclick="setMode('cash')">CASH</button>
-            </div>
-            <input type="hidden" name="payment_mode" id="id_payment_mode" value="upi">
 
-            <div id="upi-section">
-                <div class="p-3 rounded-4 border-2 bg-light mb-3 text-center border" style="border-style: dashed;">
-                    <div class="display-6 fw-900 text-dark mb-2">₹{{ delivery.order.total|floatformat:0 }}</div>
-                    <button type="button" class="btn btn-dark btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#qrModal">
-                        <i class="bi bi-qr-code-scan me-2"></i> SHOW QR
+                <button
+                    type="button"
+                    id="cash-btn"
+                    class="payment-btn active"
+                    onclick="setPaymentMode('cash')">
+
+                    CASH RECEIVED
+
+                </button>
+
+                <button
+                    type="button"
+                    id="upi-btn"
+                    class="payment-btn"
+                    onclick="setPaymentMode('upi')">
+
+                    UPI / ONLINE
+
+                </button>
+
+            </div>
+
+            <!-- IMPORTANT -->
+            <!-- DEFAULT CASH -->
+            <input
+                type="hidden"
+                name="payment_mode"
+                id="payment_mode"
+                value="cash">
+
+            <!-- CASH -->
+
+            <div id="cash-section">
+
+                <div class="cash-box">
+
+                    <div class="cash-title">
+                        CASH TO COLLECT
+                    </div>
+
+                    <div class="cash-amount">
+                        ₹{{ delivery.order.total|floatformat:0 }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- UPI -->
+
+            <div
+                id="upi-section"
+                style="display:none;">
+
+                <div class="upi-box">
+
+                    <div class="upi-total">
+                        ₹{{ delivery.order.total|floatformat:0 }}
+                    </div>
+
+                    <button
+                        type="button"
+                        class="qr-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#qrModal">
+
+                        <i class="bi bi-qr-code-scan me-2"></i>
+
+                        SHOW PAYMENT QR
+
                     </button>
+
+                    <div class="utr-label">
+                        Enter 12 Digit UTR Number
+                    </div>
+
+                    <input
+                        type="text"
+                        id="utr_input"
+                        class="utr-input"
+                        maxlength="12"
+                        inputmode="numeric"
+                        placeholder="ENTER UTR">
+
                 </div>
-                
-                <label class="field-label">12-Digit Transaction ID (UTR) <span class="required-dot"></span></label>
-                <input type="text" name="transaction_id" id="id_utr" class="utr-field" placeholder="Enter UTR Number" maxlength="12" inputmode="numeric" oninput="valCheck()">
+
             </div>
 
-            <div id="cash-section" style="display: none;">
-                <div class="p-4 rounded-4 bg-warning bg-opacity-10 border border-warning border-2 text-center">
-                    <div class="fw-900 text-warning mb-1">COLLECT CASH</div>
-                    <div class="display-6 fw-900 text-dark">₹{{ delivery.order.total|floatformat:0 }}</div>
-                    <p class="small text-muted mt-2 mb-0 fw-bold">Ensure you count the notes carefully!</p>
-                </div>
+            <div class="confirm-box">
+
+                <input
+                    type="checkbox"
+                    id="cod_checkbox"
+                    name="cod_collected"
+                    value="yes">
+
+                <label for="cod_checkbox">
+
+                    I confirm that I received the full payment
+                    from the customer successfully.
+
+                </label>
+
             </div>
-        </div>
+
+        </section>
+
         {% endif %}
 
-        <div class="mb-5">
-            <label class="field-label">Handover Proof <span class="required-dot"></span></label>
-            <div class="bg-light rounded-4 p-5 text-center border-2 border-dashed" onclick="document.getElementById('id_proof_photo').click()" style="cursor: pointer; border-color: #cbd5e1 !important;">
-                <div id="preview-wrap">
-                    <div class="bg-white d-inline-block p-3 rounded-circle shadow-sm mb-2">
-                        <i class="bi bi-camera-fill fs-2 text-primary"></i>
-                    </div>
-                    <div class="fw-900 text-dark">Take Photo</div>
-                    <div class="text-muted small fw-bold">Capture the bag at the door</div>
+        <!-- PHOTO -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="bi bi-camera-fill"></i>
                 </div>
-                <input type="file" name="proof_photo" id="id_proof_photo" accept="image/*" capture="environment" onchange="imgIn(this)" style="display:none;" required>
-            </div>
-        </div>
 
-        <div class="mb-5">
-            <label class="field-label d-block text-center">Customer 4-Digit PIN <span class="required-dot"></span></label>
-            <div class="d-flex justify-content-center gap-3 mt-3">
-                <input type="hidden" name="order_token" id="fullToken">
-                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
-                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
-                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
-                <input type="number" class="otp-field d-cell" maxlength="1" inputmode="numeric">
-            </div>
-        </div>
+                <div>
 
-        <button type="submit" class="btn-action" id="subBtn" disabled>
-            COMPLETE DELIVERY
-        </button>
+                    <h3>Delivery Proof Photo</h3>
+
+                    <p>Capture delivery proof image</p>
+
+                </div>
+
+            </div>
+
+            <label
+                for="proof_input"
+                class="photo-box"
+                id="photo-box">
+
+                <div id="preview-wrap">
+
+                    <div class="camera-circle">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
+
+                    <div class="upload-title">
+                        Capture Delivery Photo
+                    </div>
+
+                    <div class="upload-sub">
+
+                        Take a clear photo of the package
+                        near the customer doorstep.
+
+                    </div>
+
+                </div>
+
+            </label>
+
+            <input
+                type="file"
+                name="proof_photo"
+                id="proof_input"
+                accept="image/*"
+                capture="environment"
+                hidden
+                required>
+
+        </section>
+
+        <!-- OTP -->
+
+        <section class="section-card">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+
+                <div>
+
+                    <h3>OTP Verification</h3>
+
+                    <p>Enter customer delivery OTP</p>
+
+                </div>
+
+            </div>
+
+            <input
+                type="hidden"
+                name="order_token"
+                id="full_otp">
+
+            <div class="otp-wrap">
+
+                <input type="number" class="otp-input otp-cell">
+                <input type="number" class="otp-input otp-cell">
+                <input type="number" class="otp-input otp-cell">
+                <input type="number" class="otp-input otp-cell">
+
+            </div>
+
+        </section>
+
+        {{ form.non_field_errors }}
+
     </form>
+
 </div>
 
-<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered px-4">
-        <div class="modal-content rounded-5 border-0">
-            <div class="modal-body text-center p-5">
-                <div class="caps-label mb-3">Scan with PhonePe, GPay, Paytm</div>
-                
-                {% if upi_qr_base64 %}
-                <div class="p-3 bg-white border-2 border rounded-5 mb-4 shadow-sm">
-                    <img src="data:image/png;base64,{{ upi_qr_base64 }}" class="img-fluid" style="border-radius: 15px;">
+<!-- BOTTOM ACTION -->
+
+<div class="bottom-action">
+
+    <button
+        type="submit"
+        form="delivery-form"
+        id="complete-btn"
+        class="complete-btn"
+        disabled>
+
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        COMPLETE DELIVERY
+
+    </button>
+
+</div>
+
+<!-- QR MODAL -->
+
+<div
+    class="modal fade"
+    id="qrModal"
+    tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered px-3">
+
+        <div class="modal-content">
+
+            <div class="modal-body p-4 text-center">
+
+                <div class="fw-bold text-muted small mb-3">
+                    Scan Using Any UPI App
                 </div>
+
+                {% if upi_qr_base64 %}
+
+                <img
+                    src="data:image/png;base64,{{ upi_qr_base64 }}"
+                    class="qr-image mb-4">
+
                 {% endif %}
 
-                <div class="bg-light p-3 rounded-4 font-monospace fw-bold small text-muted mb-4">
-                    {{ upi_id|default:"UPI ID NOT FOUND" }}
+                <div class="bg-light rounded-4 p-3 fw-bold">
+
+                    {{ upi_id|default:"UPI NOT AVAILABLE" }}
+
                 </div>
 
-                <button type="button" class="btn btn-dark w-100 rounded-pill py-3 fw-900" data-bs-dismiss="modal">
+                <button
+                    type="button"
+                    class="qr-btn mt-4"
+                    data-bs-dismiss="modal">
+
                     DONE
+
                 </button>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}
 
 {% block page_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    const cells = document.querySelectorAll('.d-cell');
-    const hidden = document.getElementById('fullToken');
-    const btn = document.getElementById('subBtn');
-    const utrField = document.getElementById('id_utr');
-    const photoInput = document.getElementById('id_proof_photo');
-    const modeInput = document.getElementById('id_payment_mode');
 
-    // Auto-dismiss messages after 5 seconds
-    setTimeout(() => {
-        document.querySelectorAll('.alert-toast').forEach(el => el.style.opacity = '0');
-        setTimeout(() => document.querySelectorAll('.alert-toast').forEach(el => el.remove()), 500);
-    }, 5000);
+const otpInputs =
+    document.querySelectorAll('.otp-cell');
 
-    function setMode(mode) {
-        modeInput.value = mode;
-        document.getElementById('btn-upi').classList.toggle('active', mode === 'upi');
-        document.getElementById('btn-cash').classList.toggle('active', mode === 'cash');
-        document.getElementById('upi-section').style.display = (mode === 'upi') ? 'block' : 'none';
-        document.getElementById('cash-section').style.display = (mode === 'cash') ? 'block' : 'none';
-        valCheck();
-    }
+const hiddenOtp =
+    document.getElementById('full_otp');
 
-    cells.forEach((cell, idx) => {
-        cell.addEventListener('input', (e) => {
-            if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
-            if (e.target.value && idx < cells.length - 1) cells[idx + 1].focus();
-            valCheck();
-        });
-        cell.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && !e.target.value && idx > 0) cells[idx - 1].focus();
-        });
+const submitBtn =
+    document.getElementById('complete-btn');
+
+const proofInput =
+    document.getElementById('proof_input');
+
+const previewWrap =
+    document.getElementById('preview-wrap');
+
+const photoBox =
+    document.getElementById('photo-box');
+
+const paymentMode =
+    document.getElementById('payment_mode');
+
+const codCheckbox =
+    document.getElementById('cod_checkbox');
+
+const utrInput =
+    document.getElementById('utr_input');
+
+/* ========================================================= */
+/* PAYMENT MODE */
+/* ========================================================= */
+
+function setPaymentMode(mode){
+
+    paymentMode.value = mode;
+
+    document
+        .getElementById('cash-btn')
+        ?.classList.toggle(
+            'active',
+            mode === 'cash'
+        );
+
+    document
+        .getElementById('upi-btn')
+        ?.classList.toggle(
+            'active',
+            mode === 'upi'
+        );
+
+    document
+        .getElementById('cash-section')
+        ?.style.setProperty(
+            'display',
+            mode === 'cash'
+                ? 'block'
+                : 'none'
+        );
+
+    document
+        .getElementById('upi-section')
+        ?.style.setProperty(
+            'display',
+            mode === 'upi'
+                ? 'block'
+                : 'none'
+        );
+
+    validateForm();
+}
+
+/* ========================================================= */
+/* OTP */
+/* ========================================================= */
+
+otpInputs.forEach((input,index)=>{
+
+    input.addEventListener('input',(e)=>{
+
+        e.target.value =
+            e.target.value.slice(0,1);
+
+        if(
+            e.target.value &&
+            index < otpInputs.length - 1
+        ){
+
+            otpInputs[index + 1].focus();
+        }
+
+        updateOtp();
     });
 
-    function imgIn(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('preview-wrap').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:25px; height:180px; object-fit:cover; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">`;
-                valCheck();
-            };
-            reader.readAsDataURL(input.files[0]);
+    input.addEventListener('keydown',(e)=>{
+
+        if(
+            e.key === 'Backspace' &&
+            !e.target.value &&
+            index > 0
+        ){
+
+            otpInputs[index - 1].focus();
         }
+    });
+});
+
+function updateOtp(){
+
+    let otp = '';
+
+    otpInputs.forEach(input => {
+
+        otp += input.value;
+    });
+
+    hiddenOtp.value = otp;
+
+    validateForm();
+}
+
+/* ========================================================= */
+/* PHOTO */
+/* ========================================================= */
+
+proofInput.addEventListener('change', function(){
+
+    if(this.files && this.files[0]){
+
+        const reader =
+            new FileReader();
+
+        reader.onload = (e)=>{
+
+            photoBox.classList.add('active');
+
+            previewWrap.innerHTML = `
+
+                <img
+                    src="${e.target.result}"
+                    class="preview-image">
+
+            `;
+        };
+
+        reader.readAsDataURL(this.files[0]);
     }
 
-    function valCheck() {
-        let pinVal = "";
-        cells.forEach(c => pinVal += c.value);
-        hidden.value = pinVal;
-        const hasPhoto = photoInput.files.length > 0;
-        const mode = modeInput ? modeInput.value : 'none';
-        let paymentValid = true;
-        if (mode === 'upi' && utrField) {
-            paymentValid = utrField.value.trim().length === 12;
-        }
-        btn.disabled = !(hasPhoto && pinVal.length === 4 && paymentValid);
+    validateForm();
+});
+
+/* ========================================================= */
+/* VALIDATION */
+/* ========================================================= */
+
+codCheckbox?.addEventListener(
+    'change',
+    validateForm
+);
+
+utrInput?.addEventListener(
+    'input',
+    validateForm
+);
+
+function validateForm(){
+
+    const otpValid =
+        hiddenOtp.value.length === 4;
+
+    const photoValid =
+        proofInput.files.length > 0;
+
+    let paymentValid = true;
+
+    {% if delivery.is_cod %}
+
+    const mode =
+        paymentMode.value;
+
+    const checked =
+        codCheckbox.checked;
+
+    if(mode === 'upi'){
+
+        paymentValid =
+            checked &&
+            utrInput.value.trim().length === 12;
+
+    }else{
+
+        paymentValid = checked;
     }
+
+    {% endif %}
+
+    submitBtn.disabled = !(
+
+        otpValid &&
+        photoValid &&
+        paymentValid
+
+    );
+}
+
 </script>
+
 {% endblock %}

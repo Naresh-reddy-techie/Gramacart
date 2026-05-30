@@ -45,7 +45,61 @@
                                        value="{{ form.name.value|default:'' }}"
                                        required>
                             </div>
+                            <!-- STATE -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    State
+                                </label>
 
+                                <input type="text"
+                                    name="state"
+                                    id="id_state"
+                                    class="form-control border-2"
+                                    value="{{ form.state.value|default:'Andhra Pradesh' }}"
+                                    required>
+                            </div>
+
+                            <!-- DISTRICT -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    District
+                                </label>
+
+                                <input type="text"
+                                    name="district"
+                                    id="id_district"
+                                    class="form-control border-2"
+                                    value="{{ form.district.value|default:'' }}"
+                                    required>
+                            </div>
+
+                            <!-- MANDAL -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    Mandal
+                                </label>
+
+                                <input type="text"
+                                    name="mandal"
+                                    id="id_mandal"
+                                    class="form-control border-2"
+                                    value="{{ form.mandal.value|default:'' }}"
+                                    required>
+                            </div>
+
+                            <!-- VILLAGE -->
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted text-uppercase mb-2">
+                                    Village/City
+                                </label>
+
+                                <input type="text"
+                                    name="village"
+                                    id="id_village"
+                                    class="form-control border-2"
+                                    value="{{ form.village.value|default:'' }}"
+                                    required>
+                            </div>
                             <!-- LAT LNG -->
                             <div class="row">
                                 <div class="col-6 mb-3">
@@ -128,7 +182,42 @@
                                     Coverage radius: <span id="radiusText">{{ form.max_delivery_radius_km.value }}</span> KM
                                 </small>
                             </div>
+                            <!-- HUB STATUS -->
+                            <div class="row mb-4">
 
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="is_active"
+                                            id="id_is_active"
+                                            checked
+                                        >
+
+                                        <label class="form-check-label fw-bold" for="id_is_active">
+                                            Active Hub
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="is_accepting_orders"
+                                            id="id_is_accepting_orders"
+                                            checked
+                                        >
+
+                                        <label class="form-check-label fw-bold" for="id_is_accepting_orders">
+                                            Accept Orders
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
                             <!-- WARNING -->
                             <div class="alert alert-warning border-0 rounded-4 small">
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -178,55 +267,167 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const lat = parseFloat(document.getElementById("id_latitude").value);
-const lng = parseFloat(document.getElementById("id_longitude").value);
-const radius = parseFloat(document.getElementById("id_max_delivery_radius_km").value);
+
+const lat = parseFloat(
+    document.getElementById("id_latitude").value
+);
+
+const lng = parseFloat(
+    document.getElementById("id_longitude").value
+);
+
+const radius = parseFloat(
+    document.getElementById("id_max_delivery_radius_km").value
+);
 
 const map = L.map("map").setView([lat, lng], 14);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+).addTo(map);
 
-const marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+const marker = L.marker(
+    [lat, lng],
+    { draggable: true }
+).addTo(map);
 
 const circle = L.circle([lat, lng], {
+
     color: "#0d6efd",
+
     fillColor: "#0d6efd",
+
     fillOpacity: 0.15,
+
     radius: radius * 1000
+
 }).addTo(map);
 
-function update(lat, lng) {
-    document.getElementById("id_latitude").value = lat.toFixed(6);
-    document.getElementById("id_longitude").value = lng.toFixed(6);
 
-    marker.setLatLng([lat, lng]);
-    circle.setLatLng([lat, lng]);
-    map.panTo([lat, lng]);
+// =====================================================
+// REVERSE GEOCODING
+// =====================================================
+
+function reverseGeocode(lat, lng){
+
+    fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        const address = data.address || {};
+
+        // STATE
+        document.getElementById("id_state").value =
+            address.state || "";
+
+        // DISTRICT
+        document.getElementById("id_district").value =
+            address.county || "";
+
+        // MANDAL
+        document.getElementById("id_mandal").value =
+            address.suburb ||
+            address.state_district ||
+            address.city_district ||
+            "";
+
+        // VILLAGE
+        document.getElementById("id_village").value =
+            address.village ||
+            address.hamlet ||
+            address.town ||
+            "";
+
+        // OPTIONAL AUTO NAME
+        if(address.village){
+
+            document.getElementById("id_name").value =
+                `GramaCart ${address.village}`;
+        }
+
+    })
+
+    .catch(err => {
+
+        console.log("Reverse geocode failed", err);
+
+    });
 }
 
+
+// =====================================================
+// UPDATE LOCATION
+// =====================================================
+
+function update(lat, lng){
+
+    document.getElementById("id_latitude").value =
+        lat.toFixed(6);
+
+    document.getElementById("id_longitude").value =
+        lng.toFixed(6);
+
+    marker.setLatLng([lat, lng]);
+
+    circle.setLatLng([lat, lng]);
+
+    map.panTo([lat, lng]);
+
+    reverseGeocode(lat, lng);
+}
+
+
+// =====================================================
+// MARKER DRAG
+// =====================================================
+
 marker.on("dragend", () => {
+
     const p = marker.getLatLng();
+
     update(p.lat, p.lng);
 });
 
+
+// =====================================================
+// MAP CLICK
+// =====================================================
+
 map.on("click", (e) => {
+
     update(e.latlng.lat, e.latlng.lng);
 });
 
-document.getElementById("id_max_delivery_radius_km").addEventListener("input", function () {
+
+// =====================================================
+// DELIVERY RADIUS
+// =====================================================
+
+document.getElementById(
+    "id_max_delivery_radius_km"
+).addEventListener("input", function () {
+
     circle.setRadius(this.value * 1000);
-    document.getElementById("radiusText").innerText = this.value;
+
+    document.getElementById("radiusText").innerText =
+        this.value;
 });
 
-document.getElementById("resetBtn").addEventListener("click", () => {
+
+// =====================================================
+// RESET BUTTON
+// =====================================================
+
+document.getElementById("resetBtn")
+.addEventListener("click", () => {
+
     update(lat, lng);
 });
-</script>
 
-<style>
-.fw-900 { font-weight: 900; }
-#map { z-index: 1; }
-.btn-white { background: #fff; }
-</style>
+</script>
 
 {% endblock %}

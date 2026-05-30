@@ -1,4 +1,4 @@
-"""
+
 from django.contrib import admin
 from django.urls import path,include
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('shop/',include('shop.urls')),
     path('payment/',include('payments.urls')),
     path('delivery_portal/',include('delivery_portal.urls')),
+    path('inventory/', include('inventory.urls'))
    
 ]
 if settings.DEBUG:
@@ -46,3 +47,5 @@ if settings.DEBUG:
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+
+"""

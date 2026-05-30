@@ -1,300 +1,960 @@
 {% extends "shop/base.html" %}
 {% load static %}
 
-{% block title %}GramaCart | My Addresses{% endblock %}
+{% block title %}
+GramaCart | My Addresses
+{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 
 <style>
-    :root { --primary: #10B981; --navy: #0F172A; --bg: #F8FAFC; }
 
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background: var(--bg);
-        color: var(--navy);
-        margin: 0;
-        padding-bottom: 100px;
-    }
+:root{
+    --primary:#10B981;
+    --primary-dark:#059669;
 
-    .header {
-        background: #fff;
-        padding: 16px 20px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column; /* 👈 important fix */
-        gap: 10px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.04);
-    }
+    --navy:#0F172A;
 
-    .header h2 {
-        font-size: 20px;
-        font-weight: 800;
-        margin: 0;
-    }
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
 
-    .btn-add-float {
-        position: fixed;
-        bottom: calc(90px + env(safe-area-inset-bottom)); /* 👈 FIX for navbar overlap */
-        right: 20px;
-        z-index: 3000; /* 👈 MUST be higher than bottom nav */
-        background: var(--primary);
-        color: #fff;
-        width: 60px;
-        height: 60px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-        text-decoration: none;
-        font-size: 24px;
-    }
+    --border:#E2E8F0;
 
-    .address-grid {
-        padding: 16px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 20px;
-    }
+    --text:#0F172A;
+    --muted:#64748B;
 
-    .address-card {
-        background: #fff;
-        border-radius: 28px;
-        padding: 20px;
-        position: relative;
-        border: 1px solid #E2E8F0;
-    }
+    --success-bg:#DCFCE7;
+    --success-text:#166534;
 
-    .address-card.default {
-        border-color: var(--primary);
-        background: #F0FDF4;
-    }
+    --danger-bg:#FEE2E2;
+    --danger-text:#991B1B;
 
-    .type-badge {
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        padding: 5px 12px;
-        border-radius: 10px;
-        background: #F1F5F9;
-        color: #64748B;
-    }
+    --shadow:
+        0 10px 30px rgba(15,23,42,0.05);
+}
 
-    .address-card.default .type-badge {
-        background: var(--primary);
-        color: white;
-    }
+/* =========================================================
+BASE
+========================================================= */
 
-    .recipient-name {
-        font-size: 18px;
-        font-weight: 800;
-        margin-top: 10px;
-        display: block;
-    }
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+}
 
-    .address-details {
-        font-size: 13px;
-        color: #64748B;
-        line-height: 1.6;
-        margin: 10px 0;
-        font-weight: 500;
-    }
+/* =========================================================
+HEADER
+========================================================= */
 
-    .address-map {
-        height: 160px;
-        border-radius: 20px;
-        margin: 15px 0;
-        border: 1px solid #E2E8F0;
-    }
+.address-header{
 
-    .delivery-status {
-        padding: 10px 15px;
-        border-radius: 14px;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
+    position:sticky;
+    top:0;
+    z-index:1000;
 
-    .status-inside { background: #DCFCE7; color: #166534; }
-    .status-outside { background: #FEE2E2; color: #991B1B; }
+    background:rgba(255,255,255,0.96);
 
-    .address-actions {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        gap: 8px;
-    }
+    backdrop-filter:blur(10px);
 
-    .action-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        border: 1px solid #E2E8F0;
-        text-decoration: none;
-    }
+    border-bottom:1px solid var(--border);
+}
 
-    .no-data {
-        text-align: center;
-        padding: 60px 20px;
-    }
+.address-header-inner{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+}
+
+.header-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.back-btn{
+
+    width:44px;
+    height:44px;
+
+    border-radius:14px;
+
+    background:#fff;
+
+    border:1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    color:var(--navy);
+}
+
+.page-title{
+
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:800;
+}
+
+.address-count{
+
+    padding:10px 14px;
+
+    border-radius:999px;
+
+    background:#fff;
+
+    border:1px solid var(--border);
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:var(--muted);
+}
+
+/* =========================================================
+WRAPPER
+========================================================= */
+
+.address-wrapper{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding:18px 14px 120px;
+}
+
+/* =========================================================
+GRID
+========================================================= */
+
+.address-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(340px,1fr));
+
+    gap:22px;
+}
+
+/* =========================================================
+CARD
+========================================================= */
+
+.address-card{
+
+    position:relative;
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:28px;
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+
+    transition:0.25s ease;
+}
+
+.address-card:hover{
+
+    transform:translateY(-2px);
+}
+
+.address-card.default{
+
+    border-color:#10B981;
+}
+
+/* =========================================================
+TOP BAR
+========================================================= */
+
+.card-top{
+
+    padding:18px 18px 0;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:space-between;
+
+    gap:12px;
+}
+
+.type-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:7px 12px;
+
+    border-radius:999px;
+
+    background:#F1F5F9;
+
+    color:#475569;
+
+    font-size:11px;
+
+    font-weight:800;
+
+    text-transform:uppercase;
+
+    letter-spacing:0.5px;
+}
+
+.address-card.default .type-badge{
+
+    background:#ECFDF5;
+
+    color:#047857;
+}
+
+.card-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.action-btn{
+
+    width:40px;
+    height:40px;
+
+    border-radius:14px;
+
+    border:1px solid var(--border);
+
+    background:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#334155;
+
+    text-decoration:none;
+
+    transition:0.2s ease;
+}
+
+.action-btn:hover{
+
+    background:#F8FAFC;
+
+    transform:translateY(-1px);
+}
+
+/* =========================================================
+CONTENT
+========================================================= */
+
+.card-content{
+
+    padding:16px 18px 18px;
+}
+
+.recipient{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:14px;
+}
+
+.recipient-avatar{
+
+    width:50px;
+    height:50px;
+
+    border-radius:16px;
+
+    background:#ECFDF5;
+
+    color:#047857;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:20px;
+}
+
+.recipient-name{
+
+    margin:0;
+
+    font-size:18px;
+
+    font-weight:800;
+}
+
+.phone{
+
+    margin:2px 0 0;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    font-weight:600;
+}
+
+/* =========================================================
+ADDRESS TEXT
+========================================================= */
+
+.address-box{
+
+    background:#F8FAFC;
+
+    border:1px solid #EEF2F7;
+
+    border-radius:18px;
+
+    padding:14px;
+
+    margin-bottom:16px;
+}
+
+.address-line{
+
+    margin:0;
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    color:#334155;
+
+    font-weight:600;
+}
+
+/* =========================================================
+MAP
+========================================================= */
+
+.address-map{
+
+    height:190px;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    border:1px solid var(--border);
+
+    margin-bottom:14px;
+}
+
+/* =========================================================
+STATUS
+========================================================= */
+
+.delivery-status{
+
+    min-height:48px;
+
+    border-radius:16px;
+
+    padding:12px 14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    font-size:13px;
+
+    font-weight:800;
+}
+
+.status-inside{
+
+    background:var(--success-bg);
+
+    color:var(--success-text);
+}
+
+.status-outside{
+
+    background:var(--danger-bg);
+
+    color:var(--danger-text);
+}
+
+/* =========================================================
+EMPTY STATE
+========================================================= */
+
+.empty-state{
+
+    background:#fff;
+
+    border-radius:30px;
+
+    border:1px solid var(--border);
+
+    padding:80px 24px;
+
+    text-align:center;
+
+    box-shadow:var(--shadow);
+}
+
+.empty-icon{
+
+    width:90px;
+    height:90px;
+
+    margin:auto auto 20px;
+
+    border-radius:28px;
+
+    background:#ECFDF5;
+
+    color:#059669;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:40px;
+}
+
+.empty-title{
+
+    font-size:24px;
+
+    font-weight:800;
+
+    margin-bottom:8px;
+}
+
+.empty-text{
+
+    color:var(--muted);
+
+    max-width:420px;
+
+    margin:auto auto 24px;
+}
+
+.btn-primary-modern{
+
+    min-height:54px;
+
+    padding:0 26px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    font-weight:800;
+
+    text-decoration:none;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+}
+
+/* =========================================================
+FLOAT BUTTON
+========================================================= */
+
+.btn-add-floating{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:calc(95px + env(safe-area-inset-bottom));
+
+    width:64px;
+    height:64px;
+
+    border-radius:24px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    font-size:24px;
+
+    box-shadow:
+        0 18px 40px rgba(16,185,129,0.35);
+
+    z-index:3000;
+}
+
+/* =========================================================
+LEAFLET
+========================================================= */
+
+.leaflet-control-attribution{
+    display:none;
+}
+
+.leaflet-popup-content{
+    font-weight:700;
+}
+
 </style>
+
 {% endblock %}
 
 {% block content %}
 
-<div class="header">
-    <div class="d-flex align-items-center gap-2">
-        <a href="{% url 'public_dashboard' %}" class="text-dark">
-            <i class="bi bi-arrow-left fs-4"></i>
-        </a>
-        <h2>Saved Addresses</h2>
+<!-- =====================================================
+HEADER
+===================================================== -->
+
+<div class="address-header">
+
+    <div class="address-header-inner">
+
+        <div class="header-left">
+
+            <a
+                href="{% url 'public_dashboard' %}"
+                class="back-btn"
+            >
+                <i class="bi bi-arrow-left"></i>
+            </a>
+
+            <div>
+
+                <h1 class="page-title">
+                    My Addresses
+                </h1>
+
+            </div>
+
+        </div>
+
+        <div class="address-count">
+
+            {{ addresses.count }}
+            Address{{ addresses.count|pluralize }}
+
+        </div>
+
     </div>
 
-    <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-700">
-        {{ addresses.count }} Total
-    </span>
-    <a href="{% url 'address_create' %}" class="btn-add-float">
-    <i class="bi bi-plus-lg"></i>
-</a>
 </div>
 
+<!-- =====================================================
+FLOAT BUTTON
+===================================================== -->
 
+<a
+    href="{% url 'address_create' %}"
+    class="btn-add-floating"
+>
+    <i class="bi bi-plus-lg"></i>
+</a>
+
+<!-- =====================================================
+BODY
+===================================================== -->
+
+<div class="address-wrapper">
 
 {% if addresses %}
-<div class="address-grid">
-    {% for address in addresses %}
-    <div class="address-card {% if address.is_default %}default{% endif %}">
 
-        <div class="address-actions">
-            <a href="{% url 'address_update' address.pk %}" class="action-btn">
-                <i class="bi bi-pencil-square"></i>
-            </a>
-            <a href="{% url 'address_delete' address.pk %}" class="action-btn">
-                <i class="bi bi-trash3"></i>
-            </a>
-        </div>
+<div class="address-grid">
+
+{% for address in addresses %}
+
+<div class="address-card {% if address.is_default %}default{% endif %}">
+
+    <!-- =================================================
+    TOP
+    ================================================== -->
+
+    <div class="card-top">
 
         <span class="type-badge">
+
+            {% if address.is_default %}
+                <i class="bi bi-check-circle-fill"></i>
+            {% endif %}
+
             {{ address.get_address_type_display }}
+
         </span>
 
-        <span class="recipient-name">{{ address.recipient_name }}</span>
+        <div class="card-actions">
 
-        <div class="address-details">
-            <i class="bi bi-geo-alt-fill"></i> {{ address.address_line }}<br>
-            <i class="bi bi-pin-map"></i> {{ address.landmark }}, {{ address.city }}<br>
-            <i class="bi bi-telephone-fill"></i> {{ address.phone_number }}
+            <a
+                href="{% url 'address_update' address.pk %}"
+                class="action-btn"
+            >
+                <i class="bi bi-pencil-square"></i>
+            </a>
+
+            <a
+                href="{% url 'address_delete' address.pk %}"
+                class="action-btn"
+            >
+                <i class="bi bi-trash3"></i>
+            </a>
+
         </div>
 
-        {% if address.latitude and address.longitude %}
-            <div id="map-{{ address.pk }}" class="address-map"></div>
+    </div>
 
-            <div id="status-{{ address.pk }}" class="delivery-status">
-                <div class="spinner-border spinner-border-sm"></div>
-                Checking...
+    <!-- =================================================
+    CONTENT
+    ================================================== -->
+
+    <div class="card-content">
+
+        <!-- recipient -->
+
+        <div class="recipient">
+
+            <div class="recipient-avatar">
+                <i class="bi bi-geo-alt-fill"></i>
             </div>
+
+            <div>
+
+                <h3 class="recipient-name">
+                    {{ address.recipient_name }}
+                </h3>
+
+                <p class="phone">
+                    {{ address.phone_number }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- address -->
+
+        <div class="address-box">
+
+            <p class="address-line">
+
+                {{ address.address_line }}
+
+                {% if address.landmark %}
+                    , {{ address.landmark }}
+                {% endif %}
+
+                <br>
+
+                {{ address.city }}
+                -
+                {{ address.pincode }}
+
+            </p>
+
+        </div>
+
+        <!-- map -->
+
+        {% if address.latitude and address.longitude %}
+
+        <div
+            id="map-{{ address.pk }}"
+            class="address-map"
+        ></div>
+
+        <div
+            id="status-{{ address.pk }}"
+            class="delivery-status status-outside"
+        >
+
+            <div
+                class="spinner-border spinner-border-sm"
+                role="status"
+            ></div>
+
+            Checking delivery availability...
+
+        </div>
+
         {% else %}
-            <div class="delivery-status status-outside">
-                Location missing
-            </div>
+
+        <div class="delivery-status status-outside">
+
+            <i class="bi bi-exclamation-triangle-fill"></i>
+
+            Location coordinates missing
+
+        </div>
+
         {% endif %}
 
     </div>
-    {% endfor %}
+
 </div>
+
+{% endfor %}
+
+</div>
+
 {% else %}
-<div class="no-data">
-    <i class="bi bi-geo-alt fs-1 text-muted"></i>
-    <h5 class="mt-3 fw-bold">No Addresses Yet</h5>
-    <p class="text-muted">Add your first delivery address</p>
+
+<!-- =====================================================
+EMPTY
+===================================================== -->
+
+<div class="empty-state">
+
+    <div class="empty-icon">
+        <i class="bi bi-geo-alt"></i>
+    </div>
+
+    <h2 class="empty-title">
+        No Saved Addresses
+    </h2>
+
+    <p class="empty-text">
+
+        Add your first delivery address
+        to start ordering from nearby hubs.
+
+    </p>
+
+    <a
+        href="{% url 'address_create' %}"
+        class="btn-primary-modern"
+    >
+        <i class="bi bi-plus-lg"></i>
+        Add Address
+    </a>
+
 </div>
+
 {% endif %}
+
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const nearestHubs = [
-    {% for hub in nearest_hubs %}
-    {
-        lat: {{ hub.latitude }},
-        lon: {{ hub.longitude }},
-        radius: {{ hub.max_delivery_radius_km|default:7 }} * 1000,
-        name: "{{ hub.name }}"
-    },
-    {% endfor %}
-];
+
+/* =========================================================
+HUBS
+========================================================= */
+
+const hubs = {{ delivery_hubs_json|safe }};
+
+/* =========================================================
+ICONS
+========================================================= */
 
 const userIcon = L.icon({
-    iconUrl: 'https://cdn-icons-png.flaticon.com/512/1673/1673188.png',
-    iconSize: [35, 35],
-    iconAnchor: [17, 35]
+
+    iconUrl:
+        "https://cdn-icons-png.flaticon.com/512/1673/1673188.png",
+
+    iconSize:[34,34],
+
+    iconAnchor:[17,34]
 });
 
 const hubIcon = L.icon({
-    iconUrl: 'https://cdn-icons-png.flaticon.com/512/609/609803.png',
-    iconSize: [30, 30],
-    iconAnchor: [15, 30]
+
+    iconUrl:
+        "https://cdn-icons-png.flaticon.com/512/609/609803.png",
+
+    iconSize:[28,28],
+
+    iconAnchor:[14,28]
 });
 
+/* =========================================================
+MAPS
+========================================================= */
+
 {% for address in addresses %}
+
 {% if address.latitude and address.longitude %}
-(function () {
+
+(function(){
+
     const lat = {{ address.latitude }};
     const lon = {{ address.longitude }};
 
-    const map = L.map('map-{{ address.pk }}', {
-        zoomControl: false,
-        attributionControl: false
-    }).setView([lat, lon], 14);
+    const map = L.map(
+        "map-{{ address.pk }}",
+        {
+            zoomControl:false,
+            attributionControl:false,
+            scrollWheelZoom:false
+        }
+    ).setView([lat, lon], 14);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png')
-        .addTo(map);
+    L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+    ).addTo(map);
 
-    nearestHubs.forEach(hub => {
-        L.circle([hub.lat, hub.lon], {
-            radius: hub.radius,
-            color: '#10B981',
-            fillOpacity: 0.1
-        }).addTo(map);
+    /* =====================================================
+    HUBS
+    ===================================================== */
 
-        L.marker([hub.lat, hub.lon], { icon: hubIcon })
-            .addTo(map)
-            .bindPopup(hub.name);
+    let deliverable = false;
+
+    hubs.forEach(hub=>{
+
+        L.circle(
+            [hub.lat, hub.lon],
+            {
+                radius:hub.radius,
+                color:"#10B981",
+                fillOpacity:0.08,
+                weight:2
+            }
+        ).addTo(map);
+
+        L.marker(
+            [hub.lat, hub.lon],
+            {
+                icon:hubIcon,
+                interactive:false
+            }
+        )
+        .addTo(map)
+        .bindPopup(hub.name);
+
+        const distance =
+            map.distance(
+                [lat, lon],
+                [hub.lat, hub.lon]
+            );
+
+        if(distance <= hub.radius){
+            deliverable = true;
+        }
+
     });
 
-    L.marker([lat, lon], { icon: userIcon }).addTo(map);
+    /* =====================================================
+    USER
+    ===================================================== */
 
-    let isDeliverable = false;
+    L.marker(
+        [lat, lon],
+        {
+            icon:userIcon
+        }
+    ).addTo(map);
 
-    nearestHubs.forEach(hub => {
-        const d = map.distance([lat, lon], [hub.lat, hub.lon]);
-        if (d <= hub.radius) isDeliverable = true;
-    });
+    /* =====================================================
+    STATUS
+    ===================================================== */
 
-    const statusEl = document.getElementById("status-{{ address.pk }}");
+    const status =
+        document.getElementById(
+            "status-{{ address.pk }}"
+        );
 
-    if (isDeliverable) {
-        statusEl.className = "delivery-status status-inside";
-        statusEl.innerHTML = "Serviceable Area";
+    if(deliverable){
+
+        status.className =
+            "delivery-status status-inside";
+
+        status.innerHTML = `
+            <i class="bi bi-check-circle-fill"></i>
+            Deliverable Area
+        `;
+
     } else {
-        statusEl.className = "delivery-status status-outside";
-        statusEl.innerHTML = "Outside Delivery Range";
+
+        status.className =
+            "delivery-status status-outside";
+
+        status.innerHTML = `
+            <i class="bi bi-x-circle-fill"></i>
+            Outside Delivery Range
+        `;
     }
+
 })();
+
 {% endif %}
+
 {% endfor %}
+
 </script>
+
 {% endblock %}

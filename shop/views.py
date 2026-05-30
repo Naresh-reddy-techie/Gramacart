@@ -1,192 +1,679 @@
-from django.shortcuts import render, get_object_or_404,redirect
-from django.db.models import Q, Prefetch
-from admin_dashboard.models import Product,Category,ProductImage, CompanyInfo
-from shop.models import CartItem
-from collections import defaultdict
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
 
-def get_filtered_products(query=None, category_slug=None):
-    """
-    Helper function to filter products based on search query or category.
-    Prefetches images for better performance.
-    """
-    products = Product.objects.all().prefetch_related(
-        Prefetch('product_images', queryset=ProductImage.objects.all())
+from django.db.models import (
+    Q,
+    Avg,
+    Count,
+    Prefetch,
+)
+
+from admin_dashboard.models import (
+    Product,
+    ProductVariant,
+    Category,
+    ProductImage,
+    CompanyInfo,
+    DeliveryHub,
+)
+
+from inventory.models import Inventory
+
+from shop.models import (
+    CartItem,
+    WishlistItem,
+)
+
+
+# =========================================================
+# HUB PRODUCTS
+# =========================================================
+
+def get_hub_products(hub, query=None, category_slug=None):
+
+    # -----------------------------------------------------
+    # INVENTORY FOR CURRENT HUB
+    # -----------------------------------------------------
+
+    inventory_qs = Inventory.objects.select_related(
+        "shop",
+        "variant",
+        "variant__product",
+    ).filter(
+        shop__hub=hub,
+        shop__is_active=True,
     )
 
+    # -----------------------------------------------------
+    # BASE PRODUCTS
+    # -----------------------------------------------------
+
+    products = Product.objects.filter(
+        is_active=True
+    ).select_related(
+        "category"
+    )
+
+    # -----------------------------------------------------
+    # CATEGORY FILTER
+    # -----------------------------------------------------
+
     if category_slug:
-        selected_category = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=selected_category)
-        print(f"Filtered by category: {selected_category.name}. Products count: {products.count()}")
+        products = products.filter(
+            category__slug=category_slug
+        )
+
+    # -----------------------------------------------------
+    # SEARCH FILTER
+    # -----------------------------------------------------
 
     if query:
         products = products.filter(
             Q(name__icontains=query) |
             Q(description__icontains=query) |
             Q(category__name__icontains=query)
-        ).distinct()
-        print(f"Filtered by query '{query}'. Products count: {products.count()}")
+        )
 
-    return products
+    # -----------------------------------------------------
+    # RATINGS
+    # -----------------------------------------------------
 
-def get_category_product_map(products):
-    """
-    Groups products by category for dashboard display.
-    """
-    category_product_map = defaultdict(list)
-    for product in products:
-        category_product_map[product.category].append(product)
-    return category_product_map
-
-
-from django.db.models import Avg, Count
-from inventory.models import Inventory 
-
-from django.db.models import Q, Prefetch
-
-from admin_dashboard.models import Product
-
-
-def get_hub_products(query=None, category_slug=None, hub=None):
-    """
-    Returns PRODUCTS based on INVENTORY availability in a HUB
-    """
-
-    # =========================
-    # STEP 1: Base inventory filter
-    # =========================
-    inventory_qs = Inventory.objects.select_related(
-        'variant__product',
-        'shop__hub',
-        'shop'
-    ).filter(
-        stock__gt=0,
-        shop__is_active=True,
+    products = products.annotate(
+        avg_rating_value=Avg("ratings__score"),
+        rating_count_value=Count("ratings", distinct=True),
     )
 
-    # =========================
-    # STEP 2: Hub filter (MOST IMPORTANT)
-    # =========================
-    if hub:
-        inventory_qs = inventory_qs.filter(shop__hub=hub)
+    # -----------------------------------------------------
+    # PREFETCH
+    # -----------------------------------------------------
 
-    # =========================
-    # STEP 3: Category filter
-    # =========================
-    if category_slug:
-        inventory_qs = inventory_qs.filter(
-            variant__product__category__slug=category_slug
+    products = products.prefetch_related(
+
+        Prefetch(
+            "product_images",
+            queryset=ProductImage.objects.all()
+        ),
+
+        Prefetch(
+            "variants",
+            queryset=ProductVariant.objects.filter(
+                is_active=True
+            ).prefetch_related(
+
+                Prefetch(
+                    "inventory_items",
+                    queryset=inventory_qs,
+                    to_attr="hub_inventory"
+                )
+
+            ),
+            to_attr="active_variants"
         )
+    )
 
-    # =========================
-    # STEP 4: Search filter
-    # =========================
-    if query:
-        inventory_qs = inventory_qs.filter(
-            Q(variant__product__name__icontains=query) |
-            Q(variant__product__description__icontains=query)
+    # -----------------------------------------------------
+    # PRODUCT CALCULATIONS
+    # -----------------------------------------------------
+
+    for product in products:
+
+        total_stock = 0
+        min_price = None
+        default_variant = None
+
+        # -------------------------------------------------
+        # VARIANTS
+        # -------------------------------------------------
+
+        for variant in getattr(product, "active_variants", []):
+
+            inventories = getattr(
+                variant,
+                "hub_inventory",
+                []
+            )
+
+            # ---------------------------------------------
+            # STOCK
+            # ---------------------------------------------
+
+            variant_stock = sum(
+                inv.stock for inv in inventories
+            )
+
+            total_stock += variant_stock
+
+            # ---------------------------------------------
+            # PRICE
+            # ---------------------------------------------
+
+            valid_prices = [
+
+                inv.selling_price
+
+                for inv in inventories
+
+                if inv.selling_price is not None
+
+            ]
+
+            # fallback to variant price if inventory
+            # price not available
+
+            if not valid_prices and getattr(variant, "price", None):
+                valid_prices.append(variant.price)
+
+            if valid_prices:
+
+                current_price = min(valid_prices)
+
+                if (
+                    min_price is None or
+                    current_price < min_price
+                ):
+
+                    min_price = current_price
+                    default_variant = variant
+
+        # -------------------------------------------------
+        # FINAL ATTRIBUTES
+        # -------------------------------------------------
+
+        product.total_stock = total_stock
+
+        # IMPORTANT:
+        # keep price even if stock = 0
+        # so product can still display as
+        # "Coming Soon"
+
+        product.min_price_value = min_price
+
+        product.default_variant_value = default_variant
+
+        # -------------------------------------------------
+        # IMAGE FALLBACK
+        # -------------------------------------------------
+
+        product.first_image = next(
+            iter(product.product_images.all()),
+            None
         )
-
-    # =========================
-    # STEP 5: Extract PRODUCTS
-    # (important: DISTINCT products only)
-    # =========================
-    products = Product.objects.filter(
-        id__in=inventory_qs.values_list('variant__product_id', flat=True)
-    ).distinct()
 
     return products
+
+
+# =========================================================
+# PUBLIC DASHBOARD
+# =========================================================
 
 def public_dashboard(request, category_slug=None):
-    query = request.GET.get('q', '').strip()
-    star_range = range(1, 6)
 
-    company_info = CompanyInfo.objects.first()
-    categories = Category.objects.all()
+    # -----------------------------------------------------
+    # SEARCH QUERY
+    # -----------------------------------------------------
 
-    # ==============================
-    # 1. ACTIVE HUB DETECTION
-    # ==============================
-    active_hub = None
+    query = request.GET.get("q", "").strip()
 
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.customer_profile
-            address = profile.addresses.filter(
-                is_default=True,
-                is_active=True
-            ).first()
+    # -----------------------------------------------------
+    # COMPANY
+    # -----------------------------------------------------
 
-            if address:
-                active_hub = DeliveryHub.objects.filter(
-                    is_active=True,
-                    city__iexact=address.city
-                ).first()
+    company = CompanyInfo.objects.first()
 
-        except Exception:
-            active_hub = None
+    # -----------------------------------------------------
+    # CATEGORIES
+    # -----------------------------------------------------
 
-    # ==============================
-    # 2. HUB-BASED PRODUCTS (NEW CORE)
-    # ==============================
-    products = get_hub_products(
-        query=query,
-        category_slug=category_slug,
-        hub=active_hub
-    ).annotate(
-        avg_rating_value=Avg('ratings__score'),
-        rating_count_value=Count('ratings')
+    categories = Category.objects.only(
+        "id",
+        "name",
+        "slug"
     )
 
-    # ==============================
-    # 3. CATEGORY VIEW (OPTIONAL)
-    # ==============================
+    # -----------------------------------------------------
+    # ACTIVE HUB
+    # -----------------------------------------------------
+
+    active_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    active_hub = DeliveryHub.objects.filter(
+        id=active_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).only(
+        "id",
+        "name"
+    ).first()
+
+    # -----------------------------------------------------
+    # HUB REQUIRED
+    # -----------------------------------------------------
+
+    if not active_hub:
+        return redirect("where_we_deliver")
+
+    # -----------------------------------------------------
+    # SELECTED CATEGORY
+    # -----------------------------------------------------
+
     selected_category = None
-    category_product_map = None
 
     if category_slug:
-        selected_category = get_object_or_404(Category, slug=category_slug)
 
-    if not (query or category_slug):
-        category_product_map = get_category_product_map(products)
-
-    # ==============================
-    # 4. CART COUNT
-    # ==============================
-    cart_count = 0
-    if request.user.is_authenticated:
-        cart_count = CartItem.objects.filter(user=request.user).count()
-
-    # ==============================
-    # 5. WISHLIST IDS
-    # ==============================
-    wishlist_ids = []
-    if request.user.is_authenticated:
-        wishlist_ids = list(
-            WishlistItem.objects.filter(user=request.user)
-            .values_list('product_id', flat=True)
+        selected_category = get_object_or_404(
+            Category.objects.only(
+                "id",
+                "name",
+                "slug"
+            ),
+            slug=category_slug
         )
 
-    # ==============================
-    # 6. CONTEXT
-    # ==============================
-    context = {
-        'categories': categories,
-        'selected_products': products,
-        'category_product_map': category_product_map,
-        'company': company_info,
-        'cart_count': cart_count,
-        'search_query': query,
-        'star_range': star_range,
-        'wishlist_ids': wishlist_ids,
+    # -----------------------------------------------------
+    # PRODUCTS
+    # -----------------------------------------------------
 
-        # 🔥 IMPORTANT FOR UI
-        'active_hub': active_hub,
+    products = get_hub_products(
+        hub=active_hub,
+        query=query,
+        category_slug=category_slug
+    )
+
+    # IMPORTANT:
+    # DO NOT REMOVE OUT OF STOCK PRODUCTS
+    # They should still appear as
+    # "Coming Soon"
+
+    # -----------------------------------------------------
+    # CART COUNT
+    # -----------------------------------------------------
+
+    cart_count = 0
+
+    if request.user.is_authenticated:
+
+        cart_count = CartItem.objects.filter(
+            user=request.user
+        ).count()
+
+    # -----------------------------------------------------
+    # WISHLIST IDS
+    # -----------------------------------------------------
+
+    wishlist_ids = []
+
+    if request.user.is_authenticated:
+
+        wishlist_ids = list(
+
+            WishlistItem.objects.filter(
+                user=request.user
+            ).values_list(
+                "product_id",
+                flat=True
+            )
+
+        )
+
+    # -----------------------------------------------------
+    # CONTEXT
+    # -----------------------------------------------------
+
+    context = {
+
+        "company": company,
+
+        "categories": categories,
+
+        "selected_category": selected_category,
+
+        "products": products,
+
+        "search_query": query,
+
+        "cart_count": cart_count,
+
+        "wishlist_ids": wishlist_ids,
+
+        "active_hub": active_hub,
+
+        "delivery_ready": True,
+
+        "star_range": range(1, 6),
+
     }
 
-    return render(request, 'Public_view/dashboard.html', context)
+    return render(
+        request,
+        "Public_view/dashboard.html",
+        context
+    )
 
+
+# =========================================================
+# WHERE SHOULD WE DELIVER
+# =========================================================
+
+from django.shortcuts import render
+
+from admin_dashboard.models import DeliveryHub
+
+
+def where_should_we_deliver(request):
+
+    """
+    Public delivery hub selection page.
+
+    Responsibilities:
+    - Show active delivery hubs
+    - Support remote/manual selection
+    - Used before entering marketplace
+    """
+
+    hubs_queryset = (
+
+        DeliveryHub.objects
+
+        .filter(
+            is_active=True,
+            is_accepting_orders=True
+        )
+
+        .order_by(
+            "state",
+            "district",
+            "mandal",
+            "village"
+        )
+
+        .values(
+            "id",
+            "name",
+            "state",
+            "district",
+            "mandal",
+            "village"
+        )
+    )
+
+    hubs = []
+
+    for hub in hubs_queryset:
+
+        hubs.append({
+
+            "id": hub["id"],
+
+            "name": (
+                hub["name"] or ""
+            ).strip(),
+
+            "state": (
+                hub["state"] or ""
+            ).strip(),
+
+            "district": (
+                hub["district"] or ""
+            ).strip(),
+
+            "mandal": (
+                hub["mandal"] or ""
+            ).strip(),
+
+            "village": (
+                hub["village"] or ""
+            ).strip(),
+        })
+
+    return render(
+        request,
+        "shop/where_we_deliver.html",
+        {
+            "hubs": hubs
+        }
+    )
+
+# =========================================================
+# DELIVERY AVAILABILITY CHECK
+# =========================================================
+
+import json
+import logging
+
+from decimal import Decimal
+from types import SimpleNamespace
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
+
+from admin_dashboard.models import DeliveryHub
+
+from shop.utils import check_address_within_hub
+
+logger = logging.getLogger(__name__)
+
+
+@require_POST
+@csrf_protect
+def check_delivery_availability(request):
+
+    """
+    Production-ready delivery availability engine.
+
+    Supports:
+    - GPS/local delivery
+    - Remote/manual hub selection
+    - Session-based hub locking
+    """
+
+    try:
+
+        # =====================================================
+        # REQUEST DATA
+        # =====================================================
+
+        data = json.loads(request.body or "{}")
+
+        flow_type = data.get("type")
+
+        if flow_type not in ["local", "remote"]:
+
+            return JsonResponse({
+                "success": False,
+                "message": "Invalid delivery type."
+            })
+
+        active_hub = None
+        hub_check = None
+
+        delivery_latitude = None
+        delivery_longitude = None
+
+        # =====================================================
+        # LOCAL DELIVERY
+        # =====================================================
+
+        if flow_type == "local":
+
+            latitude = data.get("latitude")
+            longitude = data.get("longitude")
+
+            if latitude is None or longitude is None:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "Unable to detect your location."
+                })
+
+            temp_address = SimpleNamespace(
+                latitude=Decimal(str(latitude)),
+                longitude=Decimal(str(longitude))
+            )
+
+            hub_check = check_address_within_hub(
+                temp_address,
+                allow_remote=False
+            )
+
+            # =================================================
+            # NO HUB FOUND
+            # =================================================
+
+            if not hub_check.delivery_hub:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "No nearby delivery hubs found."
+                })
+
+            # =================================================
+            # OUTSIDE DELIVERY RADIUS
+            # =================================================
+
+            if not hub_check.deliverable:
+
+                return JsonResponse({
+                    "success": True,
+                    "deliverable": False,
+                    "message": "Sorry, we are not serving this area yet.",
+                    "hub_name": hub_check.delivery_hub.name,
+                    "distance_km": float(
+                        hub_check.distance_km or 0
+                    )
+                })
+
+            active_hub = hub_check.delivery_hub
+
+            delivery_latitude = float(latitude)
+            delivery_longitude = float(longitude)
+
+        # =====================================================
+        # REMOTE DELIVERY
+        # =====================================================
+
+        else:
+
+            hub_id = data.get("hub_id")
+
+            if not hub_id:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "Please select delivery hub."
+                })
+
+            active_hub = DeliveryHub.objects.filter(
+                id=hub_id,
+                is_active=True,
+                is_accepting_orders=True
+            ).first()
+
+            if not active_hub:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "Selected delivery hub unavailable."
+                })
+
+            delivery_latitude = float(active_hub.latitude)
+            delivery_longitude = float(active_hub.longitude)
+
+        # =====================================================
+        # STORE SESSION
+        # =====================================================
+
+        request.session["active_hub_id"] = active_hub.id
+
+        request.session["delivery_type"] = flow_type
+
+        request.session["delivery_latitude"] = delivery_latitude
+
+        request.session["delivery_longitude"] = delivery_longitude
+
+        # =====================================================
+        # REMOTE SESSION DATA
+        # =====================================================
+
+        if flow_type == "remote":
+
+            request.session["selected_state"] = active_hub.state
+
+            request.session["selected_district"] = active_hub.district
+
+            request.session["selected_mandal"] = active_hub.mandal
+
+            request.session["selected_village"] = active_hub.village
+
+        else:
+
+            request.session.pop("selected_state", None)
+
+            request.session.pop("selected_district", None)
+
+            request.session.pop("selected_mandal", None)
+
+            request.session.pop("selected_village", None)
+
+        # =====================================================
+        # SUCCESS RESPONSE
+        # =====================================================
+
+        return JsonResponse({
+
+            "success": True,
+
+            "deliverable": True,
+
+            "message": "Delivery available in your area.",
+
+            "hub_name": active_hub.name,
+
+            "hub_location": (
+                active_hub.landmark
+                or active_hub.full_address
+                or active_hub.village
+            ),
+
+            "distance_km": (
+                round(float(hub_check.distance_km), 2)
+                if hub_check else 0
+            ),
+
+            "redirect_url": "/shop/public_dashboard/"
+        })
+
+    # =========================================================
+    # INVALID JSON
+    # =========================================================
+
+    except json.JSONDecodeError:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid request format."
+        })
+
+    # =========================================================
+    # SERVER ERROR
+    # =========================================================
+
+    except Exception as e:
+
+        logger.exception(
+            f"Delivery availability check failed: {e}"
+        )
+
+        return JsonResponse({
+            "success": False,
+            "message": "Something went wrong. Please try again."
+        })
 #----------my profile------------------------
 
 from .forms import CustomerProfileForm
@@ -215,218 +702,750 @@ def manage_profile(request):
 
 
 
+
+
 @login_required
 def profile_view(request):
-    try:
-        profile = request.user.customer_profile
-    except CustomerProfile.DoesNotExist:
-        return redirect('manage_profile')
 
-    # ✅ Use CustomerProfile everywhere (IMPORTANT)
-    orders_count = Order.objects.filter(user=request.user).count()
-    address_count = Address.objects.filter(customer=profile).count()
+    # =====================================================
+    # PROFILE
+    # =====================================================
 
-    # Status logic
+    profile = get_object_or_404(
+        CustomerProfile.objects.select_related("user"),
+        user=request.user
+    )
+
+    # =====================================================
+    # ADDRESSES
+    # =====================================================
+
+    addresses_qs = Address.active.filter(
+        customer=profile
+    )
+
+    address_count = addresses_qs.count()
+
+    # =====================================================
+    # DEFAULT ADDRESS
+    # =====================================================
+
+    default_address = addresses_qs.filter(
+        is_default=True
+    ).first()
+
+    # fallback
+    if not default_address:
+        default_address = addresses_qs.first()
+
+    # =====================================================
+    # ORDERS
+    # =====================================================
+
+    orders_qs = Order.objects.filter(
+        user=request.user
+    )
+
+    orders_count = orders_qs.count()
+
+    # =====================================================
+    # USER STATUS ENGINE
+    # =====================================================
+
     if orders_count == 0:
-        status = "New"
+        user_status = "New"
+
     elif orders_count < 10:
-        status = "Active"
+        user_status = "Active"
+
     elif orders_count < 30:
-        status = "Regular"
+        user_status = "Regular"
+
     else:
-        status = "Premium"
+        user_status = "Premium"
+
+    # =====================================================
+    # WISHLIST
+    # =====================================================
+
+    wishlist_count = 0
+
+    if hasattr(profile, "wishlist_items"):
+        wishlist_count = profile.wishlist_items.count()
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
 
     context = {
-        'user': request.user,
-        'profile': profile,
-        'orders_count': orders_count,
-        'address_count': address_count,
-        'user_status': status
+
+        "profile": profile,
+
+        "orders_count": orders_count,
+
+        "address_count": address_count,
+
+        "wishlist_count": wishlist_count,
+
+        "user_status": user_status,
+
+        "default_address": default_address,
     }
 
-    return render(request, 'profile/profile_view.html', context)
-#=================================================================
-from decimal import Decimal
+    return render(
+        request,
+        "profile/profile_view.html",
+        context
+    )
+# =========================================================
+# ACTIVE HUBS JSON
+# =========================================================
 
-from django.http import JsonResponse
+def get_active_hubs_json():
 
-from shop.forms import AddressForm
-from shop.utils import check_address_within_hub
+    hubs = DeliveryHub.objects.filter(
+        is_active=True,
+        is_accepting_orders=True
+    ).only(
+        "id",
+        "name",
+        "latitude",
+        "longitude",
+        "max_delivery_radius_km"
+    )
 
-# ================================
-# Reverse Geocode (AJAX)
-# ================================
-from geopy.geocoders import Nominatim
+    return json.dumps([
 
-geolocator = Nominatim(user_agent="hyperlocal_app")
+        {
+            "id": hub.id,
+            "name": hub.name,
+            "lat": float(hub.latitude),
+            "lon": float(hub.longitude),
+            "radius": float(
+                hub.max_delivery_radius_km or 7
+            ) * 1000
+        }
+
+        for hub in hubs
+    ])
+
+
+# =========================================================
+# REVERSE GEOCODE
+# =========================================================
 
 def reverse_geocode(request):
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
+
+    lat = request.GET.get("lat")
+    lon = request.GET.get("lon")
 
     if not lat or not lon:
-        return JsonResponse({'error': 'Missing coordinates'}, status=400)
+
+        return JsonResponse({
+            "success": False,
+            "message": "Coordinates missing."
+        })
 
     try:
-        location = geolocator.reverse(f"{lat},{lon}", exactly_one=True, zoom=18)
-        data = location.raw.get('address', {})
 
-        # Collect all potential landmarks for the "Chips"
-        poi_list = []
-        for key in ['amenity', 'tourism', 'historic', 'shop', 'office', 'building', 'attraction']:
-            val = data.get(key)
-            if val and val not in poi_list:
-                poi_list.append(val.replace('_', ' ').title())
+        lat = float(lat)
+        lon = float(lon)
 
-        # Primary landmark for the input field
-        landmark = next((l for l in poi_list if l), '')
+        location = geolocator.reverse(
+            (lat, lon),
+            exactly_one=True
+        )
 
-        response = {
-            'street': data.get('road', ''),
-            'city': data.get('city') or data.get('town') or data.get('village') or '',
-            'pincode': data.get('postcode', ''),
-            'state': data.get('state', 'Andhra Pradesh'),
-            'country': data.get('country', 'India'),
-            'landmark': landmark,
-            'nearby_pois': poi_list[:5]  # Send top 5 candidates for the UI chips
-        }
-        return JsonResponse(response)
+        if not location:
 
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({
+                "success": False,
+                "message": "Location not found."
+            })
 
-# ================================
-# Shared Save Logic
-# ================================
-def save_address_from_form(form, profile, allow_remote, lat, lon, address_instance=None):
-    """
-    Saves the address after checking hub distance and default flag.
-    """
-    address = form.save(commit=False)
-    address.customer = profile
-    address.latitude = Decimal(lat)
-    address.longitude = Decimal(lon)
+        data = location.raw.get(
+            "address",
+            {}
+        )
 
-    # Check if deliverable
-    hub_check = check_address_within_hub(address, allow_remote=allow_remote)
-    if not hub_check.deliverable:
-        return None, "Selected location is outside our delivery area."
+        city = (
+            data.get("city")
+            or data.get("town")
+            or data.get("village")
+            or ""
+        )
 
-    address.distance_km = hub_check.distance_km
+        return JsonResponse({
 
-    # Handle default address
-    if address.is_default:
-        Address.objects.filter(customer=profile, is_default=True).exclude(
-            pk=address_instance.pk if address_instance else None
-        ).update(is_default=False)
+            "success": True,
 
-    address.save()
-    return address, None
+            "street": data.get("road", ""),
+
+            "city": city,
+
+            "state": data.get("state", ""),
+
+            "country": data.get(
+                "country",
+                "India"
+            ),
+
+            "pincode": data.get(
+                "postcode",
+                ""
+            ),
+
+            "landmark": (
+                data.get("amenity")
+                or data.get("shop")
+                or data.get("building")
+                or ""
+            ),
+        })
+
+    except Exception:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Unable to fetch location."
+        })
+
+# =========================================================
+# ADDRESS CREATE / UPDATE (PRODUCTION GRADE)
+# =========================================================
+
+import json
+import logging
+
+from geopy.distance import geodesic
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import (
+    get_object_or_404,
+    redirect,
+    render
+)
+
+from admin_dashboard.models import DeliveryHub
+
+from shop.forms import AddressForm
+
+from .models import (
+    Address,
+    CustomerProfile
+)
+
+logger = logging.getLogger(__name__)
 
 
-# ================================
-# Create / Update View (Combined Logic)
-# ================================
+# =========================================================
+# ADDRESS FORM
+# =========================================================
+
 @login_required
 def address_form(request, pk=None):
-    profile = CustomerProfile.objects.filter(user=request.user).first()
-    if not profile:
-        return redirect('manage_profile')
-    hubs = DeliveryHub.objects.all() # Fetching hubs for the map circles
+
+    logger.info("========== ADDRESS FORM START ==========")
+
+    # =====================================================
+    # CUSTOMER
+    # =====================================================
+
+    profile = get_object_or_404(
+        CustomerProfile,
+        user=request.user
+    )
+
+    # =====================================================
+    # EDIT MODE
+    # =====================================================
+
     address_instance = None
 
     if pk:
-        address_instance = get_object_or_404(Address, pk=pk, customer=profile)
 
-    if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address_instance)
-        allow_remote = request.POST.get('remote_delivery') == "on"
-        lat = request.POST.get('latitude')
-        lon = request.POST.get('longitude')
+        address_instance = get_object_or_404(
+            Address.active,
+            pk=pk,
+            customer=profile
+        )
 
-        # Basic coordinate check
-        if not lat or not lon:
-            messages.error(request, "Please tap the map to pick your house location.")
-        else:
-            try:
-                lat_dec = Decimal(lat)
-                lon_dec = Decimal(lon)
-                
-                if form.is_valid():
-                    # Pass lat/lon directly to the save logic
-                    address, error = save_address_from_form(form, profile, allow_remote, lat_dec, lon_dec, address_instance)
-                    if error:
-                        messages.error(request, error)
-                    else:
-                        msg = "Address updated!" if pk else "Address saved!"
-                        messages.success(request, msg)
-                        return redirect('address_list')
-            except Exception as e:
-                messages.error(request, "Invalid map coordinates.")
-    else:
-        form = AddressForm(instance=address_instance)
+        logger.info(
+            "EDIT ADDRESS ID=%s",
+            address_instance.id
+        )
 
-    return render(request, 'address/address_form.html', {
-        'form': form,
-        'nearest_hubs': hubs, # Crucial for the Leaflet circles
-        'address': address_instance
-    })
+    # =====================================================
+    # FORM
+    # =====================================================
 
-# ================================
-# Delete Address
-# ================================
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from .models import Order, Address,CustomerProfile
+    form = AddressForm(
+        request.POST or None,
+        instance=address_instance
+    )
+
+    # =====================================================
+    # ACTIVE HUBS
+    # =====================================================
+
+    hubs_qs = DeliveryHub.objects.filter(
+        is_active=True,
+        is_accepting_orders=True
+    ).only(
+        "id",
+        "name",
+        "latitude",
+        "longitude",
+        "max_delivery_radius_km"
+    )
+
+    # =====================================================
+    # USER LOCATION
+    # =====================================================
+
+    user_lat = None
+    user_lon = None
+
+    # ---------------------------------------------
+    # POST GPS
+    # ---------------------------------------------
+
+    if request.method == "POST":
+
+        try:
+
+            user_lat = float(
+                request.POST.get("latitude")
+            )
+
+            user_lon = float(
+                request.POST.get("longitude")
+            )
+
+            logger.info(
+                "GPS FROM POST => %s,%s",
+                user_lat,
+                user_lon
+            )
+
+        except Exception:
+
+            logger.warning(
+                "POST GPS INVALID"
+            )
+
+    # ---------------------------------------------
+    # SESSION GPS
+    # ---------------------------------------------
+
+    if user_lat is None or user_lon is None:
+
+        try:
+
+            session_lat = request.session.get(
+                "delivery_latitude"
+            )
+
+            session_lon = request.session.get(
+                "delivery_longitude"
+            )
+
+            if session_lat and session_lon:
+
+                user_lat = float(session_lat)
+                user_lon = float(session_lon)
+
+                logger.info(
+                    "GPS FROM SESSION => %s,%s",
+                    user_lat,
+                    user_lon
+                )
+
+        except Exception:
+
+            logger.warning(
+                "SESSION GPS INVALID"
+            )
+
+    # =====================================================
+    # ACTIVE HUB RESOLUTION
+    # =====================================================
+
+    active_hub = None
+
+    # ---------------------------------------------
+    # GPS BASED HUB
+    # ---------------------------------------------
+
+    if user_lat and user_lon and hubs_qs.exists():
+
+        try:
+
+            active_hub = min(
+
+                hubs_qs,
+
+                key=lambda hub: geodesic(
+
+                    (
+                        float(user_lat),
+                        float(user_lon)
+                    ),
+
+                    (
+                        float(hub.latitude),
+                        float(hub.longitude)
+                    )
+
+                ).km
+            )
+
+            logger.info(
+                "GPS HUB => %s",
+                active_hub.name
+            )
+
+        except Exception as e:
+
+            logger.error(
+                "GPS HUB ERROR => %s",
+                str(e)
+            )
+
+    # ---------------------------------------------
+    # SESSION HUB
+    # ---------------------------------------------
+
+    if not active_hub:
+
+        session_hub_id = request.session.get(
+            "active_hub_id"
+        )
+
+        if session_hub_id:
+
+            active_hub = hubs_qs.filter(
+                id=session_hub_id
+            ).first()
+
+            logger.info(
+                "SESSION HUB => %s",
+                active_hub.name if active_hub else None
+            )
+
+    # ---------------------------------------------
+    # FINAL FALLBACK
+    # ---------------------------------------------
+
+    if not active_hub:
+
+        active_hub = hubs_qs.first()
+
+        logger.info(
+            "FALLBACK HUB => %s",
+            active_hub.name if active_hub else None
+        )
+
+    # =====================================================
+    # SESSION SYNC
+    # =====================================================
+
+    if active_hub:
+
+        request.session["active_hub_id"] = (
+            active_hub.id
+        )
+
+        logger.info(
+            "SESSION HUB SAVED => %s",
+            active_hub.name
+        )
+
+    # ---------------------------------------------
+    # SAVE CUSTOMER GPS (NOT HUB GPS)
+    # ---------------------------------------------
+
+    if user_lat and user_lon:
+
+        request.session["delivery_latitude"] = (
+            float(user_lat)
+        )
+
+        request.session["delivery_longitude"] = (
+            float(user_lon)
+        )
+
+        logger.info(
+            "SESSION GPS SAVED => %s,%s",
+            user_lat,
+            user_lon
+        )
+
+    # =====================================================
+    # SAVE FORM
+    # =====================================================
+
+    if request.method == "POST":
+
+        logger.info("POST REQUEST RECEIVED")
+
+        if form.is_valid():
+
+            address = form.save(
+                commit=False
+            )
+
+            address.customer = profile
+
+            # -----------------------------------------
+            # SINGLE DEFAULT ADDRESS
+            # -----------------------------------------
+
+            if address.is_default:
+
+                Address.active.filter(
+                    customer=profile,
+                    is_default=True
+                ).exclude(
+                    pk=address.pk
+                ).update(
+                    is_default=False
+                )
+
+            # -----------------------------------------
+            # SAVE
+            # -----------------------------------------
+
+            address.save()
+
+            logger.info(
+                "ADDRESS SAVED => ID=%s",
+                address.id
+            )
+
+            messages.success(
+                request,
+                "Address saved successfully."
+            )
+
+            return redirect(
+                "address_list"
+            )
+
+        logger.error(
+            "FORM ERRORS => %s",
+            form.errors
+        )
+
+        messages.error(
+            request,
+            "Please correct form errors."
+        )
+
+    # =====================================================
+    # HUB JSON
+    # =====================================================
+
+    delivery_hubs_json = json.dumps([
+
+        {
+            "id": hub.id,
+
+            "name": hub.name,
+
+            "lat": float(hub.latitude),
+
+            "lon": float(hub.longitude),
+
+            "radius": float(
+                hub.max_delivery_radius_km or 7
+            ) * 1000
+        }
+
+        for hub in hubs_qs
+
+    ])
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+
+        "form": form,
+
+        "address": address_instance,
+
+        "delivery_hubs_json": delivery_hubs_json,
+
+        "active_hub": {
+
+            "id": active_hub.id,
+
+            "name": active_hub.name,
+
+            "lat": float(active_hub.latitude),
+
+            "lon": float(active_hub.longitude)
+
+        } if active_hub else None
+    }
+
+    logger.info(
+        "FINAL ACTIVE HUB => %s",
+        active_hub.name if active_hub else None
+    )
+
+    logger.info("========== ADDRESS FORM END ==========")
+
+    return render(
+        request,
+        "address/address_form.html",
+        context
+    )
+
+# =========================================================
+# ADDRESS LIST
+# =========================================================
+@login_required
+def address_list(request):
+
+    profile = get_object_or_404(
+        CustomerProfile,
+        user=request.user
+    )
+
+    addresses = (
+        Address.active
+        .filter(customer=profile)
+        .order_by("-is_default", "-created_at")
+    )
+
+    delivery_hubs = (
+        DeliveryHub.objects
+        .filter(
+            is_active=True,
+            is_accepting_orders=True
+        )
+        .only(
+            "id",
+            "name",
+            "latitude",
+            "longitude",
+            "max_delivery_radius_km"
+        )
+    )
+
+    context = {
+
+        "addresses": addresses,
+
+        "delivery_hubs_json": [
+
+            {
+                "id": hub.id,
+                "name": hub.name,
+                "lat": float(hub.latitude),
+                "lon": float(hub.longitude),
+                "radius": float(
+                    hub.max_delivery_radius_km or 7
+                ) * 1000
+            }
+
+            for hub in delivery_hubs
+        ]
+    }
+
+    return render(
+        request,
+        "address/address_list.html",
+        context
+    )
+
+# =========================================================
+# ADDRESS DELETE
+# =========================================================
 
 @login_required
 def address_delete(request, pk):
-    profile = get_object_or_404(CustomerProfile, user=request.user)
-    address = get_object_or_404(Address, pk=pk, customer=profile)
 
-    if request.method == 'POST':
-        # 1. CHECK FOR ACTIVE ORDERS
-        # We don't want to hide an address if a Rider is currently looking for it!
-        active_orders = Order.objects.filter(
-            address=address, 
-            status__in=['pending', 'processing', 'shipped']
-        ).exists()
+    profile = get_object_or_404(
+        CustomerProfile,
+        user=request.user
+    )
 
-        if active_orders:
-            messages.error(request, "Cannot remove this address while an order is being delivered to it.")
-            return redirect('address_list')
+    address = get_object_or_404(
+        Address.active,
+        pk=pk,
+        customer=profile
+    )
 
-        # 2. SOFT DELETE (Deactivate instead of .delete())
-        address.is_active = False
-        address.save()
-        
-        messages.success(request, "Address removed from your profile.")
-        return redirect('address_list')
+    if request.method != "POST":
 
-    return render(request, 'address/address_confirm_delete.html', {'address': address})
+        return redirect(
+            "address_list"
+        )
 
-# ================================
-# List Addresses
-# ================================
-@login_required
-def address_list(request):
-    profile = get_object_or_404(CustomerProfile, user=request.user)
-    
-    # 1. FILTER: Only show addresses where is_active is True
-    # We order by '-is_default' so their primary address shows at the top
-    addresses = Address.objects.filter(
-        customer=profile, 
-        is_active=True
-    ).order_by('-is_default', '-id')
-    
-    # 2. HUB LOGIC: Keep your delivery hubs for the map/distance features
-    hubs = DeliveryHub.objects.filter(is_active=True) # Assuming hubs also have an active status
-    
-    return render(request, 'address/address_list.html', {
-        'addresses': addresses,
-        'nearest_hubs': hubs
-    })
+    # =====================================================
+    # ACTIVE ORDERS CHECK
+    # =====================================================
 
+    active_orders = Order.objects.filter(
+        address=address,
+        status__in=[
+            "pending",
+            "confirmed",
+            "packed",
+            "assigned",
+            "out_for_delivery"
+        ]
+    ).exists()
+
+    if active_orders:
+
+        messages.error(
+            request,
+            "Cannot delete address with active orders."
+        )
+
+        return redirect(
+            "address_list"
+        )
+
+    # =====================================================
+    # PREVENT DELETING LAST ADDRESS
+    # =====================================================
+
+    remaining = Address.active.filter(
+        customer=profile
+    ).count()
+
+    if remaining <= 1:
+
+        messages.error(
+            request,
+            "At least one address required."
+        )
+
+        return redirect(
+            "address_list"
+        )
+
+    # =====================================================
+    # SOFT DELETE
+    # =====================================================
+
+    address.deactivate()
+
+    messages.success(
+        request,
+        "Address removed successfully."
+    )
+
+    return redirect(
+        "address_list"
+    )
 #--------------------------------------------------------------------
 
 
@@ -438,38 +1457,548 @@ from django.utils import timezone
 # -------------------------
 # 🛒 CART VIEWS
 # -------------------------
+from decimal import Decimal
 
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import (
+    get_object_or_404,
+    redirect
+)
+
+from admin_dashboard.models import (
+    Product,
+    ProductVariant,
+    DeliveryHub
+)
+
+from inventory.models import Inventory
+
+from .models import CartItem
+
+
+# =========================================================
+# ADD TO CART
+# =========================================================
+import json
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import (
+    get_object_or_404,
+    redirect
+)
+
+from admin_dashboard.models import (
+    Product,
+    ProductVariant,
+    DeliveryHub
+)
+
+from inventory.models import Inventory
+
+from .models import CartItem
+
+
+# =========================================================
+# ADD TO CART
+# =========================================================
+import json
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import (
+    get_object_or_404,
+    redirect
+)
+from django.views.decorators.http import require_POST
+
+from admin_dashboard.models import (
+    DeliveryHub,
+    Product,
+    ProductVariant
+)
+
+from inventory.models import Inventory
+
 from shop.models import CartItem
-from admin_dashboard.models import Product
+
+
+# =========================================================
+# HELPER
+# =========================================================
+
+def _fail(
+    request,
+    message,
+    redirect_url="cart_view",
+    redirect_kwargs=None
+):
+
+    redirect_kwargs = redirect_kwargs or {}
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+
+        return JsonResponse({
+            "success": False,
+            "message": message
+        })
+
+    messages.error(request, message)
+
+    return redirect(
+        redirect_url,
+        **redirect_kwargs
+    )
+
+
+# =========================================================
+# ADD TO CART (PRODUCTION READY)
+# =========================================================
+
+import json
+import logging
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import (
+    get_object_or_404,
+    redirect
+)
+from django.views.decorators.http import require_POST
+
+from admin_dashboard.models import (
+    DeliveryHub,
+    Product,
+    ProductVariant
+)
+
+from inventory.models import Inventory
+
+from .models import CartItem
+
+
+logger = logging.getLogger(__name__)
+
+
+# =========================================================
+# STANDARD ERROR RESPONSE
+# =========================================================
+
+def _fail(
+    request,
+    message,
+    redirect_url="cart_view",
+    redirect_kwargs=None,
+    status=400,
+    extra_data=None
+):
+
+    redirect_kwargs = redirect_kwargs or {}
+    extra_data = extra_data or {}
+
+    # =====================================================
+    # AJAX RESPONSE
+    # =====================================================
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+
+        response_data = {
+            "success": False,
+            "message": message
+        }
+
+        response_data.update(extra_data)
+
+        return JsonResponse(
+            response_data,
+            status=status
+        )
+
+    # =====================================================
+    # NORMAL REQUEST
+    # =====================================================
+
+    messages.error(request, message)
+
+    return redirect(
+        redirect_url,
+        **redirect_kwargs
+    )
+
+
+# =========================================================
+# ADD TO CART
+# =========================================================
 
 @login_required
 @require_POST
 def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart_item, created = CartItem.objects.get_or_create(user=request.user, product=product)
 
-    if not created:
-        cart_item.quantity += 1
-        cart_item.save()
+    user = request.user
 
-    # Get current cart count
-    cart_count = CartItem.objects.filter(user=request.user).count()
+    # =====================================================
+    # PRODUCT
+    # =====================================================
 
-    # Return JSON for fetch
-    return JsonResponse({
-        'success': True,
-        'product_name': product.name,
-        'cart_count': cart_count
-    })
+    product = get_object_or_404(
+        Product,
+        id=product_id,
+        is_active=True
+    )
+
+    # =====================================================
+    # SAFE REQUEST PARSING
+    # =====================================================
+
+    data = {}
+
+    if request.body:
+
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            data = {}
+
+    variant_id = (
+        request.POST.get("variant_id")
+        or data.get("variant_id")
+        or request.GET.get("variant_id")
+    )
+
+    if not variant_id:
+
+        return _fail(
+            request,
+            "Please select product variant."
+        )
+
+    try:
+
+        quantity = int(
+            request.POST.get("quantity")
+            or data.get("quantity", 1)
+        )
+
+    except (TypeError, ValueError):
+
+        quantity = 1
+
+    quantity = max(1, quantity)
+
+    # =====================================================
+    # VARIANT
+    # =====================================================
+
+    variant = get_object_or_404(
+        ProductVariant,
+        id=variant_id,
+        product=product,
+        is_active=True
+    )
+
+    # =====================================================
+    # ACTIVE HUB (SOURCE OF TRUTH)
+    # =====================================================
+
+    session_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    if not session_hub_id:
+
+        return _fail(
+            request,
+            "Please select delivery location first.",
+            redirect_url="where_should_we_deliver"
+        )
+
+    active_hub = DeliveryHub.objects.filter(
+        id=session_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    if not active_hub:
+
+        return _fail(
+            request,
+            "Selected delivery hub unavailable.",
+            redirect_url="where_should_we_deliver"
+        )
+
+    # =====================================================
+    # TRANSACTION
+    # =====================================================
+
+    try:
+
+        with transaction.atomic():
+
+            # =================================================
+            # CLEAN CROSS HUB CART ITEMS
+            # =================================================
+
+            CartItem.objects.filter(
+                user=user
+            ).exclude(
+                hub=active_hub
+            ).delete()
+
+            # =================================================
+            # INVENTORY (STRICT HUB ISOLATION)
+            # =================================================
+
+            inventory = (
+                Inventory.objects
+                .select_for_update()
+                .select_related(
+                    "shop",
+                    "shop__hub",
+                    "variant"
+                )
+                .filter(
+                    variant=variant,
+                    stock__gt=0,
+                    shop__is_active=True,
+                    shop__hub=active_hub
+                )
+                .order_by(
+                    "selling_price",
+                    "-updated_at"
+                )
+                .first()
+            )
+
+            if not inventory:
+
+                return _fail(
+                    request,
+                    "Product unavailable in selected delivery area."
+                )
+
+            # =================================================
+            # SECURITY VALIDATION
+            # =================================================
+
+            if inventory.shop.hub_id != active_hub.id:
+
+                logger.warning(
+                    "Hub mismatch detected. "
+                    f"Inventory={inventory.id}, "
+                    f"Hub={active_hub.id}"
+                )
+
+                return _fail(
+                    request,
+                    "Inventory validation failed."
+                )
+
+            # =================================================
+            # ALLOWED QUANTITY
+            # =================================================
+
+            allowed_quantity = min(
+                inventory.stock,
+                inventory.max_order_quantity
+            )
+
+            if quantity > allowed_quantity:
+
+                return _fail(
+                    request,
+                    f"You can order maximum "
+                    f"{allowed_quantity} item(s)."
+                )
+
+            # =================================================
+            # EXISTING CART ITEM
+            # =================================================
+
+            cart_item = (
+                CartItem.objects
+                .select_for_update()
+                .filter(
+                    user=user,
+                    variant=variant,
+                    hub=active_hub
+                )
+                .first()
+            )
+
+            # =================================================
+            # UPDATE EXISTING CART
+            # =================================================
+
+            if cart_item:
+
+                new_quantity = (
+                    cart_item.quantity + quantity
+                )
+
+                if new_quantity > allowed_quantity:
+
+                    return _fail(
+                        request,
+                        f"You can order maximum "
+                        f"{allowed_quantity} item(s)."
+                    )
+
+                cart_item.quantity = new_quantity
+
+            # =================================================
+            # CREATE CART ITEM
+            # =================================================
+
+            else:
+
+                cart_item = CartItem(
+                    user=user,
+                    product=product,
+                    variant=variant,
+                    inventory=inventory,
+                    hub=active_hub,
+                    quantity=quantity
+                )
+
+            # =================================================
+            # ALWAYS SYNC PRICE + INVENTORY
+            # =================================================
+
+            cart_item.inventory = inventory
+
+            cart_item.unit_price = (
+                inventory.selling_price
+            )
+
+            cart_item.save()
+
+            # =================================================
+            # CART COUNT
+            # =================================================
+
+            cart_count = CartItem.objects.filter(
+                user=user,
+                hub=active_hub
+            ).count()
+
+    except Exception as e:
+
+        logger.exception(
+            f"ADD TO CART ERROR: {str(e)}"
+        )
+
+        return _fail(
+            request,
+            "Failed to add product to cart."
+        )
+
+    # =====================================================
+    # AJAX RESPONSE
+    # =====================================================
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+
+        return JsonResponse({
+
+            "success": True,
+
+            "message": "Added to cart.",
+
+            "cart_count": cart_count,
+
+            "hub_id": active_hub.id,
+
+            "hub_name": active_hub.name,
+
+            "product": product.name,
+
+            "variant": getattr(
+                variant,
+                "display_name",
+                ""
+            ),
+
+            "quantity": quantity
+        })
+
+    # =====================================================
+    # NORMAL RESPONSE
+    # =====================================================
+
+    messages.success(
+        request,
+        "Added to cart successfully."
+    )
+
+    return redirect("cart_view")
+# =========================================================
+# STANDARD ERROR RESPONSE HELPER
+# =========================================================
+
+from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import redirect
 
 
+def _fail(
+    request,
+    message,
+    redirect_url="cart_view",
+    redirect_kwargs=None,
+    status=400,
+    extra_data=None
+):
+    """
+    Production-ready unified error handler.
 
+    Supports:
+    - AJAX requests
+    - Normal requests
+    - Future API scalability
+    - Standardized responses
+    """
 
+    redirect_kwargs = redirect_kwargs or {}
+    extra_data = extra_data or {}
 
+    # =====================================================
+    # AJAX / API RESPONSE
+    # =====================================================
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+
+        response_data = {
+            "success": False,
+            "message": message
+        }
+
+        response_data.update(extra_data)
+
+        return JsonResponse(
+            response_data,
+            status=status
+        )
+
+    # =====================================================
+    # DJANGO MESSAGE FRAMEWORK
+    # =====================================================
+
+    messages.error(request, message)
+
+    # =====================================================
+    # STANDARD REDIRECT
+    # =====================================================
+
+    return redirect(
+        redirect_url,
+        **redirect_kwargs
+    )
 # -------------------------
 # 💚 WISHLIST VIEWS
 # -------------------------
@@ -513,588 +2042,2745 @@ def remove_from_wishlist(request, item_id):
 
 #=============================================================
 
-from django.db import transaction
-from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from decimal import Decimal
-
-# Import your optimized utilities
-from shop.utils import calculate_shipping_cost
-
-from .models import Product, Order, OrderItem, Address
-from payments.models import PaymentMethod
 from payments.models import Payment
+# =========================================================
+# BUY NOW CHECKOUT
+# =========================================================
 
 @login_required
 def buy_now(request, product_id):
-    product = get_object_or_404(Product, id=product_id, is_active=True)
+
     user = request.user
-    
-    try:
-        quantity = int(request.POST.get('quantity', 1))
-    except (ValueError, TypeError):
-        quantity = 1
-    
-    # --- FIX ISSUE #2 & #3: Stock Validation for GET (Preview) ---
-    if product.stock_available < quantity:
-        messages.warning(request, f"Sorry, only {product.stock_available} units left in stock.")
-        # If stock is 0, they shouldn't even be here, redirect them back
-        if product.stock_available == 0:
-            return redirect('public_dashboard')
 
-    user_addresses = Address.objects.filter(customer__user=user)
-    payment_methods = PaymentMethod.objects.filter(is_active=True).order_by('sort_order')
+    # =====================================================
+    # ACTIVE HUB (SESSION SOURCE OF TRUTH)
+    # =====================================================
 
-    if request.method == "GET":
-        subtotal = product.price * quantity
-        default_address = user_addresses.first()
-        shipping_fee = Decimal('0')
-        shipping_fee = Decimal('0')
-        is_serviceable = True
+    session_hub_id = request.session.get(
+        "active_hub_id"
+    )
 
-        if default_address:
-            ship_res = calculate_shipping_cost(default_address)
+    if not session_hub_id:
 
-            raw_fee = ship_res.get("customer_fee")
-            is_serviceable = not ship_res.get("error") and raw_fee is not None
-
-            if is_serviceable:
-                shipping_fee = Decimal(str(raw_fee))
-            else:
-                shipping_fee = Decimal('0')
-
-        totals = {
-            'sub_total': subtotal,
-            'shipping_cost': shipping_fee,
-            'final_total': subtotal + shipping_fee
-        }
-
-        return render(request, 'shop/checkout.html', {
-            'product': product,
-            'quantity': quantity,
-            'user_addresses': user_addresses,
-            'payment_methods': payment_methods,
-            'order_totals': totals,
-            'is_serviceable': is_serviceable,
-        })
-
-    # ---------------- POST (Processing the Instant Buy) ----------------
-    address_id = request.POST.get('address_id')
-    payment_method_id = request.POST.get('payment_method')
-
-    if not address_id or not payment_method_id:
-        messages.error(request, "Please select an address and payment method.")
-        return redirect('buy_now', product_id=product.id)
-
-    selected_address = get_object_or_404(Address, customer__user=user, id=address_id)
-    payment_method = get_object_or_404(PaymentMethod, id=payment_method_id, is_active=True)
-
-    shipping_res = calculate_shipping_cost(selected_address)
-
-    raw_fee = shipping_res.get("customer_fee")
-    is_serviceable = not shipping_res.get("error") and raw_fee is not None
-
-    if not is_serviceable:
         messages.error(
             request,
-            "Sorry, we are not delivering to this address. Please select another address."
+            "Please select delivery location first."
         )
-        return redirect('buy_now', product_id=product.id)
 
-    customer_fee = Decimal(str(raw_fee))
-    subtotal = product.price * quantity
-    final_total = subtotal + customer_fee
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    active_hub = DeliveryHub.objects.filter(
+        id=session_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    if not active_hub:
+
+        messages.error(
+            request,
+            "Selected delivery hub unavailable."
+        )
+
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    # =====================================================
+    # PRODUCT
+    # =====================================================
+
+    product = get_object_or_404(
+        Product,
+        id=product_id,
+        is_active=True
+    )
+
+    # =====================================================
+    # VARIANT
+    # =====================================================
+
+    variant_id = (
+        request.POST.get("variant_id")
+        or request.GET.get("variant_id")
+    )
+
+    if not variant_id:
+
+        messages.error(
+            request,
+            "Please select product variant."
+        )
+
+        return redirect(
+            "product_detail",
+            slug=product.slug
+        )
+
+    variant = get_object_or_404(
+        ProductVariant,
+        id=variant_id,
+        product=product,
+        is_active=True
+    )
+
+    # =====================================================
+    # QUANTITY
+    # =====================================================
 
     try:
+
+        quantity = int(
+            request.POST.get("quantity")
+            or request.GET.get("quantity")
+            or 1
+        )
+
+    except (TypeError, ValueError):
+
+        quantity = 1
+
+    quantity = max(1, quantity)
+
+    # =====================================================
+    # INVENTORY (STRICT HUB ISOLATION)
+    # =====================================================
+
+    inventory = (
+        Inventory.objects
+        .select_related(
+            "shop",
+            "shop__hub",
+            "variant"
+        )
+        .filter(
+            variant=variant,
+            stock__gt=0,
+            shop__is_active=True,
+            shop__hub=active_hub
+        )
+        .order_by(
+            "selling_price",
+            "-updated_at"
+        )
+        .first()
+    )
+
+    if not inventory:
+
+        messages.error(
+            request,
+            "Product unavailable in selected delivery area."
+        )
+
+        return redirect(
+            "product_detail",
+            slug=product.slug
+        )
+
+    # =====================================================
+    # HUB SECURITY CHECK
+    # =====================================================
+
+    if inventory.shop.hub_id != active_hub.id:
+
+        messages.error(
+            request,
+            "Inventory hub mismatch detected."
+        )
+
+        return redirect(
+            "product_detail",
+            slug=product.slug
+        )
+
+    # =====================================================
+    # STOCK VALIDATION
+    # =====================================================
+
+    if quantity > inventory.stock:
+
+        messages.error(
+            request,
+            f"Only {inventory.stock} item(s) available."
+        )
+
+        return redirect(
+            "product_detail",
+            slug=product.slug
+        )
+
+    # =====================================================
+    # MAX ORDER LIMIT
+    # =====================================================
+
+    if quantity > inventory.max_order_quantity:
+
+        messages.error(
+            request,
+            f"Maximum {inventory.max_order_quantity} item(s) allowed."
+        )
+
+        return redirect(
+            "product_detail",
+            slug=product.slug
+        )
+
+    # =====================================================
+    # USER ADDRESSES
+    # =====================================================
+
+    user_addresses = Address.objects.filter(
+        customer__user=user,
+        is_active=True
+    ).order_by(
+        "-is_default",
+        "-id"
+    )
+
+    # =====================================================
+    # PAYMENT METHODS
+    # =====================================================
+
+    payment_methods = PaymentMethod.objects.filter(
+        is_active=True
+    ).order_by(
+        "sort_order"
+    )
+
+    # =====================================================
+    # PRICING
+    # =====================================================
+
+    unit_price = Decimal(
+        str(inventory.selling_price)
+    )
+
+    sub_total = (
+        unit_price * quantity
+    )
+
+    order_totals = {
+        "sub_total": sub_total,
+        "shipping_cost": Decimal("0.00"),
+        "final_total": sub_total
+    }
+
+    # =====================================================
+    # GET REQUEST
+    # =====================================================
+
+    if request.method == "GET":
+
+        return render(
+            request,
+            "shop/checkout.html",
+            {
+                "product": product,
+                "variant": variant,
+                "inventory": inventory,
+                "quantity": quantity,
+                "user_addresses": user_addresses,
+                "payment_methods": payment_methods,
+                "active_hub": active_hub,
+                "order_totals": order_totals
+            }
+        )
+
+    # =====================================================
+    # ADDRESS
+    # =====================================================
+
+    address_id = request.POST.get(
+        "address_id"
+    )
+
+    payment_method_id = request.POST.get(
+        "payment_method"
+    )
+
+    if not address_id or not payment_method_id:
+
+        messages.error(
+            request,
+            "Please select address and payment method."
+        )
+
+        return redirect(
+            "buy_now",
+            product_id=product.id
+        )
+
+    address = get_object_or_404(
+        Address,
+        id=address_id,
+        customer__user=user,
+        is_active=True
+    )
+
+    payment_method = get_object_or_404(
+        PaymentMethod,
+        id=payment_method_id,
+        is_active=True
+    )
+
+    # =====================================================
+    # SHIPPING + GEO VALIDATION
+    # =====================================================
+
+    shipping_data = calculate_shipping_cost(
+        address=address,
+        delivery_hub=active_hub
+    )
+
+    if shipping_data.get("error"):
+
+        messages.error(
+            request,
+            shipping_data.get(
+                "message",
+                "Delivery unavailable"
+            )
+        )
+
+        return redirect(
+            "buy_now",
+            product_id=product.id
+        )
+
+    shipping_cost = Decimal(
+        str(
+            shipping_data.get(
+                "customer_fee",
+                0
+            )
+        )
+    )
+
+    final_total = (
+        sub_total + shipping_cost
+    )
+
+    # =====================================================
+    # ORDER CREATION
+    # =====================================================
+
+    try:
+
         with transaction.atomic():
-            # --- FIX ISSUE #2: Final Stock Check before creating Order ---
-            # select_for_update() locks the row so two people can't buy the same item at once
-            fresh_product = Product.objects.select_for_update().get(id=product.id)
-            
-            if fresh_product.stock_available < quantity:
-                messages.error(request, f"Could not complete order. Only {fresh_product.stock_available} units left.")
-                return redirect('public_dashboard')
 
-            # --- FIX: Subtract Stock ---
-            fresh_product.stock_available -= quantity
-            fresh_product.save()
+            locked_inventory = (
+                Inventory.objects
+                .select_for_update()
+                .select_related(
+                    "shop",
+                    "shop__hub"
+                )
+                .get(
+                    id=inventory.id
+                )
+            )
 
-            # 2. Create Order
+            # =============================================
+            # FINAL STOCK CHECK
+            # =============================================
+
+            if locked_inventory.stock < quantity:
+
+                raise Exception(
+                    f"Only {locked_inventory.stock} item(s) available."
+                )
+
+            # =============================================
+            # FINAL HUB VALIDATION
+            # =============================================
+
+            if locked_inventory.shop.hub_id != active_hub.id:
+
+                raise Exception(
+                    "Inventory hub mismatch."
+                )
+
+            # =============================================
+            # REDUCE STOCK
+            # =============================================
+
+            locked_inventory.reduce_stock(
+                quantity
+            )
+
+            # =============================================
+            # CREATE ORDER
+            # =============================================
+
             order = Order.objects.create(
+
                 user=user,
-                address=selected_address,
-                subtotal=subtotal,
-                shipping_cost=customer_fee,
+
+                address=address,
+
+                shop=locked_inventory.shop,
+
+                hub=active_hub,
+
+                subtotal=sub_total,
+
+                shipping_cost=shipping_cost,
+
                 total=final_total,
-                status='pending'
+
+                status="pending"
             )
 
-            # 3. Create single OrderItem
+            # =============================================
+            # ORDER ITEM
+            # =============================================
+
             OrderItem.objects.create(
+
                 order=order,
-                product=fresh_product,
+
+                product=product,
+
+                variant=variant,
+
+                inventory=locked_inventory,
+
                 quantity=quantity,
-                price=fresh_product.price
+
+                price=unit_price,
+
+                variant_name=getattr(
+                    variant,
+                    "display_name",
+                    ""
+                )
             )
 
-            # 4. Create Payment
+            # =============================================
+            # PAYMENT
+            # =============================================
+
             Payment.objects.create(
-                order=order,
-                method=payment_method,
-                amount=final_total,
-                currency='INR',
-                status='pending'
-            )
 
-            # 5. TRIGGER LOGISTICS ENGINE
-            from delivery_portal.models import Delivery 
-            Delivery.objects.create(
                 order=order,
-                status='pending' # It stays pending until Admin clicks 'Pack'
+
+                method=payment_method,
+
+                amount=final_total,
+
+                currency="INR",
+
+                status="pending"
             )
 
     except Exception as e:
-        print(f"Buy Now Error: {str(e)}")
-        messages.error(request, "Order failed. Please try again.")
-        return redirect('buy_now', product_id=product.id)
 
-    # 6. Success Routing
-    if payment_method.name.lower() == 'cod':
-        messages.success(request, "Order placed! We are fetching your items now.")
-        return redirect('order_detail', order_id=order.id)
+        messages.error(
+            request,
+            str(e)
+        )
 
-    return redirect('payment', order_id=order.id)
+        return redirect(
+            "buy_now",
+            product_id=product.id
+        )
+
+    # =====================================================
+    # COD FLOW
+    # =====================================================
+
+    if payment_method.name.lower() == "cod":
+
+        messages.success(
+            request,
+            "Order placed successfully."
+        )
+
+        return redirect(
+            "order_detail",
+            order_id=order.id
+        )
+
+    # =====================================================
+    # ONLINE PAYMENT
+    # =====================================================
+
+    return redirect(
+        "payment",
+        order_id=order.id
+    )
+
+# =========================================================
+# AJAX SHIPPING CALCULATOR
+# =========================================================
 
 @login_required
-def get_buy_now_shipping_cost(request, product_id):
+def get_buy_now_shipping_cost(
+    request,
+    product_id
+):
+
     user = request.user
-    address_id = request.GET.get("address_id")
-    
-    if not address_id:
-        return JsonResponse({"success": False, "error": "Address not provided"}, status=400)
 
-    try:
-        address = Address.objects.get(customer__user=user, id=address_id)
-    except Address.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Address not found"}, status=404)
+    # =====================================================
+    # ACTIVE HUB
+    # =====================================================
 
-    # 1. Get the shipping info from your utility
-    shipping_info = calculate_shipping_cost(address)
+    session_hub_id = request.session.get(
+        "active_hub_id"
+    )
 
-    # 2. STRICT VALIDATION:
-    # An area is ONLY serviceable if the utility didn't error 
-    # AND the database actually returned a fee (even if the fee is 0.00).
-    # If customer_fee is None, it means no Shipping Slab exists for that distance.
-    raw_fee = shipping_info.get("customer_fee")
-    is_serviceable = not shipping_info.get('error') and raw_fee is not None
+    if not session_hub_id:
 
-    if not is_serviceable:
         return JsonResponse({
             "success": False,
-            "message": "Sorry currently we are not serving this area .Please select another address.",
-            "shipping_cost": 0,
-            "distance": float(shipping_info.get("distance_km") or 0)
+            "message": "Delivery location not selected"
         })
 
-    # 3. AREA IS VALID - Return full data
+    active_hub = DeliveryHub.objects.filter(
+        id=session_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    if not active_hub:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Delivery hub unavailable"
+        })
+
+    # =====================================================
+    # ADDRESS
+    # =====================================================
+
+    address_id = request.GET.get(
+        "address_id"
+    )
+
+    if not address_id:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Address required"
+        })
+
+    try:
+
+        address = Address.objects.get(
+            id=address_id,
+            customer__user=user,
+            is_active=True
+        )
+
+    except Address.DoesNotExist:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid address"
+        })
+
+    # =====================================================
+    # SHIPPING ENGINE
+    # =====================================================
+
+    shipping_data = calculate_shipping_cost(
+        address=address,
+        delivery_hub=active_hub
+    )
+
+    if shipping_data.get("error"):
+
+        return JsonResponse({
+            "success": False,
+            "message": shipping_data.get(
+                "message",
+                "Delivery unavailable"
+            )
+        })
+
     return JsonResponse({
+
         "success": True,
-        "shipping_cost": float(raw_fee),
-        "rider_earning": float(shipping_info.get("rider_earning") or 0),
-        "platform_fee": float(shipping_info.get("platform_fee") or 0),
-        "distance": float(shipping_info.get("distance_km") or 0),
-        "hub": shipping_info.get("hub_name", "Unknown")
+
+        "shipping_cost": float(
+            shipping_data.get(
+                "customer_fee",
+                0
+            )
+        ),
+
+        "rider_earning": float(
+            shipping_data.get(
+                "rider_earning",
+                0
+            )
+        ),
+
+        "platform_fee": float(
+            shipping_data.get(
+                "platform_fee",
+                0
+            )
+        ),
+
+        "distance": float(
+            shipping_data.get(
+                "distance_km",
+                0
+            )
+        ),
+
+        "hub": shipping_data.get(
+            "hub_name",
+            active_hub.name
+        )
     })
 #=================================
+from decimal import Decimal
 
-from django.shortcuts import get_object_or_404
-from shop.models import Rating, WishlistItem  # 👈 add Wishlist
+from django.db.models import Prefetch
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
+
+from decimal import Decimal
+
+from django.db.models import Prefetch
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
+
+from admin_dashboard.models import (
+    Product,
+    ProductVariant,
+    DeliveryHub,
+)
+
+from inventory.models import Inventory
+from shop.models import WishlistItem
+
 
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug)
 
-    average_rating = product.avg_rating
-    reviews = product.ratings.select_related('user').order_by('-created_at')
+    # =====================================================
+    # ACTIVE HUB
+    # =====================================================
+    active_hub_id = request.session.get(
+        "active_hub_id"
+    )
 
-    user_rating = None
-    if request.user.is_authenticated:
-        user_rating = reviews.filter(user=request.user).first()
+    active_hub = DeliveryHub.objects.filter(
+        id=active_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
 
-    related_products = Product.objects.filter(
-        category=product.category
-    ).exclude(id=product.id)[:6]
+    # =====================================================
+    # NO ACTIVE HUB
+    # =====================================================
+    if not active_hub:
 
-    # ✅ 🔥 ADD THIS BLOCK
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    # =====================================================
+    # INVENTORY QUERY
+    # =====================================================
+    inventory_qs = Inventory.objects.select_related(
+        "shop",
+        "shop__hub",
+        "variant"
+    ).filter(
+
+        variant__is_active=True,
+
+        shop__is_active=True,
+
+        shop__hub=active_hub,
+
+        selling_price__isnull=False
+
+    )
+
+    # =====================================================
+    # PRODUCT QUERY
+    # =====================================================
+    product = get_object_or_404(
+
+        Product.objects.prefetch_related(
+
+            "product_images",
+
+            Prefetch(
+
+                "variants",
+
+                queryset=ProductVariant.objects.filter(
+                    is_active=True
+                ).prefetch_related(
+
+                    Prefetch(
+                        "inventory_items",
+                        queryset=inventory_qs,
+                        to_attr="hub_inventory"
+                    )
+
+                ),
+
+                to_attr="active_variants"
+
+            )
+
+        ),
+
+        slug=slug,
+        is_active=True
+
+    )
+
+    # =====================================================
+    # VARIANTS
+    # =====================================================
+    variants = []
+
+    for variant in product.active_variants:
+
+        # -------------------------------------------------
+        # SAFETY
+        # -------------------------------------------------
+        if not variant.is_active:
+            continue
+
+        inventories = getattr(
+            variant,
+            "hub_inventory",
+            []
+        )
+
+        # -------------------------------------------------
+        # NO INVENTORY
+        #
+        # Product exists globally
+        # but inventory not assigned yet
+        # -------------------------------------------------
+        if not inventories:
+            continue
+
+        # -------------------------------------------------
+        # VALID PRICES
+        # -------------------------------------------------
+        valid_prices = [
+
+            Decimal(str(inv.selling_price))
+
+            for inv in inventories
+
+            if inv.selling_price is not None
+
+        ]
+
+        if not valid_prices:
+            continue
+
+        # -------------------------------------------------
+        # LOWEST PRICE
+        # -------------------------------------------------
+        min_price = min(valid_prices)
+
+        # -------------------------------------------------
+        # TOTAL STOCK
+        # -------------------------------------------------
+        total_stock = sum(
+
+            int(inv.stock or 0)
+
+            for inv in inventories
+
+        )
+
+        # -------------------------------------------------
+        # STOCK STATUS
+        # -------------------------------------------------
+        in_stock = total_stock > 0
+
+        if total_stock <= 0:
+
+            stock_status = "Coming Soon"
+
+        elif total_stock <= 5:
+
+            stock_status = f"Only {total_stock} left"
+
+        else:
+
+            stock_status = "In Stock"
+
+        # -------------------------------------------------
+        # APPEND
+        # -------------------------------------------------
+        variants.append({
+
+            "id": variant.id,
+
+            "name": variant.display_name,
+
+            "price": min_price,
+
+            "stock": total_stock,
+
+            "in_stock": in_stock,
+
+            "status": stock_status,
+
+        })
+
+    # =====================================================
+    # SORT VARIANTS
+    #
+    # PRIORITY:
+    # 1. In-stock first
+    # 2. Lower price first
+    # =====================================================
+    variants.sort(
+
+        key=lambda x: (
+
+            not x["in_stock"],
+
+            x["price"]
+
+        )
+
+    )
+
+    # =====================================================
+    # PRODUCT STOCK STATUS
+    # =====================================================
+    is_in_stock = any(
+
+        variant["in_stock"]
+
+        for variant in variants
+
+    )
+
+    # =====================================================
+    # DEFAULT VARIANT
+    # =====================================================
+    default_variant = next(
+
+        (
+
+            variant
+
+            for variant in variants
+
+            if variant["in_stock"]
+
+        ),
+
+        variants[0] if variants else None
+
+    )
+
+    # =====================================================
+    # REVIEWS
+    # =====================================================
+    reviews = product.ratings.select_related(
+        "user"
+    ).order_by(
+        "-created_at"
+    )
+
+    # =====================================================
+    # WISHLIST
+    # =====================================================
     wishlist_ids = []
+
     if request.user.is_authenticated:
-        wishlist_ids = WishlistItem.objects.filter(
-            user=request.user
-        ).values_list('product_id', flat=True)
 
+        wishlist_ids = list(
+
+            WishlistItem.objects.filter(
+                user=request.user
+            ).values_list(
+                "product_id",
+                flat=True
+            )
+
+        )
+
+    # =====================================================
+    # RELATED PRODUCTS
+    # =====================================================
+    related_products = Product.objects.filter(
+
+        category=product.category,
+
+        is_active=True
+
+    ).exclude(
+
+        id=product.id
+
+    ).prefetch_related(
+
+        "product_images"
+
+    )[:8]
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
     context = {
-        'product': product,
-        'related_products': related_products,
-        'star_range': range(1, 6),
-        'average_rating': average_rating,
-        'reviews': reviews,
-        'user_rating': user_rating,
-        'rating_count': product.rating_count,
 
-        # ✅ 👇 IMPORTANT
-        'wishlist_ids': list(wishlist_ids),
+        # PRODUCT
+        "product": product,
+
+        # VARIANTS
+        "variants": variants,
+
+        # DEFAULT VARIANT
+        "default_variant": default_variant,
+
+        # STOCK
+        "is_in_stock": is_in_stock,
+
+        # REVIEWS
+        "reviews": reviews,
+
+        "avg_rating": product.avg_rating,
+
+        "rating_count": product.rating_count,
+
+        # WISHLIST
+        "wishlist_ids": wishlist_ids,
+
+        # HUB
+        "active_hub": active_hub,
+
+        # RELATED PRODUCTS
+        "related_products": related_products,
+
     }
 
-    return render(request, 'Public_view/product_detail.html', context)
+    # =====================================================
+    # RENDER
+    # =====================================================
+    return render(
 
+        request,
+
+        "Public_view/product_detail.html",
+
+        context
+
+    )
+
+    # =====================================================
+    # ACTIVE DELIVERY HUB
+    # =====================================================
+    active_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    active_hub = DeliveryHub.objects.filter(
+        id=active_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    # =====================================================
+    # NO ACTIVE HUB
+    # =====================================================
+    if not active_hub:
+
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    # =====================================================
+    # INVENTORY QUERY
+    #
+    # IMPORTANT:
+    # - DO NOT FILTER stock__gt=0
+    #   because we want out-of-stock variants visible
+    #
+    # - ONLY ACTIVE VARIANTS
+    # - ONLY ACTIVE SHOPS
+    # =====================================================
+    inventory_qs = Inventory.objects.select_related(
+        "shop",
+        "shop__hub",
+        "variant"
+    ).filter(
+
+        variant__is_active=True,
+
+        shop__is_active=True,
+
+        shop__hub=active_hub,
+
+        selling_price__isnull=False
+
+    )
+
+    # =====================================================
+    # PRODUCT QUERY
+    # =====================================================
+    product = get_object_or_404(
+
+        Product.objects.prefetch_related(
+
+            "product_images",
+
+            Prefetch(
+
+                "variants",
+
+                queryset=ProductVariant.objects.filter(
+                    is_active=True
+                ).prefetch_related(
+
+                    Prefetch(
+                        "inventory_items",
+                        queryset=inventory_qs,
+                        to_attr="hub_inventory"
+                    )
+
+                ),
+
+                to_attr="active_variants"
+
+            )
+
+        ),
+
+        slug=slug,
+        is_active=True
+
+    )
+
+    # =====================================================
+    # VARIANTS
+    # =====================================================
+    variants = []
+
+    for variant in product.active_variants:
+
+        # -------------------------------------------------
+        # SAFETY
+        # NEVER SHOW INACTIVE VARIANT
+        # -------------------------------------------------
+        if not variant.is_active:
+            continue
+
+        inventories = getattr(
+            variant,
+            "hub_inventory",
+            []
+        )
+
+        # -------------------------------------------------
+        # NO INVENTORY IN THIS HUB
+        # HIDE VARIANT COMPLETELY
+        # -------------------------------------------------
+        if not inventories:
+            continue
+
+        # -------------------------------------------------
+        # VALID PRICES
+        # -------------------------------------------------
+        valid_prices = [
+
+            Decimal(str(inv.selling_price))
+
+            for inv in inventories
+
+            if inv.selling_price is not None
+
+        ]
+
+        # -------------------------------------------------
+        # NO VALID PRICE
+        # -------------------------------------------------
+        if not valid_prices:
+            continue
+
+        # -------------------------------------------------
+        # LOWEST PRICE
+        # -------------------------------------------------
+        min_price = min(valid_prices)
+
+        # -------------------------------------------------
+        # TOTAL STOCK
+        # -------------------------------------------------
+        total_stock = sum(
+
+            int(inv.stock or 0)
+
+            for inv in inventories
+
+        )
+
+        # -------------------------------------------------
+        # STOCK STATUS
+        # -------------------------------------------------
+        in_stock = total_stock > 0
+
+        if total_stock <= 0:
+
+            stock_status = "Out of Stock"
+
+        elif total_stock <= 5:
+
+            stock_status = f"Only {total_stock} left"
+
+        else:
+
+            stock_status = "In Stock"
+
+        # -------------------------------------------------
+        # APPEND
+        # -------------------------------------------------
+        variants.append({
+
+            "id": variant.id,
+
+            "name": variant.display_name,
+
+            "price": min_price,
+
+            "stock": total_stock,
+
+            "in_stock": in_stock,
+
+            "status": stock_status,
+
+        })
+
+        # =====================================================
+        # SORT VARIANTS
+        #
+        # PRIORITY:
+        # 1. In-stock first
+        # 2. Lower price first
+        # =====================================================
+        variants.sort(
+
+            key=lambda x: (
+
+                not x["in_stock"],
+
+                x["price"]
+
+            )
+
+        )
+
+        # =====================================================
+        # PRODUCT STOCK STATUS
+        # =====================================================
+        is_in_stock = any(
+
+            variant["in_stock"]
+
+            for variant in variants
+
+        )
+
+        # =====================================================
+        # DEFAULT VARIANT
+        # =====================================================
+        default_variant = next(
+
+            (
+
+                variant
+
+                for variant in variants
+
+                if variant["in_stock"]
+
+            ),
+
+            variants[0] if variants else None
+
+        )
+
+    # =====================================================
+    # REVIEWS
+    # =====================================================
+    reviews = product.ratings.select_related(
+        "user"
+    ).order_by(
+        "-created_at"
+    )
+
+    # =====================================================
+    # WISHLIST
+    # =====================================================
+    wishlist_ids = []
+
+    if request.user.is_authenticated:
+
+        wishlist_ids = list(
+
+            WishlistItem.objects.filter(
+                user=request.user
+            ).values_list(
+                "product_id",
+                flat=True
+            )
+
+        )
+
+    # =====================================================
+    # RELATED PRODUCTS
+    # =====================================================
+    related_products = Product.objects.filter(
+
+        category=product.category,
+
+        is_active=True
+
+    ).exclude(
+
+        id=product.id
+
+    ).prefetch_related(
+
+        "product_images"
+
+    )[:8]
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+    context = {
+
+        # PRODUCT
+        "product": product,
+
+        # VARIANTS
+        "variants": variants,
+
+        "default_variant": default_variant,
+
+        # STOCK
+        "is_in_stock": is_in_stock,
+
+        # REVIEWS
+        "reviews": reviews,
+
+        "avg_rating": product.avg_rating,
+
+        "rating_count": product.rating_count,
+
+        # WISHLIST
+        "wishlist_ids": wishlist_ids,
+
+        # HUB
+        "active_hub": active_hub,
+
+        # RELATED PRODUCTS
+        "related_products": related_products,
+
+    }
+
+    # =====================================================
+    # RENDER
+    # =====================================================
+    return render(
+
+        request,
+
+        "Public_view/product_detail.html",
+
+        context
+
+    )
 from django.views.decorators.http import require_POST
 # =================== CART VIEW ===================
 import json
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from .models import CartItem, Product
+from decimal import Decimal
 
-def get_cart_totals(user):
-    cart_items = CartItem.objects.filter(user=user)
-    # Change 'get_effective_price()' to 'price'
-    sub_total = sum(float(item.product.price) * item.quantity for item in cart_items)
-    
-    
-       
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_POST
+
+from admin_dashboard.models import DeliveryHub
+
+from inventory.models import Inventory
+
+from .models import CartItem
+
+
+# =========================================================
+# CART TOTALS ENGINE
+# =========================================================
+def get_cart_totals(user, request):
+
+    active_hub_id = request.session.get("active_hub_id")
+
+    if not active_hub_id:
+        return {
+            "sub_total": Decimal("0.00"),
+            "cart_count": 0
+        }
+
+    cart_items = CartItem.objects.select_related(
+        "product",
+        "variant"
+    ).filter(
+        user=user
+    )
+
+    sub_total = Decimal("0.00")
+
+    for item in cart_items:
+
+        inventory = Inventory.objects.select_related(
+            "shop",
+            "shop__hub"
+        ).filter(
+            variant=item.variant,
+            stock__gt=0,
+            selling_price__isnull=False,
+            shop__is_active=True,
+            shop__hub_id=active_hub_id
+        ).order_by("selling_price").first()
+
+        # Skip unavailable inventory
+        if not inventory:
+            continue
+
+        item_price = Decimal(
+            str(inventory.selling_price)
+        )
+
+        item_total = item_price * item.quantity
+
+        sub_total += item_total
+
     return {
-        'sub_total': sub_total,
-        
-        
-        'cart_count': cart_items.count()
+        "sub_total": sub_total,
+        "cart_count": cart_items.count()
     }
+
+# =========================================================
+# CART PAGE
+# =========================================================
 
 @login_required
 def cart_view(request):
-    cart_items = CartItem.objects.filter(user=request.user)
-    if not cart_items.exists():
-        return render(request, 'shop/cart.html', {'cart_items': cart_items, 'order_totals': None})
-    
-    order_totals = get_cart_totals(request.user)
-    return render(request, 'shop/cart.html', {
-        'cart_items': cart_items,
-        'order_totals': order_totals
-    })
+
+    user = request.user
+
+    # =====================================================
+    # ACTIVE HUB
+    # =====================================================
+
+    active_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    active_hub = DeliveryHub.objects.filter(
+        id=active_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).only(
+        "id",
+        "name"
+    ).first()
+
+    # =====================================================
+    # NO HUB
+    # =====================================================
+
+    if not active_hub:
+
+        messages.error(
+            request,
+            "Please select delivery location."
+        )
+
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    # =====================================================
+    # CART ITEMS
+    # =====================================================
+
+    cart_items = CartItem.objects.select_related(
+        "product",
+        "variant",
+        "inventory",
+        "inventory__shop",
+        "inventory__shop__hub"
+    ).prefetch_related(
+        "product__product_images"
+    ).filter(
+        user=user,
+        hub=active_hub
+    ).order_by(
+        "-added_on"
+    )
+
+    enriched_items = []
+
+    # =====================================================
+    # PROCESS ITEMS
+    # =====================================================
+
+    for item in cart_items:
+
+        item.unavailable = False
+        item.out_of_stock = False
+        item.price_changed = False
+
+        item.unavailable_reason = ""
+
+        inventory = item.inventory
+
+        # -------------------------------------------------
+        # INVENTORY MISSING
+        # -------------------------------------------------
+
+        if not inventory:
+
+            item.unavailable = True
+            item.unavailable_reason = (
+                "Inventory unavailable"
+            )
+
+            enriched_items.append(item)
+
+            continue
+
+        # -------------------------------------------------
+        # HUB SECURITY
+        # -------------------------------------------------
+
+        if inventory.shop.hub_id != active_hub.id:
+
+            item.unavailable = True
+            item.unavailable_reason = (
+                "Invalid delivery zone"
+            )
+
+            enriched_items.append(item)
+
+            continue
+
+        # -------------------------------------------------
+        # PRODUCT STATUS
+        # -------------------------------------------------
+
+        if not item.product.is_active:
+
+            item.unavailable = True
+            item.unavailable_reason = (
+                "Product unavailable"
+            )
+
+            enriched_items.append(item)
+
+            continue
+
+        # -------------------------------------------------
+        # VARIANT STATUS
+        # -------------------------------------------------
+
+        if not item.variant.is_active:
+
+            item.unavailable = True
+            item.unavailable_reason = (
+                "Variant unavailable"
+            )
+
+            enriched_items.append(item)
+
+            continue
+
+        # -------------------------------------------------
+        # SHOP STATUS
+        # -------------------------------------------------
+
+        if not inventory.shop.is_active:
+
+            item.unavailable = True
+            item.unavailable_reason = (
+                "Shop unavailable"
+            )
+
+            enriched_items.append(item)
+
+            continue
+
+        # -------------------------------------------------
+        # STOCK CHECK
+        # -------------------------------------------------
+
+        if inventory.stock <= 0:
+
+            item.out_of_stock = True
+
+            item.unavailable_reason = (
+                "Out of stock"
+            )
+
+        # -------------------------------------------------
+        # AUTO QUANTITY FIX
+        # -------------------------------------------------
+
+        allowed_quantity = min(
+            inventory.stock,
+            inventory.max_order_quantity
+        )
+
+        if allowed_quantity > 0 and item.quantity > allowed_quantity:
+
+            item.quantity = allowed_quantity
+
+            item.save(
+                update_fields=["quantity"]
+            )
+
+        # -------------------------------------------------
+        # PRICE SYNC
+        # -------------------------------------------------
+
+        current_price = Decimal(
+            str(inventory.selling_price)
+        )
+
+        if item.unit_price != current_price:
+
+            item.price_changed = True
+
+            item.unit_price = current_price
+
+            item.save(
+                update_fields=["unit_price"]
+            )
+
+        # -------------------------------------------------
+        # TOTALS
+        # -------------------------------------------------
+
+        item.item_total = (
+            Decimal(str(item.unit_price))
+            * item.quantity
+        )
+
+        enriched_items.append(item)
+
+    # =====================================================
+    # TOTALS
+    # =====================================================
+
+    order_totals = get_cart_totals(
+        user,
+        request
+    )
+
+    # =====================================================
+    # CHECKOUT BLOCK
+    # =====================================================
+
+    checkout_blocked = any([
+
+        item.unavailable
+        or item.out_of_stock
+
+        for item in enriched_items
+    ])
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+
+        "cart_items": enriched_items,
+
+        "order_totals": order_totals,
+
+        "active_hub": active_hub,
+
+        "checkout_blocked": checkout_blocked,
+
+        "cart_count": cart_items.count(),
+    }
+
+    return render(
+        request,
+        "shop/cart.html",
+        context
+    )
+
+# =========================================================
+# UPDATE CART QUANTITY
+# =========================================================
 
 @login_required
 @require_POST
 def update_cart_quantity(request, cart_item_id):
-    try:
-        cart_item = CartItem.objects.get(id=cart_item_id, user=request.user)
-        data = json.loads(request.body)
-        new_quantity = int(data.get('quantity', 1))
 
-        if new_quantity < 1:
-            return JsonResponse({'success': False, 'message': 'Minimum 1 item required'})
+    user = request.user
 
-        cart_item.quantity = new_quantity
-        cart_item.save()
+    # =====================================================
+    # ACTIVE HUB
+    # =====================================================
 
-        totals = get_cart_totals(request.user)
-        
-        # Change 'get_effective_price()' to 'price' here too!
-        item_total = float(cart_item.product.price) * cart_item.quantity
+    active_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    if not active_hub_id:
 
         return JsonResponse({
-            'success': True,
-            'item_total': item_total,
-            'sub_total': totals['sub_total'],
-            'cart_count': totals['cart_count']
+            "success": False,
+            "message": "Delivery location missing"
         })
-    except (CartItem.DoesNotExist, ValueError):
-        return JsonResponse({'success': False, 'message': 'Update failed'})
 
+    # =====================================================
+    # CART ITEM
+    # =====================================================
+
+    try:
+
+        cart_item = CartItem.objects.select_related(
+            "inventory",
+            "inventory__shop",
+            "inventory__shop__hub",
+            "product",
+            "variant"
+        ).get(
+            id=cart_item_id,
+            user=user,
+            hub_id=active_hub_id
+        )
+
+    except CartItem.DoesNotExist:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Cart item not found"
+        })
+
+    # =====================================================
+    # REQUEST DATA
+    # =====================================================
+
+    try:
+
+        data = json.loads(request.body)
+
+        new_quantity = int(
+            data.get("quantity", 1)
+        )
+
+    except Exception:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid quantity"
+        })
+
+    # =====================================================
+    # MINIMUM VALIDATION
+    # =====================================================
+
+    if new_quantity < 1:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Minimum quantity is 1"
+        })
+
+    # =====================================================
+    # INVENTORY
+    # =====================================================
+
+    inventory = cart_item.inventory
+
+    if not inventory:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Inventory unavailable"
+        })
+
+    # =====================================================
+    # HUB SECURITY
+    # =====================================================
+
+    if inventory.shop.hub_id != active_hub_id:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Hub mismatch detected"
+        })
+
+    # =====================================================
+    # STOCK VALIDATION
+    # =====================================================
+
+    if new_quantity > inventory.stock:
+
+        return JsonResponse({
+            "success": False,
+            "message": (
+                f"Only {inventory.stock} item(s) available"
+            )
+        })
+
+    # =====================================================
+    # MAX ORDER LIMIT
+    # =====================================================
+
+    if new_quantity > inventory.max_order_quantity:
+
+        return JsonResponse({
+            "success": False,
+            "message": (
+                f"Maximum {inventory.max_order_quantity} item(s) allowed"
+            )
+        })
+
+    # =====================================================
+    # UPDATE
+    # =====================================================
+
+    cart_item.quantity = new_quantity
+
+    cart_item.unit_price = inventory.selling_price
+
+    cart_item.save(
+        update_fields=[
+            "quantity",
+            "unit_price"
+        ]
+    )
+
+    # =====================================================
+    # TOTALS
+    # =====================================================
+
+    item_total = (
+        Decimal(str(inventory.selling_price))
+        * new_quantity
+    )
+
+    totals = get_cart_totals(
+        user,
+        request
+    )
+
+    # =====================================================
+    # RESPONSE
+    # =====================================================
+
+    return JsonResponse({
+
+        "success": True,
+
+        "quantity": new_quantity,
+
+        "item_total": float(item_total),
+
+        "sub_total": float(
+            totals["sub_total"]
+        ),
+
+        "shipping_cost": float(
+            totals.get("shipping_cost", 0)
+        ),
+
+        "final_total": float(
+            totals["final_total"]
+        ),
+
+        "cart_count": totals["cart_count"]
+    })
+
+# =========================================================
+# REMOVE FROM CART
+# =========================================================
 @login_required
 @require_POST
 def remove_from_cart(request, item_id):
+
     try:
-        cart_item = CartItem.objects.get(id=item_id, user=request.user)
+
+        cart_item = CartItem.objects.get(
+            id=item_id,
+            user=request.user
+        )
+
         cart_item.delete()
-        
-        totals = get_cart_totals(request.user)
-        
+
+        totals = get_cart_totals(
+            request.user,
+            request
+        )
+
         return JsonResponse({
-            'success': True,
-            'cart_empty': totals['cart_count'] == 0,
-            'sub_total': totals['sub_total'],
-            'cart_count': totals['cart_count']
+            "success": True,
+            "cart_empty": totals["cart_count"] == 0,
+            "sub_total": float(totals["sub_total"]),
+            "cart_count": totals["cart_count"]
         })
+
     except CartItem.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Item not found'})
-    
+
+        return JsonResponse({
+            "success": False,
+            "message": "Item not found"
+        })
 #==========================================================
-from .utils import calculate_order_totals, calculate_shipping_cost, check_address_within_hub
-from admin_dashboard.utils import haversine
 
-from admin_dashboard.models import DeliveryHub
 
-from django.conf import settings
+# =========================================================
+# LOCATIONIQ GEOCODING
+# =========================================================
+
+import logging
 import requests
 
+from typing import Tuple, Optional
+from django.conf import settings
 
-# ===== LocationIQ helper =====
-def get_lat_long_from_address(address_text):
+logger = logging.getLogger(__name__)
+
+
+def get_lat_long_from_address(
+    address_text: str
+) -> Tuple[Optional[float], Optional[float]]:
+
     """
-    Fetch latitude and longitude from LocationIQ API using address string.
-    Returns tuple: (latitude, longitude) or (None, None) if failed.
+    Convert address text into latitude & longitude.
+
+    Production-ready features:
+    - India-only search
+    - Timeout protection
+    - Safe JSON parsing
+    - Error logging
+    - Returns (None, None) safely
     """
+
+    if not address_text:
+        return None, None
+
     url = "https://us1.locationiq.com/v1/search.php"
+
     params = {
         "key": settings.LOCATIONIQ_ACCESS_TOKEN,
         "q": address_text,
         "format": "json",
-        "limit": 1
+        "limit": 1,
+        "countrycodes": "in"
     }
+
     try:
-        response = requests.get(url, params=params, timeout=5)
+
+        response = requests.get(
+            url,
+            params=params,
+            timeout=5
+        )
+
         response.raise_for_status()
+
         data = response.json()
-        if data and isinstance(data, list):
-            lat = float(data[0]["lat"])
-            lon = float(data[0]["lon"])
-            return lat, lon
-    except Exception as e:
-        print(f"LocationIQ Error: {e}")
+
+        if not data or not isinstance(data, list):
+            return None, None
+
+        first_result = data[0]
+
+        latitude = first_result.get("lat")
+        longitude = first_result.get("lon")
+
+        if not latitude or not longitude:
+            return None, None
+
+        return (
+            float(latitude),
+            float(longitude)
+        )
+
+    except requests.exceptions.Timeout:
+
+        logger.warning(
+            "LocationIQ timeout for address: %s",
+            address_text
+        )
+
+    except requests.exceptions.RequestException as e:
+
+        logger.error(
+            "LocationIQ request failed: %s",
+            str(e)
+        )
+
+    except (ValueError, TypeError, KeyError) as e:
+
+        logger.error(
+            "LocationIQ invalid response: %s",
+            str(e)
+        )
+
     return None, None
 
-from django.db import transaction
-from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+
+# =========================================================
+# CHECKOUT VIEWS - PRODUCTION READY
+# =========================================================
+
 from decimal import Decimal
 
-# Import your new optimized utilities
-from shop.utils import calculate_shipping_cost, calculate_order_totals
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import (
+    get_object_or_404,
+    redirect,
+    render
+)
 
-from .models import CartItem, Order, OrderItem, Address
+from admin_dashboard.models import DeliveryHub
+
 from payments.models import PaymentMethod
-from payments.models import Payment
+
+from .models import (
+    Address,
+    CartItem,
+    Order,
+    OrderItem
+)
+
+from .utils import calculate_shipping_cost
+
+
+# =========================================================
+# CART CHECKOUT
+# =========================================================
+# =========================================================
+# CART CHECKOUT (PRODUCTION READY)
+# =========================================================
 
 @login_required
 def cart_checkout(request):
+
     user = request.user
-    # 1. Fetch cart items with a lock on the products to prevent stock changes during calculation
-    cart_items = CartItem.objects.filter(user=user).select_related('product')
+
+    # =====================================================
+    # ACTIVE HUB (SESSION SOURCE OF TRUTH)
+    # =====================================================
+
+    session_hub_id = request.session.get(
+        "active_hub_id"
+    )
+
+    if not session_hub_id:
+
+        messages.error(
+            request,
+            "Please select delivery location first."
+        )
+
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    cart_hub = DeliveryHub.objects.filter(
+        id=session_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    if not cart_hub:
+
+        messages.error(
+            request,
+            "Selected delivery hub unavailable."
+        )
+
+        return redirect(
+            "where_should_we_deliver"
+        )
+
+    # =====================================================
+    # CART ITEMS (STRICT HUB FILTER)
+    # =====================================================
+
+    cart_items = (
+        CartItem.objects
+        .select_related(
+            "product",
+            "variant",
+            "inventory",
+            "inventory__shop",
+            "inventory__shop__hub"
+        )
+        .filter(
+            user=user,
+            hub=cart_hub
+        )
+    )
 
     if not cart_items.exists():
-        messages.error(request, "Your cart is empty!")
-        return redirect('cart_view')
 
-    user_addresses = Address.objects.filter(customer__user=user)
-    payment_methods = PaymentMethod.objects.filter(is_active=True).order_by('sort_order')
+        messages.error(
+            request,
+            "Your basket is empty."
+        )
 
-    if request.method == "GET":
-        
-        totals = calculate_order_totals(cart_items, address=None)
-        
-        return render(request, 'shop/checkout_cart.html', {
-            'cart_items': cart_items,
-            'user_addresses': user_addresses,
-            'payment_methods': payment_methods,
-            'order_totals': totals,
-        })
+        return redirect(
+            "cart_view"
+        )
 
-    # ---------------- POST Processing ----------------
-    address_id = request.POST.get('address_id')
-    payment_method_id = request.POST.get('payment_method')
+    # =====================================================
+    # USER ADDRESSES
+    # =====================================================
 
-    if not address_id or not payment_method_id:
-        messages.error(request, "Please select both an address and a payment method.")
-        return redirect('cart_checkout')
+    user_addresses = (
+        Address.objects
+        .filter(
+            customer__user=user,
+            is_active=True
+        )
+        .order_by(
+            "-is_default",
+            "-id"
+        )
+    )
 
-    selected_address = get_object_or_404(Address, customer__user=user, id=address_id)
-    payment_method = get_object_or_404(PaymentMethod, id=payment_method_id, is_active=True)
-    totals = calculate_order_totals(cart_items, address=selected_address)
+    # =====================================================
+    # PAYMENT METHODS
+    # =====================================================
 
-    try:
-        with transaction.atomic():
-            # 2. STOCK VALIDATION LOOP (The "Guard")
-            # We must check every single product in the cart before creating the order
-            for item in cart_items:
-                # select_for_update() prevents other users from buying these items right now
-                product = Product.objects.select_for_update().get(id=item.product.id)
-                
-                if product.stock_available < item.quantity:
-                    messages.error(request, f"Insufficient stock for {product.name}. Only {product.stock_available} left.")
-                    return redirect('cart_view') # Send them back to adjust their quantity
-                
-                # 3. DEDUCT STOCK
-                product.stock_available -= item.quantity
-                product.save()
+    payment_methods = (
+        PaymentMethod.objects
+        .filter(
+            is_active=True
+        )
+        .order_by(
+            "sort_order"
+        )
+    )
 
-            # 4. Create the Order
-            order = Order.objects.create(
-                user=user,
-                address=selected_address,
-                subtotal=totals['sub_total'],
-                shipping_cost=totals['shipping_cost'],
-                tax=totals['taxes'],
-                total=totals['final_total'],
-                status='pending'
+    # =====================================================
+    # SUBTOTAL
+    # =====================================================
+
+    sub_total = sum(
+        Decimal(str(item.unit_price or 0))
+        * item.quantity
+        for item in cart_items
+    )
+
+    order_totals = {
+
+        "sub_total": sub_total,
+
+        "shipping_cost": Decimal("0.00"),
+
+        "final_total": sub_total
+    }
+
+    # =====================================================
+    # POST → PLACE ORDER
+    # =====================================================
+
+    if request.method == "POST":
+
+        address_id = request.POST.get(
+            "address_id"
+        )
+
+        payment_id = request.POST.get(
+            "payment_method"
+        )
+
+        # =================================================
+        # BASIC VALIDATION
+        # =================================================
+
+        if not address_id or not payment_id:
+
+            messages.error(
+                request,
+                "Please select address and payment method."
             )
 
-            # 5. Create Order Items
-            order_items = [
-                OrderItem(
-                    order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    price=item.product.price
-                ) for item in cart_items
-            ]
-            OrderItem.objects.bulk_create(order_items)
-
-            # 6. Create Payment Record
-            Payment.objects.create(
-                order=order,
-                method=payment_method,
-                amount=totals['final_total'],
-                currency='INR',
-                status='pending'
+            return redirect(
+                "cart_checkout"
             )
 
-            # 7. Clear the Cart and Trigger Logistics
-            cart_items.delete()
-            from delivery_portal.models import Delivery
-            Delivery.objects.create(
-                order=order,
-                status='pending' # It stays pending until Admin clicks 'Pack'
+        # =================================================
+        # ADDRESS VALIDATION
+        # =================================================
+
+        address = get_object_or_404(
+            Address,
+            id=address_id,
+            customer__user=user,
+            is_active=True
+        )
+
+        # =================================================
+        # PAYMENT METHOD
+        # =================================================
+
+        payment_method = get_object_or_404(
+            PaymentMethod,
+            id=payment_id,
+            is_active=True
+        )
+
+        # =================================================
+        # DELIVERY VALIDATION
+        # =================================================
+
+        shipping_data = calculate_shipping_cost(
+            address=address,
+            delivery_hub=cart_hub
+        )
+
+        if shipping_data.get("error"):
+
+            messages.error(
+                request,
+                shipping_data.get(
+                    "message",
+                    "Delivery unavailable."
+                )
             )
 
-    except Exception as e:
-        print(f"Checkout Error: {str(e)}") 
-        messages.error(request, "There was a problem processing your order. Please try again.")
-        return redirect('cart_checkout')
+            return redirect(
+                "cart_checkout"
+            )
 
-    # SUCCESS ROUTING
-    if payment_method.name.lower() == 'cod':
-        messages.success(request, f"Order #{order.id} placed! A rider is being assigned.")
-        return redirect('order_detail', order_id=order.id)
+        shipping_cost = Decimal(
+            str(
+                shipping_data.get(
+                    "customer_fee",
+                    0
+                )
+            )
+        )
 
-    return redirect('payment', order_id=order.id)
+        final_total = (
+            sub_total + shipping_cost
+        )
 
-# ---------------- AJAX: Get Shipping Cost ----------------
+        # =================================================
+        # ORDER TRANSACTION
+        # =================================================
 
-from shop.models import Address
+        try:
 
-"""
+            with transaction.atomic():
+
+                # =========================================
+                # CREATE ORDER
+                # =========================================
+
+                order = Order.objects.create(
+
+                    user=user,
+
+                    address=address,
+
+                    hub=cart_hub,
+
+                    subtotal=sub_total,
+
+                    shipping_cost=shipping_cost,
+
+                    total=final_total,
+
+                    status="pending"
+                )
+
+                # =========================================
+                # PROCESS CART ITEMS
+                # =========================================
+
+                for item in cart_items:
+
+                    # -------------------------------------
+                    # LOCK INVENTORY ROW
+                    # -------------------------------------
+
+                    inventory = (
+                        Inventory.objects
+                        .select_for_update()
+                        .select_related(
+                            "shop",
+                            "shop__hub"
+                        )
+                        .get(
+                            pk=item.inventory_id
+                        )
+                    )
+
+                    # -------------------------------------
+                    # HUB SECURITY
+                    # -------------------------------------
+
+                    if inventory.shop.hub_id != cart_hub.id:
+
+                        raise Exception(
+                            f"{item.product.name} "
+                            f"is unavailable in "
+                            f"selected delivery area."
+                        )
+
+                    # -------------------------------------
+                    # INVENTORY EXISTS
+                    # -------------------------------------
+
+                    if inventory.stock <= 0:
+
+                        raise Exception(
+                            f"{item.product.name} "
+                            f"is out of stock."
+                        )
+
+                    # -------------------------------------
+                    # MAX ALLOWED QUANTITY
+                    # -------------------------------------
+
+                    allowed_quantity = min(
+                        inventory.stock,
+                        inventory.max_order_quantity
+                    )
+
+                    if item.quantity > allowed_quantity:
+
+                        raise Exception(
+                            f"Maximum "
+                            f"{allowed_quantity} item(s) "
+                            f"allowed for "
+                            f"{item.product.name}."
+                        )
+
+                    # -------------------------------------
+                    # REDUCE STOCK
+                    # -------------------------------------
+
+                    inventory.reduce_stock(
+                        item.quantity,
+                        reason="ORDER_PLACED",
+                        note=f"Order #{order.id}"
+                    )
+
+                    # -------------------------------------
+                    # CREATE ORDER ITEM
+                    # -------------------------------------
+
+                    OrderItem.objects.create(
+
+                        order=order,
+
+                        product=item.product,
+
+                        variant=item.variant,
+
+                        inventory=inventory,
+
+                        quantity=item.quantity,
+
+                        price=item.unit_price,
+
+                        variant_name=getattr(
+                            item.variant,
+                            "display_name",
+                            ""
+                        )
+                    )
+
+                # =========================================
+                # CLEAR HUB CART
+                # =========================================
+
+                cart_items.delete()
+
+        except Exception as e:
+
+            messages.error(
+                request,
+                str(e)
+            )
+
+            return redirect(
+                "cart_checkout"
+            )
+
+        # =================================================
+        # PAYMENT FLOW
+        # =================================================
+
+        if payment_method.name.lower() == "cod":
+
+            messages.success(
+                request,
+                "Order placed successfully."
+            )
+
+            return redirect(
+                "order_detail",
+                order_id=order.id
+            )
+
+        return redirect(
+            "payment",
+            order_id=order.id
+        )
+
+    # =====================================================
+    # PAGE RENDER
+    # =====================================================
+
+    return render(
+        request,
+        "shop/checkout_cart.html",
+        {
+            "cart_items": cart_items,
+            "user_addresses": user_addresses,
+            "payment_methods": payment_methods,
+            "active_hub": cart_hub,
+            "order_totals": order_totals
+        }
+    )
+
+
+# =========================================================
+# AJAX SHIPPING CALCULATION
+# =========================================================
+
 @login_required
 def get_shipping_cost(request):
+
     user = request.user
-    address_id = request.GET.get("address_id")
-    if not address_id:
-        return JsonResponse({"error": "Address not provided"}, status=400)
 
-    try:
-        address = Address.objects.get(customer__user=user, id=address_id)
-    except Address.DoesNotExist:
-        return JsonResponse({"error": "Address not found"}, status=404)
+    # =====================================================
+    # ACTIVE HUB
+    # =====================================================
 
-    # Get cart items
-    cart_items = CartItem.objects.filter(user=user)
-    if not cart_items.exists():
-        return JsonResponse({"error": "Cart is empty"}, status=400)
+    session_hub_id = request.session.get(
+        "active_hub_id"
+    )
 
-    # Calculate shipping cost
-    shipping_info = calculate_shipping_cost(address)
-    shipping_cost = Decimal(shipping_info.get("customer_fee", 0))
+    if not session_hub_id:
 
-    # Calculate new order totals
-    order_totals = calculate_order_totals(cart_items, address)
-
-    return JsonResponse({
-        "shipping_cost": float(shipping_cost),
-        "sub_total": float(order_totals["sub_total"]),
-        "taxes": float(order_totals["taxes"]),
-        "final_total": float(order_totals["final_total"])
-    })
-"""
-
-@login_required
-def get_shipping_cost(request):
-    user = request.user
-    address_id = request.GET.get("address_id")
-
-    if not address_id:
-        return JsonResponse({"success": False, "error": "Address not provided"}, status=400)
-
-    try:
-        address = Address.objects.get(customer__user=user, id=address_id)
-    except Address.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Address not found"}, status=404)
-
-    # Get cart items
-    cart_items = CartItem.objects.filter(user=user)
-    if not cart_items.exists():
-        return JsonResponse({"success": False, "error": "Cart is empty"}, status=400)
-
-    # 🔥 SAME LOGIC AS BUY NOW
-    shipping_info = calculate_shipping_cost(address)
-
-    raw_fee = shipping_info.get("customer_fee")
-    is_serviceable = not shipping_info.get("error") and raw_fee is not None
-
-    if not is_serviceable:
         return JsonResponse({
             "success": False,
-            "message": "Sorry currently we are not serving this area. Please select another address.",
-            "shipping_cost": 0,
-            "distance": float(shipping_info.get("distance_km") or 0)
+            "message": "Please select delivery location first."
         })
 
-    # ✅ VALID AREA → continue calculations
-    order_totals = calculate_order_totals(cart_items, address)
+    cart_hub = DeliveryHub.objects.filter(
+        id=session_hub_id,
+        is_active=True,
+        is_accepting_orders=True
+    ).first()
+
+    if not cart_hub:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Delivery hub unavailable."
+        })
+
+    # =====================================================
+    # CART ITEMS
+    # =====================================================
+
+    cart_items = CartItem.objects.filter(
+        user=user
+    )
+
+    if not cart_items.exists():
+
+        return JsonResponse({
+            "success": False,
+            "message": "Cart is empty."
+        })
+
+    # =====================================================
+    # ADDRESS
+    # =====================================================
+
+    address_id = request.GET.get(
+        "address_id"
+    )
+
+    if not address_id:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Address not selected."
+        })
+
+    try:
+
+        address = Address.objects.get(
+            id=address_id,
+            customer__user=user,
+            is_active=True
+        )
+
+    except Address.DoesNotExist:
+
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid address."
+        })
+
+    # =====================================================
+    # SHIPPING ENGINE
+    # =====================================================
+
+    shipping_data = calculate_shipping_cost(
+        address=address,
+        delivery_hub=cart_hub
+    )
+
+    if shipping_data.get("error"):
+
+        return JsonResponse({
+            "success": False,
+            "message": shipping_data.get(
+                "message",
+                "Delivery unavailable"
+            )
+        })
+
+    # =====================================================
+    # TOTALS
+    # =====================================================
+
+    subtotal = sum(
+        Decimal(str(item.unit_price or 0))
+        * item.quantity
+        for item in cart_items
+    )
+
+    shipping_cost = Decimal(
+        str(
+            shipping_data.get(
+                "customer_fee",
+                0
+            )
+        )
+    )
+
+    final_total = (
+        subtotal + shipping_cost
+    )
+
+    # =====================================================
+    # RESPONSE
+    # =====================================================
 
     return JsonResponse({
+
         "success": True,
-        "shipping_cost": float(raw_fee),
-        "sub_total": float(order_totals["sub_total"]),
-        "taxes": float(order_totals["taxes"]),
-        "final_total": float(order_totals["final_total"]),
-        "distance": float(shipping_info.get("distance_km") or 0),
-        "hub": shipping_info.get("hub_name", "Unknown")
+
+        "sub_total": float(subtotal),
+
+        "shipping_cost": float(shipping_cost),
+
+        "final_total": float(final_total),
+
+        "distance": float(
+            shipping_data.get(
+                "distance_km",
+                0
+            )
+        ),
+
+        "hub": cart_hub.name
     })
 #===========================================================
+
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Prefetch
+from django.shortcuts import render
+
+
 @login_required
 def order_list(request):
-    orders = Order.objects.filter(user=request.user).order_by('-placed_at')  # Assuming the user is authenticated
-    order_items = OrderItem.objects.all()
-    return render(request, 'shop/order_list.html', {'orders': orders,'order_items': order_items,})
+
+    order_items_qs = (
+        OrderItem.objects
+        .select_related(
+            "product",
+            "variant",
+            "inventory"
+        )
+        .prefetch_related(
+            "product__product_images"
+        )
+    )
+
+    orders = (
+        Order.objects
+        .filter(user=request.user)
+        .select_related(
+            "address",
+            "shop",
+            "hub"
+        )
+        .prefetch_related(
+            Prefetch(
+                "items",
+                queryset=order_items_qs
+            )
+        )
+        .order_by("-placed_at")
+    )
+
+    print("TOTAL ORDERS =>", orders.count())
+
+    paginator = Paginator(orders,8)
+
+    page_number = request.GET.get("page")
+
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+        "total_orders": orders.count(),
+        "active_orders": orders.exclude(
+            status__in=[
+                "delivered",
+                "cancelled",
+                "declined"
+            ]
+        ).count(),
+        "delivered_orders": orders.filter(
+            status="delivered"
+        ).count(),
+    }
+
+    return render(
+        request,
+        "shop/order_list.html",
+        context
+    )
+
+
+
 
 #==================================================================
 
-# from .models import OrderItem  
-
-# def order_detail(request, order_id):
-#     order = get_object_or_404(Order, id=order_id, user=request.user)
-#     order_items = OrderItem.objects.filter(order=order)
-#     return render(request, 'order/order_detail.html', {
-#         'order': order,
-#         'order_items': order_items,
-#     })
-
 from django.shortcuts import get_object_or_404, render
-from .models import Order, OrderItem,Rating
+from django.db.models import Prefetch
+
+from .models import (
+Order,
+OrderItem,
+Rating,
+)
+
+from payments.models import Payment
 
 def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    order_items = OrderItem.objects.filter(order=order)
 
-    # products already reviewed by this user
-    rated_products = Rating.objects.filter(
-        user=request.user,
-        product__in=[item.product for item in order_items]
-    ).values_list('product_id', flat=True)
 
-    return render(request, 'order/order_detail.html', {
-        'order': order,
-        'order_items': order_items,
-        'rated_products': list(rated_products),
-    })
+# =====================================================
+# OPTIMIZED ORDER QUERY
+# =====================================================
+
+    order = get_object_or_404(
+
+        Order.objects.select_related(
+
+            # -----------------------------------------
+            # ADDRESS
+            # -----------------------------------------
+
+            "address",
+
+            # -----------------------------------------
+            # RIDER (future live tracking)
+            # -----------------------------------------
+
+            "delivery",
+
+        ).prefetch_related(
+
+            # -----------------------------------------
+            # ORDER ITEMS + PRODUCT IMAGES
+            # -----------------------------------------
+
+            Prefetch(
+
+                "items",
+
+                queryset=OrderItem.objects.select_related(
+                    "product"
+                ).prefetch_related(
+                    "product__product_images"
+                )
+
+            ),
+
+            # -----------------------------------------
+            # PAYMENTS
+            # -----------------------------------------
+
+            Prefetch(
+
+                "payments",
+
+                queryset=Payment.objects.select_related(
+                    "method"
+                )
+
+            ),
+
+        ),
+
+        id=order_id,
+        user=request.user
+
+    )
+
+    # =====================================================
+    # ORDER ITEMS
+    # =====================================================
+
+    order_items = order.items.all()
+
+    # =====================================================
+    # RATED PRODUCTS
+    # =====================================================
+
+    product_ids = [
+
+        item.product_id
+        for item in order_items
+
+    ]
+
+    rated_products = list(
+
+        Rating.objects.filter(
+
+            user=request.user,
+            product_id__in=product_ids
+
+        ).values_list(
+
+            "product_id",
+            flat=True
+
+        )
+
+    )
+
+    # =====================================================
+    # PRIMARY PAYMENT
+    # =====================================================
+
+    payment = order.payments.first()
+
+    # =====================================================
+    # LIVE TRACKING
+    # =====================================================
+
+    can_track_live = (
+
+        order.status in [
+
+            "assigned",
+            "out_for_delivery"
+
+        ]
+
+    )
+
+    # =====================================================
+    # OTP VISIBILITY
+    # =====================================================
+
+    show_delivery_otp = bool(
+
+        order.delivery_token
+
+    )
+
+    # =====================================================
+    # POST DELIVERY ACTIONS
+    # =====================================================
+
+    can_review = (
+
+        order.status == "delivered"
+
+    )
+
+    # =====================================================
+    # SUPPORT ACCESS
+    # =====================================================
+
+    support_enabled = True
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+
+        "order": order,
+
+        "order_items": order_items,
+
+        "payment": payment,
+
+        "rated_products": rated_products,
+
+        "can_track_live": can_track_live,
+
+        "show_delivery_otp": show_delivery_otp,
+
+        "can_review": can_review,
+
+        "support_enabled": support_enabled,
+
+    }
+
+    return render(
+
+        request,
+
+        "order/order_detail.html",
+
+        context
+
+    )
+
+
 
 #=========================================================
 

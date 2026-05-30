@@ -5,332 +5,438 @@
 
 {% block extra_css %}
 <style>
-:root {
-    --primary: #10B981;
-    --navy: #0F172A;
-    --gray: #9CA3AF;
+
+:root{
+    --primary:#10B981;
+    --navy:#0F172A;
+    --gray:#9CA3AF;
 }
 
-/* GRID */
-.checkout-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 24px;
+.checkout-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:24px;
 }
 
-@media (max-width: 991px) {
-    .checkout-grid {
-        grid-template-columns: 1fr;
-        margin-bottom: 140px;
+@media (max-width:991px){
+    .checkout-grid{
+        grid-template-columns:1fr;
+        margin-bottom:140px;
     }
 }
 
-/* CARD */
-.glass-card {
-    background: #fff;
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 15px;
-    border: 1px solid #eef2f6;
+.glass-card{
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:15px;
+    border:1px solid #eef2f6;
 }
 
-/* PRODUCT */
-.product-strip {
-    display: flex;
-    gap: 14px;
+.product-strip{
+    display:flex;
+    gap:14px;
 }
 
-.product-img {
-    width: 85px;
-    height: 85px;
-    border-radius: 14px;
+.product-img{
+    width:85px;
+    height:85px;
+    border-radius:14px;
+    object-fit:cover;
 }
 
-/* ADD ADDRESS BUTTON */
-.add-address-btn {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--primary);
-    text-decoration: none;
-    padding: 6px 10px;
-    border-radius: 10px;
-    background: #ECFDF5;
+.add-address-btn{
+    font-size:13px;
+    font-weight:700;
+    color:var(--primary);
+    text-decoration:none;
+    padding:6px 10px;
+    border-radius:10px;
+    background:#ECFDF5;
 }
 
-.add-address-btn:hover {
-    background: #D1FAE5;
+.address-item{
+    border:2px solid #f1f5f9;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:10px;
+    cursor:pointer;
+    position:relative;
+    transition:.2s ease;
 }
 
-/* ADDRESS */
-.address-item {
-    border: 2px solid #f1f5f9;
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    position: relative;
+.address-item.active{
+    border-color:var(--primary);
+    background:#f0fdf4;
 }
 
-.address-item.active {
-    border-color: var(--primary);
-    background: #f0fdf4;
+.tick{
+    position:absolute;
+    right:12px;
+    top:12px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
 }
 
-/* COLLAPSE */
-.extra-address.hidden {
-    display: none;
+.address-item.active .tick{
+    display:flex;
 }
 
-.show-more {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-weight: 700;
-    margin-top: 10px;
-    cursor: pointer;
+.payment-item{
+    border:2px solid #f1f5f9;
+    border-radius:14px;
+    padding:14px;
+    cursor:pointer;
+    margin-bottom:10px;
+    position:relative;
+    transition:.2s ease;
 }
 
-/* PREMIUM TICK */
-.tick {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+.payment-item.active{
+    border-color:var(--navy);
+    background:#f8fafc;
 }
 
-.address-item.active .tick {
-    display: flex;
+.payment-tick{
+    position:absolute;
+    right:12px;
+    top:12px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
 }
 
-/* PAYMENT */
-.payment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.payment-item.active .payment-tick{
+    display:flex;
 }
 
-.payment-item {
-    border: 2px solid #f1f5f9;
-    border-radius: 14px;
-    padding: 14px;
-    cursor: pointer;
-    position: relative;
+.qty-btn{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    border:none;
+    background:#f1f5f9;
+    font-weight:800;
 }
 
-.payment-item.active {
-    border-color: var(--navy);
-    background: #f8fafc;
+.summary-card{
+    position:sticky;
+    top:20px;
 }
 
-.payment-tick {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+.btn-confirm{
+    width:100%;
+    padding:16px;
+    border-radius:14px;
+    background:var(--navy);
+    color:white;
+    border:none;
+    font-weight:800;
+    transition:.2s ease;
 }
 
-.payment-item.active .payment-tick {
-    display: flex;
+.mobile-bar{
+    display:none;
 }
 
-/* SUMMARY */
-.summary-card {
-    position: sticky;
-    top: 20px;
-}
-
-/* BUTTON */
-.btn-confirm {
-    width: 100%;
-    padding: 16px;
-    border-radius: 14px;
-    background: var(--navy);
-    color: white;
-    border: none;
-    font-weight: 800;
-}
-
-.btn-disabled {
-    background: var(--gray) !important;
-    cursor: not-allowed;
-}
-.qty-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: none;
-    background: #f1f5f9;
-    font-weight: 800;
-}
-
-/* MOBILE */
-.mobile-bar {
-    display: none;
-}
-
-@media (max-width: 991px) {
-    .mobile-bar {
-        display: block;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 14px;
-        background: white;
-        border-top: 1px solid #eee;
-        z-index: 9999;
+@media (max-width:991px){
+    .mobile-bar{
+        display:block;
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        padding:14px;
+        background:white;
+        border-top:1px solid #eee;
+        z-index:9999;
     }
 }
+
+.checkout-message{
+    padding:12px 14px;
+    border-radius:12px;
+    font-size:14px;
+    margin-bottom:14px;
+    font-weight:600;
+}
+
+.checkout-message.error{
+    background:#FEF2F2;
+    color:#DC2626;
+    border:1px solid #FECACA;
+}
+
+.checkout-message.success{
+    background:#ECFDF5;
+    color:#059669;
+    border:1px solid #A7F3D0;
+}
+
+.btn-disabled{
+    opacity:.6;
+    pointer-events:none;
+}
+
+.shipping-loading{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 
 <form method="POST" class="checkout-grid">
+
 {% csrf_token %}
 
 <input type="hidden" name="address_id" id="address_id">
 <input type="hidden" name="payment_method" id="payment_method">
+<input type="hidden" name="variant_id" value="{{ variant.id }}">
 
 <!-- LEFT -->
 <div>
 
     <!-- PRODUCT -->
     <div class="glass-card">
-        <div class="fw-bold mb-2">Item Details</div>
+
+        <div class="fw-bold mb-2">
+            Item Details
+        </div>
 
         <div class="product-strip">
-            <img src="{{ product.product_images.first.image.url }}" class="product-img">
+
+            <img
+                src="{{ product.product_images.first.image.url }}"
+                class="product-img"
+            >
 
             <div>
+
                 <div class="fw-bold">
                     {{ product.name }}
-                    <span class="text-muted small">({{ product.size }})</span>
+
+                    <span class="text-muted small">
+                        ({{ variant.display_name }})
+                    </span>
                 </div>
 
-                <!-- ✅ FIXED: show unit price -->
-                <div class="text-success fw-bold">
-                    ₹{{ product.get_effective_price }}
+                <div class="text-success fw-bold mt-1">
+                    ₹<span id="unitPrice">{{ inventory.selling_price }}</span>
                 </div>
 
-                <!-- ✅ NEW: Quantity Selector -->
+                <div class="text-muted small">
+                    Available Stock:
+                    {{ inventory.stock }}
+                </div>
+
+                <div class="small text-muted">
+                    Max Order:
+                    {{ inventory.max_order_quantity }}
+                </div>
+
                 <div class="d-flex align-items-center gap-2 mt-2">
-                    <button type="button" onclick="changeQty(-1)" class="qty-btn">-</button>
-                    <span id="qty">{{ quantity }}</span>
-                    <button type="button" onclick="changeQty(1)" class="qty-btn">+</button>
+
+                    <button
+                        type="button"
+                        onclick="changeQty(-1)"
+                        class="qty-btn"
+                    >
+                        -
+                    </button>
+
+                    <span id="qty">
+                        {{ quantity }}
+                    </span>
+
+                    <button
+                        type="button"
+                        onclick="changeQty(1)"
+                        class="qty-btn"
+                    >
+                        +
+                    </button>
+
                 </div>
 
-                <!-- hidden input -->
-                <input type="hidden" name="quantity" id="quantity-input" value="{{ quantity }}">
+                <input
+                    type="hidden"
+                    name="quantity"
+                    id="quantity-input"
+                    value="{{ quantity }}"
+                >
+
             </div>
+
         </div>
+
     </div>
 
     <!-- ADDRESS -->
     <div class="glass-card">
 
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="fw-bold">Delivery Address</div>
-            <a href="{% url 'address_create' %}" class="add-address-btn">
+        <div class="d-flex justify-content-between mb-2">
+
+            <div class="fw-bold">
+                Delivery Address
+            </div>
+
+            <a
+                href="{% url 'address_create' %}"
+                class="add-address-btn"
+            >
                 + Add New
             </a>
+
         </div>
 
         {% for addr in user_addresses %}
-        <div class="address-item 
-            {% if not addr.is_default and forloop.counter > 1 %}extra-address hidden{% endif %}
-            {% if addr.is_default %}active{% endif %}"
+
+        <div
+            class="address-item {% if addr.is_default %}active{% endif %}"
             data-id="{{ addr.id }}"
-            onclick="selectAddress(this)">
+            onclick="selectAddress(this)"
+        >
 
-            <div class="tick">✓</div>
+            <div class="tick">
+                ✓
+            </div>
 
-            <div class="fw-bold">{{ addr.recipient_name }}</div>
-            <div class="small text-muted">{{ addr.address_line }}</div>
+            <div class="fw-bold">
+                {{ addr.recipient_name }}
+            </div>
+
+            <div class="small text-muted">
+                {{ addr.address_line }}
+            </div>
+
         </div>
-        {% endfor %}
 
-        {% if user_addresses|length > 1 %}
-        <button type="button" class="show-more" onclick="toggleAddresses(this)">
-            Show more addresses
-        </button>
-        {% endif %}
+        {% endfor %}
 
     </div>
 
     <!-- PAYMENT -->
     <div class="glass-card">
-        <div class="fw-bold mb-2">Select Payment Method</div>
 
-        <div class="payment-list">
-            {% for method in payment_methods %}
-            <div class="payment-item"
-                data-id="{{ method.id }}"
-                onclick="selectPayment(this)">
-
-                <div class="payment-tick">✓</div>
-                {{ method.name }}
-            </div>
-            {% endfor %}
+        <div class="fw-bold mb-2">
+            Payment Method
         </div>
+
+        {% for method in payment_methods %}
+
+        <div
+            class="payment-item"
+            data-id="{{ method.id }}"
+            onclick="selectPayment(this)"
+        >
+
+            <div class="payment-tick">
+                ✓
+            </div>
+
+            {{ method.name }}
+
+        </div>
+
+        {% endfor %}
+
     </div>
 
 </div>
 
 <!-- RIGHT -->
 <div>
+
     <div class="glass-card summary-card">
 
-        <div id="service-msg" class="alert alert-danger d-none">
-            🚫 Not Deliverable — Select another address
+        <div class="fw-bold mb-3">
+            Summary
         </div>
 
-        <div class="fw-bold mb-2">Summary</div>
+        <!-- MESSAGE BOX -->
+        <div
+            id="checkout-message"
+            class="checkout-message d-none"
+        ></div>
 
         <div class="d-flex justify-content-between">
-            <span>Subtotal</span>
-            <span id="sub_total">₹{{ order_totals.sub_total }}</span>
+
+            <span>
+                Subtotal
+            </span>
+
+            <span id="sub_total">
+                ₹{{ order_totals.sub_total }}
+            </span>
+
         </div>
 
         <div class="d-flex justify-content-between mt-2">
-            <span>Shipping</span>
-            <span id="shipping">₹{{ order_totals.shipping_cost }}</span>
+
+            <span>
+                Shipping
+            </span>
+
+            <span id="shipping">
+                ₹{{ order_totals.shipping_cost }}
+            </span>
+
         </div>
 
         <hr>
 
         <div class="d-flex justify-content-between fw-bold fs-5">
-            <span>Total</span>
-            <span id="total">₹{{ order_totals.final_total }}</span>
+
+            <span>
+                Total
+            </span>
+
+            <span id="total">
+                ₹{{ order_totals.final_total }}
+            </span>
+
         </div>
 
-        <button type="submit" class="btn-confirm mt-3" id="desktop-btn">
+        <button
+            type="submit"
+            id="desktop-btn"
+            class="btn-confirm mt-3"
+        >
             Place Order
         </button>
+
     </div>
+
 </div>
 
 <!-- MOBILE -->
 <div class="mobile-bar">
-    <button type="submit" class="btn-confirm" id="mobile-btn">
+
+    <button
+        type="submit"
+        id="mobile-btn"
+        class="btn-confirm"
+    >
         Confirm Order • ₹{{ order_totals.final_total }}
     </button>
+
 </div>
 
 </form>
@@ -338,124 +444,375 @@
 {% endblock %}
 
 {% block extra_js %}
+
 <script>
 
-let currentShipping = parseFloat("{{ order_totals.shipping_cost }}") || 0;
+let SHIPPING_CACHE = null;
 
-/* ADDRESS SELECT */
+
+/* =========================================
+   MESSAGE HELPERS
+========================================= */
+
+function showMessage(message, type="error") {
+
+    const box = document.getElementById(
+        "checkout-message"
+    );
+
+    box.classList.remove(
+        "d-none",
+        "error",
+        "success"
+    );
+
+    box.classList.add(type);
+
+    box.innerText = message;
+}
+
+function hideMessage() {
+
+    const box = document.getElementById(
+        "checkout-message"
+    );
+
+    box.classList.add("d-none");
+
+    box.innerText = "";
+}
+
+
+/* =========================================
+   BUTTON HELPERS
+========================================= */
+
+function disableButtons(d, m) {
+
+    if (!d || !m) return;
+
+    d.disabled = true;
+    m.disabled = true;
+
+    d.classList.add("btn-disabled");
+    m.classList.add("btn-disabled");
+}
+
+function enableButtons(d, m) {
+
+    if (!d || !m) return;
+
+    d.disabled = false;
+    m.disabled = false;
+
+    d.classList.remove("btn-disabled");
+    m.classList.remove("btn-disabled");
+}
+
+
+/* =========================================
+   INIT
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const defaultAddr = document.querySelector(
+            '.address-item.active'
+        );
+
+        if (defaultAddr) {
+
+            document.getElementById(
+                'address_id'
+            ).value = defaultAddr.dataset.id;
+
+            setTimeout(() => {
+                updateTotals(true);
+            }, 50);
+        } else {
+
+            updateTotals(false);
+        }
+    }
+);
+
+
+/* =========================================
+   ADDRESS SELECT
+========================================= */
+
 function selectAddress(el) {
-    document.querySelectorAll('.address-item').forEach(e => e.classList.remove('active'));
+
+    document.querySelectorAll('.address-item')
+        .forEach(e => e.classList.remove('active'));
+
     el.classList.add('active');
 
-    const id = el.dataset.id;
-    document.getElementById('address_id').value = id;
+    document.getElementById(
+        'address_id'
+    ).value = el.dataset.id;
 
-    updateTotals(); // 🔥 always recalc everything
+    updateTotals(true);
 }
 
-/* PAYMENT SELECT */
+
+/* =========================================
+   PAYMENT SELECT
+========================================= */
+
 function selectPayment(el) {
-    document.querySelectorAll('.payment-item').forEach(e => e.classList.remove('active'));
+
+    document.querySelectorAll('.payment-item')
+        .forEach(e => e.classList.remove('active'));
+
     el.classList.add('active');
-    document.getElementById('payment_method').value = el.dataset.id;
+
+    document.getElementById(
+        'payment_method'
+    ).value = el.dataset.id;
 }
 
-/* TOGGLE ADDRESS */
-function toggleAddresses(btn) {
-    const extras = document.querySelectorAll('.extra-address');
-    let expanded = btn.innerText.toLowerCase().includes("less");
 
-    extras.forEach(el => el.classList.toggle('hidden'));
-    btn.innerText = expanded ? "Show more addresses" : "Show less";
-}
+/* =========================================
+   QUANTITY CONTROL
+========================================= */
 
-/* QUANTITY CHANGE */
 function changeQty(delta) {
-    let qtyEl = document.getElementById('qty');
-    let input = document.getElementById('quantity-input');
 
-    let qty = parseInt(qtyEl.innerText);
-    qty += delta;
+    let qtyEl = document.getElementById('qty');
+
+    let input = document.getElementById(
+        'quantity-input'
+    );
+
+    let qty = parseInt(
+        qtyEl.innerText || 1
+    );
+
+    const stock = parseInt(
+        "{{ inventory.stock|default:1 }}"
+    );
+
+    const maxQty = parseInt(
+        "{{ inventory.max_order_quantity|default:1 }}"
+    );
+
+    qty = qty + delta;
 
     if (qty < 1) qty = 1;
-    if (qty > {{ product.stock_available }}) {
-        qty = {{ product.stock_available }};
+
+    qty = Math.min(qty, stock);
+    qty = Math.min(qty, maxQty);
+
+    if (qty >= maxQty) {
+
+        showMessage(
+            "Maximum order quantity reached.",
+            "error"
+        );
     }
 
     qtyEl.innerText = qty;
+
     input.value = qty;
 
-    updateTotals(); // 🔥 no manual passing
+    updateTotals(true);
 }
 
-/* CORE CALCULATION ENGINE */
-function updateTotals() {
 
-    let qty = parseInt(document.getElementById('qty').innerText);
-    let unitPrice = parseFloat("{{ product.get_effective_price }}");
+/* =========================================
+   CORE TOTAL ENGINE
+========================================= */
 
-    let subtotal = unitPrice * qty;
+function updateTotals(fetchShipping = false) {
 
-    document.getElementById('sub_total').innerText = "₹" + subtotal;
+    let qty = parseInt(
+        document.getElementById('qty').innerText || 1
+    );
 
-    const addressId = document.getElementById('address_id').value;
+    let unitPrice = parseFloat(
+        "{{ inventory.selling_price|default:0 }}"
+    );
 
-    if (!addressId) return;
+    if (isNaN(unitPrice)) {
+        unitPrice = 0;
+    }
 
-    fetch("{% url 'get_buy_now_shipping_cost' product.id %}?address_id=" + addressId)
+    let subtotal = qty * unitPrice;
+
+    document.getElementById(
+        'sub_total'
+    ).innerText = "₹" + subtotal.toFixed(2);
+
+    const addressId = document.getElementById(
+        'address_id'
+    ).value;
+
+    const shippingEl = document.getElementById(
+        'shipping'
+    );
+
+    const totalEl = document.getElementById(
+        'total'
+    );
+
+    const desktopBtn = document.getElementById(
+        'desktop-btn'
+    );
+
+    const mobileBtn = document.getElementById(
+        'mobile-btn'
+    );
+
+    // =====================================
+    // ADDRESS REQUIRED
+    // =====================================
+
+    if (!addressId) {
+
+        shippingEl.innerText = "Select address";
+
+        totalEl.innerText =
+            "₹" + subtotal.toFixed(2);
+
+        showMessage(
+            "Please select delivery address.",
+            "error"
+        );
+
+        disableButtons(
+            desktopBtn,
+            mobileBtn
+        );
+
+        return;
+    }
+
+    // =====================================
+    // CACHE
+    // =====================================
+
+    if (
+        !fetchShipping &&
+        SHIPPING_CACHE !== null
+    ) {
+
+        let total = subtotal + SHIPPING_CACHE;
+
+        shippingEl.innerText =
+            "₹" + SHIPPING_CACHE.toFixed(2);
+
+        totalEl.innerText =
+            "₹" + total.toFixed(2);
+
+        return;
+    }
+
+    // =====================================
+    // LOADING
+    // =====================================
+
+    shippingEl.innerHTML = `
+        <span class="spinner-border spinner-border-sm"></span>
+        Calculating...
+    `;
+
+    // =====================================
+    // API
+    // =====================================
+
+    fetch(
+        "{% url 'get_buy_now_shipping_cost' product.id %}?address_id="
+        + addressId
+    )
+
     .then(res => res.json())
-    .then(data => {
 
-        const msg = document.getElementById('service-msg');
-        const desktopBtn = document.getElementById('desktop-btn');
-        const mobileBtn = document.getElementById('mobile-btn');
+    .then(data => {
 
         if (data.success) {
 
-            currentShipping = parseFloat(data.shipping_cost);
+            hideMessage();
 
-            let total = subtotal + currentShipping;
+            showMessage(
+                "Delivery available",
+                "success"
+            );
 
-            document.getElementById('shipping').innerText = "₹" + currentShipping;
-            document.getElementById('total').innerText = "₹" + total;
+            SHIPPING_CACHE = parseFloat(
+                data.shipping_cost || 0
+            );
 
-            mobileBtn.innerText = "Confirm Order • ₹" + total;
+            let total =
+                subtotal + SHIPPING_CACHE;
 
-            msg.classList.add('d-none');
+            shippingEl.innerText =
+                "₹" + SHIPPING_CACHE.toFixed(2);
 
-            desktopBtn.disabled = false;
-            mobileBtn.disabled = false;
+            totalEl.innerText =
+                "₹" + total.toFixed(2);
 
-            desktopBtn.classList.remove('btn-disabled');
-            mobileBtn.classList.remove('btn-disabled');
+            if (mobileBtn) {
+
+                mobileBtn.innerText =
+                    "Confirm Order • ₹"
+                    + total.toFixed(2);
+            }
+
+            enableButtons(
+                desktopBtn,
+                mobileBtn
+            );
 
         } else {
 
-            currentShipping = 0;
+            SHIPPING_CACHE = null;
 
-            msg.classList.remove('d-none');
+            shippingEl.innerText =
+                "Unavailable";
 
-            document.getElementById('shipping').innerText = "Not Available";
-            document.getElementById('total').innerText = "--";
+            totalEl.innerText =
+                "₹" + subtotal.toFixed(2);
 
-            desktopBtn.disabled = true;
-            mobileBtn.disabled = true;
+            showMessage(
+                data.message
+                || "Delivery unavailable for selected address.",
+                "error"
+            );
 
-            desktopBtn.classList.add('btn-disabled');
-            mobileBtn.classList.add('btn-disabled');
+            disableButtons(
+                desktopBtn,
+                mobileBtn
+            );
         }
+
+    })
+
+    .catch(err => {
+
+        console.error(err);
+
+        SHIPPING_CACHE = null;
+
+        shippingEl.innerText = "Error";
+
+        totalEl.innerText =
+            "₹" + subtotal.toFixed(2);
+
+        showMessage(
+            "Unable to calculate shipping right now.",
+            "error"
+        );
+
+        disableButtons(
+            desktopBtn,
+            mobileBtn
+        );
     });
 }
 
-/* INIT */
-document.addEventListener("DOMContentLoaded", function () {
-    const defaultAddr = document.querySelector('.address-item.active');
-
-    if (defaultAddr) {
-        document.getElementById('address_id').value = defaultAddr.dataset.id;
-        updateTotals(); // 🔥 single source of truth
-    }
-});
-
 </script>
+
 {% endblock %}

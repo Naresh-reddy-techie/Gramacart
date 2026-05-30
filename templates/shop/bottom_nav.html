@@ -1,110 +1,352 @@
+{% load static %}
+
 <style>
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    
-    height: calc(70px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
 
-    background: #ffffff;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+:root{
+    --nav-height:72px;
 
-    border-radius: 24px 24px 0 0;
-    z-index: 9999;
+    --nav-bg:#FFFFFF;
+    --nav-border:#E2E8F0;
 
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.06);
-    border-top: 1px solid #f1f5f9;
+    --nav-text:#94A3B8;
+    --nav-active:#10B981;
+
+    --nav-shadow:
+        0 -10px 30px rgba(15,23,42,0.06);
+
+    --badge-bg:#F97316;
+
+    --safe-bottom:env(safe-area-inset-bottom);
 }
 
-.nav-item {
-    text-align: center;
-    text-decoration: none;
-    color: #94a3b8;
-    font-size: 0.65rem;
-    font-weight: 700;
-    position: relative;
-    flex: 1;
-    transition: all 0.2s ease;
+/* =========================================================
+BOTTOM NAV
+========================================================= */
+
+.bottom-nav{
+
+    position:fixed;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:calc(var(--nav-height) + var(--safe-bottom));
+
+    padding-bottom:var(--safe-bottom);
+
+    background:rgba(255,255,255,0.96);
+
+    backdrop-filter:blur(18px);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+
+    border-top:1px solid var(--nav-border);
+
+    box-shadow:var(--nav-shadow);
+
+    z-index:5000;
 }
 
-.nav-item i {
-    font-size: 1.4rem;
-    display: block;
-    margin-bottom: 3px;
-    transition: transform 0.2s ease;
+/* =========================================================
+ITEM
+========================================================= */
+
+.bottom-nav-item{
+
+    position:relative;
+
+    flex:1;
+
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:4px;
+
+    text-decoration:none;
+
+    color:var(--nav-text);
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+
+    -webkit-tap-highlight-color:transparent;
 }
 
-/* ACTIVE STATE */
-.nav-item.active {
-    color: #10B981;
+/* =========================================================
+ICON
+========================================================= */
+
+.bottom-nav-icon{
+
+    position:relative;
+
+    font-size:1.38rem;
+
+    line-height:1;
+
+    transition:
+        transform .2s ease,
+        color .2s ease;
 }
 
-.nav-item.active i {
-    transform: translateY(-2px);
+/* =========================================================
+LABEL
+========================================================= */
+
+.bottom-nav-label{
+
+    font-size:.68rem;
+
+    font-weight:700;
+
+    line-height:1;
 }
 
-/* CART BADGE */
-.nav-badge {
-    position: absolute;
-    top: -4px;
-    right: 28%;
-    background: #ff9900;
-    color: white;
-    font-size: 0.6rem;
-    min-width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-    font-weight: 800;
+/* =========================================================
+ACTIVE
+========================================================= */
+
+.bottom-nav-item.active{
+
+    color:var(--nav-active);
 }
+
+.bottom-nav-item.active .bottom-nav-icon{
+
+    transform:translateY(-2px) scale(1.02);
+}
+
+/* active pill */
+.bottom-nav-item.active::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:8px;
+
+    width:42px;
+    height:4px;
+
+    border-radius:999px;
+
+    background:var(--nav-active);
+}
+
+/* =========================================================
+BADGE
+========================================================= */
+
+.bottom-nav-badge{
+
+    position:absolute;
+
+    top:-6px;
+    right:-10px;
+
+    min-width:18px;
+    height:18px;
+
+    padding:0 5px;
+
+    border-radius:999px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:var(--badge-bg);
+
+    color:#fff;
+
+    font-size:.60rem;
+    font-weight:800;
+
+    border:2px solid #fff;
+
+    box-sizing:border-box;
+}
+
+/* =========================================================
+PRESS EFFECT
+========================================================= */
+
+.bottom-nav-item:active{
+
+    transform:scale(.96);
+}
+
+/* =========================================================
+DESKTOP
+========================================================= */
+
+@media (min-width:992px){
+
+    .bottom-nav{
+
+        max-width:480px;
+
+        left:50%;
+
+        transform:translateX(-50%);
+
+        border-radius:24px 24px 0 0;
+    }
+}
+
 </style>
 
 {% with request.resolver_match.url_name as url_name %}
 
-<div class="bottom-nav">
+<nav
+    class="bottom-nav"
+    role="navigation"
+    aria-label="Bottom Navigation"
+>
 
     <!-- HOME -->
-    <a href="{% url 'public_dashboard' %}"
-       class="nav-item {% if url_name == 'public_dashboard' %}active{% endif %}">
-        <i class="bi bi-house-door{% if url_name == 'public_dashboard' %}-fill{% endif %}"></i>
-        <span>Home</span>
+    <a
+        href="{% url 'public_dashboard' %}"
+        class="bottom-nav-item {% if url_name == 'public_dashboard' %}active{% endif %}"
+    >
+
+        <div class="bottom-nav-icon">
+
+            <i class="bi bi-house-door{% if url_name == 'public_dashboard' %}-fill{% endif %}"></i>
+
+        </div>
+
+        <div class="bottom-nav-label">
+            Home
+        </div>
+
     </a>
 
     <!-- ORDERS -->
-    <a href="{% url 'orders_list' %}"
-       class="nav-item {% if url_name == 'orders_list' %}active{% endif %}">
-        <i class="bi bi-truck{% if url_name == 'orders_list' %}-front-fill{% endif %}"></i>
-        <span>Orders</span>
+    <a
+        href="{% url 'orders_list' %}"
+        class="bottom-nav-item {% if url_name == 'orders_list' %}active{% endif %}"
+    >
+
+        <div class="bottom-nav-icon">
+
+            <i class="bi bi-bag{% if url_name == 'orders_list' %}-fill{% endif %}"></i>
+
+        </div>
+
+        <div class="bottom-nav-label">
+            Orders
+        </div>
+
     </a>
 
     <!-- CART -->
-    <a href="{% url 'cart_view' %}"
-       class="nav-item {% if url_name == 'cart_view' %}active{% endif %}">
-        <i class="bi bi-bag-check{% if url_name == 'cart_view' %}-fill{% endif %}"></i>
+    <a
+        href="{% url 'cart_view' %}"
+        class="bottom-nav-item {% if url_name == 'cart_view' %}active{% endif %}"
+        id="bottom-cart-link"
+    >
 
-        {% if cart_count and cart_count > 0 %}
-            <span class="nav-badge" id="cart-badge">{{ cart_count }}</span>
-        {% else %}
-            <span class="nav-badge" id="cart-badge" style="display:none;"></span>
-        {% endif %}
+        <div class="bottom-nav-icon">
 
-        <span>Cart</span>
+            <i class="bi bi-cart3"></i>
+
+            <span
+                class="bottom-nav-badge"
+                id="bottom-cart-badge"
+                {% if not cart_count or cart_count <= 0 %}
+                    style="display:none;"
+                {% endif %}
+            >
+                {{ cart_count }}
+            </span>
+
+        </div>
+
+        <div class="bottom-nav-label">
+            Cart
+        </div>
+
     </a>
 
     <!-- PROFILE -->
-    <a href="{% url 'profile_view' %}"
-       class="nav-item {% if url_name == 'profile_view' %}active{% endif %}">
-        <i class="bi bi-person{% if url_name == 'profile_view' %}-fill{% endif %}"></i>
-        <span>Profile</span>
+    <a
+        href="{% url 'profile_view' %}"
+        class="bottom-nav-item {% if url_name == 'profile_view' %}active{% endif %}"
+    >
+
+        <div class="bottom-nav-icon">
+
+            <i class="bi bi-person{% if url_name == 'profile_view' %}-fill{% endif %}"></i>
+
+        </div>
+
+        <div class="bottom-nav-label">
+            Profile
+        </div>
+
     </a>
 
-</div>
+</nav>
 
 {% endwith %}
+
+<script>
+
+/* =========================================================
+REALTIME CART BADGE ENGINE
+========================================================= */
+
+window.updateCartBadge = function(count){
+
+    const badge =
+        document.getElementById(
+            "bottom-cart-badge"
+        );
+
+    if(!badge) return;
+
+    count = parseInt(count || 0);
+
+    if(count <= 0){
+
+        badge.style.display = "none";
+        badge.innerText = "";
+
+        return;
+    }
+
+    badge.style.display = "flex";
+
+    badge.innerText =
+        count > 99
+        ? "99+"
+        : count;
+};
+
+/* =========================================================
+OPTIONAL GLOBAL EVENT SUPPORT
+========================================================= */
+
+window.addEventListener(
+    "cart:updated",
+    function(e){
+
+        if(e.detail?.count !== undefined){
+
+            updateCartBadge(
+                e.detail.count
+            );
+        }
+    }
+);
+
+</script>

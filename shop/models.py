@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from admin_dashboard.models import Product
+from admin_dashboard.models import Product,DeliveryHub
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='customer_profile')
@@ -10,72 +10,339 @@ class CustomerProfile(models.Model):
         return self.user.username
 
 
+# =========================================================
+# MODELS.py (PRODUCTION READY ADDRESS MODEL)
+# =========================================================
+
+from django.db import models
+from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+
+
+# =========================================================
+# ACTIVE ADDRESS MANAGER
+# =========================================================
+
+class ActiveAddressManager(models.Manager):
+
+    def get_queryset(self):
+
+        return super().get_queryset().filter(
+            is_active=True
+        )
+
+
+# =========================================================
+# ADDRESS
+# =========================================================
 
 class Address(models.Model):
 
     ADDRESS_TYPE = [
-        ('home', 'Home'),
-        ('parents', 'Parents'),
-        ('work', 'Work'),
-        ('other', 'Other'),
+        ("home", "Home"),
+        ("parents", "Parents"),
+        ("work", "Work"),
+        ("other", "Other"),
     ]
 
+    # =====================================================
+    # RELATIONS
+    # =====================================================
+
     customer = models.ForeignKey(
-        'CustomerProfile',
+        "CustomerProfile",
         on_delete=models.CASCADE,
-        related_name='addresses'
+        related_name="addresses"
     )
 
-    recipient_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
-    address_line = models.CharField(max_length=255, blank=True, null=True)
-    landmark = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    country = models.CharField(max_length=100, default='India')
-    pincode = models.CharField(max_length=6, blank=True, null=True)
-    address_type = models.CharField(max_length=20, choices=ADDRESS_TYPE, default='home')
+    # =====================================================
+    # USER DETAILS
+    # =====================================================
 
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
-    distance_km = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    recipient_name = models.CharField(
+        max_length=255
+    )
 
-    is_default = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True, help_text="Soft delete toggle")
-    created_at = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(
+        max_length=10,
+        validators=[
+            RegexValidator(
+                regex=r"^[6-9]\d{9}$",
+                message="Enter valid 10 digit mobile number."
+            )
+        ]
+    )
+
+    # =====================================================
+    # ADDRESS DETAILS
+    # =====================================================
+
+    address_line = models.CharField(
+        max_length=255
+    )
+
+    landmark = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    city = models.CharField(
+        max_length=100
+    )
+
+    state = models.CharField(
+        max_length=100,
+        default="Andhra Pradesh"
+    )
+
+    country = models.CharField(
+        max_length=100,
+        default="India"
+    )
+
+    pincode = models.CharField(
+        max_length=6,
+        validators=[
+            RegexValidator(
+                regex=r"^\d{6}$",
+                message="Enter valid 6 digit pincode."
+            )
+        ]
+    )
+
+    address_type = models.CharField(
+        max_length=20,
+        choices=ADDRESS_TYPE,
+        default="home"
+    )
+
+    # =====================================================
+    # GEO LOCATION
+    # =====================================================
+
+    latitude = models.DecimalField(
+        max_digits=12,
+        decimal_places=8,
+        db_index=True
+    )
+
+    longitude = models.DecimalField(
+        max_digits=12,
+        decimal_places=8,
+        db_index=True
+    )
+
+    # =====================================================
+    # FUTURE SCALABILITY
+    # =====================================================
+
+    full_address = models.TextField(
+        blank=True
+    )
+
+    is_remote = models.BooleanField(
+        default=False
+    )
+
+    # =====================================================
+    # STATUS
+    # =====================================================
+
+    is_default = models.BooleanField(
+        default=False
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    # =====================================================
+    # MANAGERS
+    # =====================================================
+
+    objects = models.Manager()
+
+    active = ActiveAddressManager()
+
+    # =====================================================
+    # META
+    # =====================================================
 
     class Meta:
-        ordering = ['-created_at']
-        indexes = [models.Index(fields=['latitude', 'longitude'])]
+
+        ordering = ["-is_default", "-created_at"]
+
+        indexes = [
+            models.Index(fields=["latitude", "longitude"]),
+            models.Index(fields=["customer", "is_active"]),
+            models.Index(fields=["city"]),
+            models.Index(fields=["pincode"]),
+        ]
+
+    # =====================================================
+    # CLEAN
+    # =====================================================
+
+    def clean(self):
+
+        if self.latitude is None or self.longitude is None:
+
+            raise ValidationError(
+                "Location coordinates missing."
+            )
+
+    # =====================================================
+    # SAVE
+    # =====================================================
+
+    def save(self, *args, **kwargs):
+
+        # ---------------------------------------------
+        # NORMALIZATION
+        # ---------------------------------------------
+
+        self.recipient_name = (
+            self.recipient_name.strip()
+        )
+
+        self.address_line = (
+            self.address_line.strip()
+        )
+
+        self.city = (
+            self.city.strip().title()
+        )
+
+        self.state = (
+            self.state.strip().title()
+        )
+
+        self.country = (
+            self.country.strip().title()
+        )
+
+        if self.landmark:
+            self.landmark = (
+                self.landmark.strip()
+            )
+
+        # ---------------------------------------------
+        # FULL ADDRESS
+        # ---------------------------------------------
+
+        parts = [
+            self.address_line,
+            self.landmark,
+            self.city,
+            self.state,
+            self.pincode,
+            self.country
+        ]
+
+        self.full_address = ", ".join(
+            [p for p in parts if p]
+        )
+
+        self.full_clean()
+
+        super().save(*args, **kwargs)
+
+    # =====================================================
+    # SOFT DELETE
+    # =====================================================
+
+    def deactivate(self):
+
+        self.is_active = False
+
+        self.save(update_fields=["is_active"])
+
+    # =====================================================
+    # STRING
+    # =====================================================
 
     def __str__(self):
-        return f"{self.recipient_name} - {self.city}"
 
-    # Logic to handle deletion safely
-    def deactivate(self):
-        self.is_active = False
-        self.save()
+        return (
+            f"{self.recipient_name} - "
+            f"{self.city}"
+        )
+#===============================================
 
-
+from admin_dashboard.models import ProductVariant
+from inventory.models import Inventory 
+#==================================
 class CartItem(models.Model):
-    user = models.ForeignKey(User,on_delete = models.CASCADE)
-    product=models.ForeignKey(Product,on_delete=models.CASCADE)
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cart_items'
+    )
+
+    hub = models.ForeignKey(
+        DeliveryHub,
+        on_delete=models.PROTECT,
+        db_index=True
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE
+    )
+
+    variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.CASCADE
+    )
+
+    inventory = models.ForeignKey(
+        Inventory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     quantity = models.PositiveIntegerField(default=1)
+
+    unit_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
     added_on = models.DateTimeField(auto_now_add=True)
 
-    @property
-    def total_price(self):
-        return self.product.price * self.quantity
-    
-    def __str__(self):
-        return f"{self.user.username}-{self.product.name}x{self.quantity}"
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'variant', 'hub'],
+                name='unique_cart_per_hub_variant'
+            )
+        ]
+        ordering = ['-added_on']
 
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} - {self.variant.display_name} x {self.quantity}"
 #====================================================================
 
 class WishlistItem(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together =('user','product')
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name}"
@@ -86,6 +353,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from admin_dashboard.models import Shop,DeliveryHub
+from decimal import Decimal
 
 def generate_order_number():
     # Returns ORD-A1B2C3D4
@@ -94,7 +362,6 @@ def generate_order_number():
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Order Placed'),        # Customer just placed it
-        ('confirmed', 'Confirmed'),    # Admin/Shop accepted it
         ('declined', 'Declined'),      # Admin rejected (e.g., out of stock)
         ('packed', 'Packed'),          # Shop ready! Admin can now assign rider
         ('assigned', 'Rider Assigned'),#rider travelling to hub
@@ -129,6 +396,9 @@ class Order(models.Model):
     #New Token Field
     delivery_token = models.CharField(max_length=4,blank=True,null=True,help_text="4-digit PIN for delivery verification")
     is_ledger_created = models.BooleanField(default=False)
+    #calculating for estimate delivery
+    estimated_distance_km = models.DecimalField(max_digits=6,decimal_places=2,null=True,blank=True)
+    estimated_eta_minutes = models.PositiveIntegerField(null=True,blank=True)
     
     def save(self, *args, **kwargs):
 
@@ -144,7 +414,7 @@ class Order(models.Model):
             self.delivery_token=str(random.randint(1000,9999))
         # Automatically calculate total before saving to DB
 
-        self.total = self.subtotal + self.tax + self.shipping_cost
+        self.total = (self.subtotal + self.tax + self.shipping_cost + Decimal("0.00"))
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -158,10 +428,9 @@ class Order(models.Model):
     def display_status(self):
         mapping = {
             'pending': 'Order Placed',
-            'confirmed': 'Order Placed',
-            'packed': 'Packed',
-            'assigned': 'In Transit',
-            'out_for_delivery': 'In Transit',
+            'packed': 'Packed & Ready',
+            'assigned': 'Rider Assigned',
+            'out_for_delivery': 'Out For Delivery',
             'delivered': 'Delivered',
             'declined': 'Cancelled',
             'cancelled': 'Cancelled',
@@ -170,31 +439,183 @@ class Order(models.Model):
     
     @property
     def progress(self):
+
         mapping = {
-            'pending': 10,
-            'confirmed': 10,
-            'packed': 50,
-            'assigned': 50,
-            'out_for_delivery': 75,
+
+            'pending': 20,
+
+            'packed': 55,
+
+            'assigned': 55,
+
+            'out_for_delivery': 85,
+
             'delivered': 100,
+
             'declined': 0,
+
             'cancelled': 0,
         }
-        return mapping.get(self.status, 0)
 
+        return mapping.get(self.status, 0)
+    
+    @property
+    def payment(self):
+
+        return self.payments.select_related(
+            "method"
+        ).first()
+        
+
+    @property
+    def payment_status_display(self):
+
+
+        payment = self.payment
+
+        if not payment:
+            return "Unavailable"
+
+        # COD LOGIC
+        if payment.method.name.lower() == "cod":
+
+            if self.status == "delivered":
+                return "Paid At Delivery"
+
+            return "Cash On Delivery"
+
+        # ONLINE PAYMENTS
+        if payment.status == "success":
+            return "Paid"
+
+        if payment.status == "failed":
+            return "Failed"
+
+        return "Pending"
+    
+
+    @property
+    def can_track(self):
+
+     
+        return self.status in [
+
+            "assigned",
+            "out_for_delivery"
+
+        ]
+    
+
+    @property
+    def show_otp(self):
+
+  
+        return self.status in [
+
+            "assigned",
+            "out_for_delivery"
+
+        ] and bool(self.delivery_token)
+ 
+
+    @property
+    def estimated_delivery_text(self):
+
+        
+        mapping = {
+
+            "pending": "Order Confirmation Pending",
+
+            "confirmed": "Preparing Your Order",
+
+            "packed": "Ready For Dispatch",
+
+            "assigned": "Rider Assigned",
+
+            "out_for_delivery": "Arriving Soon",
+
+            "delivered": "Delivered Successfully",
+
+            "cancelled": "Order Cancelled",
+
+            "declined": "Order Declined",
+
+        }
+
+        return mapping.get(
+            self.status,
+            "Processing"
+        )
+ 
+
+from inventory.models import Inventory
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # price at the time of order
 
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='items'
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT
+    )
+
+    variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+    inventory = models.ForeignKey(
+        Inventory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+    quantity = models.PositiveIntegerField()
+
+    # snapshot price
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    # snapshot variant name
+    variant_name = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ['-id']
+
+    @property
     def get_total(self):
         return self.quantity * self.price
+    
 
     def __str__(self):
-        return f"{self.product.name} x {self.quantity}"
 
+        if self.variant_name:
+            return (
+                f"{self.product.name} - "
+                f"{self.variant_name} x {self.quantity}"
+            )
+
+        return (
+            f"{self.product.name} x {self.quantity}"
+        )
 
 class Rating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')

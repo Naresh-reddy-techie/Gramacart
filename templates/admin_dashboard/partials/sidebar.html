@@ -46,13 +46,6 @@
             <a href="{% url 'inventory_assign' %}" class="menu-item">
                 <i class="bi bi-box-seam"></i>
                 <span>Inventory Allocation Center</span>
-            </a>
-            <a href="{% url 'live_inventory' %}" class="menu-item {% if 'inventory' in request.path %}active{% endif %}">
-
-                <i class="bi bi-archive-fill"></i>
-
-                <span>Live Inventory</span>
-
                 {% if low_stock_count > 0 %}
                     <span class="badge bg-warning-soft text-warning ms-auto extra-small fw-800 rounded-pill px-2">
                         {{ low_stock_count }} LOW
@@ -62,8 +55,8 @@
                         OK
                     </span>
                 {% endif %}
-
             </a>
+          
             <a href="{% url 'list_category' %}" class="menu-item {% if 'category' in request.path %}active{% endif %}">
                 <i class="bi bi-tags-fill"></i>
                 <span>Categories</span>

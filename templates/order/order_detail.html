@@ -1,214 +1,1186 @@
 {% extends "shop/base.html" %}
 {% load static %}
 
-{% block title %}Order Status | GramaCart{% endblock %}
+{% block title %}
+Order Details | GramaCart
+{% endblock %}
 
 {% block extra_css %}
+
 <style>
-/* ================= ORDER DETAIL ONLY STYLES ================= */
 
-.tracking-card {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: white;
-    border-radius: 28px;
-    padding: 25px;
-    margin-bottom: 20px;
-    overflow: hidden;
+:root{
+
+    --primary:#10B981;
+    --primary-dark:#059669;
+
+    --secondary:#0EA5E9;
+
+    --navy:#0F172A;
+    --slate:#64748B;
+
+    --border:#E2E8F0;
+
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
+
+    --success:#16A34A;
+    --warning:#F59E0B;
+    --danger:#EF4444;
+
+    --shadow:
+        0 10px 35px rgba(15,23,42,0.06);
 }
 
-.tracking-card.is-failed {
-    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+/* =========================================================
+BASE
+========================================================= */
+
+body{
+
+    background:var(--bg);
+    color:var(--navy);
 }
 
-.order-id-badge {
-    background: rgba(255,255,255,0.1);
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
+/* =========================================================
+LAYOUT
+========================================================= */
+
+.gc-order-wrapper{
+
+    max-width:760px;
+
+    margin:auto;
+
+    padding:
+        18px
+        16px
+        120px;
 }
 
-.token-card {
-    background: #f0fdf4;
-    border: 2px dashed #10b981;
-    border-radius: 22px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
+/* =========================================================
+HEADER CARD
+========================================================= */
+
+.gc-hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #10B981 0%,
+            #059669 45%,
+            #0EA5E9 100%
+        );
+
+    border-radius:32px;
+
+    padding:26px;
+
+    color:#fff;
+
+    margin-bottom:18px;
+
+    box-shadow:
+        0 20px 45px rgba(16,185,129,0.25);
 }
 
-.token-number {
-    font-size: 2.2rem;
-    font-weight: 900;
-    letter-spacing: 10px;
-    color: #064e3b;
+.gc-hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    right:-60px;
+    top:-60px;
 }
 
-.timeline-box {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    margin-top: 35px;
+.gc-order-badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:
+        rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(10px);
+
+    font-size:12px;
+    font-weight:800;
+
+    margin-bottom:16px;
 }
 
-.timeline-line {
-    position: absolute;
-    top: 18px;
-    left: 8%;
-    right: 8%;
-    height: 3px;
-    background: #334155;
+.gc-order-title{
+
+    font-size:30px;
+    font-weight:900;
+
+    line-height:1.1;
+
+    margin-bottom:10px;
 }
 
-.line-progress {
-    height: 100%;
-    background: #00b359;
+.gc-order-sub{
+
+    color:
+        rgba(255,255,255,0.9);
+
+    font-size:14px;
 }
 
-.t-step {
-    flex: 1;
-    text-align: center;
+/* =========================================================
+ETA CARD
+========================================================= */
+
+.gc-eta-card{
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:20px;
+
+    margin-bottom:18px;
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
 }
 
-.t-icon {
-    width: 36px;
-    height: 36px;
-    background: #334155;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8;
+.gc-eta-top{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:16px;
 }
 
-.t-step.active .t-icon {
-    background: #00b359;
-    color: white;
+.gc-eta-title{
+
+    font-size:14px;
+    font-weight:800;
 }
 
-.info-card {
-    background: #fff;
-    border-radius: 24px;
-    padding: 20px;
-    margin-bottom: 16px;
-    border: 1px solid rgba(0,0,0,0.05);
+.gc-eta-time{
+
+    font-size:26px;
+    font-weight:900;
+
+    color:var(--primary);
 }
 
-.product-item {
-    display: flex;
-    gap: 15px;
-    padding: 12px 0;
-    border-bottom: 1px solid #f1f5f9;
+.gc-status-pill{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:800;
 }
 
-.product-item img {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    object-fit: cover;
+.pending{
+    background:#FFF7ED;
+    color:#C2410C;
 }
 
-.btn-main {
-    width: 100%;
-    padding: 16px;
-    border-radius: 18px;
-    font-weight: 900;
-    text-align: center;
-    display: block;
-    text-decoration: none;
+.confirmed{
+    background:#EFF6FF;
+    color:#1D4ED8;
 }
 
-.btn-green {
-    background: #00b359;
-    color: white;
+.packed{
+    background:#FEF3C7;
+    color:#B45309;
+}
+
+.assigned{
+    background:#F3E8FF;
+    color:#7E22CE;
+}
+
+.out_for_delivery{
+    background:#E0F2FE;
+    color:#0369A1;
+}
+
+.delivered{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.cancelled,
+.declined{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.gc-live-dot{
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.35;
+    }
+
+    100%{
+        opacity:1;
+    }
+}
+
+/* =========================================================
+OTP CARD
+========================================================= */
+
+.gc-otp-card{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ECFDF5,
+            #F0FDF4
+        );
+
+    border:2px dashed #10B981;
+
+    border-radius:26px;
+
+    padding:24px;
+
+    margin-bottom:18px;
+
+    text-align:center;
+}
+
+.gc-otp-title{
+
+    font-size:13px;
+    font-weight:800;
+
+    color:#166534;
+
+    margin-bottom:8px;
+}
+
+.gc-otp-number{
+
+    font-size:40px;
+    font-weight:900;
+
+    letter-spacing:10px;
+
+    color:#064E3B;
+
+    line-height:1;
+}
+
+.gc-otp-sub{
+
+    margin-top:10px;
+
+    font-size:12px;
+
+    color:#166534;
+}
+
+/* =========================================================
+TRACK BUTTON
+========================================================= */
+
+.gc-track-btn{
+
+    width:100%;
+
+    min-height:58px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0EA5E9,
+            #0284C7
+        );
+
+    color:#fff;
+
+    text-decoration:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    font-weight:800;
+
+    margin-bottom:18px;
+
+    box-shadow:
+        0 12px 30px rgba(14,165,233,.28);
+}
+
+/* =========================================================
+COMMON CARD
+========================================================= */
+
+.gc-card{
+
+    background:#fff;
+
+    border-radius:28px;
+
+    border:1px solid var(--border);
+
+    padding:22px;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow);
+}
+
+.gc-section-title{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:18px;
+    font-weight:900;
+
+    margin-bottom:20px;
+}
+
+/* =========================================================
+TIMELINE
+========================================================= */
+
+.gc-timeline{
+
+    position:relative;
+
+    margin-left:10px;
+}
+
+.gc-timeline::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:15px;
+    top:0;
+    bottom:0;
+
+    width:2px;
+
+    background:#E2E8F0;
+}
+
+.gc-step{
+
+    position:relative;
+
+    padding-left:50px;
+
+    padding-bottom:28px;
+}
+
+.gc-step:last-child{
+
+    padding-bottom:0;
+}
+
+.gc-step-dot{
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:32px;
+    height:32px;
+
+    border-radius:50%;
+
+    background:#E2E8F0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#94A3B8;
+}
+
+.gc-step.active .gc-step-dot{
+
+    background:var(--primary);
+
+    color:#fff;
+}
+
+.gc-step-title{
+
+    font-weight:800;
+
+    margin-bottom:4px;
+}
+
+.gc-step-time{
+
+    font-size:12px;
+
+    color:var(--slate);
+}
+
+/* =========================================================
+ADDRESS
+========================================================= */
+
+.gc-address-box{
+
+    background:#F8FAFC;
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:18px;
+}
+
+.gc-address-top{
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:12px;
+}
+
+.gc-address-name{
+
+    font-weight:900;
+}
+
+.gc-address-phone{
+
+    color:var(--slate);
+
+    font-size:14px;
+}
+
+.gc-address-full{
+
+    line-height:1.7;
+
+    color:#334155;
+
+    font-size:14px;
+}
+
+/* =========================================================
+ITEMS
+========================================================= */
+
+.gc-item{
+
+    display:flex;
+    gap:16px;
+
+    padding:16px 0;
+
+    border-bottom:1px solid #F1F5F9;
+}
+
+.gc-item:last-child{
+
+    border-bottom:none;
+}
+
+.gc-item-image{
+
+    width:74px;
+    height:74px;
+
+    border-radius:20px;
+
+    object-fit:cover;
+
+    background:#F8FAFC;
+}
+
+.gc-item-name{
+
+    font-weight:800;
+
+    margin-bottom:4px;
+}
+
+.gc-item-meta{
+
+    font-size:13px;
+
+    color:var(--slate);
+}
+
+.gc-item-price{
+
+    margin-left:auto;
+
+    font-weight:900;
+}
+
+/* =========================================================
+PAYMENT
+========================================================= */
+
+.gc-payment-row{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+.gc-payment-row:last-child{
+
+    margin-bottom:0;
+}
+
+.gc-total{
+
+    padding-top:14px;
+
+    border-top:1px dashed #CBD5E1;
+
+    margin-top:14px;
+
+    font-size:20px;
+    font-weight:900;
+}
+
+/* =========================================================
+SUPPORT
+========================================================= */
+
+.gc-support-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+}
+
+.gc-support-btn{
+
+    min-height:56px;
+
+    border-radius:18px;
+
+    text-decoration:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    font-weight:800;
+}
+
+.gc-support-call{
+
+    background:#ECFDF5;
+
+    color:#166534;
+}
+
+.gc-support-chat{
+
+    background:#EFF6FF;
+
+    color:#1D4ED8;
+}
+
+/* =========================================================
+POST DELIVERY
+========================================================= */
+
+.gc-post-actions{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+}
+
+.gc-post-btn{
+
+    min-height:56px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    text-decoration:none;
+
+    font-weight:800;
+}
+
+.gc-rate-btn{
+
+    background:#FEF3C7;
+
+    color:#92400E;
+}
+
+.gc-reorder-btn{
+
+    background:#DCFCE7;
+
+    color:#166534;
+}
+
+/* =========================================================
+BACK BUTTON
+========================================================= */
+
+.gc-back-btn{
+
+    width:100%;
+
+    min-height:60px;
+
+    border-radius:22px;
+
+    background:var(--navy);
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    font-weight:900;
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media(max-width:576px){
+
+    .gc-order-title{
+
+        font-size:24px;
+    }
+
+    .gc-otp-number{
+
+        font-size:34px;
+
+        letter-spacing:8px;
+    }
+
+    .gc-support-grid,
+    .gc-post-actions{
+
+        grid-template-columns:1fr;
+    }
 }
 
 </style>
+
 {% endblock %}
 
 {% block content %}
 
-<div class="container py-3" style="max-width: 650px;">
+<div class="gc-order-wrapper">
 
-    <!-- TRACKING HEADER -->
-    <div class="tracking-card text-center {% if order.status in 'declined,cancelled,failed' %}is-failed{% endif %}">
-        
-        <div class="order-id-badge mb-2">
+    <!-- =====================================================
+    HERO
+    ====================================================== -->
+
+    <div class="gc-hero">
+
+        <div class="gc-order-badge">
+            <i class="bi bi-bag-check-fill"></i>
             ORDER #{{ order.order_number }}
         </div>
 
-        <h2 class="fw-800 m-0">
-            {{ order.get_status_display }}
-        </h2>
-
-        <div class="timeline-box">
-            <div class="timeline-line">
-                <div class="line-progress" style="width:
-                    {% if order.status == 'delivered' %}100%
-                    {% elif order.status == 'out_for_delivery' %}75%
-                    {% elif order.status == 'packed' %}50%
-                    {% else %}20%{% endif %};">
-                </div>
-            </div>
-
-            <div class="t-step active">
-                <div class="t-icon"><i class="bi bi-receipt"></i></div>
-                <small>Placed</small>
-            </div>
-
-            <div class="t-step {% if order.status in 'packed,assigned,out_for_delivery,delivered' %}active{% endif %}">
-                <div class="t-icon"><i class="bi bi-box"></i></div>
-                <small>Packed</small>
-            </div>
-
-            <div class="t-step {% if order.status in 'out_for_delivery,delivered' %}active{% endif %}">
-                <div class="t-icon"><i class="bi bi-truck"></i></div>
-                <small>Transit</small>
-            </div>
-
-            <div class="t-step {% if order.status == 'delivered' %}active{% endif %}">
-                <div class="t-icon"><i class="bi bi-house"></i></div>
-                <small>Delivered</small>
-            </div>
+        <div class="gc-order-title">
+            {{ order.display_status }}
         </div>
+
+        <div class="gc-order-sub">
+
+            Placed on
+            {{ order.placed_at|date:"d M Y • h:i A" }}
+
+        </div>
+
     </div>
 
-    <!-- TOKEN -->
-    {% if order.status != 'delivered' %}
-    <div class="token-card">
-        <small class="text-success fw-bold">Delivery PIN</small>
-        <div class="token-number">{{ order.delivery_token }}</div>
-        <small>Share only after receiving order</small>
+    <!-- =====================================================
+    DELIVERY ETA
+    ====================================================== -->
+
+    <div class="gc-eta-card">
+
+        <div class="gc-eta-top">
+
+            <div>
+
+                <div class="gc-eta-title">
+                    Delivery Status
+                </div>
+
+                <div class="gc-eta-time">
+
+                    {% if order.status == "delivered" %}
+
+                        Delivered
+
+                    {% elif order.status == "out_for_delivery" %}
+
+                        Arriving Soon
+
+                    {% elif order.status == "packed" %}
+
+                        Preparing
+
+                    {% else %}
+
+                        Processing
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <div class="gc-status-pill {{ order.status }}">
+
+                {% if order.status != "delivered" and order.status != "cancelled" and order.status != "declined" %}
+                <span class="gc-live-dot"></span>
+                {% endif %}
+
+                {{ order.get_status_display }}
+
+            </div>
+
+        </div>
+
     </div>
+
+    <!-- =====================================================
+    OTP
+    ====================================================== -->
+
+    {% if order.status == "out_for_delivery" %}
+
+    <div class="gc-otp-card">
+
+        <div class="gc-otp-title">
+            DELIVERY VERIFICATION PIN
+        </div>
+
+        <div class="gc-otp-number">
+            {{ order.delivery_token }}
+        </div>
+
+        <div class="gc-otp-sub">
+            Share this OTP only after receiving your order.
+        </div>
+
+    </div>
+
     {% endif %}
 
-    <!-- ITEMS -->
-    <div class="info-card">
-        <h6 class="fw-800 mb-3">Your Items</h6>
+    <!-- =====================================================
+    LIVE TRACKING
+    ====================================================== -->
 
-        {% for item in order.items.all %}
-        <div class="product-item">
-            <img src="{% if item.product.product_images.first %}{{ item.product.product_images.first.image.url }}{% else %}{% static 'images/default.png' %}{% endif %}">
-            <div class="flex-grow-1">
-                <strong>{{ item.product.name }}</strong><br>
-                <small class="text-muted">Qty: {{ item.quantity }}</small>
+    {% if order.status == "assigned" or order.status == "out_for_delivery" %}
+
+    <a
+        href="#"
+        class="gc-track-btn"
+    >
+        <i class="bi bi-geo-alt-fill"></i>
+        Track Delivery Live
+    </a>
+
+    {% endif %}
+
+    <!-- =====================================================
+    TIMELINE
+    ====================================================== -->
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-truck"></i>
+            Order Timeline
+
+        </div>
+
+        <div class="gc-timeline">
+
+            <div class="gc-step active">
+
+                <div class="gc-step-dot">
+                    <i class="bi bi-check"></i>
+                </div>
+
+                <div class="gc-step-title">
+                    Order Placed
+                </div>
+
+                <div class="gc-step-time">
+                    {{ order.placed_at|date:"d M Y • h:i A" }}
+                </div>
+
             </div>
-            <div class="fw-bold">₹{{ item.get_total }}</div>
-        </div>
-        {% endfor %}
 
-        <hr>
+            <div class="gc-step {% if order.status != 'pending' %}active{% endif %}">
 
-        <div class="d-flex justify-content-between">
-            <span>Total</span>
-            <strong>₹{{ order.total }}</strong>
+                <div class="gc-step-dot">
+                    <i class="bi bi-box"></i>
+                </div>
+
+                <div class="gc-step-title">
+                    Packed & Ready
+                </div>
+
+                <div class="gc-step-time">
+                    Your order is prepared for dispatch
+                </div>
+
+            </div>
+
+            <div class="gc-step {% if order.status == 'assigned' or order.status == 'out_for_delivery' or order.status == 'delivered' %}active{% endif %}">
+
+                <div class="gc-step-dot">
+                    <i class="bi bi-bicycle"></i>
+                </div>
+
+                <div class="gc-step-title">
+                    Out For Delivery
+                </div>
+
+                <div class="gc-step-time">
+                    Rider is on the way
+                </div>
+
+            </div>
+
+            <div class="gc-step {% if order.status == 'delivered' %}active{% endif %}">
+
+                <div class="gc-step-dot">
+                    <i class="bi bi-house-check"></i>
+                </div>
+
+                <div class="gc-step-title">
+                    Delivered
+                </div>
+
+                <div class="gc-step-time">
+                    Delivered successfully
+                </div>
+
+            </div>
+
         </div>
+
     </div>
 
-    <!-- ACTION -->
-    <a href="{% url 'orders_list' %}" class="btn-main btn-green">
-        Back to Orders
+    <!-- =====================================================
+    ADDRESS
+    ====================================================== -->
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-geo-alt-fill"></i>
+            Delivery Address
+
+        </div>
+
+        <div class="gc-address-box">
+
+            <div class="gc-address-top">
+
+                <div>
+
+                    <div class="gc-address-name">
+                        {{ order.address.recipient_name }}
+                    </div>
+
+                    <div class="gc-address-phone">
+                        +91 {{ order.address.phone_number }}
+                    </div>
+
+                </div>
+
+                <span class="gc-status-pill confirmed">
+
+                    {{ order.address.get_address_type_display }}
+
+                </span>
+
+            </div>
+
+            <div class="gc-address-full">
+
+                {{ order.address.address_line }}
+
+                {% if order.address.landmark %}
+                    , {{ order.address.landmark }}
+                {% endif %}
+
+                <br>
+
+                {{ order.address.city }},
+                {{ order.address.state }}
+
+                - {{ order.address.pincode }}
+
+                <br>
+
+                {{ order.address.country }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    ITEMS
+    ====================================================== -->
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-bag"></i>
+            Ordered Items
+
+        </div>
+
+        {% for item in order.items.all %}
+
+        <div class="gc-item">
+
+            <img
+                src="{% if item.product.product_images.first %}{{ item.product.product_images.first.image.url }}{% else %}{% static 'images/default-product.png' %}{% endif %}"
+                class="gc-item-image"
+            >
+
+            <div>
+
+                <div class="gc-item-name">
+                    {{ item.product.name }}
+                </div>
+
+                <div class="gc-item-meta">
+
+                    Qty: {{ item.quantity }}
+
+                    {% if item.variant_name %}
+                    • {{ item.variant_name }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <div class="gc-item-price">
+                ₹{{ item.get_total }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        </div>
+
+    
+            <div class="gc-payment-row">
+
+            <span>Payment Status</span>
+
+            <strong>
+
+                {% if order.is_paid %}
+
+                    <span style="color:#16A34A;">
+                        Paid
+                    </span>
+
+                {% else %}
+
+                    <span style="color:#F59E0B;">
+                        Pending
+                    </span>
+
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+        {% if order.tax > 0 %}
+
+        <div class="gc-payment-row">
+
+            <span>Taxes</span>
+            <strong>₹{{ order.tax }}</strong>
+
+        </div>
+
+        {% endif %}
+           
+
+        <div class="gc-payment-row gc-total">
+
+            <span>Total Paid</span>
+            <span>₹{{ order.total }}</span>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    SUPPORT
+    ====================================================== -->
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-headset"></i>
+            Need Help?
+
+        </div>
+
+        <div class="gc-support-grid">
+
+            <a
+                href="tel:+919999999999"
+                class="gc-support-btn gc-support-call"
+            >
+                <i class="bi bi-telephone-fill"></i>
+                Call Support
+            </a>
+
+            <a
+                href="#"
+                class="gc-support-btn gc-support-chat"
+            >
+                <i class="bi bi-chat-dots-fill"></i>
+                Chat Support
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    POST DELIVERY
+    ====================================================== -->
+
+    {% if order.status == "delivered" %}
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-stars"></i>
+            Post Delivery Actions
+
+        </div>
+
+        <div class="gc-post-actions">
+
+            <a
+                href="#"
+                class="gc-post-btn gc-rate-btn"
+            >
+                <i class="bi bi-star-fill"></i>
+                Rate Products
+            </a>
+
+            <a
+                href="#"
+                class="gc-post-btn gc-reorder-btn"
+            >
+                <i class="bi bi-arrow-repeat"></i>
+                Reorder
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- =====================================================
+    BACK
+    ====================================================== -->
+
+    <a
+        href="{% url 'orders_list' %}"
+        class="gc-back-btn"
+    >
+        Back To Orders
     </a>
 
 </div>

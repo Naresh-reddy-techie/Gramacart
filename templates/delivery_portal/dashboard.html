@@ -1,594 +1,1817 @@
+
 {% extends "delivery_portal/base.html" %}
 {% load static %}
-{% block title %}Rider Pro | GramaCart{% endblock %}
+
+{% block title %}Rider Command Center{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --brand-success: #10B981;
-        --brand-warning: #F59E0B;
-        --brand-danger: #EF4444;
-        --brand-primary: #2563EB;
-        --ui-card: #ffffff;
-        --ui-border: #f1f5f9;
-        --ui-subtext: #64748b;
+    /* =========================================================
+RIDER DASHBOARD ISOLATION LAYER
+========================================================= */
+
+.dashboard-shell,
+.dashboard-shell * {
+    box-sizing: border-box;
+}
+
+.dashboard-shell {
+    --surface-card: #ffffff;
+    --surface-card-muted: #f8fafc;
+
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+
+    --border-subtle: #e2e8f0;
+
+    color: var(--text-main);
+}
+
+/* DARK MODE SAFE TOKENS */
+
+html[data-theme="dark"] .dashboard-shell {
+    --surface-card: #0f172a;
+    --surface-card-muted: #1e293b;
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+
+    --border-subtle: #334155;
+}
+
+/* FORCE CARD VISIBILITY */
+
+.dashboard-shell .order-card,
+.dashboard-shell .metric-card,
+.dashboard-shell .manifest-container,
+.dashboard-shell .analytic-pill,
+.dashboard-shell .blank-state-card {
+    background: var(--surface-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+/* FORCE BUTTON VISIBILITY */
+
+.dashboard-shell .btn-tactile {
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.dashboard-shell .btn-tactile.secondary {
+    background: #334155 !important;
+}
+
+.dashboard-shell .btn-tactile.warning {
+    background: #f59e0b !important;
+}
+
+.dashboard-shell .btn-tactile.primary {
+    background: #2563eb !important;
+}
+
+.dashboard-shell .btn-tactile.success {
+    background: #10b981 !important;
+}
+
+/* FIX WHITE TEXT LEAKS */
+
+.dashboard-shell .stepper-detail,
+.dashboard-shell .manifest-item-name,
+.dashboard-shell .metric-number,
+.dashboard-shell .badge-outline-chip,
+.dashboard-shell .meta-capsule {
+    color: var(--text-main) !important;
+}
+
+/* FIX MUTED TEXT */
+
+.dashboard-shell .manifest-item-subtext,
+.dashboard-shell .stepper-label,
+.dashboard-shell .metric-tag,
+.dashboard-shell .payout-label {
+    color: var(--text-muted) !important;
+}
+
+:root{
+    --gc-primary:#10B981;
+    --gc-primary-dark:#059669;
+    --gc-blue:#2563EB;
+    --gc-warning:#F59E0B;
+    --gc-danger:#EF4444;
+
+    --surface:#ffffff;
+    --surface-soft:#f8fafc;
+    --border:#e2e8f0;
+
+    --text:#0f172a;
+    --muted:#64748b;
+
+    --radius-xl:24px;
+    --radius-lg:18px;
+    --radius-md:14px;
+    --radius-sm:10px;
+
+    --shadow-sm:0 4px 12px rgba(15,23,42,.04);
+    --shadow-md:0 10px 30px rgba(15,23,42,.08);
+}
+
+/* =========================================================
+BASE
+========================================================= */
+
+.dashboard-shell{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    padding-bottom:100px;
+}
+
+/* =========================================================
+LIVE COMMAND HERO
+========================================================= */
+
+.hero-panel{
+    position:relative;
+    overflow:hidden;
+    border-radius:var(--radius-xl);
+    padding:26px;
+    background:
+    linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f8fafc 35%,
+        #e0f2fe 100%
+    );
+
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 20px 50px rgba(15,23,42,.08);
+}
+
+.hero-panel::before{
+    content:'';
+    position:absolute;
+    width:320px;
+    height:320px;
+    border-radius:50%;
+    top:-180px;
+    right:-120px;
+
+    background:
+    radial-gradient(
+        circle,
+        rgba(37,99,235,.12) 0%,
+        transparent 70%
+    );
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.live-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 14px;
+    border-radius:999px;
+
+    background:rgba(16,185,129,.1);
+    border:1px solid rgba(16,185,129,.18);
+
+    color:var(--gc-primary);
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--gc-primary);
+
+    animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);opacity:1;}
+    50%{transform:scale(1.4);opacity:.5;}
+    100%{transform:scale(1);opacity:1;}
+}
+
+.hero-title{
+    margin-top:16px;
+    font-size:28px;
+    line-height:1.1;
+    font-weight:900;
+    letter-spacing:-1px;
+    color:var(--text);
+}
+
+.hero-subtitle{
+    margin-top:8px;
+    max-width:580px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--muted);
+}
+
+.hero-stats{
+    margin-top:24px;
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.hero-pill{
+    padding:14px;
+    border-radius:16px;
+
+    background:rgba(255,255,255,.82);
+    border:1px solid rgba(255,255,255,.95);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.hero-pill-label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+.hero-pill-value{
+    margin-top:6px;
+    font-size:20px;
+    font-weight:900;
+    color:var(--text);
+}
+
+/* =========================================================
+ONLINE SWITCH
+========================================================= */
+
+.switch-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.switch-track{
+    width:58px;
+    height:32px;
+    border-radius:999px;
+    position:relative;
+    cursor:pointer;
+
+    background:var(--gc-primary);
+    transition:.25s ease;
+}
+
+.switch-track.offline{
+    background:#cbd5e1;
+}
+
+.switch-thumb{
+    position:absolute;
+    width:26px;
+    height:26px;
+    top:3px;
+    left:3px;
+    border-radius:50%;
+    background:#fff;
+
+    transition:.25s ease;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.switch-track.offline .switch-thumb{
+    transform:translateX(26px);
+}
+
+.switch-status{
+    font-size:12px;
+    font-weight:900;
+    color:var(--text);
+}
+
+/* =========================================================
+RADAR BAR
+========================================================= */
+
+.radar-live-strip{
+    border-radius:18px;
+    padding:14px 16px;
+
+    background:linear-gradient(
+        135deg,
+        #0f172a 0%,
+        #1e293b 100%
+    );
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    box-shadow:var(--shadow-md);
+}
+
+.radar-live-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.radar-wave{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 0 rgba(34,197,94,.4);
+
+    animation:radarPulse 1.5s infinite;
+}
+
+@keyframes radarPulse{
+    0%{
+        box-shadow:0 0 0 0 rgba(34,197,94,.4);
+    }
+    70%{
+        box-shadow:0 0 0 12px rgba(34,197,94,0);
+    }
+    100%{
+        box-shadow:0 0 0 0 rgba(34,197,94,0);
+    }
+}
+
+.radar-title{
+    font-size:14px;
+    font-weight:800;
+}
+
+.radar-sub{
+    font-size:11px;
+    color:#94a3b8;
+}
+
+.radar-actions{
+    display:flex;
+    gap:10px;
+}
+
+/* =========================================================
+BUTTONS
+========================================================= */
+
+.gc-btn{
+    border:none;
+    min-height:44px;
+    padding:0 16px;
+    border-radius:12px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    font-size:12px;
+    font-weight:800;
+
+    cursor:pointer;
+    text-decoration:none !important;
+
+    transition:.2s ease;
+}
+
+.gc-btn:active{
+    transform:scale(.98);
+}
+
+.gc-btn.white{
+    background:#fff;
+    color:#0f172a;
+}
+
+.gc-btn.primary{
+    background:var(--gc-primary);
+    color:#fff;
+}
+
+.gc-btn.primary:hover{
+    background:var(--gc-primary-dark);
+}
+
+.gc-btn.blue{
+    background:var(--gc-blue);
+    color:#fff;
+}
+
+.gc-btn.warning{
+    background:var(--gc-warning);
+    color:#fff;
+}
+
+.gc-btn.dark{
+    background:#334155;
+    color:#fff;
+}
+
+/* =========================================================
+STATS GRID
+========================================================= */
+
+.telemetry-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.metric-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    padding:18px;
+
+    box-shadow:var(--shadow-sm);
+}
+
+.metric-icon{
+    width:44px;
+    height:44px;
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:18px;
+    margin-bottom:14px;
+}
+
+.metric-card.green .metric-icon{
+    background:rgba(16,185,129,.08);
+    color:var(--gc-primary);
+}
+
+.metric-card.blue .metric-icon{
+    background:rgba(37,99,235,.08);
+    color:var(--gc-blue);
+}
+
+.metric-card.orange .metric-icon{
+    background:rgba(245,158,11,.08);
+    color:var(--gc-warning);
+}
+
+.metric-card.red .metric-icon{
+    background:rgba(239,68,68,.08);
+    color:var(--gc-danger);
+}
+
+.metric-number{
+    font-size:24px;
+    font-weight:900;
+    color:var(--text);
+}
+
+.metric-label{
+    margin-top:4px;
+    font-size:12px;
+    font-weight:700;
+    color:var(--muted);
+}
+
+/* =========================================================
+SEGMENT
+========================================================= */
+
+.segment-wrap{
+    background:var(--surface-soft);
+    border:1px solid var(--border);
+
+    padding:4px;
+    border-radius:16px;
+
+    display:flex;
+    gap:4px;
+}
+
+.segment-btn{
+    flex:1;
+    border:none;
+    min-height:42px;
+    border-radius:12px;
+
+    background:transparent;
+
+    font-size:13px;
+    font-weight:800;
+
+    color:var(--muted);
+}
+
+.segment-btn.active{
+    background:#fff;
+    color:var(--text);
+
+    box-shadow:0 4px 12px rgba(15,23,42,.05);
+}
+
+/* =========================================================
+ORDER CARDS
+========================================================= */
+
+.order-card{
+    background:#fff;
+    border:1px solid var(--border);
+
+    border-radius:24px;
+    padding:18px;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow-md);
+
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+
+    overflow:hidden;
+    position:relative;
+}
+
+.order-card.radar{
+    border-top:5px solid var(--gc-primary);
+}
+
+.order-card.task{
+    border-top:5px solid var(--gc-blue);
+}
+
+.order-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.order-id{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    padding:7px 12px;
+    border-radius:10px;
+
+    background:#f8fafc;
+    border:1px solid var(--border);
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.order-status{
+    margin-top:10px;
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    padding:5px 10px;
+    border-radius:999px;
+
+    background:rgba(37,99,235,.08);
+
+    color:var(--gc-blue);
+
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.earning-label{
+    font-size:10px;
+    color:var(--muted);
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.earning-value{
+    margin-top:4px;
+    font-size:24px;
+    font-weight:900;
+    color:var(--gc-primary);
+}
+
+.order-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.meta-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    padding:7px 12px;
+    border-radius:10px;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.meta-pill.distance{
+    background:rgba(37,99,235,.06);
+    color:var(--gc-blue);
+}
+
+.meta-pill.eta{
+    background:rgba(16,185,129,.06);
+    color:var(--gc-primary-dark);
+}
+
+.meta-pill.cod{
+    background:rgba(245,158,11,.08);
+    color:#d97706;
+}
+
+/* =========================================================
+TIMELINE
+========================================================= */
+
+.route-track{
+    display:grid;
+    grid-template-columns:16px 1fr;
+    gap:14px;
+}
+
+.route-line{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.route-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+}
+
+.route-dot.pickup{
+    background:var(--gc-blue);
+}
+
+.route-dot.drop{
+    background:var(--gc-primary);
+}
+
+.route-bar{
+    width:2px;
+    flex:1;
+    margin:6px 0;
+    background:var(--border);
+}
+
+.route-label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+.route-text{
+    margin-top:4px;
+    margin-bottom:12px;
+
+    font-size:13px;
+    font-weight:700;
+    line-height:1.5;
+
+    color:var(--text);
+}
+
+/* =========================================================
+ITEMS
+========================================================= */
+
+.manifest{
+    background:#f8fafc;
+    border:1px solid var(--border);
+
+    border-radius:16px;
+    padding:14px;
+}
+
+.manifest-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding-bottom:10px;
+    margin-bottom:10px;
+
+    border-bottom:1px solid var(--border);
+}
+
+.manifest-title{
+    font-size:12px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.manifest-sub{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.item-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:8px 0;
+}
+
+.item-row:not(:last-child){
+    border-bottom:1px dashed var(--border);
+}
+
+.item-name{
+    font-size:12px;
+    font-weight:800;
+    color:var(--text);
+}
+
+.item-size{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.item-qty{
+    min-width:34px;
+    height:28px;
+
+    padding:0 10px;
+
+    border-radius:8px;
+
+    background:#0f172a;
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+/* =========================================================
+ACTIONS
+========================================================= */
+
+.action-stack{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.action-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+/* =========================================================
+EMPTY
+========================================================= */
+
+.empty-card{
+    background:#fff;
+    border:1px solid var(--border);
+
+    border-radius:24px;
+    padding:60px 24px;
+
+    text-align:center;
+}
+
+.empty-icon{
+    width:64px;
+    height:64px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:0 auto 16px;
+
+    background:rgba(16,185,129,.08);
+    color:var(--gc-primary);
+
+    font-size:28px;
+}
+
+.empty-title{
+    font-size:16px;
+    font-weight:900;
+    color:var(--text);
+}
+
+.empty-sub{
+    margin-top:8px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--muted);
+}
+
+/* =========================================================
+LOADER
+========================================================= */
+
+.loader-overlay{
+    position:fixed;
+    inset:0;
+
+    background:rgba(15,23,42,.4);
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    z-index:9999;
+}
+
+.loader-overlay.active{
+    display:flex;
+}
+
+.loader-card{
+    width:180px;
+    padding:24px;
+
+    border-radius:22px;
+
+    background:#fff;
+
+    text-align:center;
+}
+
+.loader-spinner{
+    width:40px;
+    height:40px;
+
+    border-radius:50%;
+    border:3px solid #e2e8f0;
+    border-top-color:var(--gc-blue);
+
+    margin:0 auto;
+
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.loader-text{
+    margin-top:14px;
+    font-size:12px;
+    font-weight:800;
+    color:var(--text);
+}
+
+/* =========================================================
+ANIMATION
+========================================================= */
+
+.fade-in{
+    animation:fadeUp .25s ease;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(6px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.hidden{
+    display:none !important;
+}
+
+@media(max-width:768px){
+
+    .hero-content{
+        flex-direction:column;
     }
 
-    .dashboard-shell { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
-
-    /* Calendar Strip */
-    .calendar-strip {
-        display: flex; gap: 10px; overflow-x: auto; padding: 10px 2px;
-        scrollbar-width: none;
-    }
-    .calendar-strip::-webkit-scrollbar { display: none; }
-    
-    .date-card {
-        min-width: 62px; height: 75px; background: var(--ui-card);
-        border: 1px solid var(--ui-border); border-radius: 20px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        transition: all 0.2s ease; cursor: pointer;
-    }
-    
-    .date-card.active {
-        background: var(--brand-success); border-color: var(--brand-success); color: white;
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25); transform: translateY(-3px);
-    }
-    .date-card .day-name { font-size: 9px; font-weight: 800; text-transform: uppercase; opacity: 0.7; }
-    .date-card .day-num { font-size: 20px; font-weight: 900; }
-
-    .wallet-card {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        color: white; border-radius: 28px; padding: 25px;
-        box-shadow: 0 15px 30px -10px rgba(30, 41, 59, 0.3);
-    }
-    .stat-box {
-        background: var(--ui-card); border: 1px solid var(--ui-border);
-        border-radius: 20px; padding: 15px 10px; text-align: center;
-    }
-    .stat-val { font-size: 20px; font-weight: 900; display: block; }
-    .stat-lbl { font-size: 9px; font-weight: 800; color: var(--ui-subtext); text-transform: uppercase; }
-
-    /* Radar Scanning Animation */
-    .scanning-wrapper { padding: 40px 20px; text-align: center; }
-    .radar-pulse {
-        width: 80px; height: 80px; background: rgba(16, 185, 129, 0.2);
-        border-radius: 50%; margin: 0 auto 20px; position: relative;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .radar-pulse::after {
-        content: ''; position: absolute; width: 100%; height: 100%;
-        border: 2px solid var(--brand-success); border-radius: 50%;
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(2); opacity: 0; }
+    .hero-stats{
+        grid-template-columns:1fr;
     }
 
-    .view-switcher {
-        display: flex; background: #e2e8f0; padding: 4px; border-radius: 18px; margin: 20px 0;
+    .action-grid{
+        grid-template-columns:1fr;
     }
-    .view-btn {
-        flex: 1; border: none; padding: 14px; border-radius: 14px;
-        font-weight: 800; font-size: 11px; color: var(--ui-subtext);
-        background: transparent; transition: 0.3s;
-    }
-    .view-btn.active { background: white; color: #1e293b; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-
-    .order-card {
-        background: white; border-radius: 20px; padding: 15px;
-        border: 1px solid var(--ui-border); margin-bottom: 12px;
-    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-shell px-3">
-    
-    <div class="d-flex justify-content-between align-items-center mt-3 mb-1 px-1">
-        <span class="fw-800 text-muted" style="font-size: 11px; letter-spacing: 0.5px;">WEEKLY ACTIVITY</span>
-        <div class="d-flex align-items-center gap-2">
-            <span id="sync-indicator" class="text-success fw-900" style="font-size: 10px;">LIVE SYNC</span>
+
+<div class="dashboard-shell">
+
+    <!-- HERO -->
+    <section class="hero-panel">
+
+        <div class="hero-content">
+
+            <div>
+
+                <div class="live-chip">
+                    <div class="live-dot"></div>
+                    Live Rider Network
+                </div>
+
+                <div class="hero-title">
+                    Rider Command Center
+                </div>
+
+                <div class="hero-subtitle">
+                    Real-time rural logistics intelligence system with live dynamic order radar, route orchestration and delivery tracking engine.
+                </div>
+
+                <div class="hero-stats">
+
+                    <div class="hero-pill">
+                        <div class="hero-pill-label">Active Tasks</div>
+                        <div class="hero-pill-value" id="hero-active-tasks">0</div>
+                    </div>
+
+                    <div class="hero-pill">
+                        <div class="hero-pill-label">Radar Orders</div>
+                        <div class="hero-pill-value" id="hero-radar-orders">0</div>
+                    </div>
+
+                    <div class="hero-pill">
+                        <div class="hero-pill-label">Wallet Balance</div>
+                        <div class="hero-pill-value">₹{{ wallet_balance|default:0 }}</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="switch-area">
+
+                <div
+                    id="availability-toggle"
+                    class="switch-track {% if not profile.is_online %}offline{% endif %}"
+                    onclick="toggleAvailability()">
+
+                    <div class="switch-thumb"></div>
+                </div>
+
+                <div
+                    id="availability-label"
+                    class="switch-status">
+
+                    {% if profile.is_online %}
+                        ONLINE
+                    {% else %}
+                        OFFLINE
+                    {% endif %}
+                </div>
+
+            </div>
+
         </div>
-    </div>
 
-    <div class="calendar-strip mb-4" id="calendar-strip"></div>
+    </section>
 
-    <div id="stats-container">
-        <a href="{% url 'rider_earnings' %}" style="text-decoration: none; color: inherit;">
-            <div class="wallet-card mb-3">
-                <span class="small opacity-75 fw-bold text-uppercase" id="date-label">Today's Earnings</span>
-                <h1 class="fw-900 mb-0 mt-1" id="wallet-display">₹{{ today_earnings|default:0 }}</h1>
-                <div class="text-end mt-1">
-                    <span style="font-size: 10px; opacity: 0.6;">Show All Transactions</span><i class="fa-solid fa-chevron-right ms-1"></i></span>
-                </div>
-            </div>
-        </a>
+    <!-- LIVE RADAR -->
+    <section class="radar-live-strip">
 
-        <div class="row g-2 mb-4">
-            <div class="col-4">
-                <div class="stat-box shadow-sm">
-                    <span class="stat-val text-success" id="stat-delivered">0</span>
-                    <span class="stat-lbl">Delivered</span>
+        <div class="radar-live-left">
+
+            <div class="radar-wave"></div>
+
+            <div>
+                <div class="radar-title">
+                    Dynamic Radar Active
+                </div>
+
+                <div class="radar-sub">
+                    Auto scanning nearby orders every 7 seconds
                 </div>
             </div>
-            <div class="col-4">
-                <div class="stat-box shadow-sm">
-                    <span class="stat-val text-danger" id="stat-cancelled">0</span>
-                    <span class="stat-lbl">Cancelled</span>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="stat-box shadow-sm">
-                    <span class="stat-val text-primary" id="stat-cash">₹0</span>
-                    <span class="stat-lbl">COD Cash</span>
-                </div>
-            </div>
+
         </div>
-    </div>
 
-    <div class="view-switcher">
-        <button class="view-btn active" id="tab-radar" onclick="switchView('radar')">RADAR FEED</button>
-        <button class="view-btn" id="tab-duty" onclick="switchView('duty')">MY TASKS (<span id="duty-count">0</span>)</button>
-    </div>
+        <div class="radar-actions">
 
-    <div id="view-radar">
-        <div id="radar-list">
-            <div class="scanning-wrapper">
-                <div class="radar-pulse"><i class="fa-solid fa-satellite-dish text-success fs-4"></i></div>
-                <p class="fw-bold text-muted small">Scanning for nearby village orders...</p>
-            </div>
+            <button
+                class="gc-btn white"
+                onclick="fetchDashboard(true)">
+                <i class="bi bi-arrow-clockwise"></i>
+                Sync
+            </button>
+
         </div>
-    </div>
 
-    <div id="view-duty" style="display: none;">
-        <div id="duty-list"></div>
-    </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="telemetry-grid">
+
+        <div class="metric-card green">
+            <div class="metric-icon">
+                <i class="bi bi-wallet2"></i>
+            </div>
+
+            <div class="metric-number" id="earnings-stat">₹0</div>
+            <div class="metric-label">Today's Earnings</div>
+        </div>
+
+        <div class="metric-card blue">
+            <div class="metric-icon">
+                <i class="bi bi-check2-circle"></i>
+            </div>
+
+            <div class="metric-number" id="delivered-stat">0</div>
+            <div class="metric-label">Delivered Orders</div>
+        </div>
+
+        <div class="metric-card orange">
+            <div class="metric-icon">
+                <i class="bi bi-currency-rupee"></i>
+            </div>
+
+            <div class="metric-number" id="cash-stat">₹0</div>
+            <div class="metric-label">COD Collection</div>
+        </div>
+
+        <div class="metric-card red">
+            <div class="metric-icon">
+                <i class="bi bi-x-circle"></i>
+            </div>
+
+            <div class="metric-number" id="cancelled-stat">0</div>
+            <div class="metric-label">Cancelled</div>
+        </div>
+
+    </section>
+
+    <!-- SEGMENT -->
+    <section class="segment-wrap">
+
+        <button
+            id="radar-tab"
+            class="segment-btn active"
+            onclick="switchTab('radar')">
+
+            Radar Feed
+            (<span id="radar-count">0</span>)
+        </button>
+
+        <button
+            id="tasks-tab"
+            class="segment-btn"
+            onclick="switchTab('tasks')">
+
+            Active Tasks
+            (<span id="tasks-count">0</span>)
+        </button>
+
+    </section>
+
+    <!-- RADAR -->
+    <section id="radar-section">
+
+        <div id="radar-container"></div>
+
+    </section>
+
+    <!-- TASKS -->
+    <section
+        id="tasks-section"
+        class="hidden">
+
+        <div id="tasks-container"></div>
+
+    </section>
+
 </div>
+
+<!-- LOADER -->
+<div id="loader" class="loader-overlay">
+
+    <div class="loader-card">
+
+        <div class="loader-spinner"></div>
+
+        <div class="loader-text">
+            Syncing live radar...
+        </div>
+
+    </div>
+
+</div>
+
+<audio id="new-order-sound" preload="auto">
+    <source src="{% static 'sounds/new-order.mp3' %}" type="audio/mpeg">
+</audio>
+
 {% endblock %}
 
 {% block page_scripts %}
 <script>
-function getCookie(name) {
+
+const riderState = {
+    online: {{ profile.is_online|yesno:'true,false' }},
+    notifiedOrders: new Set(),
+    autoRefresh: null,
+    isFetching: false
+};
+
+/* =========================================================
+LOADER
+========================================================= */
+
+function showLoader(){
+    document.getElementById('loader').classList.add('active');
+}
+
+function hideLoader(){
+    setTimeout(()=>{
+        document.getElementById('loader').classList.remove('active');
+    },150);
+}
+
+/* =========================================================
+TAB SWITCH
+========================================================= */
+
+function switchTab(tab){
+
+    document
+        .getElementById('radar-tab')
+        .classList.toggle('active', tab === 'radar');
+
+    document
+        .getElementById('tasks-tab')
+        .classList.toggle('active', tab === 'tasks');
+
+    document
+        .getElementById('radar-section')
+        .classList.toggle('hidden', tab !== 'radar');
+
+    document
+        .getElementById('tasks-section')
+        .classList.toggle('hidden', tab !== 'tasks');
+}
+
+/* =========================================================
+ONLINE / OFFLINE
+========================================================= */
+
+async function toggleAvailability(){
+
+    riderState.online = !riderState.online;
+
+    const toggle =
+        document.getElementById('availability-toggle');
+
+    const label =
+        document.getElementById('availability-label');
+
+    toggle.classList.toggle(
+        'offline',
+        !riderState.online
+    );
+
+    label.innerText =
+        riderState.online ? 'ONLINE' : 'OFFLINE';
+
+    try{
+
+        await fetch(`{% url 'toggle_duty' %}`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRFToken':getCookie('csrftoken')
+            },
+            body:JSON.stringify({
+                is_online:riderState.online
+            })
+        });
+
+        fetchDashboard();
+
+    }catch(error){
+
+        console.error(
+            'Duty toggle error:',
+            error
+        );
+    }
+}
+
+/* =========================================================
+LIVE DASHBOARD FETCH
+========================================================= */
+
+async function fetchDashboard(showLoading=false){
+
+    if(riderState.isFetching) return;
+
+    riderState.isFetching = true;
+
+    if(showLoading){
+        showLoader();
+    }
+
+    try{
+
+        const response = await fetch(
+            `{% url 'dashboard_api' %}`,
+            {
+                headers:{
+                    'X-Requested-With':'XMLHttpRequest'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        updateStats(data);
+
+        renderRadar(data.orders || []);
+
+        renderTasks(
+            data.assigned || [],
+            data.out_deliveries || []
+        );
+
+    }catch(error){
+
+        console.error(
+            'Radar fetch error:',
+            error
+        );
+
+    }finally{
+
+        riderState.isFetching = false;
+
+        hideLoader();
+    }
+}
+
+/* =========================================================
+UPDATE STATS
+========================================================= */
+
+function updateStats(data){
+
+    document.getElementById(
+        'earnings-stat'
+    ).innerText = `₹${data.today_earnings || 0}`;
+
+    document.getElementById(
+        'delivered-stat'
+    ).innerText = data.orders_delivered || 0;
+
+    document.getElementById(
+        'cash-stat'
+    ).innerText = `₹${data.cash_to_pay || 0}`;
+
+    document.getElementById(
+        'cancelled-stat'
+    ).innerText = data.orders_cancelled || 0;
+
+    const totalTasks =
+        (data.assigned?.length || 0) +
+        (data.out_deliveries?.length || 0);
+
+    document.getElementById(
+        'tasks-count'
+    ).innerText = totalTasks;
+
+    document.getElementById(
+        'hero-active-tasks'
+    ).innerText = totalTasks;
+
+    document.getElementById(
+        'radar-count'
+    ).innerText = data.orders?.length || 0;
+
+    document.getElementById(
+        'hero-radar-orders'
+    ).innerText = data.orders?.length || 0;
+}
+
+/* =========================================================
+LIVE RADAR
+========================================================= */
+
+function renderRadar(orders){
+
+    const container =
+        document.getElementById('radar-container');
+
+    if(!orders.length){
+
+        container.innerHTML =
+            emptyState(
+                'bi-broadcast',
+                'Radar Clear',
+                'No nearby delivery requests detected.'
+            );
+
+        return;
+    }
+
+    orders.forEach(order=>{
+
+        if(!riderState.notifiedOrders.has(order.id)){
+
+            playNewOrderSound();
+
+            riderState.notifiedOrders.add(order.id);
+        }
+    });
+
+    container.innerHTML =
+        orders
+            .map(order => createCard(order,'radar'))
+            .join('');
+}
+
+/* =========================================================
+TASKS
+========================================================= */
+
+function renderTasks(assigned,outOrders){
+
+    const container =
+        document.getElementById('tasks-container');
+
+    const tasks = [
+        ...assigned,
+        ...outOrders
+    ];
+
+    if(!tasks.length){
+
+        container.innerHTML =
+            emptyState(
+                'bi-box-seam',
+                'No Active Tasks',
+                'Accepted orders will appear here.'
+            );
+
+        return;
+    }
+
+    container.innerHTML =
+        tasks
+            .map(order => createCard(order,'task'))
+            .join('');
+}
+
+/* =========================================================
+CREATE CARD
+========================================================= */
+
+function createCard(order,type){
+
+    const earning =
+        order.earnings || 0;
+
+    const distance =
+        order.distance_km || '2.4';
+
+    const eta =
+        order.eta_minutes || '12';
+
+    const cod =
+        order.cod_amount || 0;
+
+    const isAssigned =
+        order.status === 'assigned';
+
+    let actions = '';
+
+    if(type === 'radar'){
+
+        actions = `
+            <button
+                class="gc-btn primary"
+                onclick="acceptOrder('${order.id}')">
+
+                <i class="bi bi-check2-circle"></i>
+                Accept Order
+            </button>
+        `;
+
+    }else{
+
+        actions = `
+            <div class="action-grid">
+
+                <a
+                    href="tel:${order.drop?.phone || ''}"
+                    class="gc-btn dark">
+
+                    <i class="bi bi-telephone-fill"></i>
+                    Call
+                </a>
+
+                <a
+                    target="_blank"
+                    href="https://www.google.com/maps/dir/?api=1&origin=${order.pickup?.lat || 0},${order.pickup?.lng || 0}&destination=${order.drop?.lat || 0},${order.drop?.lng || 0}&travelmode=driving"
+                    class="gc-btn warning">
+
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Route
+                </a>
+
+                ${
+                    isAssigned
+                    ?
+
+                    `<a
+                        href="/delivery_portal/delivery/pickup/${order.id}/"
+                        class="gc-btn blue">
+
+                        <i class="bi bi-box-seam"></i>
+                        Pickup
+                    </a>`
+
+                    :
+
+                    `<a
+                        href="/delivery_portal/rider/complete/${order.id}/"
+                        class="gc-btn primary">
+
+                        <i class="bi bi-check-circle-fill"></i>
+                        Complete
+                    </a>`
+                }
+
+            </div>
+        `;
+    }
+
+    return `
+        <div class="order-card ${type} fade-in">
+
+            <div class="order-header">
+
+                <div>
+
+                    <div class="order-id">
+                        <i class="bi bi-hash"></i>
+                        ${order.order_number || order.id}
+                    </div>
+
+                    <div class="order-status">
+                        <i class="bi bi-lightning-fill"></i>
+
+                        ${(order.status_display || order.status || '')
+                            .replaceAll('_',' ')}
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div class="earning-label">
+                        Earnings
+                    </div>
+
+                    <div class="earning-value">
+                        ₹${earning}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="order-meta">
+
+                <div class="meta-pill distance">
+                    <i class="bi bi-signpost"></i>
+                    ${distance} KM
+                </div>
+
+                <div class="meta-pill eta">
+                    <i class="bi bi-clock"></i>
+                    ${eta} MIN
+                </div>
+
+                ${
+                    cod > 0
+                    ?
+
+                    `<div class="meta-pill cod">
+                        <i class="bi bi-currency-rupee"></i>
+                        COD ₹${cod}
+                    </div>`
+
+                    :
+
+                    ''
+                }
+
+            </div>
+
+            <div class="route-track">
+
+                <div class="route-line">
+
+                    <div class="route-dot pickup"></div>
+
+                    <div class="route-bar"></div>
+
+                    <div class="route-dot drop"></div>
+
+                </div>
+
+                <div>
+
+                    <div>
+
+                        <div class="route-label">
+                            Pickup Point
+                        </div>
+
+                        <div class="route-text">
+                            ${order.pickup?.hub_name || 'GramaCart Hub'}
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <div class="route-label">
+                            Customer Address
+                        </div>
+
+                        <div class="route-text">
+
+                            ${order.drop?.name || 'Customer'}
+
+                            <br>
+
+                            <span style="font-size:12px;color:#64748b;font-weight:600;">
+                                ${order.drop?.full_address || 'Village Delivery'}
+                            </span>
+
+                            ${
+                                order.drop?.landmark
+                                ?
+
+                                `<br>
+                                <small style="color:#94a3b8;">
+                                    ${order.drop.landmark}
+                                </small>`
+
+                                :
+
+                                ''
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="manifest">
+
+                <div class="manifest-head">
+
+                    <div class="manifest-title">
+                        Order Items
+                    </div>
+
+                    <div class="manifest-sub">
+                        ${order.items?.length || 0} Items
+                    </div>
+
+                </div>
+
+                ${
+                    order.items?.length
+
+                    ?
+
+                    order.items.map(item=>`
+
+                        <div class="item-row">
+
+                            <div>
+
+                                <div class="item-name">
+                                    ${item.name}
+                                </div>
+
+                                <div class="item-size">
+                                    ${item.size || 'Standard'}
+                                </div>
+
+                            </div>
+
+                            <div class="item-qty">
+                                ×${item.qty}
+                            </div>
+
+                        </div>
+
+                    `).join('')
+
+                    :
+
+                    `<div class="item-size">
+                        No item details available
+                    </div>`
+                }
+
+            </div>
+
+            <div class="action-stack">
+                ${actions}
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================================================
+ACCEPT ORDER
+========================================================= */
+
+async function acceptOrder(orderId){
+
+    showLoader();
+
+    try{
+
+        const response = await fetch(
+            `/delivery_portal/delivery/accept/${orderId}/`,
+            {
+                method:'POST',
+                headers:{
+                    'X-CSRFToken':getCookie('csrftoken'),
+                    'X-Requested-With':'XMLHttpRequest'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.status === 'success'){
+
+            await fetchDashboard();
+
+            switchTab('tasks');
+        }
+
+    }catch(error){
+
+        console.error(
+            'Accept order error:',
+            error
+        );
+
+    }finally{
+
+        hideLoader();
+    }
+}
+
+/* =========================================================
+SOUND
+========================================================= */
+
+function playNewOrderSound(){
+
+    const audio =
+        document.getElementById('new-order-sound');
+
+    if(audio){
+
+        audio.currentTime = 0;
+
+        audio.play().catch(()=>{});
+    }
+}
+
+/* =========================================================
+EMPTY STATE
+========================================================= */
+
+function emptyState(icon,title,subtitle){
+
+    return `
+        <div class="empty-card fade-in">
+
+            <div class="empty-icon">
+                <i class="bi ${icon}"></i>
+            </div>
+
+            <div class="empty-title">
+                ${title}
+            </div>
+
+            <div class="empty-sub">
+                ${subtitle}
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================================================
+COOKIE
+========================================================= */
+
+function getCookie(name){
+
     let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Check if this cookie string begins with the name we want
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
+    if(document.cookie && document.cookie !== ''){
+
+        const cookies =
+            document.cookie.split(';');
+
+        for(let i=0;i<cookies.length;i++){
+
+            const cookie =
+                cookies[i].trim();
+
+            if(
+                cookie.substring(0,name.length+1)
+                ===
+                (name + '=')
+            ){
+
+                cookieValue =
+                    decodeURIComponent(
+                        cookie.substring(name.length+1)
+                    );
+
                 break;
             }
         }
     }
+
     return cookieValue;
 }
 
-let currentSelectedDate = new Date().toISOString().split('T')[0];
+/* =========================================================
+INIT
+========================================================= */
 
+document.addEventListener('DOMContentLoaded',()=>{
 
-// ===============================
-// 1. CALENDAR
-// ===============================
-function renderCalendar() {
-    const strip = document.getElementById('calendar-strip');
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const today = new Date();
+    fetchDashboard();
 
-    let html = '';
-
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
-
-        const dateStr = d.toISOString().split('T')[0];
-        const isToday = i === 0;
-
-        html += `
-            <div class="date-card ${isToday ? 'active' : ''}" 
-                 data-date="${dateStr}" 
-                 onclick="handleDateClick(this, '${dateStr}')">
-                <span class="day-name">${days[d.getDay()]}</span>
-                <span class="day-num">${d.getDate()}</span>
-            </div>
-        `;
-    }
-
-    strip.innerHTML = html;
-}
-
-
-// ===============================
-// 2. DATE CLICK
-// ===============================
-function handleDateClick(element, dateString) {
-    document.querySelectorAll('.date-card')
-        .forEach(card => card.classList.remove('active'));
-
-    element.classList.add('active');
-    currentSelectedDate = dateString;
-
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    document.getElementById('date-label').innerText =
-        (dateString === todayStr)
-            ? "Today's Earnings"
-            : "Earnings for " + dateString;
-
-    fetchDashboardData();
-}
-
-
-// ===============================
-// 3. MAIN DATA FETCH
-// ===============================
-async function fetchDashboardData() {
-    try {
-        const res = await fetch(
-            "{% url 'check_new_orders' %}?date=" + currentSelectedDate
-        );
-
-        const data = await res.json();
-
-        // 1. Update the Big Earnings Card (Part C in View)
-        // Redirect logic remains in the HTML <a> tag
-        document.getElementById('wallet-display').innerText = 
-            `₹${data.today_earnings || 0}`;
-
-        // 2. Update the three Stat Boxes (Part C in View)
-        document.getElementById('stat-delivered').innerText = 
-            data.orders_delivered || 0;
-
-        document.getElementById('stat-cancelled').innerText = 
-            data.orders_cancelled || 0;
-
-        document.getElementById('stat-cash').innerText = 
-            `₹${data.cash_to_pay || 0}`;
-
-        // 3. Update the Lists (Parts A & B in View)
-        // 'orders' = Radar, 'assigned' + 'out_deliveries' = My Tasks
-        renderRadar(data.orders || []);
-        renderTasks(data.assigned || [], data.out_deliveries || []);
-
-        // 4. Update the Task Count badge
-        const totalActive = (data.assigned?.length || 0) + (data.out_deliveries?.length || 0);
-        document.getElementById('duty-count').innerText = totalActive;
-
-    } catch (err) {
-        console.error("Dashboard Sync Error:", err);
-    }
-}
-
-
-// ===============================
-// 4. RADAR ORDERS
-// ===============================
-function renderRadar(orders) {
-    const container = document.getElementById('radar-list');
-
-    if (!orders || !orders.length) {
-        container.innerHTML = `
-            <div class="scanning-wrapper">
-                <div class="radar-pulse">
-                    <i class="fa-solid fa-satellite-dish text-success fs-4"></i>
-                </div>
-                <p class="fw-bold text-muted small">
-                    No new orders found in your hub.
-                </p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '';
-
-    orders.forEach(order => {
-
-        // ITEMS
-        let itemsHtml = '';
-
-        if (order.items?.length) {
-            itemsHtml = `
-                <div class="d-flex flex-column gap-1">
-                    ${order.items.map(item => `
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="fw-800 small text-dark">
-                                ${item.name}
-                                <span class="text-muted fw-600">
-                                    ${item.size ? `• ${item.size}` : ''}
-                                </span>
-                            </div>
-                            <span class="badge bg-dark text-white">
-                                x${item.qty}
-                            </span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        html += `
-        <div class="order-card shadow-sm mb-3 p-3"
-             style="border-radius:18px; border-left:5px solid #10B981;">
-
-            <!-- HEADER -->
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge bg-light text-dark fw-800">
-                    ${order.pickup?.hub_name || 'Hub'}
-                </span>
-
-                <span class="fw-900 text-success">
-                    ₹${order.earnings || 0}
-                </span>
-            </div>
-
-            <!-- ROUTE -->
-            <div class="d-flex gap-2 mb-3">
-
-                <!-- DOT LINE -->
-                <div class="d-flex flex-column align-items-center pt-1">
-                    <div style="width:10px;height:10px;background:#2563EB;border-radius:50%;"></div>
-                    <div style="width:2px;height:38px;background:#e2e8f0;"></div>
-                    <div style="width:10px;height:10px;background:#10B981;border-radius:50%;"></div>
-                </div>
-
-                <!-- ADDRESS -->
-                <div class="flex-grow-1">
-
-                    <!-- PICKUP -->
-                    <div class="mb-2">
-                        <div class="small text-muted fw-700">PICKUP</div>
-                        <div class="fw-800 text-dark small">
-                            ${order.pickup?.hub_name || 'Hub'}
-                        </div>
-                    </div>
-
-                    <!-- DROP -->
-                    <div>
-                        <div class="small text-muted fw-700">DELIVERY</div>
-
-                        ${order.drop?.full_address ? `
-                            <div class="fw-800 text-dark small">
-                                ${order.drop.full_address}
-                            </div>
-                        ` : `
-                            <div class="text-danger small fw-800">
-                                ⚠ Address missing - check order details
-                            </div>
-                        `}
-
-                        ${order.drop?.landmark ? `
-                            <div class="small text-primary fw-700 mt-1">
-                                📍 ${order.drop.landmark}
-                            </div>
-                        ` : ''}
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- ITEMS -->
-            <div class="bg-light rounded-3 p-2 mb-3">
-                <div class="small fw-900 text-muted mb-1">
-                    ORDER ITEMS
-                </div>
-
-                ${itemsHtml || `<div class="small text-muted">No items found</div>`}
-            </div>
-
-            <!-- ACCEPT -->
-            <a href="${order.accept_url}"
-               class="btn btn-success w-100 rounded-pill fw-900">
-                ACCEPT ORDER
-            </a>
-
-        </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-// ===============================
-// 5. MY TASKS (IMPORTANT PART)
-// ===============================
-function renderTasks(assigned, out) {
-    const container = document.getElementById('duty-list');
-    const tasks = [...assigned, ...out];
-
-    if (!tasks.length) {
-        container.innerHTML = `
-            <div class="text-center py-5">
-                <div class="mb-3">
-                    <i class="fa-solid fa-box-open text-light-emphasis" style="font-size: 3rem;"></i>
-                </div>
-                <p class="text-muted small fw-bold">No active tasks.<br>Check the Radar for new orders.</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '';
-
-    tasks.forEach(task => {
-        const status = task.status;
-        let actions = '';
-        
-        // --- Items HTML (Optimized for counting) ---
-        let itemsHtml = '';
-        if (task.items && task.items.length > 0) {
-            itemsHtml = `
-                <div class="bg-light rounded-3 p-2 mb-3" style="border: 1px solid #edf2f7;">
-                    <div class="small fw-900 text-muted mb-2" style="font-size: 9px; letter-spacing: 0.5px; opacity: 0.7;">CHECKLIST</div>
-                    <div class="d-flex flex-column gap-2">
-                        ${task.items.map(item => `
-                            <div class="d-flex align-items-center">
-                                <span class="badge bg-dark text-white me-2" style="font-size: 10px; min-width: 25px;">${item.qty}x</span>
-                                <div class="fw-800 text-dark" style="font-size: 11px; line-height: 1.2;">
-                                    ${item.name}
-                                    ${item.size ? `<span class="text-muted fw-600"> (${item.size})</span>` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- Logic for Buttons ---
-        if (status === 'assigned') {
-            actions = `
-                <a href="/delivery_portal/delivery/pickup/${task.id}/"
-                   class="btn btn-primary btn-sm rounded-pill fw-900 w-100 py-2 shadow-sm">
-                   START PICKUP
-                </a>
-            `;
-        } 
-        else {
-            // FIX: Corrected Maps Deep Link and Layout
-            actions = `
-                <div class="row g-2 mb-2">
-                    <div class="col-6">
-                        <a href="tel:${task.drop?.phone || ''}" 
-                           class="btn btn-outline-success btn-sm rounded-pill fw-900 w-100">
-                           <i class="fa-solid fa-phone me-1"></i> CALL
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <button onclick="handleCancel('${task.id}')" 
-                                id="cancel-btn-${task.id}" 
-                                class="btn btn-outline-danger btn-sm rounded-pill fw-900 w-100">
-                            <i class="fa-solid fa-xmark me-1"></i> CANCEL
-                        </button>
-                    </div>
-                </div>
-
-                <a href="https://www.google.com/maps/dir/?api=1&destination=${task.drop?.lat},${task.drop?.lng}"
-                   target="_blank"
-                   class="btn btn-warning btn-sm rounded-pill fw-900 w-100 mb-2 py-2 shadow-sm">
-                   <i class="fa-solid fa-location-arrow me-1"></i> NAVIGATE TO DROP
-                </a>
-
-                <a href="/delivery_portal/rider/complete/${task.id}/"
-                    class="btn btn-success btn-sm rounded-pill fw-900 w-100 py-2 shadow-sm">
-                    COMPLETE DELIVERY
-                </a>
-            `;
-        }
-
-        // --- Final Card Assembly ---
-        html += `
-            <div class="order-card shadow-sm border-start border-primary border-4 mb-3" id="task-card-${task.id}">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="small fw-800 text-muted" style="font-size: 10px;">#${task.order_number || task.id}</span>
-                    <span class="badge ${status === 'assigned' ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'} border border-opacity-10 text-uppercase" style="font-size: 9px; letter-spacing: 0.3px;">
-                        ${status === 'out_for_delivery' ? 'ON THE WAY' : status.replace(/_/g, ' ')}
-                    </span>
-                </div>
-                
-                <h6 class="fw-900 mb-0 text-dark">${task.drop?.name || 'Customer'}</h6>
-                
-                <p class="small text-muted mb-2 text-capitalize">
-                    <i class="fa-solid fa-location-dot text-danger me-1"></i> 
-                    ${task.drop?.village || task.drop?.city || 'No Location'}
-                </p>
-
-                ${itemsHtml}
-
-                <div class="d-grid">${actions}</div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-// ===============================
-//6.HANDLE CANCELLATION OF DELIVERY
-// ===============================
-async function handleCancel(taskId) {
-    const reason = prompt("Enter reason for cancellation:");
-    if (!reason) return;
-
-    const btn = document.getElementById(`cancel-btn-${taskId}`);
-    const card = document.getElementById(`task-card-${taskId}`);
-
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-    }
-
-    // --- GET TOKEN FROM COOKIE ---
-    const csrftoken = getCookie('csrftoken');
-
-    if (!csrftoken) {
-        alert("Security session expired. Please refresh the page.");
-        if (btn) btn.disabled = false;
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('reason', reason);
-
-        const response = await fetch(`/delivery_portal/rider/failed/${taskId}/`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken // Use the cookie-sourced token
-            }
-        });
-
-        // Safety check: ensure we didn't get another HTML error page
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server error (403/500). Check the console.");
-        }
-
-        const data = await response.json();
-
-        if (response.ok && data.status === 'success') {
-            if (card) {
-                card.style.transition = '0.4s ease';
-                card.style.opacity = '0';
-                card.style.transform = 'translateX(30px)';
-                setTimeout(() => card.remove(), 400);
-            }
-        } else {
-            throw new Error(data.message || "Failed to process.");
-        }
-    } catch (err) {
-        console.error("GramaCart Error:", err);
-        alert("Error: " + err.message);
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-xmark me-1"></i> CANCEL';
-        }
-    }
-}
-
-// ===============================
-// 6. VIEW SWITCH
-// ===============================
-function switchView(view) {
-    document.getElementById('view-radar').style.display =
-        view === 'radar' ? 'block' : 'none';
-
-    document.getElementById('view-duty').style.display =
-        view === 'duty' ? 'block' : 'none';
-
-    document.getElementById('tab-radar').classList.toggle('active', view === 'radar');
-    document.getElementById('tab-duty').classList.toggle('active', view === 'duty');
-}
-
-
-// ===============================
-// INIT
-// ===============================
-renderCalendar();
-fetchDashboardData();
-setInterval(fetchDashboardData, 5000);
+    riderState.autoRefresh =
+        setInterval(fetchDashboard,7000);
+});
 </script>
 {% endblock %}
+

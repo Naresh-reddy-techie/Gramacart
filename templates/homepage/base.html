@@ -1,145 +1,213 @@
-{% load static i18n %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<title>{% block title %}{% trans "GramaCart | All Essentials One Cart" %}{% endblock %}</title>
-
-<!-- PWA -->
 <link rel="manifest" href="{% static 'PWA/manifest.json' %}">
 <meta name="theme-color" content="#059669">
-<link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
-<link rel="icon" href="{% static 'images/logo.png' %}">
 
-<!-- CSS -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GramaCart">
+<link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
+<link rel="shortcut icon" href="{% static 'images/logo.png' %}">
+
+<title>{% block title %}GramaCart | All Essentials One Cart{% endblock %}</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
     --navy:#0f172a;
-    --green:#059669;
-    --amber:#f59e0b;
-    --border:#e2e8f0;
-    --muted:#64748b;
+    --brand-green:#059669;
+    --brand-amber:#f59e0b;
+    --slate-200:#e2e8f0;
+    --white:#ffffff;
 }
 
 body {
     font-family:'Plus Jakarta Sans',sans-serif;
     color:var(--navy);
-    background:#fff;
+    background:var(--white);
+    -webkit-font-smoothing:antialiased;
+    top:0 !important;
+    position:static !important;
 }
 
 /* NAVBAR */
 .navbar {
-    background:rgba(255,255,255,0.9);
+    background:rgba(255,255,255,0.95);
     backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--border);
+    border-bottom:1px solid var(--slate-200);
+    padding:0.8rem 0;
 }
 
-.brand-logo { height:40px; }
-@media(max-width:576px){ .brand-logo { height:32px; } }
-
-.brand-text {
+.navbar-brand {
     font-weight:800;
-    white-space:nowrap;
+    font-size:1.6rem;
+    color:var(--navy)!important;
 }
+.navbar-brand span { color:var(--brand-green); }
 
 /* BUTTONS */
-.btn-primary-custom {
-    background:var(--green);
+.btn-brand-solid {
+    background:var(--brand-green);
     color:#fff;
+    border-radius:10px;
+    font-weight:700;
+    padding:10px 24px;
     border:none;
+}
+.btn-brand-outline {
+    border:1.5px solid var(--brand-green);
+    color:var(--brand-green);
     border-radius:10px;
     font-weight:600;
-    padding:10px 20px;
+    padding:10px 24px;
 }
 
-.btn-outline-custom {
-    border:1.5px solid var(--green);
-    color:var(--green);
-    border-radius:10px;
-    font-weight:600;
-}
-
-/* LANGUAGE */
+/* LANGUAGE SWITCH */
 .translate-box {
+    position:relative;
     width:42px;
     height:42px;
-    border:1px solid var(--border);
+    border:1px solid var(--slate-200);
     border-radius:10px;
     display:flex;
     align-items:center;
     justify-content:center;
-    position:relative;
 }
-
 .lang-select {
     position:absolute;
     inset:0;
     opacity:0;
     cursor:pointer;
+    z-index:10;
+}
+.translate-icon {
+    color:var(--brand-green);
+    pointer-events:none;
 }
 
+/* REMOVE GOOGLE UI */
+.goog-te-banner-frame,
+.goog-te-menu-frame,
+.skiptranslate,
+.goog-logo-link,
+.goog-te-gadget {
+    display:none !important;
+    visibility:hidden !important;
+    height:0 !important;
+}
+
+html { top:0 !important; }
+
 /* FOOTER */
-.footer {
+.main-footer {
     background:var(--navy);
-    color:#f1f5f9;
+    color:#f8fafc;
     padding:60px 0 30px;
     margin-top:60px;
 }
 
-.footer a {
-    color:#94a3b8;
-    text-decoration:none;
+.footer-heading {
+    font-weight:800;
+    font-size:0.85rem;
+    color:var(--brand-amber);
+    margin-bottom:1rem;
 }
 
-.footer a:hover {
-    color:#fff;
+.footer-link {
+    color:#94a3b8;
+    text-decoration:none;
+    display:block;
+    margin-bottom:0.5rem;
+}
+/* Prevent wrapping */
+.navbar .container {
+    flex-wrap: nowrap !important;
+}
+
+/* Keep brand in single line */
+.navbar-brand {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Reduce logo size on mobile */
+@media (max-width: 576px) {
+    .navbar-brand img {
+        height: 32px;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* Right side controls */
+.mobile-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+@media (max-width:991px){
+    .navbar-collapse{
+        background:white;
+        margin-top:1rem;
+        padding:1rem;
+        border-radius:12px;
+    }
 }
 </style>
+
+<!-- Restore language before load -->
+<script>
+(function(){
+    const lang = localStorage.getItem("lang");
+    if(lang){
+        document.cookie="googtrans=/en/"+lang+";path=/";
+    }
+})();
+</script>
 
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg sticky-top">
-<div class="container">
+<div class="container d-flex align-items-center justify-content-between flex-nowrap">
 
-<a class="navbar-brand d-flex align-items-center gap-2" href="/">
-    <img src="{% static 'images/logo.png' %}" class="brand-logo" alt="GramaCart">
-    <span class="brand-text">
-        <span style="color:var(--green)">Grama</span>Cart
-    </span>
+<a class="navbar-brand d-flex align-items-center flex-shrink-1 text-truncate" href="/">
+<img src="{% static 'images/logo.png' %}" height="40" class="me-2">
+<span>Grama</span>Cart
 </a>
 
-<!-- MOBILE CONTROLS -->
-<div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+<!-- MOBILE RIGHT SIDE -->
+<div class="mobile-controls ms-auto d-lg-none">
+    <!-- 🌐 Language -->
+    <div class="translate-box">
+        <i class="bi bi-translate translate-icon"></i>
+        <select id="langSwitcherMobile" class="lang-select">
+            <option value="">🌐</option>
+            <option value="en">English</option>
+            <option value="te">తెలుగు</option>
+            <option value="hi">हिंदी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+        </select>
+    </div>
 
-    <!-- Django Language Switch -->
-    <form action="{% url 'set_language' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.path }}">
-        
-        <div class="translate-box">
-            <i class="bi bi-translate text-success"></i>
-            <select name="language" class="lang-select" onchange="this.form.submit()">
-                <option value=""></option>
-                <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                <option value="te" {% if LANGUAGE_CODE == 'te' %}selected{% endif %}>తెలుగు</option>
-                <option value="hi" {% if LANGUAGE_CODE == 'hi' %}selected{% endif %}>हिंदी</option>
-                <option value="kn" {% if LANGUAGE_CODE == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
-                <option value="ta" {% if LANGUAGE_CODE == 'ta' %}selected{% endif %}>தமிழ்</option>
-            </select>
-        </div>
-    </form>
-
-    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+    <!-- 🍔 Hamburger -->
+    <button class="navbar-toggler border-0 shadow-none"
+            data-bs-toggle="collapse"
+            data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -149,38 +217,26 @@ body {
 <div class="collapse navbar-collapse" id="nav">
 
 <ul class="navbar-nav ms-lg-4">
-    <li class="nav-item">
-        <a class="nav-link">{% trans "How it works" %}</a>
-    </li>
+<li class="nav-item"><a class="nav-link">How it works</a></li>
 </ul>
 
-<div class="ms-auto d-flex flex-column flex-lg-row gap-3 mt-3 mt-lg-0 align-items-center">
+<div class="ms-auto d-flex flex-column flex-lg-row align-items-center gap-3 mt-3 mt-lg-0">
 
-    <!-- Desktop Language Switch -->
-    <form action="{% url 'set_language' %}" method="post" class="d-none d-lg-block">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.path }}">
-        
-        <div class="translate-box">
-            <i class="bi bi-translate text-success"></i>
-            <select name="language" class="lang-select" onchange="this.form.submit()">
-                <option value=""></option>
-                <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                <option value="te" {% if LANGUAGE_CODE == 'te' %}selected{% endif %}>తెలుగు</option>
-                <option value="hi" {% if LANGUAGE_CODE == 'hi' %}selected{% endif %}>हिंदी</option>
-                <option value="kn" {% if LANGUAGE_CODE == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
-                <option value="ta" {% if LANGUAGE_CODE == 'ta' %}selected{% endif %}>தமிழ்</option>
-            </select>
-        </div>
-    </form>
+    <!-- 🌐 Desktop Language -->
+    <div class="translate-box d-none d-lg-flex">
+        <i class="bi bi-translate translate-icon"></i>
+        <select id="langSwitcherDesktop" class="lang-select">
+            <option value="">🌐</option>
+            <option value="en">English</option>
+            <option value="te">తెలుగు</option>
+            <option value="hi">हिंदी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+        </select>
+    </div>
 
-    <a href="{% url 'public_dashboard' %}" class="btn btn-outline-custom">
-        {% trans "Shop Now" %}
-    </a>
-
-    <a href="{% url 'login' %}" class="btn btn-primary-custom">
-        {% trans "Sign In" %}
-    </a>
+    <a href="{% url 'where_we_deliver' %}" class="btn btn-brand-outline">Shop Now</a>
+    <a href="{% url 'login' %}" class="btn btn-brand-solid">Sign In</a>
 
 </div>
 </div>
@@ -188,47 +244,80 @@ body {
 </div>
 </nav>
 
-<!-- CONTENT -->
-<main>
-{% block content %}{% endblock %}
-</main>
+<main>{% block content %}{% endblock %}</main>
 
-<!-- FOOTER -->
-<footer class="footer">
-<div class="container">
-<div class="row g-4">
+<footer class="main-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h3 class="fw-800 text-white mb-3"><span>Grama</span>Cart</h3>
+                    <p class="small mb-4" style="color: #94a3b8;">
+                        Connecting villages to essentials. Starting in <strong>Krishna District</strong>. Trust and quality at your doorstep.
+                    </p>
+                    <a href="https://wa.me/919876543210" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                        <i class="bi bi-whatsapp me-2 text-brand-green"></i>WhatsApp Help
+                    </a>
+                </div>
 
-<div class="col-lg-4">
-    <h4 class="fw-bold">
-        <span style="color:var(--green)">Grama</span>Cart
-    </h4>
-    <p class="small text-muted">
-        {% blocktrans %}Connecting villages to daily essentials with trust.{% endblocktrans %}
-    </p>
-</div>
+                <div class="col-6 col-lg-3 offset-lg-1">
+                    <h5 class="footer-heading">Quick Links</h5>
+                    <a href="/" class="footer-link">Home</a>
+                    <a href="{% url 'public_dashboard' %}" class="footer-link">Shop</a>
+                    <a href="mailto:connect@gramacart.com" class="footer-link">Support</a>
+                </div>
 
-<div class="col-6 col-lg-3">
-    <h6 class="text-warning fw-bold">{% trans "Quick Links" %}</h6>
-    <a href="/">{% trans "Home" %}</a><br>
-    <a href="{% url 'public_dashboard' %}">{% trans "Shop" %}</a>
-</div>
-
-<div class="col-6 col-lg-3">
-    <h6 class="text-warning fw-bold">{% trans "Contact" %}</h6>
-    <p class="small text-muted mb-0">{% trans "Krishna Region, AP" %}</p>
-</div>
-
-</div>
-
-<div class="text-center mt-4 small text-muted">
-    © 2026 GramaCart
-</div>
-
-</div>
+                <div class="col-6 col-lg-3">
+                    <h5 class="footer-heading">Contact</h5>
+                    <p class="footer-link mb-2"><i class="bi bi-geo-alt me-2 text-brand-green"></i> Krishna Region, AP</p>
+                    <p class="footer-link mb-0"><i class="bi bi-heart-fill me-2 text-danger"></i> Built for Villages</p>
+                </div>
+            </div>
+            <div class="mt-5 pt-3 border-top border-secondary text-center" style="font-size: 0.8rem; color: #64748b;">
+                <p>© 2026 GramaCart Technologies.</p>
+            </div>
+        </div>
 </footer>
 
-<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function changeLang(lang){
+    if(!lang) return;
+
+    localStorage.setItem("lang", lang);
+    document.cookie="googtrans=/en/"+lang+";path=/";
+    location.reload();
+}
+
+document.getElementById("langSwitcherMobile")?.addEventListener("change", function(){
+    changeLang(this.value);
+});
+
+document.getElementById("langSwitcherDesktop")?.addEventListener("change", function(){
+    changeLang(this.value);
+});
+
+/* Remove Google banner */
+setInterval(()=>{
+    const frame=document.querySelector('.goog-te-banner-frame');
+    if(frame) frame.remove();
+    document.body.style.top="0px";
+},300);
+</script>
+
+<!-- GOOGLE TRANSLATE ENGINE -->
+<script>
+function googleTranslateElementInit(){
+    new google.translate.TranslateElement({
+        pageLanguage:'en',
+        includedLanguages:'te,hi,kn,ta',
+        autoDisplay:false
+    }, 'dummy');
+}
+</script>
+
+<div id="dummy" style="display:none"></div>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>

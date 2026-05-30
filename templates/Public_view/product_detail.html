@@ -2,184 +2,210 @@
 {% load static %}
 
 {% block title %}
-{{ product.name }} | {{ company.name|default:"Grama Cart" }}
+{{ product.name }} | {{ company.name|default:"GramaCart" }}
 {% endblock %}
 
 {% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-:root {
-    --primary: {{ company.primary_color|default:"#00b359" }};
-    --dark: #111827;
-    --muted: #6B7280;
-    --bg: #F9FAFB;
-    --radius: 24px;
+
+:root{
+    --primary: {{ company.primary_color|default:"#10B981" }};
+    --primary-soft:#ECFDF5;
+    --dark:#0F172A;
+    --bg:#F8FAFC;
+    --border:#E2E8F0;
+    --muted:#64748B;
 }
 
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: var(--bg);
-    color: var(--dark);
-    padding-bottom: 120px;
+body{
+    background:var(--bg);
+    font-family:'Plus Jakarta Sans',sans-serif;
+    padding-bottom:120px;
 }
 
-.gallery-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 15px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    border: 1px solid #f1f5f9;
+/* ================= LAYOUT ================= */
+
+.product-page{
+    max-width:1100px;
+    margin:auto;
+    padding:12px;
 }
 
-
-.main-img-holder img {
-    pointer-events: none; /* 👈 prevents image blocking */
-}
-.main-img-holder {
-    width: 100%;
-    height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.gc-card{
+    background:#fff;
+    border-radius:20px;
+    padding:14px;
+    border:1px solid var(--border);
+    margin-bottom:14px;
 }
 
-.main-img-holder img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: opacity 0.2s ease-in-out;
+/* ================= IMAGE ================= */
+
+.hero-wrap{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
 }
 
-.thumb-nav {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    overflow-x: auto;
-    scrollbar-width: none;
+.hero-image{
+    width:100%;
+    height:320px;
+    object-fit:contain;
+    background:#fff;
 }
 
-.thumb-nav img {
-    width: 65px;
-    height: 65px;
-    border-radius: 12px;
-    cursor: pointer;
-    border: 2px solid #F3F4F6;
-    object-fit: cover;
+.action-icons{
+    position:absolute;
+    top:12px;
+    right:12px;
+    display:flex;
+    gap:10px;
 }
 
-.thumb-nav img.active { border-color: var(--primary); }
-
-.price-now { font-size: 2rem; font-weight: 800; color: var(--dark); }
-.price-was { text-decoration: line-through; color: var(--muted); margin-left: 8px; font-size: 1rem; }
-
-.save-tag {
-    background: #ffedea;
-    color: #ff3b30;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.75rem;
+.icon-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.95);
+    font-size:18px;
 }
 
-.service-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 20px 0;
+/* THUMBNAILS */
+.thumb-strip{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    margin-top:10px;
 }
 
-.service-card {
-    background: #fff;
-    padding: 12px 5px;
-    border-radius: 16px;
-    text-align: center;
-    border: 1px solid #F1F5F9;
+.thumb{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid #eee;
+    flex-shrink:0;
 }
 
-.service-card i { color: var(--primary); font-size: 1.2rem; margin-bottom: 5px; display: block; }
-.service-card span { font-size: 0.65rem; font-weight: 700; color: var(--muted); display: block; text-transform: uppercase; }
-.service-card.policy-red i, .service-card.policy-red span { color: #ef4444; }
+.thumb.active{
+    border-color:var(--primary);
+}
 
-.sticky-buy-bar {
+/* ================= TITLE ================= */
+
+.title{
+    font-size:1.3rem;
+    font-weight:900;
+}
+
+.rating-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.pill{
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:0.8rem;
+    font-weight:700;
+}
+
+.rating{background:#FEF3C7;}
+.delivery{background:var(--primary-soft);}
+
+/* ================= PRICE ================= */
+
+.price{
+    font-size:2rem;
+    font-weight:900;
+    margin-top:10px;
+}
+
+/* ================= VARIANTS ================= */
+
+.variant-scroll{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+}
+
+.variant-card{
+    min-width:150px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    cursor:pointer;
+    background:#fff;
+}
+
+.variant-card.active{
+    border-color:var(--primary);
+    background:var(--primary-soft);
+}
+
+/* ================= GRID ================= */
+
+.icon-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.icon-box{
+    text-align:center;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    font-size:0.85rem;
+}
+
+/* ================= REVIEWS ================= */
+
+.review{
+    border:1px solid var(--border);
+    padding:12px;
+    border-radius:14px;
+    margin-bottom:10px;
+}
+
+/* ================= BOTTOM BAR ================= */
+
+.bottom-bar{
     position: fixed;
-    bottom: 70px; /* adjust based on your bottom nav height */
     left: 0;
     right: 0;
-    background: white;
-    padding: 12px 15px;
-    box-shadow: 0 -8px 30px rgba(0,0,0,0.06);
-    display: flex;
-    gap: 10px;
-    z-index: 2000;
-    border-radius: 20px 20px 0 0;
+    bottom: 70px;
+    background: #fff;
+    border-top: 1px solid #E2E8F0;
+    padding: 12px;
+    z-index: 99999;
 }
 
-.qty-control {
-    background: #F3F4F6;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
+.bottom-inner{
+    display:flex;
+    gap:10px;
 }
 
-.btn-buy-now {
-    background: #111827;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    flex: 1;
-    font-weight: 800;
+.btn{
+    flex:1;
+    height:50px;
+    border-radius:14px;
+    font-weight:800;
 }
 
-.btn-cart-add {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    flex: 1;
-    font-weight: 800;
+.btn-cart{
+    background:var(--primary-soft);
+    border:1px solid #a7f3d0;
 }
 
-
-
-.top-actions {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-
-    display: flex;
-    flex-direction: column;  /* 🔥 vertical stack */
-    gap: 8px;
-
-    z-index: 100;
-}
-
-.top-actions button {
-    width: 38px;
-    height: 38px;
-
-    border-radius: 50%;
-    border: none;
-    background: white;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-@media (max-width: 768px) {
-    .sticky-buy-bar {
-        bottom: 80px; /* more space for mobile nav */
-        padding: 10px;
-    }
-
-    
+.btn-buy{
+    background:var(--dark);
+    color:#fff;
 }
 
 </style>
@@ -187,277 +213,403 @@ body {
 
 {% block content %}
 
-<div class="container py-3">
-    <div class="small fw-bold text-muted mb-3">
-        <a href="{% url 'home' %}" class="text-decoration-none text-success">
-            {{ company.name|default:"Home" }}
-        </a> / {{ product.category.name }}
+<div class="product-page">
+
+<!-- ================= IMAGE ================= -->
+<div class="gc-card">
+
+    <div class="hero-wrap">
+
+        <div class="action-icons">
+            <button class="icon-btn" onclick="toggleWishlist(this)">❤</button>
+            <button class="icon-btn" onclick="shareProduct()">⤴</button>
+        </div>
+
+        <img id="mainImage"
+             class="hero-image"
+             src="{% if product.product_images.first %}{{ product.product_images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}">
     </div>
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <div class="gallery-card">
-                <div class="top-actions">
-                    <button class="wish-btn" id="wishBtn">
-                        <i id="wishIcon" class="fa-heart {% if product.id in wishlist_ids %}fas text-danger{% else %}far text-muted{% endif %}"></i>
-                    </button>
-
-                    <button onclick="shareProduct('{{ product.name|escapejs }}', '{{ request.build_absolute_uri|escapejs }}{% url 'product_detail' product.slug %}')">
-                        <i class="bi bi-share-fill"></i>
-                    </button>
-                </div>
-
-                <div class="main-img-holder">
-                    {% with product.product_images.all as images %}
-                    <img id="mainImage"
-                         src="{% if images %}{{ images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}"
-                         alt="{{ product.name }}">
-                </div>
-
-                <div class="thumb-nav">
-                    {% for img in images %}
-                    <img src="{{ img.image.url }}"
-                         class="thumb {% if forloop.first %}active{% endif %}"
-                         onclick="updateView(this)">
-                    {% endfor %}
-                    {% endwith %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-2 fw-bold">
-                {{ product.category.name|upper }}
-            </span>
-
-            <h1 class="fw-800">{{ product.name }}</h1>
-
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <div class="text-warning small">
-                    <i class="fas fa-star"></i> {{ average_rating|default:"0.0" }}                </div>
-                <span class="text-muted small fw-bold">
-                    | {{ reviews.count }} {{ company.review_label|default:"Reviews" }}
-                </span>
-            </div>
-
-            <div class="d-flex align-items-baseline gap-2 mb-2">
-                <span class="price-now">₹{{ product.get_effective_price|floatformat:0 }}</span>
-                {% if product.mrp > product.get_effective_price %}
-                <span class="price-was">₹{{ product.mrp|floatformat:0 }}</span>
-                <span class="save-tag">SAVE ₹{{ product.discount_amount|floatformat:0 }}</span>
-                {% endif %}
-            </div>
-
-            <p class="text-muted small mb-4">
-                {{ company.size_label|default:"Quantity" }}:
-                <strong>{{ product.size }}</strong>
-            </p>
-
-            <div class="service-grid">
-               <div class="service-card policy-red">
-                    <i class="fas fa-ban"></i>
-                    <span>Non Returnable</span>
-                </div>
-
-                <div class="service-card policy-red">
-                    <i class="fas fa-times-circle"></i>
-                    <span>Non Cancellable</span>
-                </div>
-
-                <div class="service-card">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Reliable Service</span>
-                </div>
-            </div>
-
-            <div class="bg-white p-3 rounded-4 border border-light mb-4 shadow-sm">
-                <h6 class="fw-800 small mb-2">
-                    <i class="fas fa-info-circle text-success me-1"></i>
-                    {{ company.details_label|default:"Product Details" }}
-                </h6>
-                <p class="text-muted mb-0">{{ product.description }}</p>
-            </div>
-        </div>
+    <div class="thumb-strip">
+        {% for img in product.product_images.all %}
+        <img src="{{ img.image.url }}"
+             class="thumb {% if forloop.first %}active{% endif %}"
+             onclick="switchImage(this)">
+        {% endfor %}
     </div>
 
-    <!-- Reviews -->
-    <div id="reviews" class="mt-5">
-        <h5 class="fw-800 mb-3">{{ company.feedback_label|default:"Customer Feedback" }}</h5>
+</div>
 
-        {% for review in reviews %}
-        <div class="bg-white p-3 rounded-4 border mb-2 shadow-sm">
-            <div class="d-flex justify-content-between mb-1">
-                <div class="fw-bold small">
-                    {{ review.user.get_full_name|default:review.user.username }}
-                </div>
-                <span class="text-muted small">{{ review.created_at|date:"d M Y" }}</span>
-            </div>
+<!-- ================= DETAILS ================= -->
+<div class="gc-card">
 
-            <div class="text-warning mb-2">
-                {% for i in "12345"|make_list %}
-                    <i class="fa-star {% if forloop.counter <= review.score %}fas{% else %}far{% endif %}"></i>
-                {% endfor %}
-            </div>
+    <div class="title">{{ product.name }}</div>
 
-            <p class="small text-muted mb-0">{{ review.review }}</p>
+    <div class="rating-row">
+        <div class="pill rating">⭐ {{ avg_rating|floatformat:1 }} ({{ rating_count }})</div>
+        <div class="pill delivery">📍 {{ active_hub.name }} • Hyperlocal Express</div>
+    </div>
+
+    <div class="price">
+        ₹<span id="priceValue">
+            {% if default_variant %}{{ default_variant.price }}{% else %}0{% endif %}
+        </span>
+    </div>
+
+    <div id="stockText" class="text-muted">Select variant</div>
+
+</div>
+
+<!-- ================= VARIANTS ================= -->
+{% if variants %}
+<div class="gc-card">
+
+    <h6>Select Variant</h6>
+
+    <div class="variant-scroll">
+
+        {% for v in variants %}
+        <div class="variant-card"
+             data-id="{{ v.id }}"
+             data-price="{{ v.price }}"
+             data-stock="{{ v.stock }}"
+             onclick="selectVariant(this)">
+
+            <b>{{ v.name }}</b>
+            <div>₹{{ v.price }}</div>
+
+            {% if v.stock > 0 %}
+                <small>🟢 {{ v.stock }} left</small>
+            {% else %}
+                <small>🔴 Out of stock</small>
+            {% endif %}
+
         </div>
-        {% empty %}
-        <div class="text-center py-4 border rounded-4 text-muted small">
-            No reviews yet.
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endif %}
+
+<!-- ================= DESCRIPTION ================= -->
+<div class="gc-card">
+    <h6>📦 Description</h6>
+    <p>{{ product.description|default:"No description available." }}</p>
+</div>
+
+<!-- ================= POLICY ================= -->
+<div class="gc-card">
+    <h6>🔁 Policy</h6>
+    <div class="icon-grid">
+        <div class="icon-box">🚫<br>Non Returnable</div>
+        <div class="icon-box">❌<br>Non Cancellable</div>
+        <div class="icon-box">📜<br>Policy</div>
+    </div>
+</div>
+
+<!-- ================= WHY US ================= -->
+<div class="gc-card">
+    <h6>🌟 Why Us</h6>
+    <div class="icon-grid">
+        <div class="icon-box">🤝<br>Trusted</div>
+        <div class="icon-box">⚡<br>Fast</div>
+        <div class="icon-box">📸<br>Proof</div>
+    </div>
+</div>
+
+<!-- ================= REVIEWS ================= -->
+<div class="gc-card">
+    <h6>⭐ Reviews ({{ rating_count }})</h6>
+
+    {% for review in reviews|slice:":5" %}
+    <div class="review">
+        <b>{{ review.user.username }}</b>
+        <span>⭐ {{ review.rating }}</span>
+        <div class="text-muted">{{ review.created_at|date:"M d, Y" }}</div>
+        {% if review.comment %}
+        <div>{{ review.comment }}</div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-muted">No reviews yet</p>
+    {% endfor %}
+</div>
+
+<!-- ================= SIMILAR PRODUCTS ================= -->
+<div class="gc-card">
+    <h6>🧩 Similar Products</h6>
+
+    <div class="variant-scroll">
+        {% for p in similar_products %}
+        <div class="variant-card">
+            <img src="{% if p.product_images.first %}{{ p.product_images.first.image.url }}{% endif %}"
+                 style="width:100%;height:80px;object-fit:cover;border-radius:10px;">
+            <b>{{ p.name }}</b>
+            <div>₹{{ p.get_min_price }}</div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<div class="sticky-buy-bar">
-    {% if product.stock_available %}
-    <button id="buyNowBtn" class="btn-buy-now">
-        <i class="fas fa-bolt me-1"></i> Buy Now
-    </button>
+</div>
+<div id="toast" style="
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: none;
+    z-index: 999999;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+"></div>
+<!-- ================= BOTTOM BAR ================= -->
+<div class="bottom-bar">
+    <div class="bottom-inner">
 
-    <button id="cartBtn" class="btn-cart-add">
-        <i class="fas fa-shopping-basket me-2"></i>
-        {{ company.add_to_cart_label|default:"Add to Basket" }}
-    </button>
-    {% else %}
-    <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>
-        OUT OF STOCK
-    </button>
-    {% endif %}
+        <button id="cartBtn" class="btn btn-cart">🛒 Add to Cart</button>
+        <button id="buyBtn" class="btn btn-buy">⚡ Buy Now</button>
+
+    </div>
 </div>
 
-<div id="toast"></div>
-
-{% endblock %}
-
-{% block extra_js %}
 <script>
-/* IMAGE SWITCH */
-function updateView(el){
-    const main = document.getElementById('mainImage');
 
-    main.style.opacity = '0.5';
+/* ================= TOAST ================= */
+function showToast(message, success = true) {
 
-    setTimeout(() => {
-        main.src = el.src;
-        main.style.opacity = '1';
-
-        document.querySelectorAll('.thumb')
-            .forEach(t => t.classList.remove('active'));
-
-        el.classList.add('active');
-    }, 150);
-}
-
-/* URLS */
-const addToCartUrl = "{% url 'add_to_cart' product.id %}";
-const buyNowUrl = "{% url 'buy_now' product.id %}";
-const wishlistUrl = "{% url 'add_to_wishlist' product.id %}";
-
-/* CSRF */
-function getCSRFToken() {
-    return document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken'))
-        ?.split('=')[1];
-}
-
-/* TOAST */
-function showToast(msg){
     const toast = document.getElementById("toast");
+    if (!toast) return;
 
-    toast.innerText = msg;
+    toast.innerText = message;
+    toast.style.background = success ? "#16a34a" : "#dc2626";
     toast.style.display = "block";
-    toast.style.position = "fixed";
-    toast.style.bottom = "140px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.background = "#111";
-    toast.style.color = "#fff";
-    toast.style.padding = "10px 15px";
-    toast.style.borderRadius = "8px";
-    toast.style.zIndex = "9999";
 
     setTimeout(() => {
         toast.style.display = "none";
-        toast.innerText = "";
     }, 2000);
 }
 
-/* BUY NOW */
-document.getElementById("buyNowBtn")?.addEventListener("click", function () {
-    window.location.href = buyNowUrl;
-});
 
-/* ADD TO CART */
-document.getElementById("cartBtn")?.addEventListener("click", function () {
+/* ================= STATE ================= */
+let selectedVariant = null;
 
-    fetch(addToCartUrl, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken()
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        showToast("Added to cart ✅");
 
-        const badge = document.getElementById("cart-badge");
-        if (badge && data.cart_count !== undefined) {
-            badge.innerText = data.cart_count;
-            badge.style.display = "flex";
-        }
-    })
-    .catch(() => {
-        showToast("Error ❌");
-    });
-});
+/* ================= IMAGE ================= */
+function switchImage(el) {
 
-/* WISHLIST */
-document.getElementById("wishBtn")?.addEventListener("click", function () {
+    const main = document.getElementById("mainImage");
+    if (main) main.src = el.src;
 
-    fetch(wishlistUrl, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken()
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
+    document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+}
 
-        const icon = document.getElementById("wishIcon");
 
-        if (data.status === "added") {
-            icon.classList.remove("far", "text-muted");
-            icon.classList.add("fas", "text-danger");
-            showToast("Added to wishlist ❤️");
-        } else {
-            icon.classList.remove("fas", "text-danger");
-            icon.classList.add("far", "text-muted");
-            showToast("Removed from wishlist ❌");
-        }
-    })
-    .catch(() => {
-        showToast("Error ❌");
-    });
-});
+/* ================= VARIANT ================= */
+function selectVariant(el) {
 
-/* SHARE */
-function shareProduct(name, url) {
+    document.querySelectorAll(".variant-card").forEach(v =>
+        v.classList.remove("active")
+    );
 
-    const shareData = {
-        title: name,
-        text: "Check this product on GramaCart 🛒",
-        url: url
+    el.classList.add("active");
+
+    selectedVariant = {
+        id: el.dataset.id,
+        price: parseFloat(el.dataset.price),
+        stock: parseInt(el.dataset.stock)
     };
 
-    if (navigator.share) {
-        navigator.share(shareData)
-            .catch(err => console.log("Share cancelled", err));
+    document.getElementById("priceValue").innerText = selectedVariant.price;
+
+    const stockText = document.getElementById("stockText");
+    const cartBtn = document.getElementById("cartBtn");
+    const buyBtn = document.getElementById("buyBtn");
+
+    if (selectedVariant.stock > 0) {
+
+        stockText.innerText = "🟢 In Stock";
+
+        cartBtn.disabled = false;
+        buyBtn.disabled = false;
+
+        cartBtn.style.opacity = "1";
+        buyBtn.style.opacity = "1";
+
     } else {
-        navigator.clipboard.writeText(url);
-        showToast("Link copied 🔗");
+
+        stockText.innerText = "🔴 Out of Stock";
+
+        cartBtn.disabled = true;
+        buyBtn.disabled = true;
+
+        cartBtn.style.opacity = "0.5";
+        buyBtn.style.opacity = "0.5";
     }
 }
+
+
+/* ================= AUTO SELECT BEST VARIANT ================= */
+document.addEventListener("DOMContentLoaded", function () {
+
+    let best = null;
+
+    document.querySelectorAll(".variant-card").forEach(v => {
+
+        const stock = parseInt(v.dataset.stock);
+        const price = parseFloat(v.dataset.price);
+
+        if (stock > 0) {
+            if (!best || price < parseFloat(best.dataset.price)) {
+                best = v;
+            }
+        }
+    });
+
+    if (best) {
+        best.click();
+    } else {
+
+        const stockText = document.getElementById("stockText");
+        const cartBtn = document.getElementById("cartBtn");
+        const buyBtn = document.getElementById("buyBtn");
+
+        if (stockText) stockText.innerText = "🔴 Out of Stock (All Variants)";
+
+        if (cartBtn) {
+            cartBtn.disabled = true;
+            cartBtn.style.opacity = "0.5";
+        }
+
+        if (buyBtn) {
+            buyBtn.disabled = true;
+            buyBtn.style.opacity = "0.5";
+        }
+    }
+});
+
+
+/* ================= SHARE ================= */
+function shareProduct() {
+
+    const url = window.location.href;
+
+    if (navigator.share) {
+
+        navigator.share({
+            title: document.title,
+            url: url
+        }).catch(() => fallbackShare(url));
+
+    } else {
+        fallbackShare(url);
+    }
+}
+
+function fallbackShare(url) {
+    navigator.clipboard.writeText(url);
+    showToast("Link copied!");
+}
+
+
+/* ================= WISHLIST ================= */
+function toggleWishlist(btn) {
+
+    const url = "{% url 'add_to_wishlist' product.id %}";
+
+    const isActive = btn.classList.toggle("active");
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        // backend decides actual state
+        if (data.success === true) {
+            btn.classList.add("active");
+            showToast("❤️ Added to wishlist");
+        } else {
+            btn.classList.remove("active");
+            showToast(data.message || "Removed from wishlist");
+        }
+
+    })
+    .catch(() => {
+        btn.classList.remove("active");
+        showToast("Wishlist error", false);
+    });
+}
+
+
+/* ================= ADD TO CART ================= */
+const ADD_TO_CART_URL = "{% url 'add_to_cart' product.id %}";
+
+document.getElementById("cartBtn").addEventListener("click", function () {
+
+    if (!selectedVariant || selectedVariant.stock <= 0) {
+        showToast("This item is out of stock", false);
+        return;
+    }
+
+    const btn = this;
+    btn.disabled = true;
+
+    fetch(ADD_TO_CART_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({
+            variant_id: selectedVariant.id,
+            quantity: 1
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success === true) {
+            showToast(data.message || "🛒 Added to cart");
+        } else {
+            showToast(data.message || "Failed to add to cart", false);
+        }
+
+    })
+    .catch(() => {
+        showToast("Server error", false);
+    })
+    .finally(() => {
+        btn.disabled = false;
+    });
+});
+
+
+/* ================= BUY NOW ================= */
+document.getElementById("buyBtn").addEventListener("click", function () {
+
+    if (!selectedVariant || selectedVariant.stock <= 0) {
+        showToast("This item is out of stock", false);
+        return;
+    }
+
+    showToast("Redirecting...");
+
+    window.location.href =
+        "{% url 'buy_now' product.id %}?variant_id=" + selectedVariant.id;
+});
+
 </script>
+
 {% endblock %}

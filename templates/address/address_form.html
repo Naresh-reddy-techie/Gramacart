@@ -1,365 +1,739 @@
 {% extends "shop/base.html" %}
 {% load static %}
 
-{% block title %}GramaCart | Add Address{% endblock %}
+{% block title %}
+GramaCart | Add Address
+{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 
 <style>
-:root { --primary: #10B981; --primary-dark: #059669; --navy: #0F172A; --bg: #F8FAFC; --danger: #EF4444; }
 
-.header {
-    background: #fff;
-    padding: 15px 20px;
-    border-bottom: 1px solid #E2E8F0;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+:root{
+    --primary:#10B981;
+    --primary-dark:#059669;
+    --danger:#EF4444;
+    --danger-soft:#FEE2E2;
+    --success-soft:#DCFCE7;
+    --navy:#0F172A;
+    --muted:#64748B;
+    --border:#E2E8F0;
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
 }
 
-.header h4 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
+/* =========================================================
+BASE
+========================================================= */
+
+body{
+    background:var(--bg);
 }
 
-.form-card {
-    background: #fff;
-    border-radius: 28px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    margin-top: 15px;
-    border: 1px solid #E2E8F0;
+/* =========================================================
+HEADER
+========================================================= */
+
+.address-header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    backdrop-filter:blur(10px);
 }
 
-#map {
-    height: 320px;
-    border-radius: 20px;
-    margin-bottom: 15px;
-    border: 2.5px solid #DCFCE7;
-    z-index: 1;
+.address-header-inner{
+    max-width:920px;
+    margin:auto;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-.status-badge {
-    padding: 10px 18px;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 800;
-    display: inline-block;
-    margin-bottom: 15px;
-    width: 100%;
-    text-align: center;
+.back-btn{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:var(--navy);
+    background:#fff;
 }
 
-.status-inside { background: #DCFCE7; color: #166534; border: 1px solid #166534; }
-.status-outside { background: #FEE2E2; color: #991B1B; border: 1px solid #991B1B; }
-.status-remote { background: #EFF6FF; color: #1E40AF; border: 1px solid #1E40AF; }
-
-.form-label { font-weight: 700; font-size: 13px; color: #64748B; margin-left: 5px; }
-
-.form-control, .form-select {
-    border-radius: 14px;
-    padding: 12px 15px;
-    border: 1.5px solid #F1F5F9;
-    background: #F8FAFC;
-    font-weight: 600;
-    font-size: 14px;
+.page-title{
+    margin:0;
+    font-size:18px;
+    font-weight:800;
+    color:var(--navy);
 }
 
-.btn-save {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 18px;
-    font-weight: 800;
-    width: 100%;
+/* =========================================================
+LAYOUT
+========================================================= */
+
+.address-wrapper{
+    max-width:920px;
+    margin:auto;
+    padding:18px 12px 120px;
 }
 
-.btn-save:disabled {
-    background: #CBD5E1;
-    opacity: 0.7;
+.address-card{
+    background:var(--card);
+    border-radius:28px;
+    border:1px solid var(--border);
+    overflow:hidden;
+    box-shadow:
+        0 10px 30px rgba(15,23,42,0.04);
 }
 
-.remote-card {
-    background: #F0F9FF;
-    border: 1.5px dashed #0EA5E9;
-    border-radius: 18px;
-    padding: 15px;
-    margin-bottom: 20px;
+/* =========================================================
+MAP
+========================================================= */
+
+.map-section{
+    padding:18px;
 }
+
+.btn-location{
+    width:100%;
+    border:none;
+    background:var(--navy);
+    color:#fff;
+    min-height:54px;
+    border-radius:18px;
+    font-weight:800;
+    margin-bottom:14px;
+}
+
+#map{
+    width:100%;
+    height:400px;
+    border-radius:24px;
+    border:2px solid #DCFCE7;
+}
+
+.delivery-status{
+    margin-top:14px;
+    border-radius:16px;
+    padding:14px;
+    text-align:center;
+    font-weight:800;
+    font-size:14px;
+}
+
+.status-inside{
+    background:var(--success-soft);
+    color:#166534;
+}
+
+.status-outside{
+    background:var(--danger-soft);
+    color:#991B1B;
+}
+
+/* =========================================================
+REMOTE
+========================================================= */
+
+.remote-card{
+    margin:0 18px 18px;
+    padding:16px;
+    border-radius:18px;
+    background:#F8FAFF;
+    border:1px dashed #93C5FD;
+}
+
+/* =========================================================
+FORM
+========================================================= */
+
+.form-section{
+    padding:0 18px 24px;
+}
+
+.form-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    margin-bottom:6px;
+}
+
+.form-control,
+.form-select{
+    min-height:54px;
+    border-radius:16px;
+    border:1.5px solid #E2E8F0;
+    background:#F8FAFC;
+    font-weight:600;
+    box-shadow:none !important;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#10B981;
+    background:#fff;
+}
+
+/* =========================================================
+SUBMIT
+========================================================= */
+
+.submit-wrapper{
+    position:sticky;
+    bottom:0;
+    background:
+        linear-gradient(
+            to top,
+            #fff 70%,
+            transparent
+        );
+    padding-top:36px;
+}
+
+.btn-save{
+    width:100%;
+    min-height:58px;
+    border:none;
+    border-radius:22px;
+    background:var(--primary);
+    color:#fff;
+    font-weight:800;
+    font-size:15px;
+}
+
+.btn-save:disabled{
+    background:#CBD5E1;
+}
+
+/* =========================================================
+LEAFLET
+========================================================= */
+
+.leaflet-control-attribution{
+    display:none;
+}
+
+.leaflet-popup-content{
+    font-weight:700;
+}
+
 </style>
+
 {% endblock %}
 
 {% block content %}
 
-{% if form.errors %}
-<div class="alert alert-danger">
-    <strong>Form Errors:</strong><br>
-    {{ form.errors }}
-</div>
-{% endif %}
+<div class="address-header">
 
-<div class="header">
-    <a href="{% url 'address_list' %}" class="text-dark">
-        <i class="bi bi-arrow-left fs-4"></i>
-    </a>
-    <h4>
-        {% if form.instance.pk %}Edit Address{% else %}Set Delivery Location{% endif %}
-    </h4>
-</div>
+    <div class="address-header-inner">
 
-<div class="container pb-5">
+        <a
+            href="{% url 'address_list' %}"
+            class="back-btn"
+        >
+            <i class="bi bi-arrow-left"></i>
+        </a>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 border-0 rounded-4 shadow-sm">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
+        <h1 class="page-title">
 
-    <div class="form-card">
-        <form method="post" id="address-form">
-            {% csrf_token %}
+            {% if form.instance.pk %}
+                Edit Address
+            {% else %}
+                Add Delivery Address
+            {% endif %}
 
-            {{ form.latitude }}
-            {{ form.longitude }}
-            {{ form.state }}
-            {{ form.country }}
+        </h1>
 
-            <div class="remote-card">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="id_remote_delivery"
-                    {% if form.instance.is_remote %}checked{% endif %}>
-                    <label class="form-check-label">
-                        Ordering for someone else?
-                    </label>
-                </div>
-            </div>
-
-            <button type="button" id="btn-locate" class="btn btn-dark w-100 mb-3 py-3">
-                Use My Current Location
-            </button>
-
-            <div id="map"></div>
-
-            <div id="delivery-status" class="status-badge status-outside">
-                Tap map to pick house
-            </div>
-
-            <div class="row g-3">
-                <div class="col-12">{{ form.recipient_name }}</div>
-                <div class="col-12">{{ form.phone_number }}</div>
-                <div class="col-12">{{ form.address_line }}</div>
-                <div class="col-12">{{ form.landmark }}</div>
-                <div class="col-6">{{ form.city }}</div>
-                <div class="col-6">{{ form.pincode }}</div>
-                <div class="col-12">{{ form.address_type }}</div>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" id="save-btn" class="btn-save" disabled>
-                    {% if form.instance.pk %}Update Address{% else %}Confirm Location{% endif %}
-                </button>
-            </div>
-
-        </form>
     </div>
+
+</div>
+
+<div class="address-wrapper">
+
+<form method="post" id="address-form">
+
+{% csrf_token %}
+
+{{ form.latitude }}
+{{ form.longitude }}
+{{ form.state }}
+{{ form.country }}
+
+<div class="address-card">
+
+    <!-- =====================================================
+    MAP
+    ====================================================== -->
+
+    <div class="map-section">
+
+        <button
+            type="button"
+            class="btn-location"
+            id="btn-locate"
+        >
+            📍 Use Current Location
+        </button>
+
+        <div id="map"></div>
+
+        <div
+            id="delivery-status"
+            class="delivery-status status-outside"
+        >
+            Select your location
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    REMOTE MODE
+    ====================================================== -->
+
+    <div class="remote-card">
+
+        <div class="form-check form-switch">
+
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="remote_toggle"
+            >
+
+            <label class="form-check-label fw-bold">
+
+                Remote Delivery
+                (Enable draggable pin)
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    FORM
+    ====================================================== -->
+
+    <div class="form-section">
+
+        <div class="row g-3">
+
+            <div class="col-12">
+                <label class="form-label">
+                    Recipient Name
+                </label>
+                {{ form.recipient_name }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">
+                    Phone Number
+                </label>
+                {{ form.phone_number }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">
+                    Address
+                </label>
+                {{ form.address_line }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">
+                    Landmark
+                </label>
+                {{ form.landmark }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">
+                    City
+                </label>
+                {{ form.city }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">
+                    Pincode
+                </label>
+                {{ form.pincode }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">
+                    Address Type
+                </label>
+                {{ form.address_type }}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="submit-wrapper">
+
+    <button
+        type="submit"
+        id="save-btn"
+        class="btn-save"
+        disabled
+    >
+        Save Address
+    </button>
+
+</div>
+
+</form>
+
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
-    const latInput = document.getElementById('id_latitude');
-    const lonInput = document.getElementById('id_longitude');
-    const statusBox = document.getElementById('delivery-status');
-    const saveBtn = document.getElementById('save-btn');
-    const landmarkInput = document.getElementById('id_landmark');
-    const suggestionBox = document.getElementById('landmark-suggestions');
-    const remoteToggle = document.getElementById('id_remote_delivery');
 
-    // 1. Setup Icons
-    const warehouseIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/609/609803.png',
-        iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32]
-    });
-    const userPinIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/1673/1673188.png',
-        iconSize: [38, 38], iconAnchor: [19, 38]
-    });
+/* =========================================================
+DATA
+========================================================= */
 
-    // 2. Initialize Map (Locked to 13-18 zoom)
-    let map = L.map('map', { zoomControl: false, minZoom: 12 }).setView([16.506, 80.648], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+const hubs = {{ delivery_hubs_json|safe }};
 
-    let userMarker = null;
-    let combinedBounds = L.latLngBounds([]);
+/* =========================================================
+ACTIVE HUB (FIXED)
+========================================================= */
 
-    // 3. Load Hubs from Django Context
-    const hubs = [
-        {% for hub in nearest_hubs %}
-        { 
-            name: "{{ hub.name }}", 
-            lat: {{ hub.latitude }}, 
-            lon: {{ hub.longitude }}, 
-            radius: {{ hub.max_delivery_radius_km|default:7 }} * 1000 
-        },
-        {% endfor %}
-    ];
+let activeHub =
 
-    // 4. Draw Radius and Lock Bounds
-    hubs.forEach(hub => {
-        // Warehouse Marker
-        L.marker([hub.lat, hub.lon], {icon: warehouseIcon}).addTo(map)
-         .bindPopup(`<b>${hub.name} Hub</b><br>GramaCart Warehouse`);
+{% if active_hub %}
+{
+    id: {{ active_hub.id }},
+    lat: {{ active_hub.lat }},
+    lon: {{ active_hub.lon }},
+    name: "{{ active_hub.name }}"
+}
+{% else %}
+null
+{% endif %};
 
-        // Delivery Radius Circle
-        const circle = L.circle([hub.lat, hub.lon], {
-            radius: hub.radius,
-            color: '#10B981',
-            fillColor: '#10B981',
-            fillOpacity: 0.12,
-            weight: 2,
-            dashArray: '5, 10'
-        }).addTo(map);
+/* fallback */
+if(!activeHub && hubs.length){
 
-        combinedBounds.extend(circle.getBounds());
-    });
+    activeHub = {
+        lat: hubs[0].lat,
+        lon: hubs[0].lon,
+        name: hubs[0].name
+    };
+}
 
-    // Lock the map view to ONLY your active delivery zones
-    if (hubs.length > 0) {
-        map.fitBounds(combinedBounds, { padding: [40, 40] });
-        map.setMaxBounds(combinedBounds.pad(0.3)); // User can't scroll away
-    }
+/* final fallback */
+if(!activeHub){
 
-    function updateDeliveryStatus(lat, lon) {
-        let isDeliverable = false;
-        hubs.forEach(hub => {
-            const distance = map.distance([lat, lon], [hub.lat, hub.lon]);
-            if (distance <= hub.radius) isDeliverable = true;
-        });
+    activeHub = {
+        lat:16.5,
+        lon:80.6,
+        name:"Default Hub"
+    };
+}
 
-        if (isDeliverable) {
-            statusBox.innerHTML = '<i class="bi bi-check-circle-fill"></i> Deliverable Address';
-            statusBox.className = "status-badge status-inside";
-            saveBtn.disabled = false;
-        } else if (remoteToggle.checked) {
-            statusBox.innerHTML = '<i class="bi bi-house-door-fill"></i> Remote Address Set';
-            statusBox.className = "status-badge status-remote";
-            saveBtn.disabled = false;
-        } else {
-            statusBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Outside Service Area';
-            statusBox.className = "status-badge status-outside";
-            saveBtn.disabled = true;
-        }
-    }
+/* =========================================================
+GLOBALS
+========================================================= */
 
-    function reverseGeocode(lat, lon) {
-        axios.get("{% url 'reverse_geocode' %}", { params: { lat, lon } })
-        .then(res => {
-            const d = res.data;
-            if(d.street) document.getElementById('id_address_line').value = d.street;
-            if(d.city) document.getElementById('id_city').value = d.city;
-            if(d.pincode) document.getElementById('id_pincode').value = d.pincode;
-            
-            // Hidden data for Django
-            if(d.state) document.getElementById('id_state').value = d.state;
-            if(d.country) document.getElementById('id_country').value = d.country;
+let map;
+let userMarker = null;
+let isRemote = false;
 
-            // Generate Suggestion Chips
-            suggestionBox.innerHTML = '';
-            if(d.nearby_pois) {
-                d.nearby_pois.forEach(poi => {
-                    let chip = document.createElement('div');
-                    chip.className = 'landmark-chip';
-                    chip.innerHTML = `<i class="bi bi-plus"></i> ${poi}`;
-                    chip.onclick = () => { landmarkInput.value = "Near " + poi; suggestionBox.innerHTML = ''; };
-                    suggestionBox.appendChild(chip);
-                });
+/* =========================================================
+MAP INIT
+========================================================= */
+
+function initMap(){
+
+    map = L.map("map", {
+        zoomControl:true
+    }).setView(
+        [activeHub.lat, activeHub.lon],
+        13
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ).addTo(map);
+
+    renderHubs();
+    bindEvents();
+}
+
+/* =========================================================
+HUBS
+========================================================= */
+
+function renderHubs(){
+
+    hubs.forEach(h=>{
+
+        const isActive =
+            h.id === activeHub.id;
+
+        L.circle(
+            [h.lat, h.lon],
+            {
+                radius:h.radius,
+                color:isActive
+                    ? "#10B981"
+                    : "#94A3B8",
+                fillOpacity:0.08,
+                weight:2
             }
+        ).addTo(map);
+
+        L.marker(
+            [h.lat, h.lon],
+            {
+                interactive:false
+            }
+        )
+        .addTo(map)
+        .bindPopup(
+            isActive
+            ? `✅ Active Hub: ${h.name}`
+            : h.name
+        );
+
+    });
+}
+
+/* =========================================================
+PIN
+========================================================= */
+function setPin(lat, lon){
+
+    /* SAFE ROUNDING */
+    lat = parseFloat(lat).toFixed(8);
+    lon = parseFloat(lon).toFixed(8);
+
+    /* hidden fields */
+    document.getElementById(
+        "id_latitude"
+    ).value = lat;
+
+    document.getElementById(
+        "id_longitude"
+    ).value = lon;
+
+    /* marker create */
+    if(!userMarker){
+
+        userMarker = L.marker(
+            [lat, lon],
+            {
+                draggable:isRemote
+            }
+        ).addTo(map);
+
+        userMarker.on("dragend", e=>{
+
+            const p =
+                e.target.getLatLng();
+
+            setPin(
+                p.lat,
+                p.lng
+            );
+
         });
-    }
 
-    function placePin(lat, lon) {
-        latInput.value = parseFloat(lat).toFixed(6);
-        lonInput.value = parseFloat(lon).toFixed(6);
+    } else {
 
-        if(!userMarker) {
-            userMarker = L.marker([lat, lon], { draggable: true, icon: userPinIcon }).addTo(map);
-            userMarker.on('dragend', e => {
-                const p = e.target.getLatLng();
-                placePin(p.lat, p.lng);
-            });
+        userMarker.setLatLng([lat, lon]);
+
+        if(isRemote){
+            userMarker.dragging.enable();
         } else {
-            userMarker.setLatLng([lat, lon]);
+            userMarker.dragging.disable();
         }
-        updateDeliveryStatus(lat, lon);
-        reverseGeocode(lat, lon);
     }
 
-    map.on('click', e => placePin(e.latlng.lat, e.latlng.lng));
+    map.panTo([lat, lon]);
 
-    remoteToggle.addEventListener('change', () => {
-        if(latInput.value) updateDeliveryStatus(latInput.value, lonInput.value);
+    checkDelivery(lat, lon);
+}
+
+/* =========================================================
+DELIVERY CHECK
+========================================================= */
+
+function checkDelivery(lat, lon){
+
+    let deliverable = false;
+
+    hubs.forEach(h=>{
+
+        const distance =
+            map.distance(
+                [lat, lon],
+                [h.lat, h.lon]
+            );
+
+        if(distance <= h.radius){
+            deliverable = true;
+        }
+
     });
 
-    // Auto-load existing location
-    {% if form.instance.latitude %}
-        placePin({{ form.instance.latitude }}, {{ form.instance.longitude }});
-    {% endif %}
+    const box =
+        document.getElementById(
+            "delivery-status"
+        );
 
-    const locateBtn = document.getElementById('btn-locate');
+    const btn =
+        document.getElementById(
+            "save-btn"
+        );
 
-    locateBtn.addEventListener('click', () => {
-        if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+    if(deliverable){
+
+        box.className =
+            "delivery-status status-inside";
+
+        box.innerHTML =
+            "✓ Deliverable Location";
+
+        btn.disabled = false;
+
+    } else {
+
+        box.className =
+            "delivery-status status-outside";
+
+        box.innerHTML =
+            "Outside delivery zone";
+
+        btn.disabled = true;
+    }
+}
+
+/* =========================================================
+EVENTS
+========================================================= */
+
+function bindEvents(){
+
+    /* map click */
+    map.on("click", e=>{
+
+        /* first placement always */
+        if(!userMarker){
+
+            setPin(
+                e.latlng.lat,
+                e.latlng.lng
+            );
+
             return;
         }
 
-        locateBtn.innerHTML = "Detecting location...";
-        locateBtn.disabled = true;
+        /* remote mode only */
+        if(isRemote){
+
+            setPin(
+                e.latlng.lat,
+                e.latlng.lng
+            );
+        }
+
+    });
+
+    /* gps */
+    document.getElementById(
+        "btn-locate"
+    ).onclick = function(){
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
 
-                // Move map + place marker
-                map.setView([lat, lon], 16);
-                placePin(lat, lon);
+            pos=>{
 
-                locateBtn.innerHTML = "Location detected ✓";
-                locateBtn.disabled = false;
+                const lat =
+                    pos.coords.latitude;
+
+                const lon =
+                    pos.coords.longitude;
+
+                setPin(lat, lon);
+
+                map.setView(
+                    [lat, lon],
+                    15
+                );
             },
-            (error) => {
-                console.error(error);
 
-                let msg = "Unable to get location.";
-                if (error.code === 1) msg = "Permission denied. Please allow location access.";
-                if (error.code === 2) msg = "Location unavailable.";
-                if (error.code === 3) msg = "Request timed out.";
+            ()=>{
 
-                alert(msg);
-                locateBtn.innerHTML = "Use My Current Location";
-                locateBtn.disabled = false;
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                alert(
+                    "Unable to fetch current location."
+                );
             }
+
         );
-    });
+    };
+
+    /* remote toggle */
+    document.getElementById(
+        "remote_toggle"
+    ).onchange = function(e){
+
+        isRemote = e.target.checked;
+
+        if(userMarker){
+
+            if(isRemote){
+                userMarker.dragging.enable();
+            } else {
+                userMarker.dragging.disable();
+            }
+        }
+    };
+}
+
+/* =========================================================
+BOOT
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ()=>{
+
+        initMap();
+
+        {% if form.instance.latitude and form.instance.longitude %}
+
+        setPin(
+            {{ form.instance.latitude }},
+            {{ form.instance.longitude }}
+        );
+
+        {% endif %}
+
+    }
+);
+
 </script>
 
 {% endblock %}

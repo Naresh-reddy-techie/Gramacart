@@ -23,42 +23,7 @@ def apply_shipping_rates(delivery_obj):
         delivery_obj.platform_fee = rate_card.platform_fee
         delivery_obj.save()
 
-"""
-from payments.models import FinancialWallet
-from django.db import transaction
-def settle_order_funds(delivery):
-    
-    # Triggers when status becomes 'DELIVERED'.
-    # Distributes money to Rider and Shopkeeper using your Admin models.
-   
-    order = delivery.order
-    
-    with transaction.atomic():
-        # 1. UPDATE RIDER WALLET
-        # We use the 'rider_earning' you defined in your ShippingCost model
-        rider_wallet, _ = FinancialWallet.objects.get_or_create(user=delivery.delivery_boy)
-        rider_wallet.pending_balance += delivery.rider_earning 
-        
-        # If it's COD, the rider is now 'carrying' your cash
-        if order.payments.filter(method__name__iexact='cod').exists():
-            rider_wallet.cash_in_hand += order.total
-        
-        rider_wallet.save()
 
-        # 2. UPDATE SHOPKEEPER WALLET
-        # We use the 'cost_price' you added to the Product model
-        total_vendor_cost = Decimal('0.00')
-        for item in order.items.all():
-            total_vendor_cost += item.product.cost_price * item.quantity
-        
-        # Find the shopkeeper (Assuming Order -> Vendor/Shop relation)
-        vendor_wallet, _ = FinancialWallet.objects.get_or_create(user=order.vendor.user)
-        vendor_wallet.pending_balance += total_vendor_cost
-        vendor_wallet.save()
-
-"""
-
-# payments/logic.py
 from payments.models import FinancialWallet
 from django.db import transaction
 from decimal import Decimal
@@ -86,4 +51,4 @@ def settle_order_funds(delivery):
         
         rider_wallet.save()
 
-        # Note: Shopkeeper/Vendor logic removed until you create the Vendor app.
+       

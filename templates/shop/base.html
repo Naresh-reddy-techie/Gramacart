@@ -1,4 +1,4 @@
-{% load static i18n %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -67,9 +67,6 @@ body.has-bottom-nav .main-content {
 
 <!-- LANGUAGE SWITCHER (DJANGO I18N) -->
 <div id="lang-box">
-    <form action="{% url 'set_language' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.path }}">
 
         <select name="language" onchange="this.form.submit()">
             <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
@@ -78,7 +75,7 @@ body.has-bottom-nav .main-content {
             <option value="kn" {% if LANGUAGE_CODE == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
             <option value="ta" {% if LANGUAGE_CODE == 'ta' %}selected{% endif %}>தமிழ்</option>
         </select>
-    </form>
+    
 </div>
 
 <!-- MESSAGES -->

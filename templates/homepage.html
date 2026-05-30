@@ -2,334 +2,168 @@
 {% load static %}
 
 {% block content %}
-
-<!-- HERO -->
-<section class="hero-section">
-    <div class="container">
+<section class="py-4 py-lg-5" style="background: radial-gradient(circle at top right, #f8fafc, #ffffff); overflow: hidden;">
+    <div class="container py-lg-5">
         <div class="row align-items-center g-4 g-lg-5">
-
-            <!-- LEFT -->
             <div class="col-lg-7 text-center text-lg-start">
-
-                <div class="badge badge-soft mb-4 text-primary">
+                <div class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-4 fw-bold">
                     🚀 Currently Active: {{ clusters.count|default:"Live" }} Verified Village Clusters
                 </div>
-
-                <h1 class="hero-title">
-                    Rural India's <span class="text-highlight">Direct</span><br class="d-none d-md-block">
+                <h1 class="display-4 display-lg-3 fw-800 mb-4" style="color: var(--navy); line-height: 1.1; letter-spacing: -0.04em;">
+                    Rural India's <span style="color: var(--electric-blue);">Direct</span><br class="d-none d-md-block">
                     Hyperlocal Platform.
                 </h1>
-
-                <p class="hero-subtitle text-danger">
+                <p class="fs-6 fs-lg-5 text-muted mb-4 mb-lg-5 pe-lg-5" style="font-weight: 500; line-height: 1.6;">
                     Developing the digital infrastructure for rural commerce. Delivery to village doorsteps in minutes through our verified local network.
                 </p>
-
-                <a href="{% url 'public_dashboard' %}" class="btn btn-brand-solid btn-lg px-5 py-3 shadow-lg text-success">
-                    <i class="bi bi-bag-check-fill me-2"></i> Shop Now
-                </a>
-
-            </div>
-
-            <!-- RIGHT -->
-            <div class="col-lg-5 text-center">
-                <img src="{% static 'images/1.png' %}" class="hero-img" alt="GramaCart Dashboard">
-            </div>
-
-        </div>
-    </div>
-</section>
-
-
-<!-- PLATFORM -->
-<section class="section-light">
-<div class="container">
-
-    <div class="text-center mb-5">
-        <span class="section-tag">The Business Logic</span>
-        <h2 class="section-title">Platform Execution</h2>
-    </div>
-
-    <div class="row g-4 text-center">
-
-        <!-- STEP 1 -->
-        <div class="col-md-4">
-            <div class="card card-step">
-                <div class="step-img">
-                    <img src="{% static 'images/step 1.png' %}" alt="Step 1">
-                </div>
-                <div class="card-body">
-                    <div class="step-label">Step 1</div>
-                    <h5 class="step-title">Identify Cluster</h5>
-                    <p class="step-desc">
-                        Select the verified village hub. Our network covers a {{ delivery_hub|default:"7" }} KM radius.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- STEP 2 -->
-        <div class="col-md-4">
-            <div class="card card-step">
-                <div class="step-img">
-                    <img src="{% static 'images/step 2.png' %}" alt="Step 2">
-                </div>
-                <div class="card-body">
-                    <div class="step-label">Step 2</div>
-                    <h5 class="step-title">Submit Transaction</h5>
-                    <p class="step-desc">
-                        Orders are routed from our catalog to local cluster managers instantly.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- STEP 3 -->
-        <div class="col-md-4">
-            <div class="card card-step">
-                <div class="step-img">
-                    <img src="{% static 'images/step 3.png' %}" alt="Step 3">
-                </div>
-                <div class="card-body">
-                    <div class="step-label">Step 3</div>
-                    <h5 class="step-title">Fulfillment</h5>
-                    <p class="step-desc">
-                        A local rider fulfills the request from our cluster center to the village doorstep.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-</section>
-
-
-<!-- LIVE MARKET -->
-<section class="section-light border-top">
-<div class="container">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="section-title mb-0">Live Market</h2>
-        <a href="{% url 'public_dashboard' %}" class="btn btn-brand-outline btn-sm px-4">
-            View All
-        </a>
-    </div>
-
-    <div class="row g-3 g-md-4">
-
-        {% for product in products|slice:":8" %}
-        <div class="col-6 col-md-3">
-
-            <div class="card product-card">
-
-                <div class="product-img">
-                    {% with product.product_images.all|first as img_obj %}
-                        {% if img_obj %}
-                            <img src="{{ img_obj.image.url }}" alt="{{ product.name }}">
-                        {% else %}
-                            <div class="placeholder">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                </div>
-
-                <div class="card-body text-center">
-                    <h6 class="product-name text-truncate">{{ product.name }}</h6>
-                    <p class="product-price">₹{{ product.get_effective_price }}</p>
-
-                    {% if product.is_in_stock %}
-                    <a href="{% url 'public_dashboard' %}" class="btn btn-navy-sm w-100">
-                        Order Now
+                <div class="d-grid d-md-flex justify-content-center justify-content-lg-start gap-3">
+                    <a href="{% url 'where_we_deliver' %}" class="btn btn-brand-solid btn-lg px-lg-5 py-3 shadow-lg d-inline-flex align-items-center">
+                        <i class="bi bi-bag-check-fill me-2"></i> 
+                        Shop Now
                     </a>
-                    {% else %}
-                    <button class="btn btn-light w-100 disabled">
-                        Sold Out
-                    </button>
-                    {% endif %}
                 </div>
-
             </div>
-
+            <div class="col-lg-5 text-center">
+                <img src="{% static 'images/1.png' %}" 
+                    class="img-fluid rounded-5 shadow-2xl border border-white border-4 mt-4 mt-lg-0" 
+                    alt="GramaCart Dashboard" style="max-height: 400px; width: auto;">
+            </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <p class="text-muted">Verified products from local clusters are coming soon!</p>
-        </div>
-        {% endfor %}
-
     </div>
-
-</div>
 </section>
 
+<section class="py-5 bg-light" id="platform-logistics">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="text-uppercase fw-700 tracking-wider text-primary small">The Business Logic</span>
+            <h2 class="fw-800 mt-2" style="color: var(--navy);">Platform Execution</h2>
+        </div>
+        
+        <div class="row g-3 g-md-4 text-center">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
+                    <div class="p-3">
+                        <img src="{% static 'images/step 1.png' %}" 
+                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 1">
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="text-primary fw-700 mb-2 small">Step 1</div>
+                        <h5 class="fw-800">Identify Cluster</h5>
+                        <p class="text-muted small mb-0">Select the verified village hub. Our network covers a {{ delivery_hub|default:"7" }}KM radius.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
+                    <div class="p-3">
+                        <img src="{% static 'images/step 2.png' %}" 
+                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 2">
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="text-primary fw-700 mb-2 small">Step 2</div>
+                        <h5 class="fw-800">Submit Transaction</h5>
+                        <p class="text-muted small mb-0">Orders are routed from our catalog to local cluster managers instantly.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
+                    <div class="p-3">
+                        <img src="{% static 'images/step 3.png' %}" 
+                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 3">
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="text-primary fw-700 mb-2 small">Step 3</div>
+                        <h5 class="fw-800">Fulfillment</h5>
+                        <p class="text-muted small mb-0">A local rider fulfills the request from our cluster center to the village doorstep.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<!-- WHATSAPP FLOAT -->
-<a href="https://wa.me/91XXXXXXXXXX" class="wa-float d-md-none">
+<section class="py-5 bg-light border-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5">
+            <h2 class="fw-800 h3 mb-0" style="color: var(--navy);">Live Market</h2>
+            <a href="{% url 'public_dashboard' %}" class="btn btn-brand-outline btn-sm px-4">View All</a>
+        </div>
+        
+        <div class="row g-2 g-md-4">
+            {% for product in products|slice:":8" %}
+            <div class="col-6 col-md-3">
+                <div class="card h-100 border-0 bg-white rounded-4 overflow-hidden shadow-sm hover-up">
+                    <div class="p-2 p-md-3">
+                        {% with product.product_images.all|first as img_obj %}
+                            {% if img_obj %}
+                                <img src="{{ img_obj.image.url }}" class="card-img-top rounded-4" style="aspect-ratio: 1/1; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="aspect-ratio: 1/1;">
+                                    <i class="bi bi-box-seam opacity-25 display-6 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="card-body pt-0 text-center">
+                        <h6 class="fw-700 text-truncate mb-1 px-1" style="font-size: 0.9rem;">{{ product.name }}</h6>
+                        <p class="text-primary fw-800 mb-2">₹{{ product.get_effective_price }}</p>
+                        
+                        {% if product.is_in_stock %}
+                        <a href="{% url 'public_dashboard' %}" class="btn btn-navy-sm w-100 rounded-pill py-2 fw-700}">
+                            Order Now
+                        </a>
+                        {% else %}
+                        <button class="btn btn-light w-100 rounded-pill py-2 fw-700 disabled" style="font-size: 0.8rem;">Sold Out</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Verified products from local clusters are coming soon!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<a href="https://wa.me/91XXXXXXXXXX" class="btn-wa-float d-md-none shadow-lg">
     <i class="bi bi-whatsapp"></i>
 </a>
 
-
-<!-- STYLES -->
 <style>
+    .hover-up { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    .hover-up:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
+    
+    .btn-navy-sm { background-color: var(--navy); color: white; border: none; transition: 0.3s; font-size: 0.85rem; }
+    .btn-navy-sm:hover { background-color: var(--electric-blue); color: white; }
+    
+    .btn-wa-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #25d366;
+        color: white;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        z-index: 1050;
+        text-decoration: none;
+    }
 
-/* HERO */
-.hero-section {
-    padding: 80px 0;
-    background: radial-gradient(circle at top right, #f8fafc, #ffffff);
-}
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); }
+    .rounded-5 { border-radius: 2rem !important; }
+    .fw-800 { font-weight: 800; }
+    .tracking-wider { letter-spacing: 0.05em; }
 
-.hero-title {
-    font-weight: 800;
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1.1;
-}
-
-.text-highlight {
-    color: var(--brand-green);
-}
-
-.hero-subtitle {
-    color: #64748b;
-    max-width: 520px;
-    margin: 0 auto;
-}
-
-@media (min-width: 992px){
-    .hero-subtitle { margin: 0; }
-}
-
-.hero-img {
-    max-height: 400px;
-    width: 100%;
-    object-fit: contain;
-    border-radius: 2rem;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-}
-
-/* SECTION */
-.section-light {
-    padding: 60px 0;
-    background: #f8fafc;
-}
-
-.section-title {
-    font-weight: 800;
-    color: var(--navy);
-}
-
-.section-tag {
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    color: var(--brand-green);
-    text-transform: uppercase;
-}
-
-/* STEP */
-.card-step {
-    border: none;
-    border-radius: 1.5rem;
-    overflow: hidden;
-    transition: 0.3s;
-}
-
-.card-step:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-}
-
-.step-img {
-    height: 180px;
-}
-
-.step-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.step-label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--brand-green);
-}
-
-.step-title {
-    font-weight: 800;
-}
-
-.step-desc {
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
-/* PRODUCT */
-.product-card {
-    border: none;
-    border-radius: 1rem;
-    overflow: hidden;
-}
-
-.product-img {
-    aspect-ratio: 1/1;
-}
-
-.product-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background: #f1f5f9;
-    font-size: 1.5rem;
-    color: #94a3b8;
-}
-
-.product-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.product-price {
-    color: var(--brand-green);
-    font-weight: 700;
-}
-
-/* BUTTON */
-.btn-navy-sm {
-    background: var(--navy);
-    color: #fff;
-    font-size: 0.85rem;
-    border-radius: 999px;
-}
-
-.btn-navy-sm:hover {
-    background: #1e293b;
-}
-
-/* WHATSAPP */
-.wa-float {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #25d366;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 26px;
-    z-index: 1000;
-    text-decoration: none;
-}
-
+    @media (max-width: 768px) {
+        .display-4 { font-size: 2.25rem; }
+        .card-body { padding: 1rem !important; }
+    }
 </style>
-
 {% endblock %}
