@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'payments',
     'delivery_portal',
     'inventory',
+    'core',
+    'hub_partner',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
 
@@ -192,3 +194,5 @@ SESSION_COOKIE_AGE = 2592000  # 30 days in seconds
 
 
 
+LOGIN_REDIRECT_URL = 'post_login_redirect'
+LOGOUT_REDIRECT_URL = 'user_signin'

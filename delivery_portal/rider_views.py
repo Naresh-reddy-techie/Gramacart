@@ -192,8 +192,8 @@ def serialize_delivery(delivery):
 # =========================================================
 # DASHBOARD
 # =========================================================
+from core.decorators import delivery_boy_required
 
-@login_required
 @delivery_boy_required
 def dashboard(request):
 

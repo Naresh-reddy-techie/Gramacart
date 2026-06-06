@@ -26,7 +26,7 @@ def user_signup(request):
     context = {'signupform':form}
     return render(request,'accounts/signup.html',context)
 
-
+"""
 def user_signin(request):
 
     if request.method == "POST":
@@ -63,6 +63,45 @@ def user_signin(request):
 
     return render(request, "accounts/signin.html", {"form": form})
 
+"""
+
+from core.role_router import get_dashboard_url
+
+def user_signin(request):
+
+    if request.method == "POST":
+
+        form = LoginForm(request, data=request.POST)
+
+        if form.is_valid():
+
+            user = form.get_user()
+
+            if not user.is_active:
+                messages.error(request,"Your account is inactive.")
+                return redirect("user_signin")
+
+            login(request, user)
+
+            messages.success(request,"Successfully signed in.")
+
+            return redirect(get_dashboard_url(user))
+
+        else:
+
+            messages.error(
+                request,
+                "Invalid username or password."
+            )
+
+    else:
+        form = LoginForm()
+
+    return render(
+        request,
+        "accounts/signin.html",
+        {"form": form}
+    )
 
 from django.contrib.auth import logout
 from django.contrib import messages

@@ -1,0 +1,182 @@
+{% load static %}
+
+<div class="sidebar-wrapper">
+
+    <!-- BRAND -->
+    <div class="sidebar-header">
+
+        <div class="brand-container">
+
+            <div class="brand-logo-box">
+                <img src="{% static 'images/logo.png' %}"
+                     alt="GramaCart"
+                     class="brand-logo">
+            </div>
+
+            <div class="brand-info">
+
+                <div class="brand-name">
+                    GRAMA<span class="text-emerald">CART</span>
+                </div>
+
+                <div class="brand-status">
+                    <span class="status-dot"></span>
+                    <span>Hub Partner Portal</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="sidebar-content">
+
+        <!-- OVERVIEW -->
+        <div class="sidebar-section">
+
+            <div class="sidebar-heading">
+                OVERVIEW
+            </div>
+
+            <a href="{% url 'hub_dashboard' %}"
+               class="menu-item {% if request.resolver_match.url_name == 'hub_dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'hub_shipping_cost_list' %}"
+                class="menu-item {% if request.resolver_match.url_name == 'hub_shipping_cost' %}active{% endif %}">
+                    <i class="bi bi-truck"></i>
+                    <span>Shipping Cost</span>
+            </a>
+
+        </div>
+
+        <!-- ORDERS -->
+        <div class="sidebar-section">
+
+            <div class="sidebar-heading">
+                ORDER MANAGEMENT
+            </div>
+
+            <a href="{% url 'hub_orders' %}"
+            class="menu-item {% if request.resolver_match.url_name == 'hub_orders' %}active{% endif %}">
+
+                <i class="bi bi-cart-check-fill"></i>
+
+                <span>Orders</span>
+
+                {% if pending_orders %}
+                    <span class="badge bg-danger ms-auto">
+                        {{ pending_orders }}
+                    </span>
+                {% endif %}
+
+            </a>
+
+        </div>
+
+        <!-- DELIVERY -->
+        <div class="sidebar-section">
+
+            <div class="sidebar-heading">
+                DELIVERY OPERATIONS
+            </div>
+
+            <a href="#"
+               class="menu-item {% if request.resolver_match.url_name == 'hub_riders' %}active{% endif %}">
+                <i class="bi bi-bicycle"></i>
+
+                <span>Delivery Partners</span>
+
+                {% if active_riders > 0 %}
+                    <span class="badge bg-success ms-auto">
+                        {{ active_riders }}
+                    </span>
+                {% endif %}
+            </a>
+
+        </div>
+
+        <!-- HUB -->
+        <div class="sidebar-section">
+
+            <div class="sidebar-heading">
+                HUB MANAGEMENT
+            </div>
+
+            <a href="#"
+               class="menu-item {% if request.resolver_match.url_name == 'hub_profile' %}active{% endif %}">
+                <i class="bi bi-building-fill"></i>
+                <span>Hub Details</span>
+            </a>
+
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="sidebar-section">
+
+            <div class="sidebar-heading">
+                ACCOUNT
+            </div>
+
+            <a href="#"
+               class="menu-item {% if request.resolver_match.url_name == 'hub_subscription' %}active{% endif %}">
+                <i class="bi bi-award-fill"></i>
+                <span>Subscription</span>
+            </a>
+
+            <a href="#"
+               class="menu-item {% if request.resolver_match.url_name == 'hub_account' %}active{% endif %}">
+                <i class="bi bi-person-circle"></i>
+                <span>My Account</span>
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="sidebar-footer">
+
+        <div class="partner-card">
+
+            <div class="partner-card-name">
+                {{ request.user.get_full_name|default:request.user.username }}
+            </div>
+
+            <div class="partner-card-hub">
+                {{ partner.hub.name|default:"Hub Partner" }}
+            </div>
+
+        </div>
+
+        {% if subscription_days_left and subscription_days_left <= 15 %}
+
+        <div class="subscription-alert">
+
+            <i class="bi bi-exclamation-triangle-fill"></i>
+
+            <span>
+                Subscription expires in
+                {{ subscription_days_left }} days
+            </span>
+
+        </div>
+
+        {% endif %}
+
+        <a href="{% url 'logout' %}"
+           class="logout-button">
+
+            <i class="bi bi-power"></i>
+
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</div>

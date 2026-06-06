@@ -470,3 +470,163 @@ class ShopForm(forms.ModelForm):
             raise forms.ValidationError("Shop name is too short")
 
         return name
+
+
+#====================================================
+
+from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+
+from .models import (
+    HubPartnerProfile,
+    HubSubscription,
+    DeliveryHub
+)
+
+# =========================================================
+# HUB PARTNER FORM
+# =========================================================
+
+class HubPartnerForm(forms.ModelForm):
+
+    class Meta:
+        model = HubPartnerProfile
+        fields = ["hub", "phone", "is_active"]
+
+        widgets = {
+            "hub": forms.Select(attrs={"class": "form-select"}),
+            "phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Partner Mobile Number"
+            }),
+            "is_active": forms.CheckboxInput(attrs={
+                "class": "form-check-input"
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # NEW: safe hub filtering (create + edit safe)
+        if self.instance.pk:
+            self.fields["hub"].queryset = DeliveryHub.objects.filter(is_active=True)
+        else:
+            self.fields["hub"].queryset = DeliveryHub.objects.filter(
+                partner__isnull=True,
+                is_active=True
+            ).order_by("name")
+
+
+# =========================================================
+# SUBSCRIPTION FORM
+# =========================================================
+class HubSubscriptionForm(forms.ModelForm):
+
+    class Meta:
+        model = HubSubscription
+
+        fields = [
+            "plan",
+            "start_date",
+            "amount",
+            "payment_reference",
+            "is_active",
+        ]
+
+        widgets = {
+            "plan": forms.Select(attrs={
+                "class": "form-select"
+            }),
+
+            "start_date": forms.DateInput(attrs={
+                "type": "date",
+                "class": "form-control"
+            }),
+
+            "amount": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "Subscription Amount (Yearly)"
+            }),
+
+            "payment_reference": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "UPI / Bank Reference ID"
+            }),
+
+            "is_active": forms.CheckboxInput(attrs={
+                "class": "form-check-input"
+            }),
+        }
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get("amount")
+
+        if amount is None:
+            raise forms.ValidationError("Amount is required.")
+
+        if amount <= 0:
+            raise forms.ValidationError("Amount must be greater than 0.")
+
+        if amount > 100000:
+            raise forms.ValidationError("Amount seems too large.")
+
+        return amount
+
+# =========================================================
+# HUB USER CREATE FORM (SECURE)
+# =========================================================
+
+class HubUserCreateForm(forms.Form):
+
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Username"
+        })
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Password"
+        })
+    )
+
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirm Password"
+        })
+    )
+
+    # -------------------------------
+    # CLEAN USERNAME
+    # -------------------------------
+    def clean_username(self):
+        username = self.cleaned_data.get("username", "")
+        username = username.strip().lower()
+
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Username already exists.")
+
+        return username
+
+    # -------------------------------
+    # CLEAN PASSWORD MATCH + STRENGTH
+    # -------------------------------
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password and confirm_password:
+
+            if password != confirm_password:
+                raise forms.ValidationError("Passwords do not match.")
+
+            # Django built-in strong password validator
+            validate_password(password)
+
+        return cleaned_data

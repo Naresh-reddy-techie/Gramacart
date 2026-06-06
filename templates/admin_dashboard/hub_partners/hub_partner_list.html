@@ -1,0 +1,297 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Hub Partners | GramaCart Admin{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<!-- HEADER -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Hub Partners</h1>
+        <p class="page-subtitle">
+            Manage franchise partners, subscriptions, operational hubs and access control.
+        </p>
+    </div>
+
+    <a href="{% url 'add_hub_partner' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add Hub Partner
+    </a>
+</div>
+
+<!-- KPI -->
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-buildings kpi-icon"></i>
+            <div>
+                <div class="kpi-label">Total</div>
+                <div class="kpi-value">{{ partners.count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-check-circle kpi-icon text-success"></i>
+            <div>
+                <div class="kpi-label">Active</div>
+                <div class="kpi-value">{{ active_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-clock-history kpi-icon text-warning"></i>
+            <div>
+                <div class="kpi-label">Renewal</div>
+                <div class="kpi-value">{{ renewal_due_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-x-circle kpi-icon text-danger"></i>
+            <div>
+                <div class="kpi-label">Expired</div>
+                <div class="kpi-value">{{ expired_count }}</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TABLE -->
+<div class="card modern-card">
+
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h5 class="mb-0">Partner Directory</h5>
+            <small class="text-muted">View and manage all hub partners</small>
+        </div>
+
+        <input type="text" class="form-control search-box" placeholder="Search partner...">
+    </div>
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Partner</th>
+                        <th>Hub</th>
+                        <th>Phone</th>
+                        <th>Plan</th>
+                        <th>Expiry</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for partner in partners %}
+
+                    <tr>
+
+                        <!-- Partner -->
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle">
+                                    {{ partner.user.username|slice:":1"|upper }}
+                                </div>
+
+                                <div>
+                                    <div class="fw-semibold">
+                                        {{ partner.user.get_full_name|default:partner.user.username }}
+                                    </div>
+                                    <small class="text-muted">@{{ partner.user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Hub -->
+                        <td>
+                            <div class="fw-semibold">{{ partner.hub.name }}</div>
+                            <small class="text-muted">{{ partner.hub.village }}</small>
+                        </td>
+
+                        <td>{{ partner.phone }}</td>
+
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ partner.subscription.plan }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ partner.subscription.end_date }}
+                        </td>
+
+                        <td>
+                            {% if partner.subscription.is_expired %}
+                                <span class="badge bg-danger">Expired</span>
+                            {% elif partner.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+                            <div class="d-flex justify-content-center gap-1">
+
+                                <a href="{% url 'hub_partner_detail' partner.id %}"
+                                   class="btn btn-sm btn-outline-info"
+                                   title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <a href="{% url 'edit_hub_partner' partner.id %}"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <a href="#"
+                                   class="btn btn-sm btn-outline-success"
+                                   title="Subscription">
+                                    <i class="bi bi-credit-card"></i>
+                                </a>
+
+                                {% if partner.is_active %}
+                                <a href="{% url 'toggle_hub_partner_status' partner.id %}"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Disable
+                                </a>
+                                {% else %}
+                                <a href="{% url 'toggle_hub_partner_status' partner.id %}"
+                                   class="btn btn-sm btn-outline-success">
+                                    Enable
+                                </a>
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="text-center p-5">
+                            <i class="bi bi-buildings fs-1 text-muted"></i>
+                            <h5 class="mt-3">No Hub Partners Found</h5>
+                            <p class="text-muted">Start by creating your first partner</p>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<style>
+
+/* HEADER */
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.page-title{
+    font-size:1.8rem;
+    font-weight:800;
+}
+
+.page-subtitle{
+    color:#64748B;
+    margin:0;
+}
+
+/* KPI */
+.kpi-card{
+    background:#fff;
+    border:1px solid #E2E8F0;
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.kpi-icon{
+    font-size:1.6rem;
+}
+
+.kpi-label{
+    font-size:.75rem;
+    color:#64748B;
+}
+
+.kpi-value{
+    font-size:1.4rem;
+    font-weight:800;
+}
+
+/* TABLE */
+.modern-card{
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.search-box{
+    width:250px;
+}
+
+/* AVATAR */
+.avatar-circle{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#10B981;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .search-box{
+        width:100%;
+    }
+
+    .page-title{
+        font-size:1.4rem;
+    }
+
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "hub_dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-lg rounded-4">
+
+                <div class="card-header bg-danger text-white py-4">
+
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-trash3-fill me-2"></i>
+                        Delete Shipping Slab
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <div class="alert alert-warning border-0 rounded-4">
+
+                        <strong>Warning:</strong>
+
+                        This action cannot be undone.
+
+                    </div>
+
+                    <div class="slab-info">
+
+                        <div class="info-row">
+                            <span class="label">Hub</span>
+                            <span class="value">{{ hub.name }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Distance Range</span>
+                            <span class="value">
+                                {{ shipping.min_distance_km }} km -
+                                {{ shipping.max_distance_km }} km
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Customer Fee</span>
+                            <span class="value">
+                                ₹{{ shipping.cost }}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Rider Earning</span>
+                            <span class="value">
+                                ₹{{ shipping.rider_earning }}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Platform Fee</span>
+                            <span class="value">
+                                ₹{{ shipping.platform_fee }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <form method="POST" class="mt-4">
+
+                        {% csrf_token %}
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{% url 'hub_shipping_cost_list' %}"
+                               class="btn btn-light border px-4">
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-danger px-4">
+
+                                <i class="bi bi-trash3-fill me-2"></i>
+                                Delete Slab
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.slab-info{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    padding:20px;
+}
+
+.info-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid #e2e8f0;
+}
+
+.info-row:last-child{
+    border-bottom:none;
+}
+
+.label{
+    color:#64748b;
+    font-weight:700;
+}
+
+.value{
+    color:#0f172a;
+    font-weight:800;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,346 @@
+/* ==========================================
+   GRAMACART HUB PARTNER SIDEBAR
+========================================== */
+
+:root{
+    --primary:#10B981;
+    --primary-dark:#059669;
+
+    --sidebar-bg:#0F172A;
+    --sidebar-bg-2:#111827;
+
+    --text:#E2E8F0;
+    --muted:#94A3B8;
+
+    --danger:#EF4444;
+    --warning:#F59E0B;
+    --success:#22C55E;
+
+    --border:rgba(255,255,255,.08);
+}
+
+/* ==========================
+   ROOT
+========================== */
+
+.sidebar-wrapper{
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+
+    background:
+    linear-gradient(
+        180deg,
+        #0F172A 0%,
+        #111827 60%,
+        #0B1220 100%
+    );
+
+    overflow:hidden;
+}
+
+/* ==========================
+   HEADER
+========================== */
+
+.sidebar-header{
+    flex-shrink:0;
+    border-bottom:1px solid var(--border);
+}
+
+.brand-container{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px;
+}
+
+.brand-logo-box{
+    width:44px;
+    height:44px;
+
+    border-radius:12px;
+    overflow:hidden;
+
+    background:#fff;
+}
+
+.brand-logo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.brand-name{
+    color:#fff;
+    font-size:1rem;
+    font-weight:800;
+}
+
+.brand-status{
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    margin-top:4px;
+
+    color:var(--muted);
+    font-size:.72rem;
+}
+
+.status-dot{
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--success);
+}
+
+/* ==========================
+   CONTENT
+========================== */
+
+.sidebar-content{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:14px;
+}
+
+.sidebar-content::-webkit-scrollbar{
+    width:6px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.15);
+    border-radius:20px;
+}
+
+.sidebar-content{
+    scrollbar-width:thin;
+}
+
+/* ==========================
+   SECTION
+========================== */
+
+.sidebar-section{
+    margin-bottom:28px;
+}
+
+.sidebar-heading{
+    padding-left:12px;
+    margin-bottom:10px;
+
+    color:#64748B;
+
+    font-size:.68rem;
+    font-weight:800;
+
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+}
+
+/* ==========================
+   MENU
+========================== */
+
+.menu-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:12px 14px;
+
+    margin-bottom:6px;
+
+    border-radius:14px;
+
+    color:#CBD5E1;
+    text-decoration:none;
+
+    transition:.25s ease;
+}
+
+.menu-item i{
+    width:20px;
+
+    text-align:center;
+
+    color:#94A3B8;
+
+    transition:.25s ease;
+}
+
+.menu-item:hover{
+    color:#fff;
+
+    background:
+    rgba(16,185,129,.08);
+
+    transform:translateX(4px);
+}
+
+.menu-item:hover i{
+    color:var(--primary);
+}
+
+.menu-item.active{
+
+    color:#fff;
+
+    border-left:3px solid var(--primary);
+
+    background:
+    linear-gradient(
+        90deg,
+        rgba(16,185,129,.20),
+        rgba(16,185,129,.05)
+    );
+
+    box-shadow:
+    inset 0 0 0 1px rgba(16,185,129,.08);
+}
+
+.menu-item.active i{
+    color:var(--primary);
+}
+
+/* ==========================
+   BADGES
+========================== */
+
+.badge{
+    font-size:.7rem;
+    font-weight:700;
+}
+
+/* ==========================
+   FOOTER
+========================== */
+
+.sidebar-footer{
+    flex-shrink:0;
+
+    padding:14px;
+
+    border-top:1px solid var(--border);
+
+    background:#0B1220;
+}
+
+/* ==========================
+   PARTNER CARD
+========================== */
+
+.partner-card{
+    padding:14px;
+
+    border-radius:14px;
+
+    background:
+    rgba(255,255,255,.04);
+
+    border:
+    1px solid rgba(255,255,255,.05);
+
+    margin-bottom:12px;
+}
+
+.partner-card-name{
+    color:#fff;
+
+    font-size:.92rem;
+    font-weight:700;
+}
+
+.partner-card-hub{
+    margin-top:3px;
+
+    color:var(--muted);
+
+    font-size:.75rem;
+}
+
+/* ==========================
+   SUBSCRIPTION ALERT
+========================== */
+
+.subscription-alert{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px;
+
+    border-radius:12px;
+
+    background:
+    rgba(245,158,11,.08);
+
+    color:var(--warning);
+
+    font-size:.75rem;
+    font-weight:600;
+
+    margin-bottom:12px;
+}
+
+/* ==========================
+   LOGOUT
+========================== */
+
+.logout-button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    width:100%;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    text-decoration:none;
+
+    background:
+    rgba(239,68,68,.12);
+
+    color:var(--danger);
+
+    font-weight:700;
+
+    transition:.25s ease;
+}
+
+.logout-button:hover{
+    background:var(--danger);
+    color:#fff;
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media(max-width:991px){
+
+    .brand-container{
+        padding:14px;
+    }
+
+    .brand-logo-box{
+        width:40px;
+        height:40px;
+    }
+
+    .sidebar-content{
+        padding:10px;
+    }
+
+    .menu-item{
+        padding:11px 12px;
+    }
+}

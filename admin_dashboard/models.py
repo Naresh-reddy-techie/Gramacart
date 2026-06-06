@@ -326,3 +326,50 @@ class ShopLedger(models.Model):
         order_num = self.order.order_number if self.order else "NoOrder"
         return f"{self.shop.name} - {order_num}"
     
+
+#==================================================
+
+from django.contrib.auth.models import User
+#it only support one hub one partner. 
+
+class HubPartnerProfile(models.Model):
+
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name = "hub_partner_profile")
+    hub = models.OneToOneField(DeliveryHub,on_delete=models.PROTECT,related_name="partner")
+    phone = models.CharField(max_length=15,blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.hub.name}"
+    
+
+from django.utils import timezone
+
+
+class HubSubscription(models.Model):
+
+    PLAN_CHOICES = [
+        
+        ("YEARLY", "Yearly"),
+    ]
+
+    partner = models.OneToOneField(HubPartnerProfile,on_delete=models.CASCADE,related_name="subscription")
+    plan = models.CharField(max_length=20,choices=PLAN_CHOICES)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    amount = models.DecimalField(max_digits=10,decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    renewal_reminder_sent = models.BooleanField(default=False)
+    payment_reference = models.CharField(max_length=100,blank=True)
+
+    @property
+    def is_expired(self):
+        return timezone.now().date() > self.end_date
+
+    def __str__(self):
+        return f"{self.partner.hub.name} - {self.plan}"
+    
+
+#==============================================================

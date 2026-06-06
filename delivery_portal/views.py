@@ -23,64 +23,7 @@ def delivery_boy_required(view_func):
     return wrapper
 
 
-# -----------------------------
-# SERIALIZER (RADAR FORMAT)
-# -----------------------------
-"""
-def serialize_delivery(d):
 
-    order = getattr(d, "order", None)
-
-    if not order:
-        return {
-            "id": d.id,
-            "order_number": None,
-            "earnings": float(d.rider_earning or 0),
-            "pickup": {"hub_name": "Hub"},
-            "drop": {},
-            "items": [],
-            "status": d.status,
-        }
-
-    address = getattr(order, "address", None)
-
-    items = list(
-        order.items.select_related("product").all()
-    )
-
-    return {
-        "id": d.id,
-        "order_number": order.order_number,
-
-        "pickup": {
-            "hub_name": d.nearest_hub.name if d.nearest_hub else "Hub",
-        },
-
-        "drop": {
-            "name": address.recipient_name if address else "Customer",
-            "phone": address.phone_number if address else "",
-            "full_address": (
-                f"{address.address_line or ''} {address.landmark or ''} "
-                f"{address.city or ''} {address.state or ''} {address.pincode or ''}"
-                if address else ""
-            ),
-            "lat": float(address.latitude) if address else None,
-            "lng": float(address.longitude) if address else None,
-        },
-
-        "items": [
-            {
-                "name": i.product.name,
-                "qty": i.quantity,
-                "size": i.product.size,
-            }
-            for i in items
-        ],
-
-        "status": d.status,
-    }
-
-"""
 
 from django.utils.timezone import localdate, make_aware
 import datetime as dt_module  # Use an alias to prevent clashes

@@ -1,0 +1,354 @@
+{% extends "hub_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Hub Orders | GramaCart{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+
+<style>
+
+/* ================= HUB OPS UI (OPTIMIZED) ================= */
+
+.ops{
+    background:#f4f6f9;
+    min-height:100vh;
+    padding:14px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.header h2{
+    font-size:1.2rem;
+    font-weight:900;
+}
+
+.live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.75rem;
+    font-weight:800;
+    color:#16a34a;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#16a34a;
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(22,163,74,.4);}
+    100%{box-shadow:0 0 0 10px transparent;}
+}
+
+/* METRICS */
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.metric{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:10px;
+}
+
+.metric h4{
+    font-size:.7rem;
+    color:#6b7280;
+    font-weight:800;
+}
+
+.metric .val{
+    font-size:1.3rem;
+    font-weight:900;
+}
+
+/* FILTERS */
+.toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.search{
+    flex:1;
+    min-width:180px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:10px;
+}
+
+.search input{
+    width:100%;
+    border:none;
+    outline:none;
+    font-weight:700;
+}
+
+.filter{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:10px;
+    font-weight:800;
+    min-width:140px;
+}
+
+/* PIPELINE */
+.pipeline{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin-bottom:10px;
+}
+
+.chip{
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    font-size:.72rem;
+    font-weight:800;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.chip.active{
+    background:#111827;
+    color:#fff;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:10px;
+}
+
+/* CARD */
+.card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:12px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+}
+
+.order{
+    font-weight:900;
+}
+
+.time{
+    font-size:.7rem;
+    color:#6b7280;
+}
+
+.badge{
+    font-size:.68rem;
+    font-weight:900;
+    padding:5px 9px;
+    border-radius:999px;
+}
+
+.pending{background:#fff7ed;color:#c2410c;}
+.assigned{background:#eef2ff;color:#3730a3;}
+.out_for_delivery{background:#eff6ff;color:#1d4ed8;}
+.delivered{background:#ecfdf5;color:#166534;}
+.cancelled{background:#fef2f2;color:#991b1b;}
+.packed{background:#fef3c7;color:#92400e;}
+
+.customer{
+    margin-top:8px;
+    font-weight:800;
+}
+
+.meta{
+    font-size:.72rem;
+    color:#6b7280;
+}
+
+.footer{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    align-items:center;
+}
+
+.total{
+    font-weight:900;
+}
+
+.btn{
+    padding:6px 9px;
+    font-size:.7rem;
+    border-radius:8px;
+    font-weight:800;
+    border:none;
+    cursor:pointer;
+}
+
+.view{background:#e5e7eb;}
+
+@media(max-width:768px){
+    .grid{grid-template-columns:1fr;}
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="ops">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>Hub Orders</h2>
+        <div class="live"><span class="dot"></span> LIVE</div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+        <div class="metric"><h4>Revenue</h4><div class="val">₹<span id="revenue">0</span></div></div>
+        <div class="metric"><h4>New</h4><div class="val" id="new">0</div></div>
+        <div class="metric"><h4>Assigned</h4><div class="val" id="assigned">0</div></div>
+        <div class="metric"><h4>Out</h4><div class="val" id="out">0</div></div>
+        <div class="metric"><h4>Cancelled</h4><div class="val" id="cancel">0</div></div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="toolbar">
+
+        <select class="filter" id="time">
+            <option value="day">Today</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+        </select>
+
+        <div class="search">
+            <input id="search" placeholder="Search orders...">
+        </div>
+
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="pipeline">
+        <div class="chip active" data-status="pending">New</div>
+        <div class="chip" data-status="packed">Packed</div>
+        <div class="chip" data-status="assigned">Assigned</div>
+        <div class="chip" data-status="out_for_delivery">Out</div>
+        <div class="chip" data-status="delivered">Delivered</div>
+        <div class="chip" data-status="cancelled">Cancelled</div>
+    </div>
+
+    <!-- GRID -->
+    <div id="grid" class="grid"></div>
+
+</div>
+
+<script>
+
+let status = "pending";
+let page = 1;
+
+async function load(){
+
+    const time = document.getElementById("time").value;
+    const search = document.getElementById("search").value;
+
+    const res = await fetch(
+        `/hub_partner/orders/json/?status=${status}&page=${page}&time=${time}&search=${search}`
+    );
+
+    const data = await res.json();
+
+    document.getElementById("new").innerText = data.metrics?.new_orders || 0;
+    document.getElementById("assigned").innerText = data.metrics?.assigned_orders || 0;
+    document.getElementById("out").innerText = data.metrics?.out_orders || 0;
+    document.getElementById("cancel").innerText = data.metrics?.cancelled_orders || 0;
+    document.getElementById("revenue").innerText = data.metrics?.revenue || 0;
+
+    render(data.orders || []);
+}
+
+function render(list){
+
+    const g = document.getElementById("grid");
+
+    if(!list.length){
+        g.innerHTML = "<p>No Orders Found</p>";
+        return;
+    }
+
+    g.innerHTML = list.map(o => `
+        <div class="card">
+
+            <div class="top">
+                <div>
+                    <div class="order">#${o.order_number}</div>
+                    <div class="time">${o.created_at}</div>
+                </div>
+
+                <div class="badge ${o.status_code}">
+                    ${o.status_label}
+                </div>
+            </div>
+
+            <div class="customer">${o.customer}</div>
+            <div class="meta">${o.phone || ""}</div>
+            <div class="meta">📍 ${o.address}</div>
+
+            <div class="footer">
+                <div class="total">₹${o.total}</div>
+                <button class="btn view" onclick="alert('Next: Order Drawer')">
+                    View
+                </button>
+            </div>
+
+        </div>
+    `).join("");
+}
+
+// EVENTS
+["time","search"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",()=>{
+        page = 1;
+        load();
+    });
+});
+
+// PIPELINE
+document.querySelectorAll(".chip").forEach(c=>{
+    c.onclick = () => {
+        document.querySelector(".chip.active").classList.remove("active");
+        c.classList.add("active");
+        status = c.dataset.status;
+        page = 1;
+        load();
+    }
+});
+
+load();
+
+</script>
+
+{% endblock %}

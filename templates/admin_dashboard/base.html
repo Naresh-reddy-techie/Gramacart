@@ -14,7 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{% static 'admin/css/admin.css' %}">
-
+    {% block extra_css %}{% endblock %}
     <style>
 
         :root {
@@ -122,7 +122,7 @@
 </head>
 
 <body>
-
+    
 <!-- OVERLAY -->
 <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
@@ -180,6 +180,6 @@ window.addEventListener("resize", () => {
     }
 });
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

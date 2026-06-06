@@ -1,0 +1,256 @@
+{% extends "hub_dashboard/base.html" %}
+
+{% block title %}
+Hub Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+<!-- PAGE HEADER -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h3 class="fw-bold mb-1">
+            Welcome back,
+            {{ request.user.get_full_name|default:request.user.username }}
+        </h3>
+
+        <p class="text-muted mb-0">
+            {{ partner.hub.name|default:"Hub" }}
+        </p>
+
+    </div>
+
+    <div>
+
+        <span class="badge bg-success px-3 py-2">
+            Hub Active
+        </span>
+
+    </div>
+
+</div>
+
+<!-- KPI CARDS -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Orders Today
+                </div>
+
+                <h2 class="fw-bold mb-0">
+                    {{ orders_today|default:"0" }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Pending Orders
+                </div>
+
+                <h2 class="fw-bold text-warning mb-0">
+                    {{ pending_orders|default:"0" }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Delivered Today
+                </div>
+
+                <h2 class="fw-bold text-success mb-0">
+                    {{ delivered_today|default:"0" }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Active Riders
+                </div>
+
+                <h2 class="fw-bold text-primary mb-0">
+                    {{ active_riders|default:"0" }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SECOND ROW -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-6">
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white">
+
+                <h6 class="fw-bold mb-0">
+                    Hub Summary
+                </h6>
+
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-borderless mb-0">
+
+                    <tr>
+                        <td>Hub Name</td>
+                        <td class="fw-bold">{{ partner.hub.name }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Partner</td>
+                        <td class="fw-bold">
+                            {{ request.user.username }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Total Riders</td>
+                        <td class="fw-bold">
+                            {{ active_riders|default:"0" }}
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white">
+
+                <h6 class="fw-bold mb-0">
+                    Subscription Status
+                </h6>
+
+            </div>
+
+            <div class="card-body">
+
+                <h3 class="fw-bold">
+                    {{ subscription_days_left|default:"0" }}
+                    Days Left
+                </h3>
+
+                <p class="text-muted mb-3">
+                    Remaining subscription validity.
+                </p>
+
+                <a href="#"
+                   class="btn btn-success">
+
+                    View Subscription
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- QUICK ACTIONS -->
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <h6 class="fw-bold mb-0">
+            Quick Actions
+        </h6>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <a href="#"
+               class="btn btn-outline-primary">
+
+                Orders
+
+            </a>
+
+            <a href="#"
+               class="btn btn-outline-success">
+
+                Riders
+
+            </a>
+
+            <a href="#"
+               class="btn btn-outline-dark">
+
+                Hub Details
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

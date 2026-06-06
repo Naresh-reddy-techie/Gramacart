@@ -1,0 +1,329 @@
+{% extends 'hub_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4 animate-fade-in">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+
+                <h3 class="fw-900 text-navy mb-0">
+
+                    {% if form.instance.pk %}
+                        Update Shipping Slab
+                    {% else %}
+                        Create Shipping Slab
+                    {% endif %}
+
+                </h3>
+
+                <span class="badge bg-emerald-soft text-emerald extra-small rounded-pill px-2">
+                    {{ hub.name }}
+                </span>
+
+            </div>
+
+            <p class="text-muted small mb-0">
+                Configure delivery pricing for your hub.
+            </p>
+
+        </div>
+
+        <a href="{% url 'hub_shipping_cost_list' %}" class="btn-cancel px-4 py-2">
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+
+                <div class="card-header bg-navy p-4 border-0">
+
+                    <h5 class="text-white mb-0 fw-800 fs-6">
+
+                        <i class="bi bi-truck me-2 text-success"></i>
+
+                        Shipping Configuration
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+
+                        <div class="alert alert-danger">
+
+                            Please correct the errors below.
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- DISTANCE RANGE -->
+
+                        <div class="row g-4 mb-4">
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+
+                                    Minimum Distance (KM)
+
+                                </label>
+
+                                {{ form.min_distance_km }}
+
+                                {{ form.min_distance_km.errors }}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+
+                                    Maximum Distance (KM)
+
+                                </label>
+
+                                {{ form.max_distance_km }}
+
+                                {{ form.max_distance_km.errors }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- COST BREAKDOWN -->
+
+                        <div class="financial-box p-4 rounded-4 mb-5">
+
+                            <h6 class="fw-800 text-uppercase small mb-4">
+
+                                Financial Breakdown
+
+                            </h6>
+
+                            <div class="row g-4">
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Customer Fee
+
+                                    </label>
+
+                                    {{ form.cost }}
+
+                                    {{ form.cost.errors }}
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Rider Earning
+
+                                    </label>
+
+                                    {{ form.rider_earning }}
+
+                                    {{ form.rider_earning.errors }}
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Platform Fee
+
+                                    </label>
+
+                                    {{ form.platform_fee }}
+
+                                    {{ form.platform_fee.errors }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center border-top pt-4">
+
+                            <small class="text-muted">
+
+                                Changes affect only your hub.
+
+                            </small>
+
+                            <button type="submit" class="btn-save">
+
+                                <i class="bi bi-check-circle-fill me-2"></i>
+
+                                {% if form.instance.pk %}
+                                    Update Slab
+                                {% else %}
+                                    Create Slab
+                                {% endif %}
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.text-navy{
+    color:#0f172a;
+}
+
+.bg-navy{
+    background:#0f172a;
+}
+
+.fw-900{
+    font-weight:900;
+}
+
+.fw-800{
+    font-weight:800;
+}
+
+.extra-small{
+    font-size:.7rem;
+}
+
+.bg-emerald-soft{
+    background:rgba(16,185,129,.1);
+}
+
+.text-emerald{
+    color:#10B981;
+}
+
+.form-label{
+    font-size:.75rem;
+    font-weight:800;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.form-control,
+.form-select{
+
+    width:100%;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:12px;
+
+    padding:12px;
+
+    font-weight:600;
+}
+
+.form-control:focus,
+.form-select:focus{
+
+    border-color:#10B981;
+
+    box-shadow:0 0 0 4px rgba(16,185,129,.10);
+}
+
+.financial-box{
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+}
+
+.btn-save{
+
+    background:#10B981;
+
+    border:none;
+
+    color:white;
+
+    font-weight:800;
+
+    border-radius:12px;
+
+    padding:12px 24px;
+}
+
+.btn-save:hover{
+
+    background:#059669;
+}
+
+.btn-cancel{
+
+    text-decoration:none;
+
+    border:1px solid #e2e8f0;
+
+    color:#475569;
+
+    border-radius:12px;
+
+    font-weight:700;
+}
+
+.btn-cancel:hover{
+
+    background:#f8fafc;
+}
+
+.animate-fade-in{
+
+    animation:fadeIn .35s ease;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+</style>
+
+{% endblock %}

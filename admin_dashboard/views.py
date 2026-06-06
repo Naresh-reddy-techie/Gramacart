@@ -31,13 +31,13 @@ from admin_dashboard.models import (
 )
 
 from delivery_portal.models import DeliveryProfile
-
+from core.decorators import admin_required
 
 # ============================================================
 # ADMIN DASHBOARD
 # ============================================================
 
-@login_required
+@admin_required
 def dashboard(request):
 
     today = timezone.now().date()
@@ -1315,6 +1315,15 @@ def admin_order_list_json(request, order_number=None):
         "today_revenue": float(revenue)
     })
 
+@staff_member_required
+def admin_order_detail_json(request, order_number):
+    order = get_object_or_404(
+        Order.objects.select_related("user", "address", "hub"),
+        order_number=order_number
+    )
+
+    return JsonResponse(serialize_order(order))
+
 
 @staff_member_required
 @require_POST
@@ -1441,26 +1450,7 @@ def assign_rider_ajax(request):
         "distance_km": float(order.estimated_distance_km or 0)
     })
 
-"""
-@staff_member_required
-@require_POST
-def assign_rider_ajax(request):
 
-    data = json.loads(request.body or "{}")
-
-    order = get_object_or_404(Order, order_number=data["order_number"])
-    profile = get_object_or_404(DeliveryProfile, id=data["delivery_boy_id"])
-
-    delivery = OrderService.assign_rider(order, profile)
-
-    order.status = "assigned"
-    order.save(update_fields=["status", "updated_at"])
-
-    return JsonResponse({
-        "success": True,
-        "earning": float(delivery.rider_earning)
-    })
-""" 
 @staff_member_required
 @require_POST
 def reject_order_ajax(request):
@@ -1810,3 +1800,4 @@ def delete_shop(request, pk):
     }
 
     return render(request, 'shops/shop_confirm_delete.html', context)
+

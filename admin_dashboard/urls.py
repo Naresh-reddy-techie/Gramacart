@@ -1,9 +1,9 @@
 from django.urls import path
 from .import views
-
+from admin_dashboard import hub_partner_views
 
 urlpatterns = [
-    path('',views.dashboard,name='dashboard'),
+    path('',views.dashboard,name='admin_dashboard'),
     path('admin/roles/', views.manage_groups, name='manage_groups'),
     path('admin/roles/edit/<int:pk>/', views.edit_group_permissions, name='edit_group_permissions'),
     path('admin/roles/delete/<int:pk>/', views.delete_group, name='delete_group'),
@@ -48,6 +48,8 @@ urlpatterns = [
 
     # Order Management
     path('orders/', views.live_orders_admin, name='admin_orders'),
+   path('orders/json/<str:order_number>/', views.admin_order_detail_json,name='admin_order_detail_json'),
+
     path('orders/json/', views.admin_order_list_json, name='admin_orders_json'),
     path('orders/json/<str:order_number>/', views.admin_order_list_json, name='admin_order_detail_json'),
 
@@ -85,5 +87,18 @@ urlpatterns = [
     path('shops/<int:pk>/edit/', views.edit_shop, name='edit_shop'),
 
     path('shops/<int:pk>/delete/', views.delete_shop, name='delete_shop'),
+
+    #======================================================
+
+    path("hub-partners/",hub_partner_views.hub_partner_list,name="hub_partner_list"),
+
+    path("hub-partners/add/",hub_partner_views.add_hub_partner,name="add_hub_partner"),
+
+    path("hub-partners/<int:partner_id>/edit/",hub_partner_views.edit_hub_partner,name="edit_hub_partner"),
+
+    path("hub-partners/<int:partner_id>/toggle-status/",hub_partner_views.toggle_hub_partner_status,name="toggle_hub_partner_status"),
+
+    path("hub-partners/<int:partner_id>/",hub_partner_views.hub_partner_detail,name="hub_partner_detail"),
+
 ]
 

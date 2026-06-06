@@ -13,7 +13,9 @@ urlpatterns = [
     path('shop/',include('shop.urls')),
     path('payment/',include('payments.urls')),
     path('delivery_portal/',include('delivery_portal.urls')),
-    path('inventory/', include('inventory.urls'))
+    path('inventory/', include('inventory.urls')),
+    path('core/',include('core.urls')),
+    path('hub_partner/',include('hub_partner.urls')),
    
 ]
 if settings.DEBUG:
