@@ -181,9 +181,14 @@
             <i class="bi bi-lock-fill me-2 text-primary"></i> Update Security
         </button>
         
-        <a href="{% url 'logout' %}" onclick="if(window.haptic) haptic('heavy')" class="btn btn-logout btn-action text-decoration-none">
-            <i class="bi bi-power me-2"></i> Terminate Session
-        </a>
+        <form method="post" action="{% url 'user_logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit"
+                    onclick="if(window.haptic) haptic('heavy')"
+                    class="btn btn-logout btn-action text-decoration-none">
+                <i class="bi bi-power me-2"></i> Terminate Session
+            </button>
+        </form>
     </div>
 
     <div class="mt-4 p-4 rounded-4 text-center bg-light border">

@@ -227,7 +227,7 @@ class DeliveryHubForm(forms.ModelForm):
         fields = [
 
             'name',
-
+            'owner',
             'state',
             'district',
             'mandal',
@@ -250,6 +250,9 @@ class DeliveryHubForm(forms.ModelForm):
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Example: GramaCart Kaza'
+            }),
+            'owner':forms.Select(attrs={
+                'class':"form-select",
             }),
 
             'state': forms.TextInput(attrs={
@@ -305,6 +308,20 @@ class DeliveryHubForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['owner'].queryset = User.objects.filter(
+            groups__name='HubPartner',
+            is_active=True
+        ).distinct().order_by('username')
+
+        self.fields['owner'].empty_label = "Select Hub Owner"
+
+        self.fields['owner'].label_from_instance = (
+            lambda user: f"{user.get_full_name() or user.username} ({user.username})"
+        )
 
 from .models import ShippingCost
 from admin_dashboard.models import DeliveryHub
@@ -630,3 +647,28 @@ class HubUserCreateForm(forms.Form):
             validate_password(password)
 
         return cleaned_data
+    
+
+
+#==========================================
+
+# forms.py
+
+from django import forms
+from admin_dashboard.models import SellerApplication
+
+class SellerApplicationForm(forms.ModelForm):
+
+    class Meta:
+        model = SellerApplication
+
+        fields = [
+            "owner_name",
+            "phone",
+            "email",
+            "village",
+            "business_name",
+            "business_type",
+            "description",
+            "hub",
+        ]

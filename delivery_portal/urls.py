@@ -18,13 +18,13 @@ urlpatterns = [
     path(
         'login/',
         auth_views.login_user,
-        name='login'
+        name='delivery_login'
     ),
 
     path(
         'logout/',
         auth_views.logout_view,
-        name='logout'
+        name='delivery_logout'
     ),
 
     # =========================================================

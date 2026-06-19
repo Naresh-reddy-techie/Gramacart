@@ -85,7 +85,7 @@
                 DELIVERY OPERATIONS
             </div>
 
-            <a href="#"
+            <a href="{% url 'hub_rider_list'%}"
                class="menu-item {% if request.resolver_match.url_name == 'hub_riders' %}active{% endif %}">
                 <i class="bi bi-bicycle"></i>
 
@@ -168,7 +168,7 @@
 
         {% endif %}
 
-        <a href="{% url 'logout' %}"
+        <a href="{% url 'user_logout' %}"
            class="logout-button">
 
             <i class="bi bi-power"></i>

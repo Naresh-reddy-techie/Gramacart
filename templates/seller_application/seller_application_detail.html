@@ -1,0 +1,166 @@
+{% extends "admin_dashboard/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <a href="{% url 'seller_application_list' %}"
+           class="btn btn-outline-secondary">
+
+            ← Back To Applications
+
+        </a>
+
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-start mb-4">
+
+                <div>
+
+                    <h2 class="fw-bold mb-1">
+                        {{ application.business_name }}
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Seller Application Details
+                    </p>
+
+                </div>
+
+                {% if application.status == 'PENDING' %}
+                    <span class="badge bg-warning fs-6">
+                        Pending
+                    </span>
+                {% elif application.status == 'APPROVED' %}
+                    <span class="badge bg-success fs-6">
+                        Approved
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger fs-6">
+                        Rejected
+                    </span>
+                {% endif %}
+
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <h5 class="fw-bold mb-3">
+                            Owner Information
+                        </h5>
+
+                        <p>
+                            <strong>Name:</strong>
+                            {{ application.owner_name }}
+                        </p>
+
+                        <p>
+                            <strong>Phone:</strong>
+                            {{ application.phone }}
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong>
+                            {{ application.email|default:"-" }}
+                        </p>
+
+                        <p>
+                            <strong>Village:</strong>
+                            {{ application.village }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <h5 class="fw-bold mb-3">
+                            Business Information
+                        </h5>
+
+                        <p>
+                            <strong>Business Name:</strong>
+                            {{ application.business_name }}
+                        </p>
+
+                        <p>
+                            <strong>Business Type:</strong>
+                            {{ application.get_business_type_display }}
+                        </p>
+
+                        <p>
+                            <strong>Hub:</strong>
+
+                            {% if application.hub %}
+                                {{ application.hub.name }}
+                            {% else %}
+                                Not Selected
+                            {% endif %}
+
+                        </p>
+
+                        <p>
+                            <strong>Submitted:</strong>
+                            {{ application.created_at }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="border rounded p-3 mt-4">
+
+                <h5 class="fw-bold mb-3">
+                    Product / Business Description
+                </h5>
+
+                <p class="mb-0">
+                    {{ application.description|default:"No description provided." }}
+                </p>
+
+            </div>
+
+            {% if application.status == 'PENDING' %}
+
+            <div class="d-flex gap-3 mt-4">
+
+                <a href="#"
+                   class="btn btn-success">
+
+                    Approve Seller
+
+                </a>
+
+                <a href="#"
+                   class="btn btn-danger">
+
+                    Reject Seller
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

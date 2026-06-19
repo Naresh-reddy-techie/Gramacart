@@ -159,6 +159,40 @@
 
     </div>
 
+    <!-- MARKETPLACE -->
+
+    <div class="sidebar-section">
+
+        <div class="sidebar-heading">
+            MARKETPLACE
+        </div>
+
+        <a href="{% url 'seller_application_list' %}"
+        class="menu-item">
+
+            <i class="bi bi-file-earmark-text-fill"></i>
+
+            <span>Seller Applications</span>
+
+            {% if pending_seller_applications > 0 %}
+            <span class="badge bg-danger ms-auto">
+                {{ pending_seller_applications }}
+            </span>
+            {% endif %}
+
+        </a>
+
+        <a href="{% url 'shop_list' %}"
+        class="menu-item">
+
+            <i class="bi bi-shop-window"></i>
+
+            <span>Marketplace Sellers</span>
+
+        </a>
+
+    </div>
+
 
     <!-- ADMINISTRATION -->
     <div class="sidebar-section">
@@ -191,10 +225,14 @@
         <span>Global Settings</span>
     </a>
 
-    <a href="{% url 'logout' %}" class="logout-button">
-        <i class="bi bi-power"></i>
-        <span>Logout</span>
-    </a>
+    <form method="post" action="{% url 'user_logout' %}">
+        {% csrf_token %}
+        
+        <button type="submit" class="logout-button border-0">
+            <i class="bi bi-power"></i>
+            <span>Logout</span>
+        </button>
+    </form>
 
 </div>
 

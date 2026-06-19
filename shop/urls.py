@@ -5,7 +5,7 @@ urlpatterns = [
 
     path( 'where-we-deliver/', views.where_should_we_deliver, name='where_we_deliver' ), 
     path( 'check-delivery-availability/', views.check_delivery_availability, name='check_delivery_availability' ),
-
+    
 
     # 1. Dashboards & Profiles
     path('public_dashboard/', views.public_dashboard, name='public_dashboard'),
@@ -13,6 +13,8 @@ urlpatterns = [
     path('manage_profile/', views.manage_profile, name='manage_profile'),
     path('profile_view/', views.profile_view, name='profile_view'),  
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
+
+    path("catalog-version/",views.catalog_version,name="catalog_version"),
 
     # 2. Addresses
     path('addresses/', views.address_list, name='address_list'), # Moved from '' to 'addresses/' to avoid clashes

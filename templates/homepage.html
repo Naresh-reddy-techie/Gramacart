@@ -2,168 +2,378 @@
 {% load static %}
 
 {% block content %}
-<section class="py-4 py-lg-5" style="background: radial-gradient(circle at top right, #f8fafc, #ffffff); overflow: hidden;">
-    <div class="container py-lg-5">
-        <div class="row align-items-center g-4 g-lg-5">
-            <div class="col-lg-7 text-center text-lg-start">
-                <div class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-4 fw-bold">
-                    🚀 Currently Active: {{ clusters.count|default:"Live" }} Verified Village Clusters
-                </div>
-                <h1 class="display-4 display-lg-3 fw-800 mb-4" style="color: var(--navy); line-height: 1.1; letter-spacing: -0.04em;">
-                    Rural India's <span style="color: var(--electric-blue);">Direct</span><br class="d-none d-md-block">
-                    Hyperlocal Platform.
+
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-center text-lg-start">
+                <span class="badge hero-badge mb-4">
+                   
+                    <i class="bi bi-scooter me-2"></i>
+                    Delivery In As Little As 30 Minutes
+                </span>
+                
+                
+                <h1 class="display-4 fw-bold mb-4">
+                    Groceries & Daily Essentials,
+
+                    <span class="text-success">
+                        Delivered To You Or Your Family In The Village.
+                    </span>
                 </h1>
-                <p class="fs-6 fs-lg-5 text-muted mb-4 mb-lg-5 pe-lg-5" style="font-weight: 500; line-height: 1.6;">
-                    Developing the digital infrastructure for rural commerce. Delivery to village doorsteps in minutes through our verified local network.
+
+                <p class="lead text-muted mb-4">
+                    Order groceries, household essentials and daily needs for yourself
+                     or your loved ones from anywhere in India or abroad. </p>
+
+                <p class="fw-semibold text-success mb-3">
+                    ⚡ Fast delivery through trusted local village hubs
                 </p>
-                <div class="d-grid d-md-flex justify-content-center justify-content-lg-start gap-3">
-                    <a href="{% url 'where_we_deliver' %}" class="btn btn-brand-solid btn-lg px-lg-5 py-3 shadow-lg d-inline-flex align-items-center">
-                        <i class="bi bi-bag-check-fill me-2"></i> 
-                        Shop Now
-                    </a>
-                </div>
+
+                <a href="{% url 'public_dashboard' %}"
+                class="btn btn-success btn-lg px-5">
+                    <i class="bi bi-cart3 me-2"></i>
+                    Shop Now
+                </a>
             </div>
-            <div class="col-lg-5 text-center">
-                <img src="{% static 'images/1.png' %}" 
-                    class="img-fluid rounded-5 shadow-2xl border border-white border-4 mt-4 mt-lg-0" 
-                    alt="GramaCart Dashboard" style="max-height: 400px; width: auto;">
+
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'images/1.png' %}" class="img-fluid hero-image" alt="GramaCart">
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light" id="platform-logistics">
+<section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <span class="text-uppercase fw-700 tracking-wider text-primary small">The Business Logic</span>
-            <h2 class="fw-800 mt-2" style="color: var(--navy);">Platform Execution</h2>
+            <h2 class="fw-bold">Shop By Category</h2>
+            <p class="text-muted">Everything your family needs in one place</p>
         </div>
-        
-        <div class="row g-3 g-md-4 text-center">
+        <a href="{% url 'public_dashboard' %}"class="text-decoration-none text-dark">
+        <div class="row g-4">
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/groceries.png' %}"><h6>Groceries</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/women essentials.png' %}"><h6>Women Essentials</h6></div></div>          
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/dairy & breakfast.png' %}"><h6>Dairy & Breakfast</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/babycare.png' %}"><h6>Baby Care</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/personalcare.png' %}"><h6>Personal Care</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/snacks.png' %}"><h6>Snacks & Beverages</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/household.png' %}"><h6>Household Essentials</h6></div></div>
+            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/vegetables.png' %}"><h6>Vegetables & Fruits</h6></div></div>
+        </div>
+        </a>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">
+            Ordering For Parents Or Family?
+        </h2>
+
+        <p class="lead text-muted">
+
+        Working in Hyderabad, Bangalore, Chennai, Mumbai
+        or even abroad?
+
+        </p>
+
+        <p class="text-muted">
+
+        Now you can order groceries, household essentials,
+        baby care products and daily needs for your parents
+        and loved ones back in the village.
+
+        Place the order online and we'll take care of the delivery.
+
+        </p>
+    </div>
+</section>
+
+<section class="py-4 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="row text-center g-4">
+
+            <div class="col-6 col-md-3">
+                <i class="bi bi-clock-history display-6 text-success"></i>
+                <h6 class="mt-2 mb-1">30–40 Min Delivery</h6>
+                <small class="text-muted">Fast local fulfillment</small>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <i class="bi bi-house-heart display-6 text-success"></i>
+                <h6 class="mt-2 mb-1">Village Doorstep</h6>
+                <small class="text-muted">Delivered to homes</small>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <i class="bi bi-geo-alt display-6 text-success"></i>
+                <h6 class="mt-2 mb-1">Local Hubs</h6>
+                <small class="text-muted">Trusted community partners</small>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <i class="bi bi-phone display-6 text-success"></i>
+                <h6 class="mt-2 mb-1">Order Anywhere</h6>
+                <small class="text-muted">City or abroad</small>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How GramaCart Works</h2>
+        </div>
+
+        <div class="row g-4">
             <div class="col-md-4">
-                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
-                    <div class="p-3">
-                        <img src="{% static 'images/step 1.png' %}" 
-                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 1">
-                    </div>
-                    <div class="card-body p-4 pt-0">
-                        <div class="text-primary fw-700 mb-2 small">Step 1</div>
-                        <h5 class="fw-800">Identify Cluster</h5>
-                        <p class="text-muted small mb-0">Select the verified village hub. Our network covers a {{ delivery_hub|default:"7" }}KM radius.</p>
-                    </div>
+                <div class="step-card">
+                    <img src="{% static 'images/step 1.png' %}" class="img-fluid rounded-4 mb-3">
+                    <h5>Choose Delivery Location</h5>
+                    <p>Select your village and delivery address.</p>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
-                    <div class="p-3">
-                        <img src="{% static 'images/step 2.png' %}" 
-                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 2">
-                    </div>
-                    <div class="card-body p-4 pt-0">
-                        <div class="text-primary fw-700 mb-2 small">Step 2</div>
-                        <h5 class="fw-800">Submit Transaction</h5>
-                        <p class="text-muted small mb-0">Orders are routed from our catalog to local cluster managers instantly.</p>
-                    </div>
+                <div class="step-card">
+                    <img src="{% static 'images/mobile.png' %}" class="img-fluid rounded-4 mb-3">
+                    <h5>Place Your Order</h5>
+                    <p>Choose essentials, groceries and daily-use products.</p>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="card h-100 border-0 rounded-5 shadow-sm overflow-hidden bg-white hover-up">
-                    <div class="p-3">
-                        <img src="{% static 'images/step 3.png' %}" 
-                             class="card-img-top rounded-4" style="aspect-ratio: 16/9; object-fit: cover;" alt="Step 3">
-                    </div>
-                    <div class="card-body p-4 pt-0">
-                        <div class="text-primary fw-700 mb-2 small">Step 3</div>
-                        <h5 class="fw-800">Fulfillment</h5>
-                        <p class="text-muted small mb-0">A local rider fulfills the request from our cluster center to the village doorstep.</p>
-                    </div>
+                <div class="step-card">
+                    <img src="{% static 'images/image1.png' %}" class="img-fluid rounded-4 mb-3">
+                    <h5>Fast Delivery</h5>
+                    <p>Delivered directly to the doorstep within 30–40 minutes.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light border-top">
+<section class="py-5">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5">
-            <h2 class="fw-800 h3 mb-0" style="color: var(--navy);">Live Market</h2>
-            <a href="{% url 'public_dashboard' %}" class="btn btn-brand-outline btn-sm px-4">View All</a>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Popular Essentials</h2>
+            <a href="{% url 'public_dashboard' %}" class="btn btn-outline-success">
+                Explore Shop
+            </a>
         </div>
-        
-        <div class="row g-2 g-md-4">
+
+        <div class="row g-4">
             {% for product in products|slice:":8" %}
             <div class="col-6 col-md-3">
-                <div class="card h-100 border-0 bg-white rounded-4 overflow-hidden shadow-sm hover-up">
-                    <div class="p-2 p-md-3">
-                        {% with product.product_images.all|first as img_obj %}
-                            {% if img_obj %}
-                                <img src="{{ img_obj.image.url }}" class="card-img-top rounded-4" style="aspect-ratio: 1/1; object-fit: cover;">
-                            {% else %}
-                                <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="aspect-ratio: 1/1;">
-                                    <i class="bi bi-box-seam opacity-25 display-6 text-muted"></i>
-                                </div>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                    <div class="card-body pt-0 text-center">
-                        <h6 class="fw-700 text-truncate mb-1 px-1" style="font-size: 0.9rem;">{{ product.name }}</h6>
-                        <p class="text-primary fw-800 mb-2">₹{{ product.get_effective_price }}</p>
-                        
-                        {% if product.is_in_stock %}
-                        <a href="{% url 'public_dashboard' %}" class="btn btn-navy-sm w-100 rounded-pill py-2 fw-700}">
-                            Order Now
-                        </a>
-                        {% else %}
-                        <button class="btn btn-light w-100 rounded-pill py-2 fw-700 disabled" style="font-size: 0.8rem;">Sold Out</button>
+                <div class="product-card">
+                    {% with product.product_images.all|first as img_obj %}
+                        {% if img_obj %}
+                        <img src="{{ img_obj.image.url }}" class="product-image">
                         {% endif %}
-                    </div>
+                    {% endwith %}
+
+                    <a href="{% url 'public_dashboard' %}"
+                    class="btn btn-success btn-sm mt-2">
+                    Check Availability
+                    </a>
                 </div>
-            </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">Verified products from local clusters are coming soon!</p>
             </div>
             {% endfor %}
         </div>
     </div>
 </section>
 
-<a href="https://wa.me/91XXXXXXXXXX" class="btn-wa-float d-md-none shadow-lg">
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-8">
+
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
+                    Local Businesses & Creators
+                </span>
+
+                <h2 class="fw-bold mb-3">
+                    Sell Your Products On GramaCart
+                </h2>
+
+                <p class="text-muted mb-4">
+                    Do you make homemade foods, handicrafts, bangles, snacks,
+                    sweets, tailoring products or run a cloud kitchen?
+                    Reach more customers through GramaCart and grow your business
+                    in your village and nearby areas.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-basket2-fill me-2"></i>
+                        Homemade Foods
+                    </span>
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-cup-hot-fill me-2"></i>
+                        Snacks & Sweets
+                    </span>
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-shop me-2"></i>
+                        Cloud Kitchen
+                    </span>
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-gem me-2"></i>
+                        Handmade Bangles
+                    </span>
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-palette-fill me-2"></i>
+                        Handicrafts
+                    </span>
+
+                    <span class="vendor-tag">
+                        <i class="bi bi-scissors me-2"></i>
+                        Tailoring Products
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+
+                <a href="{% url 'seller_application' %}"
+                   class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-shop me-2"></i>
+                    Sell on GramaCart
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<section id="partner" class="py-5">
+    <div class="container">
+        <div class="cta-box text-center">
+            <h2 class="fw-bold mb-3">
+                Start A GramaCart Hub In Your Village
+            </h2>
+            <p>
+                Become a local hub partner and build a business in your community.
+            </p>
+            <p class="mb-4">
+
+                Serve your community, create local jobs
+                and build a profitable village business.
+
+            </p>
+            <a href="#" class="btn btn-light btn-lg">
+                Become Hub Partner
+            </a>
+        </div>
+    </div>
+</section>
+
+<a href="https://wa.me/919701969272" class="btn-wa-float">
     <i class="bi bi-whatsapp"></i>
 </a>
 
 <style>
-    .hover-up { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
-    .hover-up:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
-    
-    .btn-navy-sm { background-color: var(--navy); color: white; border: none; transition: 0.3s; font-size: 0.85rem; }
-    .btn-navy-sm:hover { background-color: var(--electric-blue); color: white; }
-    
-    .btn-wa-float {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #25d366;
-        color: white;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        z-index: 1050;
-        text-decoration: none;
-    }
+    body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+}
 
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); }
-    .rounded-5 { border-radius: 2rem !important; }
-    .fw-800 { font-weight: 800; }
-    .tracking-wider { letter-spacing: 0.05em; }
+.category-card,
+.product-card,
+.step-card{
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:24px;
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
+    transition:.3s;
+}
 
-    @media (max-width: 768px) {
-        .display-4 { font-size: 2.25rem; }
-        .card-body { padding: 1rem !important; }
-    }
+.category-card:hover,
+.product-card:hover,
+.step-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 25px 50px rgba(15,23,42,.10);
+}
+.category-img{
+    width:90px;
+    height:90px;
+    object-fit:contain;
+}
+
+.product-image{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+}
+
+.step-image{
+    width:100%;
+    aspect-ratio:16/10;
+    object-fit:cover;
+}
+.hero-section{background:linear-gradient(180deg,#fff,#f8fafc);}
+.hero-badge{background:#ecfdf5;color:#059669;padding:10px 16px;border-radius:50px;}
+.hero-image{border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.12);}
+
+.category-card,.step-card,.product-card{
+background:#fff;border-radius:24px;padding:24px;
+box-shadow:0 10px 30px rgba(15,23,42,.06);
+text-align:center;height:100%;transition:.3s;
+}
+.category-card:hover,.step-card:hover,.product-card:hover{
+transform:translateY(-6px);
+}
+.category-card i{
+font-size:2rem;color:#059669;display:block;margin-bottom:12px;
+}
+.product-image{
+width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;
+}
+.cta-box{
+background:#059669;color:#fff;padding:60px 30px;border-radius:30px;
+}
+.btn-wa-float{
+position:fixed;bottom:20px;right:20px;width:60px;height:60px;
+background:#25D366;color:#fff;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:28px;z-index:1000;text-decoration:none;
+}
+@media(max-width:768px){
+.hero-section{text-align:center;}
+}
+.vendor-tag{
+    display:inline-flex;
+    align-items:center;
+    padding:10px 16px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    font-size:.9rem;
+    font-weight:600;
+    color:#374151;
+    box-shadow:0 4px 12px rgba(15,23,42,.05);
+    transition:.3s;
+}
+
+.vendor-tag:hover{
+    transform:translateY(-2px);
+    border-color:#16a34a;
+    color:#16a34a;
+}
+
+
 </style>
+
 {% endblock %}

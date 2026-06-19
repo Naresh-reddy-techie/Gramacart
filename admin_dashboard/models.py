@@ -136,8 +136,12 @@ class StockLog(models.Model):
 
   
 #============================================================
+from django.contrib.auth.models import User
+
+
 class DeliveryHub(models.Model):
     name = models.CharField(max_length=100)
+    owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="owned_hubs",null=True,blank=True)
     state = models.CharField(max_length=100,default="Andhra Pradesh",db_index=True)
     district = models.CharField(max_length=100,db_index=True)
     mandal = models.CharField(max_length=100,db_index=True)
@@ -213,6 +217,58 @@ class ShippingCost(models.Model):
     def __str__(self):
         return f"{self.delivery_hub.name} | {self.min_distance_km}-{self.max_distance_km} km | ₹{self.cost}"
 #=========================================================================
+
+from django.db import models
+
+class SellerApplication(models.Model):
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    BUSINESS_TYPES = [
+        ('HOME_MADE', 'Home Made Products'),
+        ('CRAFTS', 'Handicrafts'),
+        ('FOOD', 'Food Business'),
+        ('KIRANA', 'Retail Shop'),
+        ('OTHER', 'Other'),
+    ]
+
+    owner_name = models.CharField(max_length=150)
+
+    phone = models.CharField(max_length=15)
+
+    email = models.EmailField(blank=True, null=True)
+
+    village = models.CharField(max_length=150)
+
+    business_name = models.CharField(max_length=150)
+
+    business_type = models.CharField(
+        max_length=30,
+        choices=BUSINESS_TYPES
+    )
+
+    description = models.TextField(blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING'
+    )
+
+    hub = models.ForeignKey('DeliveryHub',on_delete=models.SET_NULL,null=True,blank=True,related_name='seller_applications')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.business_name} ({self.status})"
+
+
+
+
 #Base of everything (ledger,dispatch,profit)
 
 class Shop(models.Model):
@@ -221,6 +277,7 @@ class Shop(models.Model):
         ('DARK_STORE','Dark Store'),
         ('WAREHOUSE','Warehouse')
     ]
+    seller_application = models.OneToOneField('SellerApplication',on_delete=models.SET_NULL,null=True,blank=True,related_name='shop')
     name = models.CharField(max_length=150)
     shop_type = models.CharField(max_length=25,choices =SHOP_TYPES,db_index=True)
     hub = models.ForeignKey('DeliveryHub',on_delete=models.CASCADE,related_name='shops',db_index=True)

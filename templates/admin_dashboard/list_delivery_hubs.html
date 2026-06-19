@@ -158,6 +158,10 @@
                         </th>
 
                         <th class="py-3 small text-muted text-uppercase fw-bold">
+                            Owner
+                        </th>
+
+                        <th class="py-3 small text-muted text-uppercase fw-bold">
                             Location
                         </th>
 
@@ -213,6 +217,27 @@
                                 </div>
 
                             </div>
+
+                        </td>
+                        <td>
+
+                            {% if hub.owner %}
+
+                                <div class="fw-semibold text-dark">
+                                    {{ hub.owner.get_full_name|default:hub.owner.username }}
+                                </div>
+
+                                <small class="text-muted">
+                                    {{ hub.owner.username }}
+                                </small>
+
+                            {% else %}
+
+                                <span class="badge bg-warning-subtle text-warning">
+                                    Not Assigned
+                                </span>
+
+                            {% endif %}
 
                         </td>
 

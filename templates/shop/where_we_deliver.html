@@ -475,21 +475,24 @@
 
         <div class="hero-badge">
 
-            <i class="bi bi-lightning-charge-fill"></i>
+            
 
-            Hyperlocal Rural Delivery
+            ⚡ Fast Delivery Through Local Village Hubs
 
         </div>
 
         <!-- TITLE -->
 
         <div class="title">
-            Where should we deliver your groceries?
+            Where Should We Deliver?
         </div>
-
+        <div class="small text-danger mt-3">
+            <i class="bi bi-info-circle me-1"></i>
+            Products and availability may vary by delivery area.
+        </div>
         <div class="subtitle">
 
-            Choose your current location or select a delivery hub remotely for family and friends.
+            Order for yourself or send essentials to your family by selecting a delivery location.
 
         </div>
 
@@ -509,7 +512,7 @@
                 <div>
 
                     <div class="btn-title">
-                        Use Current Location
+                        Use My Location
                     </div>
 
                     <div class="btn-sub">
@@ -541,11 +544,11 @@
                 <div>
 
                     <div class="btn-title">
-                        Ordering For Someone?
+                        Order For Family & Friends?
                     </div>
 
                     <div class="btn-sub">
-                        Select delivery hub manually
+                        Select a village and delivery hub manually
                     </div>
 
                 </div>
@@ -555,6 +558,10 @@
             <i class="bi bi-chevron-right"></i>
 
         </button>
+        <div class="text-center mt-4 small text-muted">
+            <i class="bi bi-shield-check text-success"></i>
+            Trusted local hubs • Fast delivery • Secure ordering
+        </div>
 
         <!-- STATUS -->
 
@@ -588,8 +595,7 @@
 
         <div class="footer-note">
 
-            GramaCart connects villages and semi-urban regions through scalable smart delivery hubs.
-
+            Fast delivery from trusted local village hubs.
         </div>
 
     </div>
@@ -748,7 +754,8 @@
                     class="submit-btn"
                     id="submitBtn"
                 >
-                    Continue To Shop
+                    <i class="bi bi-cart3 me-2"></i>
+                        Continue To Shop
                 </button>
 
             </div>
@@ -1104,7 +1111,7 @@ function detectLocation(){
                     "status-box status-success";
 
                 statusTitle.textContent =
-                    "Delivery Available ✔";
+                    "Great News! We Deliver Here 🎉";
 
                 statusSub.innerHTML = `
                     📍 Hub: <b>${data.hub_name}</b><br>

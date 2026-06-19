@@ -1,0 +1,354 @@
+{% extends "hub_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}
+Edit Delivery Partner
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.page-title{
+    font-size:1.6rem;
+    font-weight:900;
+    color:#111827;
+}
+
+.page-subtitle{
+    color:#6b7280;
+    margin-top:4px;
+}
+
+.card-box{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.04);
+}
+
+.info-banner{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:20px;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px;
+}
+
+.info-label{
+    font-size:.75rem;
+    font-weight:800;
+    color:#64748b;
+}
+
+.info-value{
+    font-weight:900;
+    color:#111827;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+label{
+    font-size:.85rem;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+input,
+select{
+    height:48px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    padding:0 14px;
+    outline:none;
+}
+
+input:focus,
+select:focus{
+    border-color:#2563eb;
+}
+
+.disabled{
+    background:#f3f4f6;
+}
+
+.actions{
+    display:flex;
+    gap:12px;
+    margin-top:24px;
+}
+
+.btn-save{
+    background:#111827;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:12px 22px;
+    font-weight:800;
+}
+
+.btn-cancel{
+    background:#f3f4f6;
+    color:#111827;
+    text-decoration:none;
+    border-radius:12px;
+    padding:12px 22px;
+    font-weight:800;
+}
+
+.status-toggle{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:8px;
+}
+
+.status-toggle input{
+    width:18px;
+    height:18px;
+}
+
+@media(max-width:768px){
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="page-title">
+            Edit Delivery Partner
+        </div>
+
+        <div class="page-subtitle">
+            Update rider information and availability.
+        </div>
+
+    </div>
+
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <div class="card-box">
+
+        <div class="info-banner">
+
+            <div class="info-grid">
+
+                <div>
+                    <div class="info-label">HUB</div>
+                    <div class="info-value">
+                        {{ hub.name }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="info-label">USERNAME</div>
+                    <div class="info-value">
+                        {{ rider.user.username }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="info-label">ONLINE</div>
+                    <div class="info-value">
+                        {% if rider.is_online %}
+                            Online
+                        {% else %}
+                            Offline
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+                    First Name
+                </label>
+
+                <input
+                    type="text"
+                    name="first_name"
+                    value="{{ rider.user.first_name }}"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Last Name
+                </label>
+
+                <input
+                    type="text"
+                    name="last_name"
+                    value="{{ rider.user.last_name }}"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    value="{{ rider.user.username }}"
+                    class="disabled"
+                    disabled
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Phone Number
+                </label>
+
+                <input
+                    type="text"
+                    name="phone_number"
+                    value="{{ rider.phone_number }}"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Vehicle Type
+                </label>
+
+                <select name="vehicle_type">
+
+                    {% for value,label in vehicle_choices %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if rider.vehicle_type == value %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Rider Status
+                </label>
+
+                <div class="status-toggle">
+
+                    <input
+                        type="checkbox"
+                        name="is_active"
+                        {% if rider.is_active %}
+                        checked
+                        {% endif %}
+                    >
+
+                    <span>
+                        Active Rider
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <button
+                type="submit"
+                class="btn-save"
+            >
+                Update Rider
+            </button>
+
+            <a
+                href="{% url 'hub_rider_list' %}"
+                class="btn-cancel"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+</div>
+
+{% endblock %}

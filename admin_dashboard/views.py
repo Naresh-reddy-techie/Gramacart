@@ -332,8 +332,9 @@ def dashboard(request):
         'admin_dashboard/dashboard.html',
         context
     )
-#================================================
 
+
+#===================================================
 
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
@@ -1325,56 +1326,34 @@ def admin_order_detail_json(request, order_number):
     return JsonResponse(serialize_order(order))
 
 
+from shop.services.order_workflow import OrderWorkflowService
+
 @staff_member_required
 @require_POST
 def mark_order_as_packed(request, order_number):
 
-    order = get_object_or_404(
-        Order,
-        order_number=order_number
-    )
+    try:
 
-    # ==========================================
-    # ORDER STATUS
-    # ==========================================
+        order = get_object_or_404(
+            Order,
+            order_number=order_number
+        )
 
-    order.status = "packed"
+        OrderWorkflowService.mark_packed(
+            order
+        )
 
-    order.save(
-        update_fields=[
-            "status",
-            "updated_at"
-        ]
-    )
+        return JsonResponse({
+            "success": True,
+            "message": "Order packed successfully"
+        })
 
-    # ==========================================
-    # DELIVERY PREPARATION
-    # ==========================================
-
-    from delivery_portal.models import Delivery
-    from delivery_portal.utils import prepare_delivery_for_radar
-
-    delivery, created = Delivery.objects.get_or_create(
-        order=order
-    )
-
-    success = prepare_delivery_for_radar(
-        delivery.id
-    )
-
-    if not success:
+    except ValueError as e:
 
         return JsonResponse({
             "success": False,
-            "message": "Delivery radar preparation failed"
+            "message": str(e)
         }, status=400)
-
-    return JsonResponse({
-        "success": True,
-        "message": "Order packed successfully"
-    })
-
-
 
 from shop.utils import get_route_data
 @staff_member_required
@@ -1393,62 +1372,30 @@ def assign_rider_ajax(request):
         id=data["delivery_boy_id"]
     )
 
-    delivery = OrderService.assign_rider(
-        order,
-        profile
-    )
-
-    # =====================================================
-    # ETA CALCULATION
-    # =====================================================
-
-    route_data = None
-
     try:
 
-        # HUB LOCATION
-        start_lat = order.hub.latitude
-        start_lng = order.hub.longitude
-
-        # CUSTOMER LOCATION
-        end_lat = order.address.latitude
-        end_lng = order.address.longitude
-
-        route_data = get_route_data(
-            start_lat=start_lat,
-            start_lng=start_lng,
-            end_lat=end_lat,
-            end_lng=end_lng
+        delivery = OrderWorkflowService.assign_rider(
+            order,
+            profile
         )
 
-    except Exception:
-        pass
+        return JsonResponse({
+            "success": True,
+            "earning": float(
+                delivery.rider_earning
+            ),
+            "eta_minutes": order.estimated_eta_minutes,
+            "distance_km": float(
+                order.estimated_distance_km or 0
+            )
+        })
 
-    # =====================================================
-    # UPDATE ORDER
-    # =====================================================
+    except ValueError as e:
 
-    order.status = "assigned"
-
-    if route_data:
-
-        order.estimated_distance_km = route_data["distance_km"]
-
-        order.estimated_eta_minutes = route_data["eta_minutes"]
-
-    order.save(update_fields=[
-        "status",
-        "estimated_distance_km",
-        "estimated_eta_minutes",
-        "updated_at"
-    ])
-
-    return JsonResponse({
-        "success": True,
-        "earning": float(delivery.rider_earning),
-        "eta_minutes": order.estimated_eta_minutes,
-        "distance_km": float(order.estimated_distance_km or 0)
-    })
+        return JsonResponse({
+            "success": False,
+            "message": str(e)
+        }, status=400)
 
 
 @staff_member_required
@@ -1459,11 +1406,26 @@ def reject_order_ajax(request):
 
     order = get_object_or_404(Order, order_number=data.get("order_number"))
 
-    order.status = "declined"
-    order.rejection_reason = data.get("reason", "No reason provided")
-    order.save(update_fields=["status", "rejection_reason", "updated_at"])
+    try:
 
-    return JsonResponse({"success": True})
+        OrderWorkflowService.reject_order(
+            order,
+            data.get(
+                "reason",
+                "No reason provided"
+            )
+        )
+
+        return JsonResponse({
+            "success": True
+        })
+
+    except ValueError as e:
+
+        return JsonResponse({
+            "success": False,
+            "message": str(e)
+        }, status=400)
 
 from .services.order_service import InvoiceService,PDFService
 from django.http import FileResponse

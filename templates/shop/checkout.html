@@ -209,7 +209,7 @@
 <input type="hidden" name="address_id" id="address_id">
 <input type="hidden" name="payment_method" id="payment_method">
 <input type="hidden" name="variant_id" value="{{ variant.id }}">
-
+<input type="hidden" name="next" value="{{ next }}">
 <!-- LEFT -->
 <div>
 
@@ -298,7 +298,7 @@
             </div>
 
             <a
-                href="{% url 'address_create' %}"
+                href="{% url 'address_create' %}?next={{ next }}"
                 class="add-address-btn"
             >
                 + Add New

@@ -4,16 +4,38 @@
 {% block title %}Checkout | GramaCart{% endblock %}
 
 {% block extra_css %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 
 :root{
-    --primary:#10B981;
-    --navy:#0F172A;
-    --bg:#F8FAFC;
-    --border:#E2E8F0;
-    --muted:#64748B;
-    --danger:#EF4444;
+    --primary:#0E9F6E;
+    --primary-dark:#065F46;
+    --primary-soft:#ECFDF5;
+    --primary-soft-border:#D1FAE8;
+
+    --marigold:#F59E0B;
+    --marigold-soft:#FFFBEB;
+    --marigold-soft-border:#FDE7BD;
+
+    --danger:#C2410C;
+    --danger-soft:#FFF1EC;
+    --danger-soft-border:#FFE0D1;
+
+    --dark:#1C1917;
+    --muted:#78716C;
+    --muted-soft:#A8A29E;
+    --border:#EDE6D8;
+    --border-soft:#F3EEE3;
+    --bg:#FBF8F3;
+    --card:#FFFFFF;
+
     --bottom-nav-height:80px;
+
+    --shadow-sm:0 4px 14px rgba(28,25,23,0.05);
+    --shadow-md:0 14px 32px rgba(28,25,23,0.09);
 }
 
 /* =========================================
@@ -23,6 +45,8 @@
 body{
     background:var(--bg);
     padding-bottom:220px;
+    font-family:'Inter',sans-serif;
+    color:var(--dark);
 }
 
 /* =========================================
@@ -36,10 +60,10 @@ body{
     right:0;
     z-index:1200;
 
-    background:rgba(255,255,255,0.96);
+    background:rgba(255,255,255,0.95);
     backdrop-filter:blur(12px);
 
-    border-bottom:1px solid var(--border);
+    border-bottom:1px solid var(--border-soft);
 
     padding:14px 16px;
 }
@@ -54,16 +78,26 @@ body{
 }
 
 .header-title{
-    font-size:1.15rem;
-    font-weight:900;
-    color:var(--navy);
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.18rem;
+    font-weight:700;
+    color:var(--dark);
 }
 
 .back-btn{
     text-decoration:none;
-    color:var(--navy);
-    font-weight:800;
-    font-size:0.9rem;
+    color:var(--muted);
+    font-weight:700;
+    font-size:0.85rem;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    padding:8px 12px;
+    border-radius:999px;
+    background:var(--bg);
+    border:1px solid var(--border-soft);
 }
 
 /* =========================================
@@ -83,7 +117,7 @@ body{
 ========================================= */
 
 .section-card{
-    background:#fff;
+    background:var(--card);
 
     border-radius:24px;
 
@@ -91,17 +125,26 @@ body{
 
     margin-bottom:16px;
 
-    border:1px solid rgba(0,0,0,0.05);
+    border:1px solid var(--border-soft);
 
-    box-shadow:0 6px 24px rgba(15,23,42,0.05);
+    box-shadow:var(--shadow-sm);
 }
 
 .section-title{
+    font-family:'Baloo 2',sans-serif;
     font-size:1rem;
-    font-weight:900;
-    color:var(--navy);
+    font-weight:700;
+    color:var(--dark);
 
     margin-bottom:16px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.section-title i{
+    color:var(--primary-dark);
 }
 
 /* =========================================
@@ -109,39 +152,77 @@ body{
 ========================================= */
 
 .address-card{
-    border:2px solid #F1F5F9;
+    border:1.5px solid var(--border-soft);
 
     border-radius:18px;
 
-    padding:16px;
+    padding:14px 16px;
 
     cursor:pointer;
 
-    margin-bottom:12px;
+    margin-bottom:10px;
 
     position:relative;
 
-    transition:0.2s ease;
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+
+    transition:0.15s ease;
 }
 
-.address-card:last-child{
+.address-card:last-of-type{
     margin-bottom:0;
+}
+
+.address-card:hover{
+    border-color:var(--primary-soft-border);
 }
 
 .address-card.active{
     border-color:var(--primary);
-    background:#ECFDF5;
+    background:var(--primary-soft);
+}
+
+.address-radio-dot{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    border:2px solid var(--border);
+    background:#fff;
+    flex-shrink:0;
+    margin-top:2px;
+    transition:0.15s ease;
+    position:relative;
+}
+
+.address-card.active .address-radio-dot{
+    border-color:var(--primary);
+    background:var(--primary);
+}
+
+.address-card.active .address-radio-dot::after{
+    content:"";
+    position:absolute;
+    inset:4px;
+    border-radius:50%;
+    background:#fff;
+}
+
+.address-body{
+    flex-grow:1;
 }
 
 .address-name{
-    font-weight:900;
-    color:var(--navy);
-    margin-bottom:6px;
+    font-weight:800;
+    color:var(--dark);
+    margin-bottom:4px;
+    font-size:0.92rem;
 }
 
 .address-text{
     color:var(--muted);
-    font-size:0.9rem;
+    font-size:0.84rem;
     line-height:1.5;
 }
 
@@ -150,9 +231,9 @@ body{
     top:14px;
     right:14px;
 
-    color:var(--primary);
+    color:var(--primary-dark);
 
-    font-size:1.1rem;
+    font-size:1.05rem;
 
     display:none;
 }
@@ -170,19 +251,45 @@ body{
     align-items:center;
     gap:12px;
 
-    padding:14px 0;
+    padding:14px 12px;
 
-    border-bottom:1px solid #F1F5F9;
+    border:1.5px solid var(--border-soft);
+    border-radius:16px;
+
+    margin-bottom:10px;
+
+    cursor:pointer;
+
+    transition:0.15s ease;
 }
 
 .payment-option:last-child{
-    border-bottom:none;
+    margin-bottom:0;
+}
+
+.payment-option:hover{
+    border-color:var(--primary-soft-border);
+}
+
+.payment-option:has(input:checked){
+    border-color:var(--primary);
+    background:var(--primary-soft);
+}
+
+.payment-option input[type="radio"]{
+    width:19px;
+    height:19px;
+    accent-color:var(--primary);
+    flex-shrink:0;
+    cursor:pointer;
 }
 
 .payment-option label{
     font-weight:700;
-    color:var(--navy);
+    color:var(--dark);
     cursor:pointer;
+    font-size:0.9rem;
+    flex-grow:1;
 }
 
 /* =========================================
@@ -193,14 +300,20 @@ body{
     display:flex;
     align-items:center;
     justify-content:space-between;
+    gap:10px;
 
-    padding:10px 0;
+    padding:11px 0;
 
-    border-bottom:1px solid #F8FAFC;
+    border-bottom:1px solid var(--border-soft);
 }
 
 .checkout-item:last-child{
     border-bottom:none;
+    padding-bottom:0;
+}
+
+.checkout-item:first-child{
+    padding-top:0;
 }
 
 .item-left{
@@ -209,18 +322,22 @@ body{
 }
 
 .item-name{
-    font-weight:800;
-    color:var(--navy);
+    font-weight:700;
+    color:var(--dark);
+    font-size:0.9rem;
 }
 
 .item-meta{
-    font-size:0.85rem;
+    font-size:0.78rem;
     color:var(--muted);
+    margin-top:2px;
 }
 
 .item-price{
-    font-weight:900;
-    color:var(--primary);
+    font-weight:800;
+    color:var(--dark);
+    font-size:0.92rem;
+    white-space:nowrap;
 }
 
 /* =========================================
@@ -234,24 +351,24 @@ body{
 
     margin-bottom:12px;
 
-    font-size:0.95rem;
+    font-size:0.88rem;
 }
 
 .summary-label{
     color:var(--muted);
-    font-weight:700;
+    font-weight:600;
 }
 
 .summary-value{
-    color:var(--navy);
-    font-weight:800;
+    color:var(--dark);
+    font-weight:700;
 }
 
 .total-row{
-    border-top:1px dashed var(--border);
+    border-top:1.5px dashed var(--border);
 
     padding-top:14px;
-    margin-top:14px;
+    margin-top:4px;
 
     display:flex;
     align-items:center;
@@ -259,15 +376,17 @@ body{
 }
 
 .total-label{
-    font-size:1rem;
-    font-weight:900;
-    color:var(--navy);
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.02rem;
+    font-weight:700;
+    color:var(--dark);
 }
 
 .total-value{
-    font-size:1.3rem;
-    font-weight:900;
-    color:var(--navy);
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.35rem;
+    font-weight:800;
+    color:var(--dark);
 }
 
 /* =========================================
@@ -275,24 +394,27 @@ body{
 ========================================= */
 
 .service-alert{
-    display:none;
-
     margin-top:14px;
 
-    background:#FEF2F2;
+    background:var(--danger-soft);
+    border:1px solid var(--danger-soft-border);
 
-    color:#B91C1C;
+    color:var(--danger);
 
     border-radius:14px;
 
     padding:12px 14px;
 
-    font-size:0.9rem;
+    font-size:0.85rem;
     font-weight:700;
+
+    display:none;
+    align-items:center;
+    gap:8px;
 }
 
 .service-alert.show{
-    display:block;
+    display:flex;
 }
 
 /* =========================================
@@ -313,7 +435,7 @@ body{
 
     backdrop-filter:blur(12px);
 
-    border-top:1px solid var(--border);
+    border-top:1px solid var(--border-soft);
 
     padding:16px;
 }
@@ -328,9 +450,9 @@ body{
 
     border:none;
 
-    border-radius:20px;
+    border-radius:18px;
 
-    background:var(--navy);
+    background:linear-gradient(150deg,var(--dark),#3a3531);
     color:#fff;
 
     padding:16px 18px;
@@ -339,15 +461,18 @@ body{
     align-items:center;
     justify-content:space-between;
 
-    font-size:1rem;
-    font-weight:900;
+    font-size:0.95rem;
+    font-weight:800;
 
-    transition:0.2s ease;
+    box-shadow:var(--shadow-md);
+
+    transition:0.15s ease;
 }
 
 .place-btn:disabled{
-    opacity:0.6;
+    opacity:0.55;
     cursor:not-allowed;
+    box-shadow:none;
 }
 
 .place-btn:active{
@@ -361,8 +486,10 @@ body{
 
     border-radius:999px;
 
-    font-size:0.92rem;
+    font-size:0.88rem;
+    font-weight:800;
 }
+
 /* =========================================
    ADD ADDRESS BUTTON
 ========================================= */
@@ -370,27 +497,29 @@ body{
 .add-address-btn{
     text-decoration:none;
 
-    background:#ECFDF5;
-    color:#047857;
+    background:var(--primary-soft);
+    color:var(--primary-dark);
+    border:1px solid var(--primary-soft-border);
 
     padding:8px 14px;
 
     border-radius:999px;
 
-    font-size:0.82rem;
+    font-size:0.78rem;
     font-weight:800;
 
     display:inline-flex;
     align-items:center;
     gap:6px;
 
-    transition:0.2s ease;
+    transition:0.15s ease;
 }
 
 .add-address-btn:hover{
     background:#D1FAE5;
-    color:#065F46;
+    color:var(--primary-dark);
 }
+
 /* =========================================
    MOBILE
 ========================================= */
@@ -408,13 +537,13 @@ body{
     }
 
     .place-btn{
-        border-radius:18px;
+        border-radius:16px;
         padding:15px;
-        font-size:0.95rem;
+        font-size:0.9rem;
     }
 
     .place-amt{
-        font-size:0.85rem;
+        font-size:0.82rem;
     }
 }
 
@@ -457,11 +586,11 @@ body{
         <div class="d-flex justify-content-between align-items-center mb-3">
 
             <div class="section-title mb-0">
+                <i class="bi bi-geo-alt-fill"></i>
                 Delivery Address
             </div>
 
-            <a
-                href="{% url 'address_create' %}"
+            <a href="{% url 'address_create' %}?next={{ request.get_full_path }}"
                 class="add-address-btn">
 
                 <i class="bi bi-plus-circle"></i>
@@ -478,16 +607,22 @@ body{
             class="address-card"
             data-id="{{ address.id }}">
 
+            <div class="address-radio-dot"></div>
+
+            <div class="address-body">
+
+                <div class="address-name">
+                    {{ address.recipient_name }}
+                </div>
+
+                <div class="address-text">
+                    {{ address.address_line }},
+                    {{ address.city }}
+                </div>
+
+            </div>
+
             <i class="bi bi-check-circle-fill check-icon"></i>
-
-            <div class="address-name">
-                {{ address.recipient_name }}
-            </div>
-
-            <div class="address-text">
-                {{ address.address_line }},
-                {{ address.city }}
-            </div>
 
         </div>
 
@@ -514,6 +649,7 @@ body{
     <div class="section-card">
 
         <div class="section-title">
+            <i class="bi bi-wallet2"></i>
             Payment Method
         </div>
 
@@ -545,6 +681,7 @@ body{
     <div class="section-card">
 
         <div class="section-title">
+            <i class="bi bi-basket3-fill"></i>
             Basket Items
         </div>
 
@@ -582,6 +719,7 @@ body{
     <div class="section-card">
 
         <div class="section-title">
+            <i class="bi bi-receipt"></i>
             Price Details
         </div>
 
@@ -637,6 +775,7 @@ body{
             id="service-alert"
             class="service-alert">
 
+            <i class="bi bi-exclamation-triangle-fill"></i>
             Unable to calculate delivery fee.
 
         </div>

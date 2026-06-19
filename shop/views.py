@@ -4,7 +4,7 @@ from django.shortcuts import (
     redirect,
     get_object_or_404,
 )
-
+from django.urls import reverse
 from django.db.models import (
     Q,
     Avg,
@@ -322,6 +322,22 @@ def public_dashboard(request, category_slug=None):
         )
 
     # -----------------------------------------------------
+    # CATALOG VERSION
+    # -----------------------------------------------------
+
+    latest_inventory = (
+        Inventory.objects
+        .order_by("-updated_at")
+        .first()
+    )
+
+    catalog_version = (
+        int(latest_inventory.updated_at.timestamp())
+        if latest_inventory
+        else 0
+    )
+
+    # -----------------------------------------------------
     # CONTEXT
     # -----------------------------------------------------
 
@@ -347,6 +363,8 @@ def public_dashboard(request, category_slug=None):
 
         "star_range": range(1, 6),
 
+        "catalog_version": catalog_version,
+
     }
 
     return render(
@@ -355,6 +373,30 @@ def public_dashboard(request, category_slug=None):
         context
     )
 
+
+#=============================================
+
+from django.http import JsonResponse
+from inventory.models import Inventory
+
+
+def catalog_version(request):
+
+    latest_inventory = (
+        Inventory.objects
+        .order_by("-updated_at")
+        .first()
+    )
+
+    version = (
+        int(latest_inventory.updated_at.timestamp())
+        if latest_inventory
+        else 0
+    )
+
+    return JsonResponse({
+        "catalog_version": version
+    })
 
 # =========================================================
 # WHERE SHOULD WE DELIVER
@@ -1229,9 +1271,15 @@ def address_form(request, pk=None):
                 "Address saved successfully."
             )
 
-            return redirect(
-                "address_list"
-            )
+            next_page = request.POST.get("next") or request.GET.get("next")
+
+            if next_page in [None, "", "None", "null", "undefined"]:
+                next_page = None
+
+            if next_page and next_page.startswith("/"):
+                return redirect(next_page)
+
+            return redirect("address_list")
 
         logger.error(
             "FORM ERRORS => %s",
@@ -2047,10 +2095,19 @@ from payments.models import Payment
 # BUY NOW CHECKOUT
 # =========================================================
 
+def safe_redirect(next_page, fallback):
+    if next_page and next_page.startswith("/"):
+        return redirect(next_page)
+    return redirect(fallback)
+
 @login_required
 def buy_now(request, product_id):
 
     user = request.user
+    next_page = request.GET.get("next") or request.POST.get("next")
+
+    if not next_page or next_page in ["None", "null", "undefined"]:
+        next_page = request.get_full_path() # 🔥 fallback to BUY NOW page itself
 
     # =====================================================
     # ACTIVE HUB (SESSION SOURCE OF TRUTH)
@@ -2285,7 +2342,8 @@ def buy_now(request, product_id):
                 "user_addresses": user_addresses,
                 "payment_methods": payment_methods,
                 "active_hub": active_hub,
-                "order_totals": order_totals
+                "order_totals": order_totals,
+                "next": next_page, 
             }
         )
 
@@ -2307,6 +2365,8 @@ def buy_now(request, product_id):
             request,
             "Please select address and payment method."
         )
+        if next_page and next_page.startswith("/"):
+            return redirect(next_page)
 
         return redirect(
             "buy_now",
@@ -3325,7 +3385,7 @@ from inventory.models import Inventory
 
 from .models import CartItem
 
-
+"""
 # =========================================================
 # CART TOTALS ENGINE
 # =========================================================
@@ -3375,6 +3435,57 @@ def get_cart_totals(user, request):
 
     return {
         "sub_total": sub_total,
+        "cart_count": cart_items.count()
+    }
+
+"""
+
+def get_cart_totals(user, request):
+
+    active_hub_id = request.session.get("active_hub_id")
+
+    if not active_hub_id:
+        return {
+            "sub_total": Decimal("0.00"),
+            "shipping_cost": Decimal("0.00"),
+            "final_total": Decimal("0.00"),
+            "cart_count": 0
+        }
+
+    cart_items = CartItem.objects.select_related(
+        "product",
+        "variant"
+    ).filter(user=user)
+
+    sub_total = Decimal("0.00")
+
+    for item in cart_items:
+
+        inventory = Inventory.objects.select_related(
+            "shop",
+            "shop__hub"
+        ).filter(
+            variant=item.variant,
+            stock__gt=0,
+            selling_price__isnull=False,
+            shop__is_active=True,
+            shop__hub_id=active_hub_id
+        ).order_by("selling_price").first()
+
+        if not inventory:
+            continue
+
+        item_price = Decimal(str(inventory.selling_price))
+        item_total = item_price * item.quantity
+        sub_total += item_total
+
+    shipping_cost = Decimal("0.00")  # adjust later if needed
+    final_total = sub_total + shipping_cost
+
+    return {
+        "sub_total": sub_total,
+        "shipping_cost": shipping_cost,
+        "final_total": final_total,
         "cart_count": cart_items.count()
     }
 
@@ -3687,7 +3798,7 @@ def update_cart_quantity(request, cart_item_id):
 
     try:
 
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode("utf-8"))
 
         new_quantity = int(
             data.get("quantity", 1)
@@ -3976,10 +4087,6 @@ from .models import (
 
 from .utils import calculate_shipping_cost
 
-
-# =========================================================
-# CART CHECKOUT
-# =========================================================
 # =========================================================
 # CART CHECKOUT (PRODUCTION READY)
 # =========================================================
@@ -4070,6 +4177,19 @@ def cart_checkout(request):
             "-id"
         )
     )
+    if not user_addresses.exists():
+
+        messages.info(
+            request,
+            "Please add a delivery address."
+        )
+
+        return redirect(
+            f"{reverse('address_create')}?next={request.get_full_path()}"
+        )
+    
+    for item in cart_items:
+        item.line_total = Decimal(str(item.unit_price or 0)) * item.quantity
 
     # =====================================================
     # PAYMENT METHODS

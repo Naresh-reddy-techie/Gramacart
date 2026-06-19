@@ -3,6 +3,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.homepage, name='homepage'),
+    path('', views.homepage, name='home'),
     path('sw.js', (TemplateView.as_view(template_name="sw.js", content_type='application/javascript',)), name='sw.js'),
 ]

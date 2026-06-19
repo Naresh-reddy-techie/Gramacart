@@ -1,0 +1,120 @@
+{% extends 'homepage/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="success-section py-5">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-7">
+
+                <div class="success-card text-center">
+
+                    <div class="success-icon">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+
+                    <h1 class="fw-bold mb-3">
+                        Application Submitted Successfully
+                    </h1>
+
+                    <p class="text-muted mb-4">
+
+                        Thank you for your interest in selling on GramaCart.
+
+                        Our team will review your application and contact you shortly.
+
+                    </p>
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-4">
+                            <div class="process-box">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <p>Review</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="process-box">
+                                <i class="bi bi-telephone"></i>
+                                <p>Contact</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="process-box">
+                                <i class="bi bi-shop"></i>
+                                <p>Start Selling</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <a href="{% url 'homepage' %}"
+                       class="btn btn-success btn-lg">
+
+                        Back To Homepage
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<style>
+
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+.success-section{
+    min-height:70vh;
+    display:flex;
+    align-items:center;
+    background:#f8fafc;
+}
+
+.success-card{
+    background:#fff;
+    padding:60px 40px;
+    border-radius:30px;
+    box-shadow:0 20px 60px rgba(15,23,42,.08);
+}
+
+.success-icon{
+    font-size:5rem;
+    color:#16a34a;
+    margin-bottom:20px;
+}
+
+.process-box{
+    background:#f8fafc;
+    padding:20px;
+    border-radius:18px;
+}
+
+.process-box i{
+    font-size:1.8rem;
+    color:#16a34a;
+    display:block;
+    margin-bottom:10px;
+}
+
+.process-box p{
+    margin:0;
+    font-weight:600;
+}
+
+</style>
+
+{% endblock %}

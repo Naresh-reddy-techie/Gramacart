@@ -1,9 +1,11 @@
 from django.urls import path
 from .import views
-from admin_dashboard import hub_partner_views
+from admin_dashboard import hub_partner_views,seller_application_views
 
 urlpatterns = [
     path('',views.dashboard,name='admin_dashboard'),
+
+
     path('admin/roles/', views.manage_groups, name='manage_groups'),
     path('admin/roles/edit/<int:pk>/', views.edit_group_permissions, name='edit_group_permissions'),
     path('admin/roles/delete/<int:pk>/', views.delete_group, name='delete_group'),
@@ -99,6 +101,17 @@ urlpatterns = [
     path("hub-partners/<int:partner_id>/toggle-status/",hub_partner_views.toggle_hub_partner_status,name="toggle_hub_partner_status"),
 
     path("hub-partners/<int:partner_id>/",hub_partner_views.hub_partner_detail,name="hub_partner_detail"),
+
+
+
+    path("sell-on-gramacart/",seller_application_views.seller_application,name="seller_application"),
+    path('sell-on-gramacart/success/',seller_application_views.seller_success,name='seller_success'),
+    path("seller-applications/",seller_application_views.seller_application_list,name="seller_application_list"),
+    path("seller-applications/<int:pk>/",seller_application_views.seller_application_detail,name="seller_application_detail"),
+
+    path("seller-applications/<int:pk>/approve/",seller_application_views.approve_seller_application,name="approve_seller_application"),
+
+    path("seller-applications/<int:pk>/reject/",seller_application_views.reject_seller_application,name="reject_seller_application"),
 
 ]
 

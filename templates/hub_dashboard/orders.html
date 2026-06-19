@@ -318,10 +318,70 @@ function render(list){
             <div class="meta">📍 ${o.address}</div>
 
             <div class="footer">
-                <div class="total">₹${o.total}</div>
-                <button class="btn view" onclick="alert('Next: Order Drawer')">
-                    View
-                </button>
+
+                <div class="total">
+                    ₹${o.total}
+                </div>
+
+                <div class="actions">
+
+                    ${
+                        o.status_code === "pending"
+                        ?
+                        `
+                        <button
+                            class="btn btn-pack"
+                            onclick="packOrder('${o.order_number}')">
+                            Pack
+                        </button>
+
+                        <button
+                            class="btn btn-reject"
+                            onclick="rejectOrder('${o.order_number}')">
+                            Reject
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                    ${
+                        o.status_code === "packed"
+                        ?
+                        `
+                        <button
+                            class="btn btn-assign"
+                            onclick="assignRider('${o.order_number}')">
+                            Assign Rider
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                    ${
+                        o.status_code === "assigned" ||
+                        o.status_code === "out_for_delivery"
+                        ?
+                        `
+                        <button
+                            class="btn btn-track"
+                            onclick="trackOrder('${o.order_number}')">
+                            Track
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                    <button
+                        class="btn view"
+                        onclick="viewOrder('${o.order_number}')">
+                        View
+                    </button>
+
+                </div>
+
             </div>
 
         </div>

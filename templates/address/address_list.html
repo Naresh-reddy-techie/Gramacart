@@ -12,30 +12,35 @@ GramaCart | My Addresses
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 />
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 
 :root{
-    --primary:#10B981;
-    --primary-dark:#059669;
+    --primary:#0E9F6E;
+    --primary-dark:#065F46;
+    --primary-soft:#ECFDF5;
+    --primary-soft-border:#D1FAE8;
 
-    --navy:#0F172A;
+    --marigold:#F59E0B;
+    --marigold-soft:#FFFBEB;
+    --marigold-soft-border:#FDE7BD;
 
-    --bg:#F8FAFC;
+    --danger:#C2410C;
+    --danger-soft:#FFF1EC;
+    --danger-soft-border:#FFE0D1;
+
+    --dark:#1C1917;
+    --muted:#78716C;
+    --muted-soft:#A8A29E;
+    --border:#EDE6D8;
+    --border-soft:#F3EEE3;
+    --bg:#FBF8F3;
     --card:#FFFFFF;
 
-    --border:#E2E8F0;
-
-    --text:#0F172A;
-    --muted:#64748B;
-
-    --success-bg:#DCFCE7;
-    --success-text:#166534;
-
-    --danger-bg:#FEE2E2;
-    --danger-text:#991B1B;
-
-    --shadow:
-        0 10px 30px rgba(15,23,42,0.05);
+    --shadow-sm:0 4px 14px rgba(28,25,23,0.05);
+    --shadow-md:0 14px 32px rgba(28,25,23,0.09);
 }
 
 /* =========================================================
@@ -44,10 +49,8 @@ BASE
 
 body{
     background:var(--bg);
-    color:var(--text);
-    font-family:
-        "Plus Jakarta Sans",
-        sans-serif;
+    color:var(--dark);
+    font-family:'Inter',sans-serif;
 }
 
 /* =========================================================
@@ -60,36 +63,28 @@ HEADER
     top:0;
     z-index:1000;
 
-    background:rgba(255,255,255,0.96);
+    background:rgba(255,255,255,0.94);
 
     backdrop-filter:blur(10px);
 
-    border-bottom:1px solid var(--border);
+    border-bottom:1px solid var(--border-soft);
 }
 
 .address-header-inner{
 
     max-width:1200px;
-
     margin:auto;
-
     padding:16px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
     gap:12px;
 }
 
 .header-left{
-
     display:flex;
-
     align-items:center;
-
     gap:12px;
 }
 
@@ -101,27 +96,25 @@ HEADER
     border-radius:14px;
 
     background:#fff;
-
-    border:1px solid var(--border);
+    border:1px solid var(--border-soft);
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
     text-decoration:none;
+    color:var(--dark);
 
-    color:var(--navy);
+    box-shadow:var(--shadow-sm);
+    flex-shrink:0;
 }
 
 .page-title{
-
     margin:0;
-
-    font-size:20px;
-
-    font-weight:800;
+    font-family:'Baloo 2',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    color:var(--dark);
 }
 
 .address-count{
@@ -130,15 +123,14 @@ HEADER
 
     border-radius:999px;
 
-    background:#fff;
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
 
-    border:1px solid var(--border);
+    font-size:12.5px;
+    font-weight:800;
+    color:var(--primary-dark);
 
-    font-size:13px;
-
-    font-weight:700;
-
-    color:var(--muted);
+    white-space:nowrap;
 }
 
 /* =========================================================
@@ -146,11 +138,8 @@ WRAPPER
 ========================================================= */
 
 .address-wrapper{
-
     max-width:1200px;
-
     margin:auto;
-
     padding:18px 14px 120px;
 }
 
@@ -159,13 +148,9 @@ GRID
 ========================================================= */
 
 .address-grid{
-
     display:grid;
-
-    grid-template-columns:
-        repeat(auto-fit,minmax(340px,1fr));
-
-    gap:22px;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:20px;
 }
 
 /* =========================================================
@@ -177,26 +162,48 @@ CARD
     position:relative;
 
     background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:28px;
+    border:1px solid var(--border-soft);
+    border-radius:26px;
 
     overflow:hidden;
 
-    box-shadow:var(--shadow);
+    box-shadow:var(--shadow-sm);
 
-    transition:0.25s ease;
+    transition:0.2s ease;
 }
 
 .address-card:hover{
-
-    transform:translateY(-2px);
+    transform:translateY(-3px);
+    box-shadow:var(--shadow-md);
 }
 
 .address-card.default{
+    border-color:var(--primary-soft-border);
+    box-shadow:0 14px 30px rgba(14,159,110,0.10);
+}
 
-    border-color:#10B981;
+.default-ribbon{
+    position:absolute;
+    top:14px;
+    left:-2px;
+    z-index:5;
+
+    background:var(--primary);
+    color:#fff;
+
+    font-size:0.66rem;
+    font-weight:800;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+
+    padding:5px 12px 5px 14px;
+    border-radius:0 8px 8px 0;
+
+    box-shadow:0 4px 10px rgba(14,159,110,0.30);
+
+    display:flex;
+    align-items:center;
+    gap:5px;
 }
 
 /* =========================================================
@@ -208,84 +215,73 @@ TOP BAR
     padding:18px 18px 0;
 
     display:flex;
-
     align-items:flex-start;
-
     justify-content:space-between;
-
     gap:12px;
 }
 
 .type-badge{
 
     display:inline-flex;
-
     align-items:center;
-
     gap:6px;
 
     padding:7px 12px;
 
     border-radius:999px;
 
-    background:#F1F5F9;
-
-    color:#475569;
+    background:var(--bg);
+    border:1px solid var(--border-soft);
+    color:var(--muted);
 
     font-size:11px;
-
     font-weight:800;
-
     text-transform:uppercase;
-
-    letter-spacing:0.5px;
+    letter-spacing:0.4px;
 }
 
 .address-card.default .type-badge{
-
-    background:#ECFDF5;
-
-    color:#047857;
+    background:var(--primary-soft);
+    border-color:var(--primary-soft-border);
+    color:var(--primary-dark);
 }
 
 .card-actions{
-
     display:flex;
-
     align-items:center;
-
     gap:8px;
 }
 
 .action-btn{
 
-    width:40px;
-    height:40px;
+    width:38px;
+    height:38px;
 
-    border-radius:14px;
+    border-radius:13px;
 
-    border:1px solid var(--border);
-
+    border:1px solid var(--border-soft);
     background:#fff;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
-    color:#334155;
-
+    color:var(--muted);
     text-decoration:none;
 
-    transition:0.2s ease;
+    transition:0.15s ease;
 }
 
 .action-btn:hover{
+    background:var(--primary-soft);
+    border-color:var(--primary-soft-border);
+    color:var(--primary-dark);
+}
 
-    background:#F8FAFC;
-
-    transform:translateY(-1px);
+.action-btn.delete:hover{
+    background:var(--danger-soft);
+    border-color:var(--danger-soft-border);
+    color:var(--danger);
 }
 
 /* =========================================================
@@ -293,18 +289,13 @@ CONTENT
 ========================================================= */
 
 .card-content{
-
     padding:16px 18px 18px;
 }
 
 .recipient{
-
     display:flex;
-
     align-items:center;
-
-    gap:10px;
-
+    gap:12px;
     margin-bottom:14px;
 }
 
@@ -315,37 +306,36 @@ CONTENT
 
     border-radius:16px;
 
-    background:#ECFDF5;
-
-    color:#047857;
+    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
+    color:#fff;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
-    font-size:20px;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1.15rem;
+
+    flex-shrink:0;
 }
 
 .recipient-name{
-
     margin:0;
-
-    font-size:18px;
-
-    font-weight:800;
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--dark);
 }
 
 .phone{
-
     margin:2px 0 0;
-
     color:var(--muted);
-
-    font-size:13px;
-
+    font-size:0.8rem;
     font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:5px;
 }
 
 /* =========================================================
@@ -354,27 +344,29 @@ ADDRESS TEXT
 
 .address-box{
 
-    background:#F8FAFC;
-
-    border:1px solid #EEF2F7;
-
-    border-radius:18px;
+    background:var(--bg);
+    border:1px solid var(--border-soft);
+    border-radius:16px;
 
     padding:14px;
+    margin-bottom:14px;
 
-    margin-bottom:16px;
+    display:flex;
+    gap:10px;
+}
+
+.address-box i{
+    color:var(--muted-soft);
+    font-size:0.95rem;
+    margin-top:2px;
+    flex-shrink:0;
 }
 
 .address-line{
-
     margin:0;
-
-    font-size:14px;
-
-    line-height:1.7;
-
-    color:#334155;
-
+    font-size:0.86rem;
+    line-height:1.6;
+    color:var(--dark);
     font-weight:600;
 }
 
@@ -383,16 +375,11 @@ MAP
 ========================================================= */
 
 .address-map{
-
-    height:190px;
-
-    border-radius:22px;
-
+    height:180px;
+    border-radius:18px;
     overflow:hidden;
-
-    border:1px solid var(--border);
-
-    margin-bottom:14px;
+    border:1px solid var(--border-soft);
+    margin-bottom:12px;
 }
 
 /* =========================================================
@@ -401,37 +388,35 @@ STATUS
 
 .delivery-status{
 
-    min-height:48px;
+    min-height:46px;
 
-    border-radius:16px;
+    border-radius:14px;
 
-    padding:12px 14px;
+    padding:11px 14px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     gap:8px;
 
-    font-size:13px;
-
+    font-size:0.78rem;
     font-weight:800;
 }
 
 .status-inside{
-
-    background:var(--success-bg);
-
-    color:var(--success-text);
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
+    color:var(--primary-dark);
 }
 
 .status-outside{
+    background:var(--danger-soft);
+    border:1px solid var(--danger-soft-border);
+    color:var(--danger);
+}
 
-    background:var(--danger-bg);
-
-    color:var(--danger-text);
+.spinner-border{
+    color:var(--muted-soft);
 }
 
 /* =========================================================
@@ -441,83 +426,72 @@ EMPTY STATE
 .empty-state{
 
     background:#fff;
-
     border-radius:30px;
+    border:1px solid var(--border-soft);
 
-    border:1px solid var(--border);
-
-    padding:80px 24px;
-
+    padding:70px 24px;
     text-align:center;
 
-    box-shadow:var(--shadow);
+    box-shadow:var(--shadow-sm);
 }
 
 .empty-icon{
 
-    width:90px;
-    height:90px;
+    width:84px;
+    height:84px;
 
     margin:auto auto 20px;
 
-    border-radius:28px;
+    border-radius:26px;
 
-    background:#ECFDF5;
-
-    color:#059669;
+    background:var(--primary-soft);
+    color:var(--primary-dark);
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
-    font-size:40px;
+    font-size:2.1rem;
 }
 
 .empty-title{
-
-    font-size:24px;
-
-    font-weight:800;
-
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.45rem;
+    font-weight:700;
     margin-bottom:8px;
+    color:var(--dark);
 }
 
 .empty-text{
-
     color:var(--muted);
-
     max-width:420px;
-
     margin:auto auto 24px;
+    font-size:0.9rem;
 }
 
 .btn-primary-modern{
 
-    min-height:54px;
+    min-height:52px;
 
     padding:0 26px;
 
     border:none;
+    border-radius:16px;
 
-    border-radius:18px;
-
-    background:var(--primary);
-
+    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
     color:#fff;
 
-    font-weight:800;
+    font-weight:700;
+    font-size:0.9rem;
 
     text-decoration:none;
 
     display:inline-flex;
-
     align-items:center;
-
     justify-content:center;
+    gap:9px;
 
-    gap:10px;
+    box-shadow:0 10px 22px rgba(14,159,110,0.26);
 }
 
 /* =========================================================
@@ -529,32 +503,33 @@ FLOAT BUTTON
     position:fixed;
 
     right:20px;
-
     bottom:calc(95px + env(safe-area-inset-bottom));
 
-    width:64px;
-    height:64px;
+    width:60px;
+    height:60px;
 
-    border-radius:24px;
+    border-radius:22px;
 
-    background:var(--primary);
-
+    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
     color:#fff;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
     text-decoration:none;
 
     font-size:24px;
 
-    box-shadow:
-        0 18px 40px rgba(16,185,129,0.35);
+    box-shadow:0 16px 34px rgba(14,159,110,0.34);
 
     z-index:3000;
+
+    transition:0.15s ease;
+}
+
+.btn-add-floating:active{
+    transform:scale(0.93);
 }
 
 /* =========================================================
@@ -567,6 +542,11 @@ LEAFLET
 
 .leaflet-popup-content{
     font-weight:700;
+    font-family:'Inter',sans-serif;
+}
+
+.leaflet-popup-content-wrapper{
+    border-radius:14px;
 }
 
 </style>
@@ -638,6 +618,13 @@ BODY
 
 <div class="address-card {% if address.is_default %}default{% endif %}">
 
+    {% if address.is_default %}
+        <div class="default-ribbon">
+            <i class="bi bi-check-circle-fill"></i>
+            Default
+        </div>
+    {% endif %}
+
     <!-- =================================================
     TOP
     ================================================== -->
@@ -645,10 +632,6 @@ BODY
     <div class="card-top">
 
         <span class="type-badge">
-
-            {% if address.is_default %}
-                <i class="bi bi-check-circle-fill"></i>
-            {% endif %}
 
             {{ address.get_address_type_display }}
 
@@ -665,7 +648,7 @@ BODY
 
             <a
                 href="{% url 'address_delete' address.pk %}"
-                class="action-btn"
+                class="action-btn delete"
             >
                 <i class="bi bi-trash3"></i>
             </a>
@@ -685,7 +668,7 @@ BODY
         <div class="recipient">
 
             <div class="recipient-avatar">
-                <i class="bi bi-geo-alt-fill"></i>
+                {{ address.recipient_name|slice:":1"|upper }}
             </div>
 
             <div>
@@ -695,6 +678,7 @@ BODY
                 </h3>
 
                 <p class="phone">
+                    <i class="bi bi-telephone-fill"></i>
                     {{ address.phone_number }}
                 </p>
 
@@ -705,6 +689,8 @@ BODY
         <!-- address -->
 
         <div class="address-box">
+
+            <i class="bi bi-geo-alt-fill"></i>
 
             <p class="address-line">
 
@@ -880,7 +866,7 @@ MAPS
             [hub.lat, hub.lon],
             {
                 radius:hub.radius,
-                color:"#10B981",
+                color:"#0E9F6E",
                 fillOpacity:0.08,
                 weight:2
             }

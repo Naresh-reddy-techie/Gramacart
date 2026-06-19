@@ -21,150 +21,640 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --navy:#0f172a;
+
+:root{
+
+    /* Brand */
     --brand-green:#059669;
-    --brand-amber:#f59e0b;
-    --slate-200:#e2e8f0;
-    --white:#ffffff;
+    --brand-green-dark:#047857;
+
+    --navy:#0F172A;
+    --slate:#475569;
+
+    --bg:#F8FAFC;
+    --white:#FFFFFF;
+
+    --border:#E2E8F0;
+
+    --success:#10B981;
+    --warning:#F59E0B;
+
+    /* Radius */
+    --radius-sm:12px;
+    --radius-md:16px;
+    --radius-lg:20px;
+
+    /* Shadows */
+    --shadow-sm:0 4px 12px rgba(15,23,42,.06);
+
+    --shadow-md:0 10px 30px rgba(15,23,42,.08);
+
+    --shadow-lg:0 20px 50px rgba(15,23,42,.12);
+
 }
 
-body {
+/* =======================================================
+   GLOBAL
+======================================================= */
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
     font-family:'Plus Jakarta Sans',sans-serif;
+
     color:var(--navy);
+
     background:var(--white);
+
     -webkit-font-smoothing:antialiased;
+
+    overflow-x:hidden;
+
     top:0 !important;
+
     position:static !important;
 }
 
-/* NAVBAR */
-.navbar {
-    background:rgba(255,255,255,0.95);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--slate-200);
-    padding:0.8rem 0;
+a{
+    text-decoration:none;
 }
 
-.navbar-brand {
-    font-weight:800;
-    font-size:1.6rem;
-    color:var(--navy)!important;
-}
-.navbar-brand span { color:var(--brand-green); }
-
-/* BUTTONS */
-.btn-brand-solid {
-    background:var(--brand-green);
-    color:#fff;
-    border-radius:10px;
-    font-weight:700;
-    padding:10px 24px;
-    border:none;
-}
-.btn-brand-outline {
-    border:1.5px solid var(--brand-green);
-    color:var(--brand-green);
-    border-radius:10px;
-    font-weight:600;
-    padding:10px 24px;
+img{
+    max-width:100%;
+    display:block;
 }
 
-/* LANGUAGE SWITCH */
-.translate-box {
+.container{
+
+    max-width:1240px;
+
+}
+
+/* =======================================================
+   NAVBAR
+======================================================= */
+
+.gc-navbar{
+    background:#FFFFFF !important;
+    border-bottom:1px solid #E5E7EB;
+    box-shadow:0 2px 12px rgba(15,23,42,.06);
+    padding:.9rem 0;
+    transition:.3s ease;
+    z-index:1050;
+}
+main{
     position:relative;
-    width:42px;
-    height:42px;
-    border:1px solid var(--slate-200);
-    border-radius:10px;
+    z-index:1;
+}
+.navbar-brand{
+
     display:flex;
+
     align-items:center;
-    justify-content:center;
-}
-.lang-select {
-    position:absolute;
-    inset:0;
-    opacity:0;
-    cursor:pointer;
-    z-index:10;
-}
-.translate-icon {
-    color:var(--brand-green);
-    pointer-events:none;
+
+    gap:.2rem;
+
+    font-size:1.7rem;
+
+    font-weight:800;
+
+    color:var(--navy)!important;
+
+    white-space:nowrap;
+
+    flex-shrink:0;
 }
 
-/* REMOVE GOOGLE UI */
+.navbar-brand img{
+
+    height:42px;
+
+    width:auto;
+}
+
+.brand-green{
+
+    color:var(--brand-green);
+}
+
+/* =======================================================
+   NAV LINKS
+======================================================= */
+
+.navbar-nav{
+
+    gap:.25rem;
+}
+
+.nav-link{
+
+    color:var(--slate)!important;
+
+    font-weight:600;
+
+    padding:.7rem 1rem !important;
+
+    border-radius:12px;
+
+    transition:.25s;
+}
+
+.nav-link:hover{
+
+    background:#ECFDF5;
+
+    color:var(--brand-green)!important;
+}
+
+/* =======================================================
+   BUTTONS
+======================================================= */
+
+.btn-shop{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:.5rem;
+
+    background:linear-gradient(
+        135deg,
+        #10B981,
+        #059669
+    );
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:12px 18px;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+    box-shadow:
+        0 10px 25px rgba(5,150,105,.25);
+
+    transition:.3s;
+}
+
+.btn-partner{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:.5rem;
+
+    background:#EFF6FF;
+
+    color:#1E40AF;
+
+    border:1px solid #BFDBFE;
+
+    border-radius:14px;
+
+    padding:12px 18px;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+    transition:.3s;
+}
+
+.btn-partner:hover{
+
+    background:#DBEAFE;
+
+    color:#1E3A8A;
+
+    transform:translateY(-2px);
+}
+
+.btn-shop:hover{
+
+    transform:translateY(-2px);
+
+    color:#fff;
+
+    box-shadow:
+        0 15px 35px rgba(5,150,105,.35);
+}
+
+.btn-staff{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:.5rem;
+
+    border:1px solid var(--border);
+
+    background:#fff;
+
+    color:var(--navy);
+
+    border-radius:14px;
+
+    padding:12px 18px;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+    transition:.3s;
+}
+
+.btn-staff:hover{
+
+    background:#F8FAFC;
+
+    color:var(--brand-green);
+}
+
+/* =======================================================
+   TRANSLATE
+======================================================= */
+
+.translate-box{
+
+    position:relative;
+
+    width:44px;
+
+    height:44px;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#fff;
+
+    transition:.3s;
+}
+
+.translate-box:hover{
+
+    background:#F8FAFC;
+}
+
+.translate-box i{
+
+    color:var(--brand-green);
+
+    font-size:1rem;
+}
+
+.lang-select{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    cursor:pointer;
+}
+
+/* =======================================================
+   HAMBURGER
+======================================================= */
+
+.navbar-toggler{
+
+    width:44px;
+
+    height:44px;
+
+    border:none !important;
+
+    border-radius:14px;
+
+    background:#F8FAFC;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    box-shadow:none !important;
+
+    padding:0;
+
+    transition:.3s;
+}
+
+.navbar-toggler:hover{
+
+    background:#ECFDF5;
+}
+
+.navbar-toggler i{
+
+    font-size:1rem;
+
+    color:var(--navy);
+}
+
+/* =======================================================
+   MOBILE MENU
+======================================================= */
+
+@media(max-width:991px){
+
+    .navbar-collapse{
+
+        background:#fff;
+
+        margin-top:1rem;
+
+        padding:1rem;
+
+        border-radius:20px;
+
+        box-shadow:var(--shadow-lg);
+    }
+
+    .navbar-nav{
+
+        margin-bottom:1rem;
+    }
+
+    .nav-link{
+
+        margin-bottom:.35rem;
+    }
+
+}
+
+/* =======================================================
+   FOOTER
+======================================================= */
+
+.main-footer{
+
+    background:var(--navy);
+
+    color:#fff;
+
+    padding:70px 0 35px;
+
+    margin-top:80px;
+}
+
+.footer-heading{
+
+    color:var(--warning);
+
+    font-weight:800;
+
+    margin-bottom:1rem;
+
+    font-size:.9rem;
+
+    letter-spacing:.05em;
+
+    text-transform:uppercase;
+}
+
+.footer-link{
+
+    color:#94A3B8;
+
+    display:block;
+
+    margin-bottom:.75rem;
+
+    transition:.25s;
+}
+
+.footer-link:hover{
+
+    color:#fff;
+}
+
+.footer-brand{
+
+    font-size:1.8rem;
+
+    font-weight:800;
+}
+
+/* =======================================================
+   GOOGLE TRANSLATE CLEANUP
+======================================================= */
+
 .goog-te-banner-frame,
 .goog-te-menu-frame,
 .skiptranslate,
 .goog-logo-link,
-.goog-te-gadget {
+.goog-te-gadget{
+
     display:none !important;
+
     visibility:hidden !important;
+
     height:0 !important;
 }
 
-html { top:0 !important; }
+html{
 
-/* FOOTER */
-.main-footer {
-    background:var(--navy);
-    color:#f8fafc;
-    padding:60px 0 30px;
-    margin-top:60px;
+    top:0 !important;
 }
 
-.footer-heading {
-    font-weight:800;
-    font-size:0.85rem;
-    color:var(--brand-amber);
-    margin-bottom:1rem;
-}
+/* =======================================================
+   RESPONSIVE
+======================================================= */
 
-.footer-link {
-    color:#94a3b8;
-    text-decoration:none;
-    display:block;
-    margin-bottom:0.5rem;
-}
-/* Prevent wrapping */
-.navbar .container {
-    flex-wrap: nowrap !important;
-}
+@media(max-width:768px){
 
-/* Keep brand in single line */
-.navbar-brand {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .navbar-brand{
 
-/* Reduce logo size on mobile */
-@media (max-width: 576px) {
-    .navbar-brand img {
-        height: 32px;
+        font-size:1.25rem;
     }
 
-    .navbar-brand {
-        font-size: 1.2rem;
+    .navbar-brand img{
+
+        height:34px;
     }
+
+    .btn-shop,
+    .btn-staff,
+    .btn-partner{
+
+        width:100%;
+    }
+
 }
 
-/* Right side controls */
-.mobile-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+.btn-shop,
+.btn-partner,
+.btn-staff{
+
+    min-height:52px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:.6rem;
+
+    font-weight:700;
 }
-@media (max-width:991px){
+
+@media(max-width:480px){
+
+    .container{
+
+        padding-left:16px;
+        padding-right:16px;
+    }
+
+}
+
+.mobile-controls{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.navbar-toggler{
+
+    width:40px;
+    height:40px;
+
+    border:none !important;
+
+    border-radius:12px;
+
+    background:#F1F5F9;
+
+    transition:.25s;
+
+    padding:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.navbar-toggler:hover{
+
+    background:#ECFDF5;
+}
+
+.navbar-toggler i{
+
+    font-size:1.2rem;
+    color:var(--brand-green);
+}
+@media(max-width:991px){
+
     .navbar-collapse{
-        background:white;
-        margin-top:1rem;
-        padding:1rem;
-        border-radius:12px;
+
+        position:absolute;
+
+        top:72px;
+
+        left:12px;
+
+        right:12px;
+
+        background:#fff;
+
+        border:1px solid #E5E7EB;
+
+        border-radius:22px;
+
+        padding:16px;
+
+        box-shadow:
+            0 20px 50px rgba(15,23,42,.12);
+
+        z-index:9999;
+    }
+
+    .navbar-collapse .btn{
+
+        width:100%;
+
+        margin-bottom:10px;
     }
 }
+/* ==========================
+   MOBILE FOOTER IMPROVEMENTS
+========================== */
+
+@media (max-width:768px){
+
+    .main-footer{
+        padding:50px 0 25px;
+        text-align:center;
+    }
+
+    .main-footer .row{
+        row-gap:2rem;
+    }
+
+    .footer-heading{
+        margin-bottom:.75rem;
+        font-size:.85rem;
+    }
+
+    .footer-link{
+        font-size:.92rem;
+        margin-bottom:.6rem;
+    }
+
+    .main-footer .btn{
+        width:100%;
+        max-width:260px;
+    }
+
+    .main-footer .col-6{
+        width:100%;
+    }
+
+    .main-footer p{
+        margin-bottom:.75rem;
+    }
+
+    .footer-features{
+        display:flex;
+        flex-direction:column;
+        gap:.6rem;
+        align-items:center;
+    }
+
+}
+
 </style>
 
 <!-- Restore language before load -->
@@ -180,103 +670,232 @@ html { top:0 !important; }
 </head>
 
 <body>
+<div class="ms-auto d-flex flex-column flex-lg-row"></div>
+<nav class="navbar gc-navbar navbar-expand-lg sticky-top">
 
-<nav class="navbar navbar-expand-lg sticky-top">
-<div class="container d-flex align-items-center justify-content-between flex-nowrap">
+    <div class="container">
 
-<a class="navbar-brand d-flex align-items-center flex-shrink-1 text-truncate" href="/">
-<img src="{% static 'images/logo.png' %}" height="40" class="me-2">
-<span>Grama</span>Cart
-</a>
+        <a class="navbar-brand d-flex align-items-center"
+           href="/">
 
-<!-- MOBILE RIGHT SIDE -->
-<div class="mobile-controls ms-auto d-lg-none">
-    <!-- 🌐 Language -->
-    <div class="translate-box">
-        <i class="bi bi-translate translate-icon"></i>
-        <select id="langSwitcherMobile" class="lang-select">
-            <option value="">🌐</option>
-            <option value="en">English</option>
-            <option value="te">తెలుగు</option>
-            <option value="hi">हिंदी</option>
-            <option value="kn">ಕನ್ನಡ</option>
-            <option value="ta">தமிழ்</option>
-        </select>
+            <img src="{% static 'images/logo.png' %}"
+                 height="42"
+                 class="me-2">
+
+            <span class="brand-green">Grama</span><span class="text-dark">Cart</span>
+
+        </a>
+
+        <!-- Mobile Controls -->
+
+        <div class="d-flex align-items-center gap-2 d-lg-none">
+
+            <div class="translate-box">
+
+                <i class="bi bi-translate"></i>
+
+                <select id="langSwitcherMobile"
+                        class="lang-select">
+
+                    <option value="">🌐</option>
+                    <option value="en">English</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="hi">हिंदी</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="ta">தமிழ்</option>
+
+                </select>
+
+            </div>
+
+            <button class="navbar-toggler border-0 shadow-none"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNav">
+
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+
+            </button>
+
+        </div>
+        <div class="collapse navbar-collapse" id="mainNav">
+
+            <div class="ms-auto d-flex flex-column flex-lg-row
+                        align-items-center
+                        gap-2 mt-3 mt-lg-0">
+       
+
+                <!-- Desktop Translate -->
+
+                <div class="translate-box d-none d-lg-flex">
+
+                    <i class="bi bi-translate"></i>
+
+                    <select id="langSwitcherDesktop"
+                            class="lang-select">
+
+                        <option value="">🌐</option>
+                        <option value="en">English</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="ta">தமிழ்</option>
+
+                    </select>
+
+                </div>
+
+                <!-- Shop -->
+
+                <a href="{% url 'public_dashboard' %}"
+                class="btn btn-shop">
+
+                    <i class="bi bi-basket2-fill"></i>
+
+                    Shop Now
+
+                </a>
+
+                
+
+                <!-- Staff -->
+
+                <a href="{% url 'user_signin' %}"
+                class="btn btn-staff">
+
+                    <i class="bi bi-person-badge"></i>
+
+                    Staff Login
+
+                </a>
+
+                <!-- Hub Partner -->
+
+                <a href="#partner"
+                    class="btn btn-partner">
+
+                    <i class="bi bi-shop-window"></i>
+
+                    Become Hub Partner
+
+                </a>
+
+            </div>
+
     </div>
 
-    <!-- 🍔 Hamburger -->
-    <button class="navbar-toggler border-0 shadow-none"
-            data-bs-toggle="collapse"
-            data-bs-target="#nav">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-</div>
-
-<!-- NAV CONTENT -->
-<div class="collapse navbar-collapse" id="nav">
-
-<ul class="navbar-nav ms-lg-4">
-<li class="nav-item"><a class="nav-link">How it works</a></li>
-</ul>
-
-<div class="ms-auto d-flex flex-column flex-lg-row align-items-center gap-3 mt-3 mt-lg-0">
-
-    <!-- 🌐 Desktop Language -->
-    <div class="translate-box d-none d-lg-flex">
-        <i class="bi bi-translate translate-icon"></i>
-        <select id="langSwitcherDesktop" class="lang-select">
-            <option value="">🌐</option>
-            <option value="en">English</option>
-            <option value="te">తెలుగు</option>
-            <option value="hi">हिंदी</option>
-            <option value="kn">ಕನ್ನಡ</option>
-            <option value="ta">தமிழ்</option>
-        </select>
-    </div>
-
-    <a href="{% url 'where_we_deliver' %}" class="btn btn-brand-outline">Shop Now</a>
-    <a href="{% url 'login' %}" class="btn btn-brand-solid">Sign In</a>
-
-</div>
-</div>
-
-</div>
 </nav>
 
 <main>{% block content %}{% endblock %}</main>
-
 <footer class="main-footer">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h3 class="fw-800 text-white mb-3"><span>Grama</span>Cart</h3>
-                    <p class="small mb-4" style="color: #94a3b8;">
-                        Connecting villages to essentials. Starting in <strong>Krishna District</strong>. Trust and quality at your doorstep.
-                    </p>
-                    <a href="https://wa.me/919876543210" class="btn btn-sm btn-outline-light rounded-pill px-3">
-                        <i class="bi bi-whatsapp me-2 text-brand-green"></i>WhatsApp Help
-                    </a>
+    <div class="container">
+
+    <div class="row g-4">
+
+        <!-- Brand -->
+        <div class="col-lg-4">
+
+            <h3 class="text-white fw-bold mb-3">
+                <span class="brand-green">Grama</span>Cart
+            </h3>
+
+            <p class="small mb-4" style="color:#94A3B8;">
+                Need something at home? GramaCart delivers daily essentials
+                and household needs to your doorstep in as little as
+                30–40 minutes through trusted local village hubs.
+            </p>
+
+            <div class="small mb-4" style="color:#94A3B8;">
+                <div class="mb-2">
+                    <i class="bi bi-truck me-2 text-success"></i>
+                    Fast Local Delivery
                 </div>
 
-                <div class="col-6 col-lg-3 offset-lg-1">
-                    <h5 class="footer-heading">Quick Links</h5>
-                    <a href="/" class="footer-link">Home</a>
-                    <a href="{% url 'public_dashboard' %}" class="footer-link">Shop</a>
-                    <a href="mailto:connect@gramacart.com" class="footer-link">Support</a>
+                <div class="mb-2">
+                    <i class="bi bi-shield-check me-2 text-success"></i>
+                    Trusted Village Network
                 </div>
 
-                <div class="col-6 col-lg-3">
-                    <h5 class="footer-heading">Contact</h5>
-                    <p class="footer-link mb-2"><i class="bi bi-geo-alt me-2 text-brand-green"></i> Krishna Region, AP</p>
-                    <p class="footer-link mb-0"><i class="bi bi-heart-fill me-2 text-danger"></i> Built for Villages</p>
+                <div>
+                    <i class="bi bi-clock-history me-2 text-success"></i>
+                    Delivery in 30–40 Minutes*
                 </div>
             </div>
-            <div class="mt-5 pt-3 border-top border-secondary text-center" style="font-size: 0.8rem; color: #64748b;">
-                <p>© 2026 GramaCart Technologies.</p>
-            </div>
+
+            <a href="https://wa.me/919876543210"
+               class="btn btn-sm btn-outline-light rounded-pill px-3">
+
+                <i class="bi bi-whatsapp me-2"></i>
+                WhatsApp Support
+
+            </a>
+
         </div>
+
+        <!-- Quick Links -->
+        <div class="col-6 col-lg-3 offset-lg-1">
+
+            <h5 class="footer-heading">Quick Links</h5>
+
+            <a href="/" class="footer-link">
+                <i class="bi bi-house-door me-2"></i>Home
+            </a>
+
+            <a href="{% url 'public_dashboard' %}" class="footer-link">
+                <i class="bi bi-basket2 me-2"></i>Shop Now
+            </a>
+
+            <a href="#partner" class="footer-link">
+                <i class="bi bi-shop me-2"></i>Become Hub Partner
+            </a>
+
+            <a href="mailto:connect@gramacart.com" class="footer-link">
+                <i class="bi bi-headset me-2"></i>Support
+            </a>
+
+        </div>
+
+        <!-- Contact -->
+        <div class="col-6 col-lg-3">
+
+            <h5 class="footer-heading">Contact</h5>
+
+            <p class="footer-link mb-3">
+                <i class="bi bi-geo-alt me-2 text-success"></i>
+                Serving Andhra Pradesh Villages
+            </p>
+
+            <p class="footer-link mb-3">
+                <i class="bi bi-heart-fill me-2 text-danger"></i>
+                Built for Rural India
+            </p>
+
+            <p class="footer-link mb-0">
+                <i class="bi bi-envelope me-2 text-success"></i>
+                connect@gramacart.com
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="mt-5 pt-4 border-top border-secondary text-center">
+
+        <p class="small mb-2" style="color:#94A3B8;">
+            *Delivery time may vary based on location, hub availability,
+            weather conditions, and order volume.
+        </p>
+
+        <p style="font-size:.85rem;color:#64748B;">
+            © 2026 GramaCart Technologies. All Rights Reserved.
+        </p>
+
+    </div>
+
+</div>
+
+
 </footer>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

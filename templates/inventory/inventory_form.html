@@ -2,7 +2,16 @@
 {% load static %}
 
 {% block content %}
-
+{% if form.errors %}
+<div class="card border-danger mt-3">
+    <div class="card-header bg-danger text-white">
+        Form Debug Errors
+    </div>
+    <div class="card-body">
+        <pre>{{ form.errors }}</pre>
+    </div>
+</div>
+{% endif %}
 <div class="container-fluid py-4 inventory-page">
 
     <!-- TOP HEADER -->

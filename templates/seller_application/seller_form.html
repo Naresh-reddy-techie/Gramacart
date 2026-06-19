@@ -1,0 +1,575 @@
+{% extends 'homepage/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+
+<section class="seller-hero py-5">
+
+
+<div class="container">
+
+    <div class="row align-items-center g-5">
+
+        <div class="col-lg-6">
+
+            <span class="badge seller-badge mb-3">
+                🚀 Start Selling On GramaCart
+            </span>
+
+            <h1 class="display-4 fw-bold mb-4">
+                Grow Your Local Business
+                <span class="text-success">With GramaCart</span>
+            </h1>
+
+            <p class="lead text-muted mb-4">
+
+                Whether you're a farmer, food maker, craft creator,
+                cloud kitchen owner or small business entrepreneur,
+                GramaCart helps you reach customers in your village
+                and nearby communities.
+
+            </p>
+
+            <div class="row g-3">
+
+                <div class="col-6">
+                    <div class="mini-feature">
+                        <i class="bi bi-shop"></i>
+                        <span>Online Store</span>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="mini-feature">
+                        <i class="bi bi-people-fill"></i>
+                        <span>More Customers</span>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="mini-feature">
+                        <i class="bi bi-truck"></i>
+                        <span>Delivery Support</span>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="mini-feature">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <span>Grow Revenue</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="seller-form-card">
+
+                <div class="text-center mb-4">
+
+                    <h3 class="fw-bold">
+                        Seller Application
+                    </h3>
+
+                    <p class="text-muted">
+                        Submit your details and our team will review your application.
+                    </p>
+
+                </div>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Owner Name</label>
+                        {{ form.owner_name }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mobile Number</label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Village</label>
+                        {{ form.village }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Business Name</label>
+                        {{ form.business_name }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Business Type</label>
+                        {{ form.business_type }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Select Hub</label>
+                        {{ form.hub }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Tell Us About Your Products
+                        </label>
+                        {{ form.description }}
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-success btn-lg w-100">
+
+                        Submit Application
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- WHO CAN SELL -->
+
+<section class="py-5 bg-light">
+
+
+<div class="container">
+
+    <div class="text-center mb-5">
+
+        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-3">
+            WHO CAN SELL
+        </span>
+
+        <h2 class="fw-bold">
+            Perfect For Local Entrepreneurs
+        </h2>
+
+        <p class="text-muted">
+            Turn your skills, products and passion into income.
+        </p>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-6 col-lg-3">
+
+            <div class="seller-card">
+
+                <div class="seller-icon">
+                    <i class="bi bi-flower1"></i>
+                </div>
+
+                <h5>Farmers</h5>
+
+                <p>
+                    Rice, grains, pulses,
+                    vegetables and farm produce.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-lg-3">
+
+            <div class="seller-card">
+
+                <div class="seller-icon">
+                    <i class="bi bi-cake2"></i>
+                </div>
+
+                <h5>Homemade Foods</h5>
+
+                <p>
+                    Pickles, snacks,
+                    sweets and traditional foods.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-lg-3">
+
+            <div class="seller-card">
+
+                <div class="seller-icon">
+                    <i class="bi bi-gem"></i>
+                </div>
+
+                <h5>Handmade Crafts</h5>
+
+                <p>
+                    Silk thread bangles,
+                    gifts and handmade products.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-lg-3">
+
+            <div class="seller-card">
+
+                <div class="seller-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+
+                <h5>Cloud Kitchens</h5>
+
+                <p>
+                    Home kitchens and
+                    local food businesses.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- BENEFITS -->
+
+<section class="py-5">
+
+
+<div class="container">
+
+    <div class="text-center mb-5">
+
+        <h2 class="fw-bold">
+            Why Sell Through GramaCart?
+        </h2>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="benefit-card">
+
+                <i class="bi bi-phone"></i>
+
+                <h5>
+                    Online Visibility
+                </h5>
+
+                <p>
+                    Get discovered by customers searching online.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="benefit-card">
+
+                <i class="bi bi-truck"></i>
+
+                <h5>
+                    Delivery Network
+                </h5>
+
+                <p>
+                    Local delivery support through GramaCart hubs.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="benefit-card">
+
+                <i class="bi bi-graph-up-arrow"></i>
+
+                <h5>
+                    Business Growth
+                </h5>
+
+                <p>
+                    Reach more customers without opening new branches.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+<style>
+
+:root{
+    --primary:#16a34a;
+    --primary-dark:#15803d;
+    --light-green:#ecfdf5;
+    --dark:#0f172a;
+    --gray:#64748b;
+    --border:#e5e7eb;
+}
+
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:#fff;
+    color:var(--dark);
+}
+
+/* HERO */
+
+.seller-hero{
+    background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+    padding-top:80px;
+    padding-bottom:80px;
+}
+
+.seller-badge{
+    background:var(--light-green);
+    color:var(--primary);
+    border:none;
+    padding:10px 18px;
+    border-radius:999px;
+    font-weight:600;
+}
+
+.display-4{
+    line-height:1.15;
+}
+
+/* FEATURE BOXES */
+
+.mini-feature{
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    border:1px solid #eef2f7;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+    transition:.3s;
+}
+
+.mini-feature:hover{
+    transform:translateY(-5px);
+}
+
+.mini-feature i{
+    color:var(--primary);
+    font-size:1.5rem;
+}
+
+.mini-feature span{
+    font-weight:600;
+}
+
+/* FORM */
+
+.seller-form-card{
+    background:#fff;
+    padding:40px;
+    border-radius:30px;
+    border:1px solid #eef2f7;
+    box-shadow:0 20px 50px rgba(15,23,42,.08);
+}
+
+.seller-form-card label{
+    font-weight:600;
+    margin-bottom:6px;
+}
+
+.seller-form-card input,
+.seller-form-card select,
+.seller-form-card textarea{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    transition:.3s;
+    background:#fff;
+}
+
+.seller-form-card textarea{
+    min-height:120px;
+}
+
+.seller-form-card input:focus,
+.seller-form-card select:focus,
+.seller-form-card textarea:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(22,163,74,.12);
+    outline:none;
+}
+
+.btn-success{
+    background:var(--primary);
+    border:none;
+    border-radius:14px;
+    font-weight:600;
+}
+
+.btn-success:hover{
+    background:var(--primary-dark);
+}
+
+/* SELLER CARDS */
+
+.seller-card{
+    background:#fff;
+    border-radius:28px;
+    padding:30px 22px;
+    text-align:center;
+    height:100%;
+    border:1px solid #eef2f7;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+    transition:.35s;
+}
+
+.seller-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 45px rgba(15,23,42,.10);
+}
+
+.seller-icon{
+    width:85px;
+    height:85px;
+    background:var(--light-green);
+    border-radius:24px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.seller-icon i{
+    font-size:2rem;
+    color:var(--primary);
+}
+
+.seller-card h5{
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.seller-card p{
+    color:var(--gray);
+    margin-bottom:0;
+}
+
+/* BENEFITS */
+
+.benefit-card{
+    background:#fff;
+    border-radius:28px;
+    padding:35px 25px;
+    text-align:center;
+    height:100%;
+    border:1px solid #eef2f7;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+    transition:.35s;
+}
+
+.benefit-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 45px rgba(15,23,42,.10);
+}
+
+.benefit-card i{
+    font-size:3rem;
+    color:var(--primary);
+    display:block;
+    margin-bottom:15px;
+}
+
+.benefit-card h5{
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+/* SECTION SPACING */
+
+section{
+    overflow:hidden;
+}
+
+/* MOBILE */
+
+@media(max-width:991px){
+
+    .seller-form-card{
+        margin-top:25px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .seller-hero{
+        padding-top:50px;
+        padding-bottom:50px;
+    }
+
+    .display-4{
+        font-size:2.2rem;
+    }
+
+    .seller-form-card{
+        padding:25px;
+    }
+
+    .seller-card{
+        padding:20px 15px;
+    }
+
+    .benefit-card{
+        padding:25px 20px;
+    }
+
+    .seller-icon{
+        width:65px;
+        height:65px;
+    }
+
+    .seller-icon i{
+        font-size:1.5rem;
+    }
+
+}
+
+</style>
+{% endblock %}

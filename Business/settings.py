@@ -158,7 +158,7 @@ MEDIA_ROOT= os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGIN_URL = 'user_signup'
+LOGIN_URL = 'request_otp'
 
 
 #Email configuration(for Reset Password)
@@ -195,4 +195,4 @@ SESSION_COOKIE_AGE = 2592000  # 30 days in seconds
 
 
 LOGIN_REDIRECT_URL = 'post_login_redirect'
-LOGOUT_REDIRECT_URL = 'user_signin'
+LOGOUT_REDIRECT_URL = 'home'

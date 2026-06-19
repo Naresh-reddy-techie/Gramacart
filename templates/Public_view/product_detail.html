@@ -7,22 +7,60 @@
 
 {% block extra_css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
-    --primary: {{ company.primary_color|default:"#10B981" }};
+
+    /* dynamic brand colour stays overridable per-hub/company, same as before */
+    --primary: {{ company.primary_color|default:"#0E9F6E" }};
+    --primary-dark:#065F46;
     --primary-soft:#ECFDF5;
-    --dark:#0F172A;
-    --bg:#F8FAFC;
-    --border:#E2E8F0;
-    --muted:#64748B;
+    --primary-soft-border:#D1FAE8;
+
+    --marigold:#F59E0B;
+    --marigold-soft:#FFFBEB;
+    --marigold-soft-border:#FDE7BD;
+
+    --terracotta:#C2410C;
+    --terracotta-soft:#FFF1EC;
+
+    --dark:#1C1917;
+    --bg:#FBF8F3;
+    --card:#FFFFFF;
+    --border:#EDE6D8;
+    --border-soft:#F3EEE3;
+    --muted:#78716C;
+    --muted-soft:#A8A29E;
+
+    --shadow-sm:0 2px 8px rgba(28,25,23,0.05);
+    --shadow-md:0 8px 22px rgba(28,25,23,0.08);
+    --shadow-lg:0 16px 36px rgba(28,25,23,0.14);
+}
+
+*{
+    box-sizing:border-box;
 }
 
 body{
     background:var(--bg);
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
+    color:var(--dark);
     padding-bottom:120px;
+    -webkit-font-smoothing:antialiased;
+}
+
+h6{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:0.95rem;
+    color:var(--dark);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:7px;
 }
 
 /* ================= LAYOUT ================= */
@@ -34,10 +72,11 @@ body{
 }
 
 .gc-card{
-    background:#fff;
-    border-radius:20px;
-    padding:14px;
-    border:1px solid var(--border);
+    background:var(--card);
+    border-radius:22px;
+    padding:16px;
+    border:1px solid var(--border-soft);
+    box-shadow:var(--shadow-sm);
     margin-bottom:14px;
 }
 
@@ -47,13 +86,15 @@ body{
     position:relative;
     border-radius:18px;
     overflow:hidden;
+    background:var(--bg);
 }
 
 .hero-image{
     width:100%;
     height:320px;
     object-fit:contain;
-    background:#fff;
+    background:var(--bg);
+    display:block;
 }
 
 .action-icons{
@@ -61,16 +102,34 @@ body{
     top:12px;
     right:12px;
     display:flex;
+    flex-direction:column;
     gap:10px;
+    z-index:5;
 }
 
 .icon-btn{
     width:42px;
     height:42px;
-    border:none;
+    border:1px solid var(--border-soft);
     border-radius:50%;
-    background:rgba(255,255,255,0.95);
-    font-size:18px;
+    background:rgba(255,255,255,0.96);
+    box-shadow:var(--shadow-sm);
+    font-size:17px;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:0.15s ease;
+}
+
+.icon-btn:active{
+    transform:scale(0.92);
+}
+
+.icon-btn.active{
+    color:#fff;
+    background:#EF4444;
+    border-color:#EF4444;
 }
 
 /* THUMBNAILS */
@@ -78,52 +137,103 @@ body{
     display:flex;
     gap:10px;
     overflow-x:auto;
-    margin-top:10px;
+    margin-top:12px;
+    scrollbar-width:none;
+}
+
+.thumb-strip::-webkit-scrollbar{
+    display:none;
 }
 
 .thumb{
-    width:70px;
-    height:70px;
+    width:64px;
+    height:64px;
     object-fit:cover;
-    border-radius:12px;
-    border:2px solid #eee;
+    border-radius:13px;
+    border:2px solid var(--border-soft);
     flex-shrink:0;
+    cursor:pointer;
+    transition:0.15s ease;
 }
 
 .thumb.active{
     border-color:var(--primary);
+    box-shadow:0 4px 10px rgba(14,159,110,0.20);
 }
 
 /* ================= TITLE ================= */
 
 .title{
-    font-size:1.3rem;
-    font-weight:900;
+    font-family:'Baloo 2',sans-serif;
+    font-size:1.32rem;
+    font-weight:700;
+    color:var(--dark);
+    line-height:1.3;
 }
 
 .rating-row{
     display:flex;
-    gap:10px;
+    gap:8px;
     flex-wrap:wrap;
-    margin-top:10px;
+    margin-top:12px;
 }
 
 .pill{
-    padding:6px 10px;
+    padding:6px 12px;
     border-radius:999px;
-    font-size:0.8rem;
+    font-size:0.76rem;
     font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
 }
 
-.rating{background:#FEF3C7;}
-.delivery{background:var(--primary-soft);}
+.rating{
+    background:var(--marigold-soft);
+    border:1px solid var(--marigold-soft-border);
+    color:#B45309;
+}
+
+.delivery{
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
+    color:var(--primary-dark);
+}
 
 /* ================= PRICE ================= */
 
 .price{
-    font-size:2rem;
-    font-weight:900;
-    margin-top:10px;
+    font-family:'Baloo 2',sans-serif;
+    font-size:2.1rem;
+    font-weight:800;
+    margin-top:14px;
+    color:var(--dark);
+    line-height:1;
+}
+
+.price small{
+    font-family:'Inter',sans-serif;
+    font-size:1rem;
+    font-weight:700;
+    color:var(--muted);
+    vertical-align:top;
+}
+
+#stockText{
+    margin-top:8px;
+    font-size:0.84rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+#stockText.in-stock{
+    color:var(--primary-dark);
+}
+
+#stockText.out-stock{
+    color:var(--terracotta);
 }
 
 /* ================= VARIANTS ================= */
@@ -132,20 +242,63 @@ body{
     display:flex;
     gap:10px;
     overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:none;
+}
+
+.variant-scroll::-webkit-scrollbar{
+    display:none;
 }
 
 .variant-card{
     min-width:150px;
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:10px;
+    border:1.5px solid var(--border);
+    border-radius:16px;
+    padding:12px;
     cursor:pointer;
     background:#fff;
+    flex-shrink:0;
+    position:relative;
+    transition:0.15s ease;
+}
+
+.variant-card b{
+    font-size:0.85rem;
+    font-weight:700;
+    color:var(--dark);
+    display:block;
+}
+
+.variant-card .v-price{
+    font-weight:800;
+    font-size:0.95rem;
+    margin-top:4px;
+    color:var(--dark);
+}
+
+.variant-card small{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:0.7rem;
+    font-weight:700;
+    margin-top:6px;
 }
 
 .variant-card.active{
     border-color:var(--primary);
     background:var(--primary-soft);
+    box-shadow:0 6px 14px rgba(14,159,110,0.18);
+}
+
+.variant-card.active::after{
+    content:"\F26E";
+    font-family:"bootstrap-icons";
+    position:absolute;
+    top:8px;
+    right:10px;
+    color:var(--primary-dark);
+    font-size:0.95rem;
 }
 
 /* ================= GRID ================= */
@@ -158,19 +311,121 @@ body{
 
 .icon-box{
     text-align:center;
-    padding:12px;
-    border:1px solid var(--border);
-    border-radius:14px;
-    font-size:0.85rem;
+    padding:14px 8px;
+    border:1px solid var(--border-soft);
+    border-radius:16px;
+    font-size:0.76rem;
+    font-weight:700;
+    color:var(--muted);
+    background:#fff;
+}
+
+.icon-box i{
+    display:block;
+    font-size:1.3rem;
+    margin-bottom:7px;
+    color:var(--primary-dark);
 }
 
 /* ================= REVIEWS ================= */
 
 .review{
-    border:1px solid var(--border);
-    padding:12px;
-    border-radius:14px;
+    border:1px solid var(--border-soft);
+    padding:14px;
+    border-radius:16px;
     margin-bottom:10px;
+    display:flex;
+    gap:12px;
+}
+
+.review-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
+    color:#fff;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:0.9rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.review-body b{
+    font-size:0.85rem;
+    font-weight:700;
+    color:var(--dark);
+}
+
+.review-stars{
+    font-size:0.72rem;
+    font-weight:800;
+    color:#B45309;
+    margin-left:6px;
+}
+
+.review-date{
+    font-size:0.72rem;
+    color:var(--muted-soft);
+    margin-top:1px;
+}
+
+.review-comment{
+    margin-top:6px;
+    font-size:0.84rem;
+    color:var(--dark);
+    line-height:1.4;
+}
+
+/* ================= SIMILAR PRODUCTS ================= */
+
+.similar-card{
+    min-width:140px;
+    border:1px solid var(--border-soft);
+    border-radius:18px;
+    padding:10px;
+    background:#fff;
+    flex-shrink:0;
+}
+
+.similar-img{
+    width:100%;
+    height:90px;
+    object-fit:contain;
+    background:var(--bg);
+    border-radius:12px;
+    margin-bottom:8px;
+}
+
+.similar-card b{
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--dark);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    line-height:1.3;
+    min-height:33px;
+}
+
+.similar-card .s-price{
+    font-weight:800;
+    font-size:0.88rem;
+    color:var(--dark);
+    margin-top:5px;
+}
+
+/* ================= TOAST ================= */
+
+#toast{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
 }
 
 /* ================= BOTTOM BAR ================= */
@@ -181,31 +436,55 @@ body{
     right: 0;
     bottom: 70px;
     background: #fff;
-    border-top: 1px solid #E2E8F0;
-    padding: 12px;
+    border-top: 1px solid var(--border-soft);
+    padding: 12px 14px;
     z-index: 99999;
+    box-shadow:0 -10px 26px rgba(28,25,23,0.06);
 }
 
 .bottom-inner{
     display:flex;
     gap:10px;
+    max-width:1100px;
+    margin:auto;
 }
 
 .btn{
     flex:1;
     height:50px;
-    border-radius:14px;
+    border-radius:15px;
     font-weight:800;
+    font-size:0.92rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:none;
+    transition:0.15s ease;
+}
+
+.btn:active{
+    transform:scale(0.97);
 }
 
 .btn-cart{
+    background:#fff;
+    border:1.5px solid var(--primary);
+    color:var(--primary-dark);
+}
+
+.btn-cart:hover{
     background:var(--primary-soft);
-    border:1px solid #a7f3d0;
 }
 
 .btn-buy{
-    background:var(--dark);
+    background:linear-gradient(150deg,var(--dark),#3a3531);
     color:#fff;
+}
+
+.btn:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
 }
 
 </style>
@@ -221,8 +500,12 @@ body{
     <div class="hero-wrap">
 
         <div class="action-icons">
-            <button class="icon-btn" onclick="toggleWishlist(this)">❤</button>
-            <button class="icon-btn" onclick="shareProduct()">⤴</button>
+            <button class="icon-btn" onclick="toggleWishlist(this)">
+                <i class="bi bi-heart"></i>
+            </button>
+            <button class="icon-btn" onclick="shareProduct()">
+                <i class="bi bi-share-fill"></i>
+            </button>
         </div>
 
         <img id="mainImage"
@@ -246,12 +529,18 @@ body{
     <div class="title">{{ product.name }}</div>
 
     <div class="rating-row">
-        <div class="pill rating">⭐ {{ avg_rating|floatformat:1 }} ({{ rating_count }})</div>
-        <div class="pill delivery">📍 {{ active_hub.name }} • Hyperlocal Express</div>
+        <div class="pill rating">
+            <i class="bi bi-star-fill"></i>
+            {{ avg_rating|floatformat:1 }} ({{ rating_count }})
+        </div>
+        <div class="pill delivery">
+            <i class="bi bi-geo-alt-fill"></i>
+            {{ active_hub.name }} &middot; Hyperlocal Express
+        </div>
     </div>
 
     <div class="price">
-        ₹<span id="priceValue">
+        <small>₹</small><span id="priceValue">
             {% if default_variant %}{{ default_variant.price }}{% else %}0{% endif %}
         </span>
     </div>
@@ -264,7 +553,7 @@ body{
 {% if variants %}
 <div class="gc-card">
 
-    <h6>Select Variant</h6>
+    <h6><i class="bi bi-box-seam"></i> Select Variant</h6>
 
     <div class="variant-scroll">
 
@@ -276,12 +565,12 @@ body{
              onclick="selectVariant(this)">
 
             <b>{{ v.name }}</b>
-            <div>₹{{ v.price }}</div>
+            <div class="v-price">₹{{ v.price }}</div>
 
             {% if v.stock > 0 %}
-                <small>🟢 {{ v.stock }} left</small>
+                <small style="color:var(--primary-dark);"><i class="bi bi-dot"></i>{{ v.stock }} left</small>
             {% else %}
-                <small>🔴 Out of stock</small>
+                <small style="color:var(--terracotta);"><i class="bi bi-dot"></i>Out of stock</small>
             {% endif %}
 
         </div>
@@ -294,85 +583,102 @@ body{
 
 <!-- ================= DESCRIPTION ================= -->
 <div class="gc-card">
-    <h6>📦 Description</h6>
-    <p>{{ product.description|default:"No description available." }}</p>
+    <h6><i class="bi bi-card-text"></i> Description</h6>
+    <p class="mb-0" style="color:var(--muted);font-size:0.88rem;line-height:1.55;">
+        {{ product.description|default:"No description available." }}
+    </p>
 </div>
 
 <!-- ================= POLICY ================= -->
 <div class="gc-card">
-    <h6>🔁 Policy</h6>
+    <h6><i class="bi bi-shield-check"></i> Policy</h6>
     <div class="icon-grid">
-        <div class="icon-box">🚫<br>Non Returnable</div>
-        <div class="icon-box">❌<br>Non Cancellable</div>
-        <div class="icon-box">📜<br>Policy</div>
+        <div class="icon-box"><i class="bi bi-arrow-counterclockwise"></i>Non Returnable</div>
+        <div class="icon-box"><i class="bi bi-x-circle"></i>Non Cancellable</div>
+        <div class="icon-box"><i class="bi bi-file-earmark-text"></i>Policy</div>
     </div>
 </div>
 
 <!-- ================= WHY US ================= -->
 <div class="gc-card">
-    <h6>🌟 Why Us</h6>
+    <h6><i class="bi bi-stars"></i> Why Us</h6>
     <div class="icon-grid">
-        <div class="icon-box">🤝<br>Trusted</div>
-        <div class="icon-box">⚡<br>Fast</div>
-        <div class="icon-box">📸<br>Proof</div>
+        <div class="icon-box"><i class="bi bi-shield-check"></i>Trusted</div>
+        <div class="icon-box"><i class="bi bi-lightning-charge-fill"></i>Fast</div>
+        <div class="icon-box"><i class="bi bi-camera-fill"></i>Proof</div>
     </div>
 </div>
 
 <!-- ================= REVIEWS ================= -->
 <div class="gc-card">
-    <h6>⭐ Reviews ({{ rating_count }})</h6>
+    <h6><i class="bi bi-chat-square-text-fill"></i> Reviews ({{ rating_count }})</h6>
 
     {% for review in reviews|slice:":5" %}
     <div class="review">
-        <b>{{ review.user.username }}</b>
-        <span>⭐ {{ review.rating }}</span>
-        <div class="text-muted">{{ review.created_at|date:"M d, Y" }}</div>
-        {% if review.comment %}
-        <div>{{ review.comment }}</div>
-        {% endif %}
+
+        <div class="review-avatar">
+            {{ review.user.username|slice:":1"|upper }}
+        </div>
+
+        <div class="review-body">
+            <b>{{ review.user.username }}</b>
+            <span class="review-stars">⭐ {{ review.rating }}</span>
+            <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+            {% if review.comment %}
+            <div class="review-comment">{{ review.comment }}</div>
+            {% endif %}
+        </div>
+
     </div>
     {% empty %}
-    <p class="text-muted">No reviews yet</p>
+    <p class="text-muted small mb-0">No reviews yet</p>
     {% endfor %}
 </div>
 
 <!-- ================= SIMILAR PRODUCTS ================= -->
 <div class="gc-card">
-    <h6>🧩 Similar Products</h6>
+    <h6><i class="bi bi-grid-3x3-gap-fill"></i> Similar Products</h6>
 
     <div class="variant-scroll">
         {% for p in similar_products %}
-        <div class="variant-card">
-            <img src="{% if p.product_images.first %}{{ p.product_images.first.image.url }}{% endif %}"
-                 style="width:100%;height:80px;object-fit:cover;border-radius:10px;">
+        <div class="similar-card">
+            <img class="similar-img"
+                 src="{% if p.product_images.first %}{{ p.product_images.first.image.url }}{% endif %}">
             <b>{{ p.name }}</b>
-            <div>₹{{ p.get_min_price }}</div>
+            <div class="s-price">₹{{ p.get_min_price }}</div>
         </div>
         {% endfor %}
     </div>
 </div>
 
 </div>
+
 <div id="toast" style="
     position: fixed;
     bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
-    background: #111827;
+    background: #1C1917;
     color: #fff;
     padding: 10px 16px;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 14px;
     display: none;
     z-index: 999999;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.24);
 "></div>
+
 <!-- ================= BOTTOM BAR ================= -->
 <div class="bottom-bar">
     <div class="bottom-inner">
 
-        <button id="cartBtn" class="btn btn-cart">🛒 Add to Cart</button>
-        <button id="buyBtn" class="btn btn-buy">⚡ Buy Now</button>
+        <button id="cartBtn" class="btn btn-cart">
+            <i class="bi bi-cart3"></i> Add to Cart
+        </button>
+
+        <button id="buyBtn" class="btn btn-buy">
+            <i class="bi bi-lightning-charge-fill"></i> Buy Now
+        </button>
 
     </div>
 </div>
@@ -386,7 +692,7 @@ function showToast(message, success = true) {
     if (!toast) return;
 
     toast.innerText = message;
-    toast.style.background = success ? "#16a34a" : "#dc2626";
+    toast.style.background = success ? "#0E9F6E" : "#C2410C";
     toast.style.display = "block";
 
     setTimeout(() => {
@@ -433,7 +739,9 @@ function selectVariant(el) {
 
     if (selectedVariant.stock > 0) {
 
-        stockText.innerText = "🟢 In Stock";
+        stockText.innerHTML = '<i class="bi bi-check-circle-fill"></i> In Stock';
+        stockText.classList.add("in-stock");
+        stockText.classList.remove("out-stock");
 
         cartBtn.disabled = false;
         buyBtn.disabled = false;
@@ -443,7 +751,9 @@ function selectVariant(el) {
 
     } else {
 
-        stockText.innerText = "🔴 Out of Stock";
+        stockText.innerHTML = '<i class="bi bi-x-circle-fill"></i> Out of Stock';
+        stockText.classList.add("out-stock");
+        stockText.classList.remove("in-stock");
 
         cartBtn.disabled = true;
         buyBtn.disabled = true;
@@ -479,7 +789,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const cartBtn = document.getElementById("cartBtn");
         const buyBtn = document.getElementById("buyBtn");
 
-        if (stockText) stockText.innerText = "🔴 Out of Stock (All Variants)";
+        if (stockText) {
+            stockText.innerHTML = '<i class="bi bi-x-circle-fill"></i> Out of Stock (All Variants)';
+            stockText.classList.add("out-stock");
+        }
 
         if (cartBtn) {
             cartBtn.disabled = true;
@@ -522,7 +835,7 @@ function toggleWishlist(btn) {
 
     const url = "{% url 'add_to_wishlist' product.id %}";
 
-    const isActive = btn.classList.toggle("active");
+    const icon = btn.querySelector("i");
 
     fetch(url, {
         method: "POST",
@@ -538,9 +851,17 @@ function toggleWishlist(btn) {
         // backend decides actual state
         if (data.success === true) {
             btn.classList.add("active");
-            showToast("❤️ Added to wishlist");
+            if (icon) {
+                icon.classList.remove("bi-heart");
+                icon.classList.add("bi-heart-fill");
+            }
+            showToast("Added to wishlist");
         } else {
             btn.classList.remove("active");
+            if (icon) {
+                icon.classList.remove("bi-heart-fill");
+                icon.classList.add("bi-heart");
+            }
             showToast(data.message || "Removed from wishlist");
         }
 
@@ -581,7 +902,7 @@ document.getElementById("cartBtn").addEventListener("click", function () {
     .then(data => {
 
         if (data.success === true) {
-            showToast(data.message || "🛒 Added to cart");
+            showToast(data.message || "Added to cart");
         } else {
             showToast(data.message || "Failed to add to cart", false);
         }

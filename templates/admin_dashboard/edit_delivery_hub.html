@@ -100,6 +100,34 @@
                                     value="{{ form.village.value|default:'' }}"
                                     required>
                             </div>
+
+
+                            <div class="mb-4">
+
+                            <label class="fw-bold small text-muted text-uppercase mb-2">
+                                Hub Owner
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-person-badge"></i>
+                                </span>
+
+                                {{ form.owner }}
+
+                            </div>
+
+                            <small class="text-muted">
+                                Select the Hub Partner who manages this hub.
+                            </small>
+
+                            <div class="text-danger small">
+                                {{ form.owner.errors }}
+                            </div>
+
+                        </div>
+
                             <!-- LAT LNG -->
                             <div class="row">
                                 <div class="col-6 mb-3">
