@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <link rel="manifest" href="{% static 'PWA/manifest.json' %}">
-<meta name="theme-color" content="#059669">
+<meta name="theme-color" content="#0B6B4F">
 
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,326 +14,287 @@
 <link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
 <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
 
-<title>{% block title %}GramaCart | All Essentials One Cart{% endblock %}</title>
+<title>{% block title %}GramaCart | All Essentials, One Cart{% endblock %}</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 
+/* =======================================================
+   DESIGN TOKENS
+======================================================= */
 :root{
 
-    /* Brand */
-    --brand-green:#059669;
-    --brand-green-dark:#047857;
+    /* Brand — deep forest, not flat emerald */
+    --brand:#0B6B4F;
+    --brand-dark:#084F3A;
+    --brand-light:#E8F2EC;
+    --brand-soft:#F1F8F4;
 
-    --navy:#0F172A;
-    --slate:#475569;
+    /* Warm accent — used sparingly for "for family" moments */
+    --terracotta:#C75D3D;
+    --terracotta-soft:#FBEAE3;
 
-    --bg:#F8FAFC;
+    /* Ink & neutrals — warm-tinted, not cold slate */
+    --ink:#13201C;
+    --ink-soft:#4B5A53;
+    --ink-faint:#7C8B83;
+
+    /* Warm sand background instead of stark white */
+    --sand:#FDF8F1;
     --white:#FFFFFF;
+    --border:#E8E2D6;
+    --border-soft:#EFEAE0;
 
-    --border:#E2E8F0;
-
-    --success:#10B981;
-    --warning:#F59E0B;
+    --gold:#D69E2E;
+    --danger:#C0392B;
 
     /* Radius */
-    --radius-sm:12px;
-    --radius-md:16px;
-    --radius-lg:20px;
+    --r-sm:10px;
+    --r-md:16px;
+    --r-lg:22px;
+    --r-xl:28px;
 
-    /* Shadows */
-    --shadow-sm:0 4px 12px rgba(15,23,42,.06);
+    /* Shadows — warm-tinted, soft */
+    --shadow-sm:0 2px 8px rgba(19,32,28,.05);
+    --shadow-md:0 10px 28px rgba(19,32,28,.08);
+    --shadow-lg:0 24px 56px rgba(19,32,28,.14);
 
-    --shadow-md:0 10px 30px rgba(15,23,42,.08);
+    /* Safe areas */
+    --sat:env(safe-area-inset-top, 0px);
+    --sab:env(safe-area-inset-bottom, 0px);
 
-    --shadow-lg:0 20px 50px rgba(15,23,42,.12);
-
+    /* App shell */
+    --nav-h:68px;
+    --tabbar-h:64px;
 }
 
 /* =======================================================
-   GLOBAL
+   GLOBAL RESET / APP SHELL FEEL
 ======================================================= */
+
+*{
+    -webkit-tap-highlight-color:transparent;
+}
 
 html{
     scroll-behavior:smooth;
 }
 
+@media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+    }
+}
+
 body{
-
     font-family:'Plus Jakarta Sans',sans-serif;
-
-    color:var(--navy);
-
-    background:var(--white);
-
+    color:var(--ink);
+    background:var(--sand);
     -webkit-font-smoothing:antialiased;
-
     overflow-x:hidden;
-
-    top:0 !important;
-
     position:static !important;
+    top:0 !important;
 }
 
-a{
-    text-decoration:none;
+/* Add this class on pages that render the bottom tab bar — see body_class block below */
+body.has-tabbar{
+    padding-bottom:calc(var(--tabbar-h) + var(--sab));
 }
 
-img{
-    max-width:100%;
-    display:block;
+h1,h2,h3,h4,h5,
+.display-serif{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:800;
+    letter-spacing:-.02em;
 }
 
-.container{
+a{ text-decoration:none; }
+img{ max-width:100%; display:block; }
+.container{ max-width:1240px; }
 
-    max-width:1240px;
+/* Native-feeling press state for any tappable element */
+.tap-scale{ transition:transform .15s ease; }
+.tap-scale:active{ transform:scale(.96); }
 
+/* Focus visibility kept for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+    outline:2px solid var(--brand);
+    outline-offset:2px;
 }
 
 /* =======================================================
-   NAVBAR
+   TOP APP BAR
 ======================================================= */
 
 .gc-navbar{
-    background:#FFFFFF !important;
-    border-bottom:1px solid #E5E7EB;
-    box-shadow:0 2px 12px rgba(15,23,42,.06);
-    padding:.9rem 0;
-    transition:.3s ease;
+    background:rgba(253,248,241,.92) !important;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border-soft);
+    padding-top:calc(.85rem + var(--sat));
+    padding-bottom:.85rem;
+    transition:.25s ease;
     z-index:1050;
 }
+
 main{
     position:relative;
     z-index:1;
 }
+
 .navbar-brand{
-
     display:flex;
-
     align-items:center;
-
-    gap:.2rem;
-
-    font-size:1.7rem;
-
+    gap:.4rem;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:1.6rem;
     font-weight:800;
-
-    color:var(--navy)!important;
-
+    color:var(--ink) !important;
     white-space:nowrap;
-
     flex-shrink:0;
 }
 
 .navbar-brand img{
-
-    height:42px;
-
+    height:40px;
     width:auto;
 }
 
-.brand-green{
-
-    color:var(--brand-green);
-}
+.brand-accent{ color:var(--brand); }
 
 /* =======================================================
-   NAV LINKS
+   NAV LINKS (desktop)
 ======================================================= */
 
-.navbar-nav{
-
-    gap:.25rem;
-}
+.navbar-nav{ gap:.25rem; }
 
 .nav-link{
-
-    color:var(--slate)!important;
-
+    color:var(--ink-soft) !important;
     font-weight:600;
-
-    padding:.7rem 1rem !important;
-
-    border-radius:12px;
-
-    transition:.25s;
+    padding:.65rem 1rem !important;
+    border-radius:var(--r-sm);
+    transition:.2s;
 }
 
 .nav-link:hover{
-
-    background:#ECFDF5;
-
-    color:var(--brand-green)!important;
+    background:var(--brand-light);
+    color:var(--brand) !important;
 }
 
 /* =======================================================
    BUTTONS
 ======================================================= */
 
+.btn{ -webkit-tap-highlight-color:transparent; }
+
 .btn-shop{
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     gap:.5rem;
-
-    background:linear-gradient(
-        135deg,
-        #10B981,
-        #059669
-    );
-
+    background:var(--brand);
     color:#fff;
-
     border:none;
-
-    border-radius:14px;
-
-    padding:12px 18px;
-
+    border-radius:var(--r-md);
+    padding:13px 20px;
     font-size:.95rem;
-
     font-weight:700;
-
-    box-shadow:
-        0 10px 25px rgba(5,150,105,.25);
-
-    transition:.3s;
-}
-
-.btn-partner{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:.5rem;
-
-    background:#EFF6FF;
-
-    color:#1E40AF;
-
-    border:1px solid #BFDBFE;
-
-    border-radius:14px;
-
-    padding:12px 18px;
-
-    font-size:.95rem;
-
-    font-weight:700;
-
-    transition:.3s;
-}
-
-.btn-partner:hover{
-
-    background:#DBEAFE;
-
-    color:#1E3A8A;
-
-    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(11,107,79,.22);
+    transition:.2s ease;
 }
 
 .btn-shop:hover{
-
-    transform:translateY(-2px);
-
+    background:var(--brand-dark);
     color:#fff;
+    transform:translateY(-1px);
+    box-shadow:0 14px 30px rgba(11,107,79,.3);
+}
 
-    box-shadow:
-        0 15px 35px rgba(5,150,105,.35);
+.btn-shop:active{ transform:scale(.97); }
+
+.btn-partner{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+    background:var(--terracotta-soft);
+    color:var(--terracotta);
+    border:1px solid #F0CFC0;
+    border-radius:var(--r-md);
+    padding:13px 20px;
+    font-size:.95rem;
+    font-weight:700;
+    transition:.2s ease;
+}
+
+.btn-partner:hover{
+    background:#F7DCCF;
+    color:#A8492E;
+    transform:translateY(-1px);
 }
 
 .btn-staff{
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     gap:.5rem;
-
     border:1px solid var(--border);
-
-    background:#fff;
-
-    color:var(--navy);
-
-    border-radius:14px;
-
-    padding:12px 18px;
-
+    background:var(--white);
+    color:var(--ink);
+    border-radius:var(--r-md);
+    padding:13px 20px;
     font-size:.95rem;
-
     font-weight:700;
-
-    transition:.3s;
+    transition:.2s ease;
 }
 
 .btn-staff:hover{
+    background:var(--brand-soft);
+    color:var(--brand);
+}
 
-    background:#F8FAFC;
-
-    color:var(--brand-green);
+.btn-shop, .btn-partner, .btn-staff{
+    min-height:52px;
+    font-weight:700;
 }
 
 /* =======================================================
-   TRANSLATE
+   TRANSLATE WIDGET
 ======================================================= */
 
 .translate-box{
-
     position:relative;
-
     width:44px;
-
     height:44px;
-
     border:1px solid var(--border);
-
-    border-radius:14px;
-
+    border-radius:var(--r-sm);
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
-    background:#fff;
-
-    transition:.3s;
+    background:var(--white);
+    transition:.2s;
+    flex-shrink:0;
 }
 
-.translate-box:hover{
-
-    background:#F8FAFC;
-}
+.translate-box:hover{ background:var(--brand-soft); }
 
 .translate-box i{
-
-    color:var(--brand-green);
-
+    color:var(--brand);
     font-size:1rem;
 }
 
 .lang-select{
-
     position:absolute;
-
     inset:0;
-
     opacity:0;
-
     cursor:pointer;
 }
 
@@ -342,71 +303,116 @@ main{
 ======================================================= */
 
 .navbar-toggler{
-
-    width:44px;
-
-    height:44px;
-
+    width:42px;
+    height:42px;
     border:none !important;
-
-    border-radius:14px;
-
-    background:#F8FAFC;
-
+    border-radius:var(--r-sm);
+    background:var(--brand-soft);
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     box-shadow:none !important;
-
     padding:0;
-
-    transition:.3s;
+    transition:.2s;
+    flex-shrink:0;
 }
 
-.navbar-toggler:hover{
-
-    background:#ECFDF5;
-}
+.navbar-toggler:hover{ background:var(--brand-light); }
 
 .navbar-toggler i{
-
-    font-size:1rem;
-
-    color:var(--navy);
+    font-size:1.05rem;
+    color:var(--brand);
 }
 
 /* =======================================================
-   MOBILE MENU
+   MOBILE MENU (full controls live here on small screens)
 ======================================================= */
 
 @media(max-width:991px){
 
     .navbar-collapse{
-
-        background:#fff;
-
-        margin-top:1rem;
-
-        padding:1rem;
-
-        border-radius:20px;
-
+        position:absolute;
+        top:calc(100% + 10px);
+        left:12px;
+        right:12px;
+        background:var(--white);
+        border:1px solid var(--border-soft);
+        border-radius:var(--r-lg);
+        padding:18px;
         box-shadow:var(--shadow-lg);
+        z-index:9999;
     }
 
-    .navbar-nav{
-
-        margin-bottom:1rem;
+    .navbar-collapse .btn{
+        width:100%;
+        margin-bottom:10px;
     }
 
-    .nav-link{
+    .navbar-nav{ margin-bottom:.75rem; }
+    .nav-link{ margin-bottom:.3rem; }
+}
 
-        margin-bottom:.35rem;
+/* =======================================================
+   BOTTOM TAB BAR — the core "app feel" element on mobile
+======================================================= */
+
+.gc-tabbar{
+    display:none;
+}
+
+@media(max-width:991px){
+
+    .gc-tabbar{
+        display:flex;
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        background:rgba(253,248,241,.97);
+        backdrop-filter:blur(16px);
+        -webkit-backdrop-filter:blur(16px);
+        border-top:1px solid var(--border-soft);
+        padding:8px 6px calc(8px + var(--sab));
+        z-index:1040;
+        box-shadow:0 -8px 24px rgba(19,32,28,.06);
     }
 
+    .gc-tab{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+        padding:6px 2px;
+        color:var(--ink-faint);
+        border-radius:var(--r-sm);
+        transition:.2s;
+    }
+
+    .gc-tab i{ font-size:1.3rem; line-height:1; }
+    .gc-tab span{ font-size:.68rem; font-weight:700; letter-spacing:.01em; }
+
+    .gc-tab.active{ color:var(--brand); }
+
+    .gc-tab.active i{
+        transform:translateY(-1px);
+    }
+
+    .gc-tab-cart{
+        position:relative;
+        top:-14px;
+        background:var(--brand);
+        color:#fff !important;
+        width:50px;
+        height:50px;
+        border-radius:50%;
+        box-shadow:0 10px 22px rgba(11,107,79,.35);
+        flex:0 0 50px;
+    }
+
+    .gc-tab-cart i{ font-size:1.4rem; }
+    .gc-tab-cart span{ display:none; }
 }
 
 /* =======================================================
@@ -414,52 +420,216 @@ main{
 ======================================================= */
 
 .main-footer{
-
-    background:var(--navy);
-
+    background:var(--ink);
     color:#fff;
-
-    padding:70px 0 35px;
-
-    margin-top:80px;
+    padding:64px 0 30px;
+    margin-top:60px;
 }
 
 .footer-heading{
-
-    color:var(--warning);
-
+    color:var(--gold);
     font-weight:800;
-
     margin-bottom:1rem;
-
-    font-size:.9rem;
-
-    letter-spacing:.05em;
-
+    font-size:.85rem;
+    letter-spacing:.06em;
     text-transform:uppercase;
 }
 
 .footer-link{
-
-    color:#94A3B8;
-
+    color:#A8B3AC;
     display:block;
-
     margin-bottom:.75rem;
-
-    transition:.25s;
+    transition:.2s;
 }
 
-.footer-link:hover{
-
-    color:#fff;
-}
+.footer-link:hover{ color:#fff; }
 
 .footer-brand{
-
-    font-size:1.8rem;
-
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:1.7rem;
     font-weight:800;
+}
+
+/* =======================================================
+   PAGE LOAD SKELETON
+======================================================= */
+
+#gc-loader{
+    position:fixed;
+    inset:0;
+    background:var(--sand);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:opacity .35s ease, visibility .35s ease;
+}
+
+#gc-loader.gc-loader-hide{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+.gc-loader-mark{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    position:relative;
+}
+
+.gc-loader-ring{
+    position:absolute;
+    top:-14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    border:2px solid var(--brand-light);
+    animation:gcRing 1.6s ease-out infinite;
+}
+
+@keyframes gcRing{
+    0%{ transform:translateX(-50%) scale(.7); opacity:.9; }
+    100%{ transform:translateX(-50%) scale(1.15); opacity:0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .gc-loader-ring{ animation:none; opacity:0; }
+}
+
+.gc-loader-logo{
+    width:72px;
+    height:72px;
+    border-radius:20px;
+    background:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 14px 32px rgba(11,107,79,.18);
+    animation:gcPulse 1.3s ease-in-out infinite;
+    padding:10px;
+}
+
+.gc-loader-logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+@keyframes gcPulse{
+    0%,100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(.93); opacity:.85; }
+}
+
+.gc-loader-text{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:800;
+    font-size:1rem;
+    color:var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce){
+    .gc-loader-logo{ animation:none; }
+}
+
+/* Skeleton shimmer for content placeholders (use class="gc-skel") */
+.gc-skel{
+    background:linear-gradient(90deg, var(--border-soft) 25%, #F5F0E6 37%, var(--border-soft) 63%);
+    background-size:400% 100%;
+    animation:gcShimmer 1.4s ease infinite;
+    border-radius:var(--r-sm);
+}
+
+@keyframes gcShimmer{
+    0%{ background-position:100% 50%; }
+    100%{ background-position:0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .gc-skel{ animation:none; }
+}
+
+/* =======================================================
+   PWA INSTALL PROMPT
+======================================================= */
+
+.gc-install-banner{
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:calc(var(--tabbar-h) + var(--sab) + 12px);
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-lg);
+    box-shadow:var(--shadow-lg);
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    z-index:1045;
+    transform:translateY(120%);
+    opacity:0;
+    transition:transform .35s ease, opacity .35s ease;
+}
+
+@media(min-width:992px){
+    .gc-install-banner{
+        left:auto;
+        right:24px;
+        bottom:24px;
+        max-width:340px;
+    }
+}
+
+.gc-install-banner.gc-install-show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+.gc-install-icon{
+    width:44px;
+    height:44px;
+    border-radius:12px;
+    background:var(--brand);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.gc-install-icon i{ color:#fff; font-size:1.15rem; }
+
+.gc-install-text{ flex:1; min-width:0; }
+.gc-install-text strong{ display:block; font-size:.9rem; color:var(--ink); }
+.gc-install-text span{ display:block; font-size:.78rem; color:var(--ink-faint); margin-top:1px; }
+
+.gc-install-actions{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+
+.gc-install-btn{
+    background:var(--brand);
+    color:#fff;
+    border:none;
+    border-radius:var(--r-sm);
+    padding:8px 14px;
+    font-size:.82rem;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.gc-install-dismiss{
+    background:none;
+    border:none;
+    color:var(--ink-faint);
+    font-size:1.2rem;
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
 }
 
 /* =======================================================
@@ -469,182 +639,38 @@ main{
 .goog-te-banner-frame,
 .goog-te-menu-frame,
 .skiptranslate,
-.goog-logo-link,
 .goog-te-gadget{
-
     display:none !important;
-
     visibility:hidden !important;
-
     height:0 !important;
 }
 
-html{
-
-    top:0 !important;
-}
-
 /* =======================================================
-   RESPONSIVE
+   RESPONSIVE TWEAKS
 ======================================================= */
 
 @media(max-width:768px){
 
-    .navbar-brand{
+    .navbar-brand{ font-size:1.3rem; }
+    .navbar-brand img{ height:32px; }
 
-        font-size:1.25rem;
-    }
-
-    .navbar-brand img{
-
-        height:34px;
-    }
-
-    .btn-shop,
-    .btn-staff,
-    .btn-partner{
-
-        width:100%;
-    }
-
-}
-
-.btn-shop,
-.btn-partner,
-.btn-staff{
-
-    min-height:52px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:.6rem;
-
-    font-weight:700;
+    .btn-shop, .btn-staff, .btn-partner{ width:100%; }
 }
 
 @media(max-width:480px){
-
-    .container{
-
-        padding-left:16px;
-        padding-right:16px;
-    }
-
+    .container{ padding-left:16px; padding-right:16px; }
 }
 
-.mobile-controls{
+@media(max-width:768px){
 
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-}
-
-.navbar-toggler{
-
-    width:40px;
-    height:40px;
-
-    border:none !important;
-
-    border-radius:12px;
-
-    background:#F1F5F9;
-
-    transition:.25s;
-
-    padding:0;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.navbar-toggler:hover{
-
-    background:#ECFDF5;
-}
-
-.navbar-toggler i{
-
-    font-size:1.2rem;
-    color:var(--brand-green);
-}
-@media(max-width:991px){
-
-    .navbar-collapse{
-
-        position:absolute;
-
-        top:72px;
-
-        left:12px;
-
-        right:12px;
-
-        background:#fff;
-
-        border:1px solid #E5E7EB;
-
-        border-radius:22px;
-
-        padding:16px;
-
-        box-shadow:
-            0 20px 50px rgba(15,23,42,.12);
-
-        z-index:9999;
-    }
-
-    .navbar-collapse .btn{
-
-        width:100%;
-
-        margin-bottom:10px;
-    }
-}
-/* ==========================
-   MOBILE FOOTER IMPROVEMENTS
-========================== */
-
-@media (max-width:768px){
-
-    .main-footer{
-        padding:50px 0 25px;
-        text-align:center;
-    }
-
-    .main-footer .row{
-        row-gap:2rem;
-    }
-
-    .footer-heading{
-        margin-bottom:.75rem;
-        font-size:.85rem;
-    }
-
-    .footer-link{
-        font-size:.92rem;
-        margin-bottom:.6rem;
-    }
-
-    .main-footer .btn{
-        width:100%;
-        max-width:260px;
-    }
-
-    .main-footer .col-6{
-        width:100%;
-    }
-
-    .main-footer p{
-        margin-bottom:.75rem;
-    }
+    .main-footer{ padding:48px 0 24px; text-align:center; }
+    body.has-tabbar .main-footer{ padding-bottom:calc(24px + var(--tabbar-h) + var(--sab)); }
+    .main-footer .row{ row-gap:2rem; }
+    .footer-heading{ margin-bottom:.75rem; font-size:.82rem; }
+    .footer-link{ font-size:.92rem; margin-bottom:.6rem; }
+    .main-footer .btn{ width:100%; max-width:260px; }
+    .main-footer .col-6{ width:100%; }
+    .main-footer p{ margin-bottom:.75rem; }
 
     .footer-features{
         display:flex;
@@ -652,7 +678,6 @@ html{
         gap:.6rem;
         align-items:center;
     }
-
 }
 
 </style>
@@ -669,240 +694,315 @@ html{
 
 </head>
 
-<body>
-<div class="ms-auto d-flex flex-column flex-lg-row"></div>
+<body class="{% block body_class %}{% endblock %}">
+
+<!-- Page load skeleton -->
+<div id="gc-loader">
+    <div class="gc-loader-mark">
+        <div class="gc-loader-ring"></div>
+        <div class="gc-loader-logo">
+            <img src="{% static 'images/logo.png' %}" alt="GramaCart">
+        </div>
+        <span class="gc-loader-text">GramaCart</span>
+    </div>
+</div>
+
 <nav class="navbar gc-navbar navbar-expand-lg sticky-top">
 
     <div class="container">
 
-        <a class="navbar-brand d-flex align-items-center"
-           href="/">
+        <a class="navbar-brand d-flex align-items-center" href="/">
 
-            <img src="{% static 'images/logo.png' %}"
-                 height="42"
-                 class="me-2">
+            <img src="{% static 'images/logo.png' %}" height="40" class="me-2">
 
-            <span class="brand-green">Grama</span><span class="text-dark">Cart</span>
+            <span class="brand-accent">Grama</span><span>Cart</span>
 
         </a>
 
-        <!-- Mobile Controls -->
-
+        <!-- Mobile top-bar controls: just translate + menu. Primary nav moved to bottom tab bar. -->
         <div class="d-flex align-items-center gap-2 d-lg-none">
 
             <div class="translate-box">
-
                 <i class="bi bi-translate"></i>
-
-                <select id="langSwitcherMobile"
-                        class="lang-select">
-
+                <select id="langSwitcherMobile" class="lang-select">
                     <option value="">🌐</option>
                     <option value="en">English</option>
                     <option value="te">తెలుగు</option>
                     <option value="hi">हिंदी</option>
                     <option value="kn">ಕನ್ನಡ</option>
                     <option value="ta">தமிழ்</option>
-
                 </select>
-
             </div>
 
-            <button class="navbar-toggler border-0 shadow-none"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#mainNav">
-
+            <button class="navbar-toggler tap-scale" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <i class="bi bi-grid-3x3-gap-fill"></i>
-
             </button>
 
         </div>
+
         <div class="collapse navbar-collapse" id="mainNav">
 
-            <div class="ms-auto d-flex flex-column flex-lg-row
-                        align-items-center
-                        gap-2 mt-3 mt-lg-0">
-       
-
-                <!-- Desktop Translate -->
+            <div class="ms-auto d-flex flex-column flex-lg-row align-items-center gap-2 mt-3 mt-lg-0">
 
                 <div class="translate-box d-none d-lg-flex">
-
                     <i class="bi bi-translate"></i>
-
-                    <select id="langSwitcherDesktop"
-                            class="lang-select">
-
+                    <select id="langSwitcherDesktop" class="lang-select">
                         <option value="">🌐</option>
                         <option value="en">English</option>
                         <option value="te">తెలుగు</option>
                         <option value="hi">हिंदी</option>
                         <option value="kn">ಕನ್ನಡ</option>
                         <option value="ta">தமிழ்</option>
-
                     </select>
-
                 </div>
 
-                <!-- Shop -->
-
-                <a href="{% url 'public_dashboard' %}"
-                class="btn btn-shop">
-
+                <a href="{% url 'public_dashboard' %}" class="btn btn-shop tap-scale">
                     <i class="bi bi-basket2-fill"></i>
-
                     Shop Now
-
                 </a>
 
-                
-
-                <!-- Staff -->
-
-                <a href="{% url 'user_signin' %}"
-                class="btn btn-staff">
-
+                <a href="{% url 'user_signin' %}" class="btn btn-staff tap-scale">
                     <i class="bi bi-person-badge"></i>
-
                     Staff Login
-
                 </a>
 
-                <!-- Hub Partner -->
-
-                <a href="#partner"
-                    class="btn btn-partner">
-
+                <a href="#partner" class="btn btn-partner tap-scale">
                     <i class="bi bi-shop-window"></i>
-
                     Become Hub Partner
-
                 </a>
 
             </div>
+
+        </div>
 
     </div>
 
 </nav>
 
 <main>{% block content %}{% endblock %}</main>
+
 <footer class="main-footer">
     <div class="container">
 
-    <div class="row g-4">
+        <div class="row g-4">
 
-        <!-- Brand -->
-        <div class="col-lg-4">
+            <div class="col-lg-4">
 
-            <h3 class="text-white fw-bold mb-3">
-                <span class="brand-green">Grama</span>Cart
-            </h3>
+                <h3 class="footer-brand text-white mb-3">
+                    <span class="brand-accent">Grama</span>Cart
+                </h3>
 
-            <p class="small mb-4" style="color:#94A3B8;">
-                Need something at home? GramaCart delivers daily essentials
-                and household needs to your doorstep in as little as
-                30–40 minutes through trusted local village hubs.
-            </p>
+                <p class="small mb-4" style="color:#A8B3AC;">
+                    Need something at home? GramaCart delivers daily essentials
+                    and household needs to your doorstep in as little as
+                    30–40 minutes through trusted local village hubs.
+                </p>
 
-            <div class="small mb-4" style="color:#94A3B8;">
-                <div class="mb-2">
-                    <i class="bi bi-truck me-2 text-success"></i>
-                    Fast Local Delivery
+                <div class="small mb-4" style="color:#A8B3AC;">
+                    <div class="mb-2"><i class="bi bi-truck me-2" style="color:#3FAE82;"></i>Fast Local Delivery</div>
+                    <div class="mb-2"><i class="bi bi-shield-check me-2" style="color:#3FAE82;"></i>Trusted Village Network</div>
+                    <div><i class="bi bi-clock-history me-2" style="color:#3FAE82;"></i>Delivery in 30–40 Minutes*</div>
                 </div>
 
-                <div class="mb-2">
-                    <i class="bi bi-shield-check me-2 text-success"></i>
-                    Trusted Village Network
-                </div>
+                <a href="https://wa.me/919876543210" class="btn btn-sm btn-outline-light rounded-pill px-3 tap-scale">
+                    <i class="bi bi-whatsapp me-2"></i>WhatsApp Support
+                </a>
 
-                <div>
-                    <i class="bi bi-clock-history me-2 text-success"></i>
-                    Delivery in 30–40 Minutes*
-                </div>
             </div>
 
-            <a href="https://wa.me/919876543210"
-               class="btn btn-sm btn-outline-light rounded-pill px-3">
+            <div class="col-6 col-lg-3 offset-lg-1">
 
-                <i class="bi bi-whatsapp me-2"></i>
-                WhatsApp Support
+                <h5 class="footer-heading">Quick Links</h5>
 
-            </a>
+                <a href="/" class="footer-link"><i class="bi bi-house-door me-2"></i>Home</a>
+                <a href="{% url 'public_dashboard' %}" class="footer-link"><i class="bi bi-basket2 me-2"></i>Shop Now</a>
+                <a href="#partner" class="footer-link"><i class="bi bi-shop me-2"></i>Become Hub Partner</a>
+                <a href="mailto:connect@gramacart.com" class="footer-link"><i class="bi bi-headset me-2"></i>Support</a>
 
-        </div>
+            </div>
 
-        <!-- Quick Links -->
-        <div class="col-6 col-lg-3 offset-lg-1">
+            <div class="col-6 col-lg-3">
 
-            <h5 class="footer-heading">Quick Links</h5>
+                <h5 class="footer-heading">Contact</h5>
 
-            <a href="/" class="footer-link">
-                <i class="bi bi-house-door me-2"></i>Home
-            </a>
+                <p class="footer-link mb-3"><i class="bi bi-geo-alt me-2" style="color:#3FAE82;"></i>Serving Andhra Pradesh Villages</p>
+                <p class="footer-link mb-3"><i class="bi bi-heart-fill me-2" style="color:var(--terracotta);"></i>Built for Rural India</p>
+                <p class="footer-link mb-0"><i class="bi bi-envelope me-2" style="color:#3FAE82;"></i>connect@gramacart.com</p>
 
-            <a href="{% url 'public_dashboard' %}" class="footer-link">
-                <i class="bi bi-basket2 me-2"></i>Shop Now
-            </a>
-
-            <a href="#partner" class="footer-link">
-                <i class="bi bi-shop me-2"></i>Become Hub Partner
-            </a>
-
-            <a href="mailto:connect@gramacart.com" class="footer-link">
-                <i class="bi bi-headset me-2"></i>Support
-            </a>
+            </div>
 
         </div>
 
-        <!-- Contact -->
-        <div class="col-6 col-lg-3">
+        <div class="mt-5 pt-4 border-top border-secondary text-center" style="border-color:#2A352F !important;">
 
-            <h5 class="footer-heading">Contact</h5>
-
-            <p class="footer-link mb-3">
-                <i class="bi bi-geo-alt me-2 text-success"></i>
-                Serving Andhra Pradesh Villages
+            <p class="small mb-2" style="color:#A8B3AC;">
+                *Delivery time may vary based on location, hub availability,
+                weather conditions, and order volume.
             </p>
 
-            <p class="footer-link mb-3">
-                <i class="bi bi-heart-fill me-2 text-danger"></i>
-                Built for Rural India
-            </p>
-
-            <p class="footer-link mb-0">
-                <i class="bi bi-envelope me-2 text-success"></i>
-                connect@gramacart.com
+            <p style="font-size:.85rem;color:#7C8B83;">
+                © 2026 GramaCart Technologies. All Rights Reserved.
             </p>
 
         </div>
 
     </div>
-
-    <div class="mt-5 pt-4 border-top border-secondary text-center">
-
-        <p class="small mb-2" style="color:#94A3B8;">
-            *Delivery time may vary based on location, hub availability,
-            weather conditions, and order volume.
-        </p>
-
-        <p style="font-size:.85rem;color:#64748B;">
-            © 2026 GramaCart Technologies. All Rights Reserved.
-        </p>
-
-    </div>
-
-</div>
-
-
 </footer>
 
+<!-- BOTTOM TAB BAR — shown only on pages that opt in (e.g. dashboard/shop), not on the homepage -->
+{% block tabbar %}{% endblock %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- PWA install banner (Android / desktop Chrome — real install prompt) -->
+<div id="gcInstallBanner" class="gc-install-banner">
+    <div class="gc-install-icon"><i class="bi bi-download"></i></div>
+    <div class="gc-install-text">
+        <strong>Add GramaCart to your home screen</strong>
+        <span>Faster access, app-like experience</span>
+    </div>
+    <div class="gc-install-actions">
+        <button id="gcInstallBtn" class="gc-install-btn tap-scale">Install</button>
+        <button id="gcInstallDismiss" class="gc-install-dismiss tap-scale" aria-label="Dismiss">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+</div>
+
+<!-- iOS install banner (Safari has no automatic prompt — show manual steps) -->
+<div id="gcInstallBannerIOS" class="gc-install-banner">
+    <div class="gc-install-icon"><i class="bi bi-house-add"></i></div>
+    <div class="gc-install-text">
+        <strong>Add GramaCart to your home screen</strong>
+        <span>Tap <i class="bi bi-box-arrow-up"></i> Share, then "Add to Home Screen"</span>
+    </div>
+    <div class="gc-install-actions">
+        <button id="gcInstallDismissIOS" class="gc-install-dismiss tap-scale" aria-label="Dismiss">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+</div>
+
 <script>
+/* Hide page-load skeleton once everything is ready */
+(function(){
+    const loader = document.getElementById('gc-loader');
+    if(!loader) return;
+    function hideLoader(){
+        loader.classList.add('gc-loader-hide');
+        setTimeout(()=> loader.remove(), 400);
+    }
+    if(document.readyState === 'complete'){
+        setTimeout(hideLoader, 250);
+    }else{
+        window.addEventListener('load', ()=> setTimeout(hideLoader, 250));
+    }
+    /* Safety net: never block the page for more than 2.5s */
+    setTimeout(hideLoader, 2500);
+})();
+
+/* PWA install prompt */
+(function(){
+    let deferredPrompt = null;
+    const banner = document.getElementById('gcInstallBanner');
+    const installBtn = document.getElementById('gcInstallBtn');
+    const dismissBtn = document.getElementById('gcInstallDismiss');
+    if(!banner){ console.warn('[GC PWA] install banner element not found in DOM'); return; }
+
+    const DISMISS_KEY = 'gc_install_dismissed_at';
+    const DISMISS_DAYS = 14;
+
+    function recentlyDismissed(){
+        const ts = localStorage.getItem(DISMISS_KEY);
+        if(!ts) return false;
+        const days = (Date.now() - Number(ts)) / (1000*60*60*24);
+        return days < DISMISS_DAYS;
+    }
+
+    console.log('[GC PWA] standalone mode:', window.matchMedia('(display-mode: standalone)').matches);
+    console.log('[GC PWA] recently dismissed:', recentlyDismissed());
+    console.log('[GC PWA] waiting for beforeinstallprompt event...');
+
+    window.addEventListener('beforeinstallprompt', (e)=>{
+        console.log('[GC PWA] beforeinstallprompt FIRED ✅');
+        e.preventDefault();
+        deferredPrompt = e;
+        if(!recentlyDismissed() && !window.matchMedia('(display-mode: standalone)').matches){
+            console.log('[GC PWA] showing banner in 1.2s');
+            setTimeout(()=> banner.classList.add('gc-install-show'), 1200);
+        }else{
+            console.log('[GC PWA] event fired but banner suppressed (dismissed recently or already standalone)');
+        }
+    });
+
+    installBtn?.addEventListener('click', async ()=>{
+        banner.classList.remove('gc-install-show');
+        if(deferredPrompt){
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            console.log('[GC PWA] user choice:', choice.outcome);
+            deferredPrompt = null;
+        }
+    });
+
+    dismissBtn?.addEventListener('click', ()=>{
+        banner.classList.remove('gc-install-show');
+        localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    });
+
+    window.addEventListener('appinstalled', ()=>{
+        console.log('[GC PWA] appinstalled event fired');
+        banner.classList.remove('gc-install-show');
+    });
+
+    /* If the event hasn't fired after 4s, log likely reasons */
+    setTimeout(()=>{
+        if(!deferredPrompt){
+            console.warn('[GC PWA] beforeinstallprompt did NOT fire within 4s. Common causes: ' +
+                '(1) already installed/in standalone mode, ' +
+                '(2) no active service worker, ' +
+                '(3) manifest.json missing/invalid or missing a 192x192 + 512x512 icon, ' +
+                '(4) not served over HTTPS (or localhost), ' +
+                '(5) the browser\'s own engagement-heuristic throttling for this origin.');
+        }
+    }, 4000);
+})();
+
+/* iOS install banner — Safari has no beforeinstallprompt event, so show manual steps instead */
+(function(){
+    const bannerIOS = document.getElementById('gcInstallBannerIOS');
+    const dismissIOS = document.getElementById('gcInstallDismissIOS');
+    if(!bannerIOS) return;
+
+    const DISMISS_KEY_IOS = 'gc_install_dismissed_ios_at';
+    const DISMISS_DAYS = 14;
+
+    function recentlyDismissedIOS(){
+        const ts = localStorage.getItem(DISMISS_KEY_IOS);
+        if(!ts) return false;
+        const days = (Date.now() - Number(ts)) / (1000*60*60*24);
+        return days < DISMISS_DAYS;
+    }
+
+    const ua = window.navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+    console.log('[GC PWA] isIOS:', isIOS, '| isSafari:', isSafari, '| standalone:', isInStandaloneMode);
+
+    if(isIOS && isSafari && !isInStandaloneMode && !recentlyDismissedIOS()){
+        setTimeout(()=> bannerIOS.classList.add('gc-install-show'), 1200);
+    }
+
+    dismissIOS?.addEventListener('click', ()=>{
+        bannerIOS.classList.remove('gc-install-show');
+        localStorage.setItem(DISMISS_KEY_IOS, String(Date.now()));
+    });
+})();
+
 function changeLang(lang){
     if(!lang) return;
-
     localStorage.setItem("lang", lang);
     document.cookie="googtrans=/en/"+lang+";path=/";
     location.reload();
@@ -922,6 +1022,24 @@ setInterval(()=>{
     if(frame) frame.remove();
     document.body.style.top="0px";
 },300);
+
+/* Scroll-reveal for sections marked with .reveal */
+(function(){
+    const items = document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window) || !items.length){
+        items.forEach(el => el.classList.add('reveal-in'));
+        return;
+    }
+    const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+            if(entry.isIntersecting){
+                entry.target.classList.add('reveal-in');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold:.15, rootMargin:'0px 0px -40px 0px' });
+    items.forEach(el => obs.observe(el));
+})();
 </script>
 
 <!-- GOOGLE TRANSLATE ENGINE -->

@@ -3,377 +3,1539 @@
 
 {% block content %}
 
-<section class="hero-section py-5">
-    <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 text-center text-lg-start">
-                <span class="badge hero-badge mb-4">
-                   
-                    <i class="bi bi-scooter me-2"></i>
-                    Delivery In As Little As 30 Minutes
-                </span>
-                
-                
-                <h1 class="display-4 fw-bold mb-4">
-                    Groceries & Daily Essentials,
-
-                    <span class="text-success">
-                        Delivered To You Or Your Family In The Village.
-                    </span>
-                </h1>
-
-                <p class="lead text-muted mb-4">
-                    Order groceries, household essentials and daily needs for yourself
-                     or your loved ones from anywhere in India or abroad. </p>
-
-                <p class="fw-semibold text-success mb-3">
-                    ⚡ Fast delivery through trusted local village hubs
-                </p>
-
-                <a href="{% url 'public_dashboard' %}"
-                class="btn btn-success btn-lg px-5">
-                    <i class="bi bi-cart3 me-2"></i>
-                    Shop Now
-                </a>
-            </div>
-
-            <div class="col-lg-6 text-center">
-                <img src="{% static 'images/1.png' %}" class="img-fluid hero-image" alt="GramaCart">
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Shop By Category</h2>
-            <p class="text-muted">Everything your family needs in one place</p>
-        </div>
-        <a href="{% url 'public_dashboard' %}"class="text-decoration-none text-dark">
-        <div class="row g-4">
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/groceries.png' %}"><h6>Groceries</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/women essentials.png' %}"><h6>Women Essentials</h6></div></div>          
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/dairy & breakfast.png' %}"><h6>Dairy & Breakfast</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/babycare.png' %}"><h6>Baby Care</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/personalcare.png' %}"><h6>Personal Care</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/snacks.png' %}"><h6>Snacks & Beverages</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/household.png' %}"><h6>Household Essentials</h6></div></div>
-            <div class="col-6 col-md-3"><div class="category-card"><img src= "{% static 'images/vegetables.png' %}"><h6>Vegetables & Fruits</h6></div></div>
-        </div>
-        </a>
-    </div>
-</section>
-
-<section class="py-5 bg-light">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4">
-            Ordering For Parents Or Family?
-        </h2>
-
-        <p class="lead text-muted">
-
-        Working in Hyderabad, Bangalore, Chennai, Mumbai
-        or even abroad?
-
-        </p>
-
-        <p class="text-muted">
-
-        Now you can order groceries, household essentials,
-        baby care products and daily needs for your parents
-        and loved ones back in the village.
-
-        Place the order online and we'll take care of the delivery.
-
-        </p>
-    </div>
-</section>
-
-<section class="py-4 bg-white border-top border-bottom">
-    <div class="container">
-        <div class="row text-center g-4">
-
-            <div class="col-6 col-md-3">
-                <i class="bi bi-clock-history display-6 text-success"></i>
-                <h6 class="mt-2 mb-1">30–40 Min Delivery</h6>
-                <small class="text-muted">Fast local fulfillment</small>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <i class="bi bi-house-heart display-6 text-success"></i>
-                <h6 class="mt-2 mb-1">Village Doorstep</h6>
-                <small class="text-muted">Delivered to homes</small>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <i class="bi bi-geo-alt display-6 text-success"></i>
-                <h6 class="mt-2 mb-1">Local Hubs</h6>
-                <small class="text-muted">Trusted community partners</small>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <i class="bi bi-phone display-6 text-success"></i>
-                <h6 class="mt-2 mb-1">Order Anywhere</h6>
-                <small class="text-muted">City or abroad</small>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">How GramaCart Works</h2>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="step-card">
-                    <img src="{% static 'images/step 1.png' %}" class="img-fluid rounded-4 mb-3">
-                    <h5>Choose Delivery Location</h5>
-                    <p>Select your village and delivery address.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="step-card">
-                    <img src="{% static 'images/mobile.png' %}" class="img-fluid rounded-4 mb-3">
-                    <h5>Place Your Order</h5>
-                    <p>Choose essentials, groceries and daily-use products.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="step-card">
-                    <img src="{% static 'images/image1.png' %}" class="img-fluid rounded-4 mb-3">
-                    <h5>Fast Delivery</h5>
-                    <p>Delivered directly to the doorstep within 30–40 minutes.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">Popular Essentials</h2>
-            <a href="{% url 'public_dashboard' %}" class="btn btn-outline-success">
-                Explore Shop
-            </a>
-        </div>
-
-        <div class="row g-4">
-            {% for product in products|slice:":8" %}
-            <div class="col-6 col-md-3">
-                <div class="product-card">
-                    {% with product.product_images.all|first as img_obj %}
-                        {% if img_obj %}
-                        <img src="{{ img_obj.image.url }}" class="product-image">
-                        {% endif %}
-                    {% endwith %}
-
-                    <a href="{% url 'public_dashboard' %}"
-                    class="btn btn-success btn-sm mt-2">
-                    Check Availability
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="py-5 bg-light">
-    <div class="container">
-
-        <div class="row align-items-center">
-
-            <div class="col-lg-8">
-
-                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
-                    Local Businesses & Creators
-                </span>
-
-                <h2 class="fw-bold mb-3">
-                    Sell Your Products On GramaCart
-                </h2>
-
-                <p class="text-muted mb-4">
-                    Do you make homemade foods, handicrafts, bangles, snacks,
-                    sweets, tailoring products or run a cloud kitchen?
-                    Reach more customers through GramaCart and grow your business
-                    in your village and nearby areas.
-                </p>
-
-                <div class="d-flex flex-wrap gap-2">
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-basket2-fill me-2"></i>
-                        Homemade Foods
-                    </span>
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-cup-hot-fill me-2"></i>
-                        Snacks & Sweets
-                    </span>
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-shop me-2"></i>
-                        Cloud Kitchen
-                    </span>
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-gem me-2"></i>
-                        Handmade Bangles
-                    </span>
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-palette-fill me-2"></i>
-                        Handicrafts
-                    </span>
-
-                    <span class="vendor-tag">
-                        <i class="bi bi-scissors me-2"></i>
-                        Tailoring Products
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-
-                <a href="{% url 'seller_application' %}"
-                   class="btn btn-success btn-lg px-4">
-                    <i class="bi bi-shop me-2"></i>
-                    Sell on GramaCart
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-</section>
-
-<section id="partner" class="py-5">
-    <div class="container">
-        <div class="cta-box text-center">
-            <h2 class="fw-bold mb-3">
-                Start A GramaCart Hub In Your Village
-            </h2>
-            <p>
-                Become a local hub partner and build a business in your community.
-            </p>
-            <p class="mb-4">
-
-                Serve your community, create local jobs
-                and build a profitable village business.
-
-            </p>
-            <a href="#" class="btn btn-light btn-lg">
-                Become Hub Partner
-            </a>
-        </div>
-    </div>
-</section>
-
-<a href="https://wa.me/919701969272" class="btn-wa-float">
-    <i class="bi bi-whatsapp"></i>
-</a>
-
 <style>
-    body{
-    font-family:'Plus Jakarta Sans',sans-serif;
+
+/* =======================================================
+   HOMEPAGE-SPECIFIC STYLES
+======================================================= */
+
+.section-pad{ padding:72px 0; }
+@media(max-width:768px){ .section-pad{ padding:48px 0; } }
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    background:var(--brand-light);
+    color:var(--brand);
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:.82rem;
+    font-weight:700;
+    letter-spacing:.02em;
 }
 
-.category-card,
-.product-card,
-.step-card{
-    background:#fff;
-    border:1px solid #eef2f7;
-    border-radius:24px;
-    box-shadow:0 10px 30px rgba(15,23,42,.06);
+/* Reveal-on-scroll */
+.reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .6s ease, transform .6s ease;
+}
+.reveal-in{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* =======================================================
+   HERO — with signature "city to village" thread
+======================================================= */
+
+.hero-section{
+    background:
+        radial-gradient(circle at 85% 10%, rgba(11,107,79,.07), transparent 55%),
+        var(--sand);
+    padding:56px 0 40px;
+    overflow:hidden;
+}
+
+.hero-eyebrow{
+    background:var(--terracotta-soft);
+    color:var(--terracotta);
+}
+
+.hero-title{
+    font-size:clamp(2.1rem, 4.2vw, 3.1rem);
+    font-weight:600;
+    line-height:1.15;
+    color:var(--ink);
+}
+
+.hero-title .accent{
+    color:var(--brand);
+    display:block;
+}
+
+.hero-sub{
+    color:var(--ink-soft);
+    font-size:1.08rem;
+    max-width:520px;
+}
+
+.hero-trust{
+    color:var(--brand);
+    font-weight:700;
+    font-size:.95rem;
+}
+
+/* The signature visual: a route card showing delivery path, switchable between two audiences */
+.route-card{
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-xl);
+    box-shadow:var(--shadow-lg);
+    padding:10px 10px 28px;
+    max-width:440px;
+    margin:0 auto;
+}
+
+.route-toggle{
+    display:flex;
+    background:var(--brand-soft);
+    border-radius:var(--r-md);
+    padding:5px;
+    margin-bottom:22px;
+    gap:4px;
+}
+
+.route-toggle button{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    font-weight:700;
+    font-size:.85rem;
+    padding:10px 8px;
+    border-radius:12px;
+    transition:.2s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+}
+
+.route-toggle button.active{
+    background:var(--white);
+    color:var(--brand);
+    box-shadow:var(--shadow-sm);
+}
+
+.route-panels{ padding:0 18px; }
+
+.route-panel{ display:none; }
+.route-panel.active{ display:block; animation:routeFade .35s ease; }
+
+@keyframes routeFade{
+    from{ opacity:0; transform:translateY(4px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.route-row{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+}
+
+.route-line{
+    position:relative;
+    width:18px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.route-dot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--brand);
+    box-shadow:0 0 0 4px var(--brand-light);
+    flex-shrink:0;
+}
+
+.route-dot.end{
+    background:var(--terracotta);
+    box-shadow:0 0 0 4px var(--terracotta-soft);
+}
+
+.route-dash{
+    width:2px;
+    flex:1;
+    min-height:56px;
+    margin:4px 0;
+    background-image:linear-gradient(var(--brand) 60%, transparent 0%);
+    background-size:2px 10px;
+    background-repeat:repeat-y;
+    animation:dashFlow 1.4s linear infinite;
+}
+
+@keyframes dashFlow{
+    from{ background-position:0 0; }
+    to{ background-position:0 20px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .route-dash{ animation:none; }
+}
+
+.route-label-top{ font-size:.78rem; color:var(--ink-faint); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+.route-place{ font-weight:700; font-size:1.05rem; color:var(--ink); margin-top:2px; }
+.route-meta{ font-size:.85rem; color:var(--ink-soft); margin-top:2px; }
+
+.route-divider{
+    margin:18px 0;
+    border-top:1px dashed var(--border);
+}
+
+.route-badge-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--brand-soft);
+    border-radius:var(--r-md);
+    padding:12px 16px;
+    margin-top:18px;
+}
+
+.route-badge-row strong{ color:var(--brand); font-size:.92rem; }
+.route-badge-row span{ font-size:.8rem; color:var(--ink-soft); }
+
+/* =======================================================
+   CATEGORY GRID
+======================================================= */
+
+.category-card{
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-lg);
+    padding:24px 14px;
+    text-align:center;
+    height:100%;
+    box-shadow:var(--shadow-sm);
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    position:relative;
+    overflow:hidden;
+}
+
+.category-card::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg, var(--brand-soft), transparent 60%);
+    opacity:0;
     transition:.3s;
 }
 
-.category-card:hover,
-.product-card:hover,
+.category-card:hover{
+    transform:translateY(-6px);
+    box-shadow:var(--shadow-md);
+    border-color:var(--brand-light);
+}
+
+.category-card:hover::before{ opacity:1; }
+
+.category-card .cat-img-wrap{
+    width:72px;
+    height:72px;
+    margin:0 auto 14px;
+    border-radius:18px;
+    background:var(--brand-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    z-index:1;
+    transition:.3s;
+}
+
+.category-card:hover .cat-img-wrap{
+    background:var(--brand-light);
+    transform:scale(1.05);
+}
+
+.category-card img{
+    width:42px;
+    height:42px;
+    object-fit:contain;
+}
+
+.category-card h6{
+    font-size:.86rem;
+    font-weight:700;
+    color:var(--ink);
+    margin:0;
+    position:relative;
+    z-index:1;
+}
+
+/* =======================================================
+   FOR-FAMILY SECTION — terracotta accent, the emotional core
+======================================================= */
+
+.family-section{
+    background:var(--white);
+    border-top:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);
+}
+
+.family-card{
+    background:linear-gradient(135deg, var(--terracotta-soft), #FFF9F5);
+    border-radius:var(--r-xl);
+    padding:40px 32px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.family-card h2{ color:var(--ink); }
+.family-card .lead{ color:var(--ink-soft); }
+
+.self-card{
+    background:var(--white);
+    border:1.5px solid var(--brand-light);
+    border-radius:var(--r-xl);
+    padding:40px 32px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.self-card h2{ color:var(--ink); }
+
+.self-eyebrow{
+    background:var(--brand-light);
+    color:var(--brand);
+}
+
+.city-pills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-top:20px;
+}
+
+.city-pill{
+    background:var(--white);
+    border:1px solid #F0CFC0;
+    color:var(--terracotta);
+    font-weight:700;
+    font-size:.85rem;
+    padding:8px 16px;
+    border-radius:999px;
+}
+
+/* =======================================================
+   STAT STRIP
+======================================================= */
+
+.stat-strip{
+    background:var(--white);
+    border-top:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);
+    padding:36px 0;
+}
+
+.stat-item i{ font-size:1.7rem; color:var(--brand); }
+.stat-item h6{ margin:10px 0 2px; font-weight:700; font-size:.95rem; }
+.stat-item small{ color:var(--ink-faint); }
+
+/* =======================================================
+   STEPS
+======================================================= */
+
+.steps-row{
+    position:relative;
+}
+
+@media(min-width:768px){
+    .steps-row::before{
+        content:'';
+        position:absolute;
+        top:38px;
+        left:16.5%;
+        right:16.5%;
+        height:2px;
+        background:repeating-linear-gradient(to right, var(--brand-light) 0, var(--brand-light) 8px, transparent 8px, transparent 16px);
+        z-index:0;
+    }
+}
+
+.step-card{
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-lg);
+    padding:28px;
+    height:100%;
+    box-shadow:var(--shadow-sm);
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    position:relative;
+    z-index:1;
+}
+
 .step-card:hover{
     transform:translateY(-6px);
-    box-shadow:0 25px 50px rgba(15,23,42,.10);
+    box-shadow:var(--shadow-md);
+    border-color:var(--brand-light);
 }
-.category-img{
-    width:90px;
-    height:90px;
-    object-fit:contain;
+
+.step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--brand);
+    color:#fff;
+    font-weight:800;
+    font-size:.95rem;
+    margin-bottom:16px;
+    box-shadow:0 8px 18px rgba(11,107,79,.25);
+}
+
+.step-card img{
+    border-radius:var(--r-md);
+    aspect-ratio:16/10;
+    object-fit:cover;
+    margin-bottom:18px;
+}
+
+.step-card h5{ font-weight:800; margin-bottom:6px; font-size:1.1rem; }
+.step-card p{ color:var(--ink-soft); font-size:.92rem; margin-bottom:0; }
+
+/* =======================================================
+   PRODUCT GRID
+======================================================= */
+
+.product-card{
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-lg);
+    padding:16px;
+    height:100%;
+    box-shadow:var(--shadow-sm);
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+}
+
+.product-card:hover{
+    transform:translateY(-5px);
+    box-shadow:var(--shadow-md);
+    border-color:var(--brand-light);
 }
 
 .product-image{
     width:100%;
     aspect-ratio:1/1;
     object-fit:cover;
+    border-radius:var(--r-md);
+    background:var(--brand-soft);
 }
 
-.step-image{
-    width:100%;
-    aspect-ratio:16/10;
-    object-fit:cover;
-}
-.hero-section{background:linear-gradient(180deg,#fff,#f8fafc);}
-.hero-badge{background:#ecfdf5;color:#059669;padding:10px 16px;border-radius:50px;}
-.hero-image{border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.12);}
+/* =======================================================
+   PARTNER CTA
+======================================================= */
 
-.category-card,.step-card,.product-card{
-background:#fff;border-radius:24px;padding:24px;
-box-shadow:0 10px 30px rgba(15,23,42,.06);
-text-align:center;height:100%;transition:.3s;
+/* =======================================================
+   POPULAR ESSENTIALS — premium spotlight rail on dark band
+======================================================= */
+
+.essentials-band{
+    background:var(--ink);
+    position:relative;
+    overflow:hidden;
 }
-.category-card:hover,.step-card:hover,.product-card:hover{
-transform:translateY(-6px);
+
+.essentials-band::before{
+    content:'';
+    position:absolute;
+    top:-120px;
+    right:-80px;
+    width:380px;
+    height:380px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(11,107,79,.4), transparent 70%);
+    pointer-events:none;
 }
-.category-card i{
-font-size:2rem;color:#059669;display:block;margin-bottom:12px;
+
+.essentials-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:32px;
+    position:relative;
+    z-index:1;
 }
-.product-image{
-width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;
-}
-.cta-box{
-background:#059669;color:#fff;padding:60px 30px;border-radius:30px;
-}
-.btn-wa-float{
-position:fixed;bottom:20px;right:20px;width:60px;height:60px;
-background:#25D366;color:#fff;border-radius:50%;
-display:flex;align-items:center;justify-content:center;
-font-size:28px;z-index:1000;text-decoration:none;
-}
-@media(max-width:768px){
-.hero-section{text-align:center;}
-}
-.vendor-tag{
+
+.essentials-eyebrow{
+    background:rgba(255,255,255,.08);
+    color:#A8E0C5;
     display:inline-flex;
     align-items:center;
-    padding:10px 16px;
-    background:#ffffff;
-    border:1px solid #e5e7eb;
+    gap:.5rem;
+    padding:7px 15px;
     border-radius:999px;
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.essentials-head h2{ color:#fff; }
+
+.essentials-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:#A8E0C5;
+    font-weight:700;
     font-size:.9rem;
-    font-weight:600;
-    color:#374151;
-    box-shadow:0 4px 12px rgba(15,23,42,.05);
-    transition:.3s;
+    border-bottom:1px solid rgba(168,224,197,.4);
+    padding-bottom:4px;
+    transition:.2s;
 }
 
-.vendor-tag:hover{
+.essentials-link:hover{ color:#fff; border-color:#fff; gap:12px; }
+
+.products-rail{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:18px;
+    position:relative;
+    z-index:1;
+}
+
+@media(max-width:991px){
+    .products-rail{
+        display:flex;
+        overflow-x:auto;
+        gap:14px;
+        padding-bottom:8px;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+    }
+    .products-rail::-webkit-scrollbar{ display:none; }
+    .products-rail{ scrollbar-width:none; }
+}
+
+.product-card{
+    background:#1C2B24;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--r-lg);
+    padding:0;
+    height:100%;
+    transition:.3s cubic-bezier(.2,.8,.2,1);
+    overflow:hidden;
+    position:relative;
+}
+
+@media(max-width:991px){
+    .product-card{
+        flex:0 0 62%;
+        scroll-snap-align:start;
+    }
+}
+
+@media(max-width:480px){
+    .product-card{ flex:0 0 72%; }
+}
+
+.product-card:hover{
+    transform:translateY(-8px);
+    border-color:rgba(168,224,197,.3);
+}
+
+.product-media{
+    position:relative;
+    aspect-ratio:1/1;
+    background:#26352E;
+    overflow:hidden;
+}
+
+.product-image{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.4s ease;
+}
+
+.product-card:hover .product-image{ transform:scale(1.08); }
+
+.product-fresh-badge{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(6px);
+    color:#A8E0C5;
+    font-size:.68rem;
+    font-weight:800;
+    padding:5px 10px;
+    border-radius:999px;
+    letter-spacing:.03em;
+}
+
+.product-body{ padding:16px; }
+
+.product-name{
+    font-size:.92rem;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.product-tag{
+    font-size:.78rem;
+    color:#8FA398;
+    margin-bottom:14px;
+}
+
+.product-cta{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    width:100%;
+    background:rgba(255,255,255,.06);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:var(--r-sm);
+    padding:10px;
+    font-size:.85rem;
+    font-weight:700;
+    transition:.2s;
+}
+
+.product-card:hover .product-cta{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:#fff;
+}
+
+.rail-scroll-hint{
+    display:none;
+}
+
+@media(max-width:991px){
+    .rail-scroll-hint{
+        display:flex;
+        align-items:center;
+        gap:6px;
+        font-size:.78rem;
+        color:#8FA398;
+        margin-top:14px;
+        justify-content:center;
+        position:relative;
+        z-index:1;
+    }
+}
+
+/* =======================================================
+   SELL ON GRAMACART — premium split pitch panel
+======================================================= */
+
+.seller-panel{
+    background:linear-gradient(135deg, var(--ink) 0%, #1C2B24 100%);
+    border-radius:var(--r-xl);
+    position:relative;
+    overflow:hidden;
+    color:#fff;
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+}
+
+@media(max-width:900px){
+    .seller-panel{ grid-template-columns:1fr; }
+}
+
+.seller-panel::before{
+    content:'';
+    position:absolute;
+    top:-60px;
+    right:-60px;
+    width:280px;
+    height:280px;
+    background:radial-gradient(circle, rgba(11,107,79,.4), transparent 70%);
+    pointer-events:none;
+}
+
+.seller-main{
+    padding:48px 44px;
+    position:relative;
+    z-index:1;
+}
+
+@media(max-width:768px){
+    .seller-main{ padding:36px 24px; }
+}
+
+.seller-eyebrow{
+    background:rgba(255,255,255,.1);
+    color:#A8E0C5;
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:700;
+}
+
+.seller-panel h2{ color:#fff; }
+.seller-main > p{ color:#C5D3CC; max-width:440px; }
+
+.seller-category-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+    margin-top:28px;
+}
+
+@media(max-width:768px){
+    .seller-category-grid{ grid-template-columns:repeat(2, 1fr); }
+}
+
+.seller-cat-item{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:var(--r-md);
+    padding:14px 10px;
+    text-align:center;
+    transition:.2s;
+}
+
+.seller-cat-item:hover{
+    background:rgba(255,255,255,.1);
     transform:translateY(-2px);
-    border-color:#16a34a;
-    color:#16a34a;
 }
 
+.seller-cat-item i{
+    font-size:1.3rem;
+    color:#A8E0C5;
+    display:block;
+    margin-bottom:8px;
+}
+
+.seller-cat-item span{
+    font-size:.78rem;
+    font-weight:600;
+    color:#E5ECE8;
+}
+
+.btn-seller-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    background:#fff;
+    color:var(--ink);
+    border-radius:var(--r-md);
+    padding:14px 26px;
+    font-weight:800;
+    margin-top:28px;
+    transition:.2s;
+}
+
+.btn-seller-cta:hover{
+    background:var(--brand-light);
+    color:var(--brand-dark);
+    transform:translateY(-2px);
+}
+
+.seller-showcase{
+    background:rgba(255,255,255,.04);
+    border-left:1px solid rgba(255,255,255,.08);
+    padding:44px 36px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:30px;
+    position:relative;
+    z-index:1;
+}
+
+@media(max-width:900px){
+    .seller-showcase{ border-left:none; border-top:1px solid rgba(255,255,255,.08); padding:32px 24px; }
+}
+
+.seller-big-stat strong{
+    display:block;
+    font-size:3.2rem;
+    font-weight:800;
+    line-height:1;
+    color:#fff;
+    letter-spacing:-.02em;
+}
+
+.seller-big-stat span{
+    font-size:.85rem;
+    color:#9FB3A8;
+    display:block;
+    margin-top:6px;
+}
+
+.seller-divider{
+    height:1px;
+    background:rgba(255,255,255,.1);
+}
+
+/* =======================================================
+   HUB PARTNER CTA — premium opportunity card
+======================================================= */
+
+.partner-panel{
+    background:var(--white);
+    border:1px solid var(--border-soft);
+    border-radius:var(--r-xl);
+    overflow:hidden;
+    box-shadow:var(--shadow-lg);
+}
+
+.partner-panel-inner{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+}
+
+@media(max-width:900px){
+    .partner-panel-inner{ grid-template-columns:1fr; }
+}
+
+.partner-copy{ padding:48px 44px; }
+
+@media(max-width:768px){
+    .partner-copy{ padding:36px 26px; }
+}
+
+.partner-copy h2{ font-size:1.8rem; margin-bottom:14px; }
+.partner-copy > p{ color:var(--ink-soft); margin-bottom:24px; max-width:440px; }
+
+.partner-steps{ display:flex; flex-direction:column; gap:14px; margin-bottom:28px; }
+
+.partner-step{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.partner-step-num{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--brand-light);
+    color:var(--brand);
+    font-weight:800;
+    font-size:.85rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.partner-step span{ font-size:.92rem; color:var(--ink); font-weight:600; }
+
+.partner-visual{
+    background:linear-gradient(160deg, var(--brand), var(--brand-dark));
+    padding:44px 36px;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.partner-visual::before{
+    content:'';
+    position:absolute;
+    bottom:-50px;
+    left:-50px;
+    width:200px;
+    height:200px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+}
+
+.partner-hub-network{
+    position:relative;
+    height:96px;
+    margin-bottom:28px;
+}
+
+.hub-node{
+    position:absolute;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:rgba(255,255,255,.9);
+}
+
+.hub-node.center{
+    width:22px;
+    height:22px;
+    background:#fff;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 8px rgba(255,255,255,.15);
+    z-index:2;
+}
+
+.hub-node.n1{ top:8%; left:18%; }
+.hub-node.n2{ top:14%; left:78%; }
+.hub-node.n3{ top:78%; left:12%; }
+.hub-node.n4{ top:82%; left:72%; }
+
+.hub-line{
+    position:absolute;
+    top:50%;
+    left:50%;
+    height:1px;
+    background:rgba(255,255,255,.35);
+    transform-origin:0 0;
+}
+
+.partner-visual-stat{
+    margin-bottom:22px;
+    position:relative;
+}
+
+.partner-visual-stat strong{
+    font-size:2.1rem;
+    font-weight:800;
+    display:block;
+    line-height:1;
+}
+
+.partner-visual-stat span{
+    font-size:.85rem;
+    color:rgba(255,255,255,.8);
+}
+
+/* =======================================================
+   WHATSAPP FLOAT — positioned above tab bar on mobile
+======================================================= */
+
+.btn-wa-float{
+    position:fixed;
+    right:18px;
+    bottom:calc(24px + var(--sab));
+    width:56px;
+    height:56px;
+    background:#25D366;
+    color:#fff;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    z-index:1030;
+    box-shadow:0 10px 26px rgba(37,211,102,.4);
+    transition:.2s;
+}
+
+.btn-wa-float:hover{ color:#fff; transform:translateY(-2px); }
+
+@media(max-width:768px){
+    .hero-section{ text-align:center; }
+    .route-card{ margin-top:32px; }
+}
 
 </style>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6 text-center text-lg-start reveal">
+
+                <span class="eyebrow hero-eyebrow mb-4">
+                    <i class="bi bi-scooter"></i>
+                    Delivery in as little as 30 minutes
+                </span>
+
+                <h1 class="hero-title mt-4 mb-4">
+                    Groceries &amp; daily essentials,
+                    <span class="accent">delivered to your village doorstep.</span>
+                </h1>
+
+                <p class="hero-sub mb-3 mx-auto mx-lg-0">
+                    Order for your own home in the village, or for your parents
+                    and loved ones — from anywhere in India or abroad. We handle the rest.
+                </p>
+
+                <p class="hero-trust mb-4">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Fulfilled through trusted local village hubs
+                </p>
+
+                <a href="{% url 'public_dashboard' %}" class="btn btn-shop tap-scale d-inline-flex px-5" style="width:auto;">
+                    <i class="bi bi-cart3"></i>
+                    Shop Now
+                </a>
+
+            </div>
+
+            <!-- Signature visual: switchable delivery route — for family (remote) or for self (villager) -->
+            <div class="col-lg-6 reveal">
+                <div class="route-card">
+
+                    <div class="route-toggle" role="tablist">
+                        <button type="button" class="active" id="routeTabFamily" onclick="gcSwitchRoute('family')">
+                            <i class="bi bi-heart-fill"></i> For Family
+                        </button>
+                        <button type="button" id="routeTabSelf" onclick="gcSwitchRoute('self')">
+                            <i class="bi bi-house-door-fill"></i> For Myself
+                        </button>
+                    </div>
+
+                    <div class="route-panels">
+
+                        <!-- Panel: remote customer ordering for family in the village -->
+                        <div class="route-panel active" id="routePanelFamily">
+
+                            <div class="route-row">
+                                <div class="route-line">
+                                    <div class="route-dot"></div>
+                                    <div class="route-dash"></div>
+                                    <div class="route-dot end"></div>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="mb-4">
+                                        <div class="route-label-top">Ordered from</div>
+                                        <div class="route-place">Hyderabad, Dubai, or anywhere</div>
+                                        <div class="route-meta">Placed in under 2 minutes</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="route-label-top">Delivered to</div>
+                                        <div class="route-place">Your family's village doorstep</div>
+                                        <div class="route-meta">By a trusted local hub partner</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="route-divider"></div>
+
+                            <div class="route-badge-row">
+                                <div>
+                                    <strong>30–40 min</strong><br>
+                                    <span>average delivery window</span>
+                                </div>
+                                <i class="bi bi-truck" style="font-size:1.6rem;color:var(--brand);"></i>
+                            </div>
+
+                        </div>
+
+                        <!-- Panel: villager ordering directly for themselves -->
+                        <div class="route-panel" id="routePanelSelf">
+
+                            <div class="route-row">
+                                <div class="route-line">
+                                    <div class="route-dot"></div>
+                                    <div class="route-dash"></div>
+                                    <div class="route-dot end"></div>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="mb-4">
+                                        <div class="route-label-top">Ordered from</div>
+                                        <div class="route-place">Right in your own village</div>
+                                        <div class="route-meta">No travel to the market needed</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="route-label-top">Delivered to</div>
+                                        <div class="route-place">Your own doorstep</div>
+                                        <div class="route-meta">By your nearest local hub partner</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="route-divider"></div>
+
+                            <div class="route-badge-row">
+                                <div>
+                                    <strong>30–40 min</strong><br>
+                                    <span>average delivery window</span>
+                                </div>
+                                <i class="bi bi-bicycle" style="font-size:1.6rem;color:var(--brand);"></i>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CATEGORIES ===================== -->
+<section class="section-pad" style="background:var(--white);">
+    <div class="container">
+
+        <div class="text-center mb-5 reveal">
+            <span class="eyebrow mb-3">Shop By Category</span>
+            <h2 class="fw-semibold mt-3 mb-2" style="font-size:1.9rem;">Everything your family needs</h2>
+            <p class="text-secondary" style="color:var(--ink-soft);">In one place, ready in minutes</p>
+        </div>
+
+        <a href="{% url 'public_dashboard' %}" class="text-decoration-none">
+            <div class="row g-3 g-md-4 reveal">
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/groceries.png' %}" alt="Groceries"></div>
+                        <h6>Groceries</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/women essentials.png' %}" alt="Women Essentials"></div>
+                        <h6>Women Essentials</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/dairy & breakfast.png' %}" alt="Dairy & Breakfast"></div>
+                        <h6>Dairy &amp; Breakfast</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/babycare.png' %}" alt="Baby Care"></div>
+                        <h6>Baby Care</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/personalcare.png' %}" alt="Personal Care"></div>
+                        <h6>Personal Care</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/snacks.png' %}" alt="Snacks & Beverages"></div>
+                        <h6>Snacks &amp; Beverages</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/household.png' %}" alt="Household Essentials"></div>
+                        <h6>Household Essentials</h6>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="category-card tap-scale">
+                        <div class="cat-img-wrap"><img src="{% static 'images/vegetables.png' %}" alt="Vegetables & Fruits"></div>
+                        <h6>Vegetables &amp; Fruits</h6>
+                    </div>
+                </div>
+
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- ===================== ORDERING FOR FAMILY ===================== -->
+<section class="section-pad family-section">
+    <div class="container">
+
+        <div class="row g-4 reveal">
+
+            <div class="col-lg-7">
+                <div class="family-card h-100">
+
+                    <span class="eyebrow hero-eyebrow mb-3">
+                        <i class="bi bi-heart-fill"></i>
+                        For families apart
+                    </span>
+
+                    <h2 class="fw-semibold mt-3 mb-3" style="font-size:1.7rem;">Ordering for parents back home?</h2>
+
+                    <p class="lead mx-auto mb-2" style="max-width:520px; font-size:1rem;">
+                        Working in Hyderabad, Bangalore, Chennai, Mumbai — or abroad?
+                    </p>
+
+                    <p class="mx-auto" style="max-width:520px; color:var(--ink-soft); font-size:.95rem;">
+                        Order groceries, household essentials, baby care products and daily
+                        needs for your parents and loved ones in the village. Place the order
+                        online, and we'll take care of the delivery.
+                    </p>
+
+                    <div class="city-pills">
+                        <span class="city-pill">Hyderabad</span>
+                        <span class="city-pill">Bangalore</span>
+                        <span class="city-pill">Chennai</span>
+                        <span class="city-pill">Mumbai</span>
+                        <span class="city-pill">Abroad</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="self-card h-100">
+
+                    <span class="eyebrow self-eyebrow mb-3">
+                        <i class="bi bi-house-door-fill"></i>
+                        For villagers
+                    </span>
+
+                    <h2 class="fw-semibold mt-3 mb-3" style="font-size:1.7rem;">Live in the village? Order directly.</h2>
+
+                    <p class="mb-4" style="color:var(--ink-soft); font-size:.95rem;">
+                        No need to wait for someone in the city to order for you.
+                        Open GramaCart, choose your essentials, and get them delivered
+                        to your own doorstep — just like anyone else.
+                    </p>
+
+                    <a href="{% url 'public_dashboard' %}" class="btn btn-shop tap-scale d-inline-flex" style="width:auto;">
+                        <i class="bi bi-cart3"></i>
+                        Order For Myself
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ===================== STAT STRIP ===================== -->
+<section class="stat-strip">
+    <div class="container">
+        <div class="row text-center g-4 reveal">
+
+            <div class="col-6 col-md-3 stat-item">
+                <i class="bi bi-clock-history"></i>
+                <h6>30–40 Min Delivery</h6>
+                <small>Fast local fulfillment</small>
+            </div>
+
+            <div class="col-6 col-md-3 stat-item">
+                <i class="bi bi-house-heart"></i>
+                <h6>Village Doorstep</h6>
+                <small>Delivered to homes</small>
+            </div>
+
+            <div class="col-6 col-md-3 stat-item">
+                <i class="bi bi-geo-alt"></i>
+                <h6>Local Hubs</h6>
+                <small>Trusted community partners</small>
+            </div>
+
+            <div class="col-6 col-md-3 stat-item">
+                <i class="bi bi-phone"></i>
+                <h6>Order Anywhere</h6>
+                <small>City or abroad</small>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section class="section-pad" style="background:var(--white);">
+    <div class="container">
+
+        <div class="text-center mb-5 reveal">
+            <span class="eyebrow mb-3">Simple, Start To Finish</span>
+            <h2 class="fw-semibold mt-3" style="font-size:1.9rem;">How GramaCart works</h2>
+        </div>
+
+        <div class="row g-4 reveal steps-row">
+
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <img src="{% static 'images/step 1.png' %}" alt="Choose delivery location">
+                    <h5>Choose delivery location</h5>
+                    <p>Select your village and delivery address.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <img src="{% static 'images/mobile.png' %}" alt="Place your order">
+                    <h5>Place your order</h5>
+                    <p>Choose essentials, groceries and daily-use products.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <img src="{% static 'images/image1.png' %}" alt="Fast delivery">
+                    <h5>Fast delivery</h5>
+                    <p>Delivered directly to the doorstep within 30–40 minutes.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===================== POPULAR PRODUCTS ===================== -->
+<section class="section-pad essentials-band">
+    <div class="container">
+
+        <div class="essentials-head reveal">
+            <div>
+                <span class="essentials-eyebrow">
+                    <i class="bi bi-lightning-fill"></i>
+                    Fresh Picks
+                </span>
+                <h2 class="fw-semibold mb-0 mt-3" style="font-size:1.8rem;">Popular essentials</h2>
+            </div>
+            <a href="{% url 'public_dashboard' %}" class="essentials-link d-none d-sm-flex">
+                Explore Shop
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="products-rail reveal">
+            {% for product in products|slice:":8" %}
+            <div class="product-card">
+
+                <div class="product-media">
+                    <span class="product-fresh-badge">In Stock</span>
+                    {% with product.product_images.all|first as img_obj %}
+                        {% if img_obj %}
+                        <img src="{{ img_obj.image.url }}" class="product-image" alt="{{ product.name|default:'Product' }}">
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                <div class="product-body">
+                    <div class="product-name">{{ product.name|default:"Daily Essential" }}</div>
+                    <div class="product-tag">Delivered in 30–40 min</div>
+
+                    <a href="{% url 'public_dashboard' %}" class="product-cta tap-scale">
+                        <i class="bi bi-cart-plus"></i>
+                        Check Availability
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="rail-scroll-hint">
+            <i class="bi bi-arrow-left-right"></i>
+            Swipe to see more
+        </div>
+
+        <a href="{% url 'public_dashboard' %}" class="btn btn-shop tap-scale w-100 mt-4 d-sm-none">
+            Explore Shop
+        </a>
+
+    </div>
+</section>
+
+<!-- ===================== SELL ON GRAMACART ===================== -->
+<section class="section-pad" style="background:var(--white);">
+    <div class="container">
+
+        <div class="seller-panel reveal">
+
+            <div class="seller-main">
+
+                <span class="seller-eyebrow">
+                    <i class="bi bi-stars"></i>
+                    Local Businesses &amp; Creators
+                </span>
+
+                <h2 class="fw-semibold mt-3 mb-3" style="font-size:1.85rem;">Sell your products on GramaCart</h2>
+
+                <p class="mb-0">
+                    Do you make homemade foods, handicrafts, bangles, snacks, sweets,
+                    tailoring products, or run a cloud kitchen? Reach more customers
+                    and grow your business in your village and nearby areas.
+                </p>
+
+                <div class="seller-category-grid">
+                    <div class="seller-cat-item">
+                        <i class="bi bi-basket2-fill"></i>
+                        <span>Homemade Foods</span>
+                    </div>
+                    <div class="seller-cat-item">
+                        <i class="bi bi-cup-hot-fill"></i>
+                        <span>Snacks &amp; Sweets</span>
+                    </div>
+                    <div class="seller-cat-item">
+                        <i class="bi bi-shop"></i>
+                        <span>Cloud Kitchen</span>
+                    </div>
+                    <div class="seller-cat-item">
+                        <i class="bi bi-gem"></i>
+                        <span>Handmade Bangles</span>
+                    </div>
+                    <div class="seller-cat-item">
+                        <i class="bi bi-palette-fill"></i>
+                        <span>Handicrafts</span>
+                    </div>
+                    <div class="seller-cat-item">
+                        <i class="bi bi-scissors"></i>
+                        <span>Tailoring</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'seller_application' %}" class="btn-seller-cta tap-scale">
+                    <i class="bi bi-shop"></i>
+                    Sell on GramaCart
+                </a>
+
+            </div>
+
+            <div class="seller-showcase">
+
+                <div class="seller-big-stat">
+                    <strong>0%</strong>
+                    <span>Setup cost to get started</span>
+                </div>
+
+                <div class="seller-divider"></div>
+
+                <div class="seller-big-stat">
+                    <strong>30 min</strong>
+                    <span>Average time to list your first product</span>
+                </div>
+
+                <div class="seller-divider"></div>
+
+                <div class="seller-big-stat">
+                    <strong>Local</strong>
+                    <span>Customers right in your own community</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ===================== HUB PARTNER CTA ===================== -->
+<section id="partner" class="section-pad">
+    <div class="container">
+
+        <div class="partner-panel reveal">
+            <div class="partner-panel-inner">
+
+                <div class="partner-copy">
+
+                    <span class="eyebrow mb-3">
+                        <i class="bi bi-shop-window"></i>
+                        Become A Hub Partner
+                    </span>
+
+                    <h2 class="fw-semibold mt-3">Start a GramaCart hub in your village</h2>
+
+                    <p>
+                        Serve your community, create local jobs, and build a
+                        profitable business — right from your own village.
+                    </p>
+
+                    <div class="partner-steps">
+                        <div class="partner-step">
+                            <div class="partner-step-num">1</div>
+                            <span>Apply and get verified as a local hub</span>
+                        </div>
+                        <div class="partner-step">
+                            <div class="partner-step-num">2</div>
+                            <span>Receive orders for your village</span>
+                        </div>
+                        <div class="partner-step">
+                            <div class="partner-step-num">3</div>
+                            <span>Deliver, earn, and grow your business</span>
+                        </div>
+                    </div>
+
+                    <a href="#" class="btn btn-shop tap-scale d-inline-flex px-4" style="width:auto;">
+                        <i class="bi bi-arrow-right-circle"></i>
+                        Become Hub Partner
+                    </a>
+
+                </div>
+
+                <div class="partner-visual">
+
+                    <div class="partner-hub-network" aria-hidden="true">
+                        <div class="hub-line" style="width:90px; transform:rotate(-148deg);"></div>
+                        <div class="hub-line" style="width:75px; transform:rotate(-200deg);"></div>
+                        <div class="hub-line" style="width:95px; transform:rotate(195deg);"></div>
+                        <div class="hub-line" style="width:80px; transform:rotate(145deg);"></div>
+                        <div class="hub-node center"></div>
+                        <div class="hub-node n1"></div>
+                        <div class="hub-node n2"></div>
+                        <div class="hub-node n3"></div>
+                        <div class="hub-node n4"></div>
+                    </div>
+
+                    <div class="partner-visual-stat">
+                        <strong>30–40 min</strong>
+                        <span>Average delivery window you'll fulfill</span>
+                    </div>
+
+                    <div class="partner-visual-stat">
+                        <strong>100%</strong>
+                        <span>Local — you serve your own community</span>
+                    </div>
+
+                    <div class="partner-visual-stat mb-0">
+                        <strong>Daily</strong>
+                        <span>Order flow from nearby customers</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<a href="https://wa.me/919701969272" class="btn-wa-float tap-scale" aria-label="WhatsApp Support">
+    <i class="bi bi-whatsapp"></i>
+</a>
+
+<script>
+function gcSwitchRoute(which){
+    const tabFamily = document.getElementById('routeTabFamily');
+    const tabSelf = document.getElementById('routeTabSelf');
+    const panelFamily = document.getElementById('routePanelFamily');
+    const panelSelf = document.getElementById('routePanelSelf');
+
+    if(which === 'family'){
+        tabFamily.classList.add('active');
+        tabSelf.classList.remove('active');
+        panelFamily.classList.add('active');
+        panelSelf.classList.remove('active');
+    }else{
+        tabSelf.classList.add('active');
+        tabFamily.classList.remove('active');
+        panelSelf.classList.add('active');
+        panelFamily.classList.remove('active');
+    }
+}
+</script>
 
 {% endblock %}
