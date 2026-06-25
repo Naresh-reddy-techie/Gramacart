@@ -1,491 +1,737 @@
 {% load static %}
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>GramaCart | Verify OTP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
 
-<title>GramaCart | Verify OTP</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<style>
-
-:root{
-    --emerald:#00c853;
-    --emerald-dark:#00a846;
-    --navy:#0f172a;
-    --bg:#f8fafc;
-    --border:#e2e8f0;
-    --muted:#64748b;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    background:var(--bg);
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-}
-
-.otp-card{
-    width:100%;
-    max-width:420px;
-    background:white;
-    border-radius:28px;
-    padding:32px 24px;
-    border:1px solid var(--border);
-    box-shadow:0 20px 50px rgba(15,23,42,.06);
-}
-
-.back-link{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    color:#475569;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:24px;
-}
-
-.back-link:hover{
-    color:var(--emerald);
-}
-
-.brand{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.brand-icon{
-    width:70px;
-    height:70px;
-    margin:auto;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 10px 25px rgba(15,23,42,.08);
-}
-
-.brand-icon img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-}
-
-.brand-name{
-    margin-top:14px;
-    font-size:28px;
-    font-weight:800;
-}
-
-.brand-name span{
-    color:var(--emerald);
-}
-
-.otp-title{
-    text-align:center;
-    font-size:24px;
-    font-weight:800;
-    margin-bottom:8px;
-}
-
-.otp-subtitle{
-    text-align:center;
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:18px;
-}
-
-.phone-pill{
-    width:fit-content;
-    margin:0 auto 22px;
-    padding:10px 16px;
-    border-radius:999px;
-    background:#f8fafc;
-    border:1px solid var(--border);
-    font-size:14px;
-    font-weight:700;
-}
-
-.sms-card{
-    background:#f8fafc;
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:18px;
-    margin-bottom:24px;
-}
-
-.sms-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:14px;
-}
-
-.sms-avatar{
-    width:42px;
-    height:42px;
-    border-radius:12px;
-    background:var(--emerald);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.sms-title{
-    font-size:14px;
-    font-weight:800;
-}
-
-.sms-time{
-    font-size:12px;
-    color:#94a3b8;
-}
-
-.otp-highlight{
-    text-align:center;
-    font-size:34px;
-    font-weight:800;
-    letter-spacing:10px;
-    color:var(--emerald);
-    margin:10px 0;
-}
-
-.sms-note{
-    text-align:center;
-    font-size:12px;
-    color:var(--muted);
-}
-
-.otp-wrapper{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    margin-bottom:24px;
-}
-
-.otp-input{
-    width:60px;
-    height:65px;
-    border:1px solid var(--border);
-    border-radius:16px;
-    text-align:center;
-    font-size:28px;
-    font-weight:800;
-}
-
-.otp-input:focus{
-    outline:none;
-    border-color:var(--emerald);
-    box-shadow:0 0 0 4px rgba(0,200,83,.08);
-}
-
-.verify-btn{
-    width:100%;
-    height:58px;
-    border:none;
-    border-radius:16px;
-    background:var(--emerald);
-    color:white;
-    font-weight:800;
-    font-size:16px;
-}
-
-.verify-btn:hover{
-    background:var(--emerald-dark);
-}
-
-.timer{
-    margin-top:20px;
-    text-align:center;
-    color:var(--muted);
-    font-size:14px;
-    font-weight:700;
-}
-
-.change-number{
-    margin-top:14px;
-    text-align:center;
-}
-
-.change-number a{
-    color:var(--emerald);
-    text-decoration:none;
-    font-weight:700;
-}
-
-.alert{
-    border-radius:14px;
-}
-
-@media(max-width:576px){
-
-    .otp-card{
-        padding:24px 18px;
+    :root{
+      --green:#10B981;
+      --green-dark:#059669;
+      --green-deeper:#065F46;
+      --green-50:#ECFDF5;
+      --green-100:#D1FAE8;
+      --amber:#F59E0B;
+      --paper:#F0FDF6;
+      --white:#FFFFFF;
+      --ink:#0F172A;
+      --ink-2:#334155;
+      --ink-3:#64748B;
+      --ink-4:#94A3B8;
+      --ink-5:#CBD5E1;
+      --border:#E2E8F0;
+      --red:#EF4444;
+      --red-light:#FEF2F2;
     }
 
-    .otp-input{
-        width:52px;
-        height:58px;
-        font-size:24px;
+    *, *::before, *::after{ margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:var(--paper);
+      min-height:100vh;
+      display:flex;
+      align-items:stretch;
+      color:var(--ink);
+      -webkit-font-smoothing:antialiased;
     }
 
-    .otp-highlight{
-        font-size:30px;
-        letter-spacing:8px;
+    a{ text-decoration:none; color:inherit; }
+
+    /* ══ LEFT PANEL ══ */
+    .left-panel{
+      flex:1;
+      background:linear-gradient(160deg, #059669 0%, #10B981 50%, #34D399 100%);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:40px 44px 44px;
+      position:relative;
+      overflow:hidden;
+      min-height:100vh;
     }
-}
 
-</style>
+    .left-panel::before{
+      content:"";
+      position:absolute;
+      width:320px; height:320px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.06);
+      top:-100px; right:-100px;
+    }
 
+    .left-panel::after{
+      content:"";
+      position:absolute;
+      width:180px; height:180px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.05);
+      bottom:-60px; left:-50px;
+    }
+
+    .lp-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      position:relative;
+      z-index:2;
+    }
+
+    .lp-logo{
+      width:48px; height:48px;
+      border-radius:15px;
+      background:rgba(255,255,255,0.18);
+      border:1.5px solid rgba(255,255,255,0.3);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+
+    .lp-logo img{ width:100%; height:100%; object-fit:contain; }
+
+    .lp-brand-name{
+      font-family:'Baloo 2',sans-serif;
+      font-size:22px; font-weight:800;
+      color:#fff; letter-spacing:-0.4px;
+    }
+
+    .lp-brand-name span{ opacity:0.75; }
+
+    .lp-centre{
+      position:relative; z-index:2;
+      flex:1; display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:32px 0;
+    }
+
+    /* big phone mockup */
+    .phone-mockup{
+      width:200px;
+      background:rgba(255,255,255,0.12);
+      border:1.5px solid rgba(255,255,255,0.25);
+      border-radius:28px;
+      padding:20px 16px;
+      margin-bottom:36px;
+    }
+
+    .pm-notch{
+      width:60px; height:6px;
+      background:rgba(255,255,255,0.3);
+      border-radius:3px;
+      margin:0 auto 20px;
+    }
+
+    .pm-sms-bubble{
+      background:rgba(255,255,255,0.92);
+      border-radius:14px 14px 14px 4px;
+      padding:12px 14px;
+      margin-bottom:10px;
+    }
+
+    .pm-sms-sender{
+      font-size:10px;
+      font-weight:800;
+      color:var(--green-deeper);
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:5px;
+    }
+
+    .pm-sms-sender i{ font-size:11px; }
+
+    .pm-otp-digits{
+      font-family:'Baloo 2',sans-serif;
+      font-size:26px;
+      font-weight:800;
+      color:var(--green-deeper);
+      letter-spacing:6px;
+      text-align:center;
+      margin:4px 0;
+    }
+
+    .pm-sms-text{
+      font-size:10px;
+      color:var(--ink-3);
+      line-height:1.4;
+      margin-top:6px;
+    }
+
+    .pm-time{
+      font-size:10px;
+      color:rgba(255,255,255,0.5);
+      text-align:right;
+      margin-top:4px;
+    }
+
+    .lp-headline{
+      font-family:'Baloo 2',sans-serif;
+      font-size:32px; font-weight:800;
+      color:#fff;
+      line-height:1.15;
+      letter-spacing:-0.7px;
+      margin-bottom:14px;
+    }
+
+    .lp-headline em{ font-style:normal; opacity:0.7; }
+
+    .lp-tagline{
+      font-size:14px;
+      color:rgba(255,255,255,0.78);
+      line-height:1.65;
+      font-weight:500;
+      max-width:300px;
+    }
+
+    .lp-trust{
+      position:relative; z-index:2;
+      display:flex; flex-direction:column;
+      gap:10px;
+    }
+
+    .trust-row{
+      display:flex; align-items:center;
+      gap:10px; font-size:13px;
+      color:rgba(255,255,255,0.82);
+      font-weight:600;
+    }
+
+    .trust-icon{
+      width:32px; height:32px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.14);
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; color:#fff; flex-shrink:0;
+    }
+
+    /* ══ RIGHT PANEL ══ */
+    .right-panel{
+      width:440px;
+      flex-shrink:0;
+      background:var(--white);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:52px 44px;
+    }
+
+    .rp-scroll{
+      width:100%;
+      max-width:340px;
+      margin:0 auto;
+    }
+
+    /* mobile logo row */
+    .rp-logo-row{
+      display:flex; align-items:center;
+      gap:10px; margin-bottom:32px;
+    }
+
+    .rp-logo-img{
+      width:42px; height:42px;
+      border-radius:13px; overflow:hidden;
+      border:1px solid var(--border);
+    }
+
+    .rp-logo-img img{ width:100%; height:100%; object-fit:contain; }
+
+    .rp-logo-name{
+      font-family:'Baloo 2',sans-serif;
+      font-size:20px; font-weight:800;
+      color:var(--ink); letter-spacing:-0.3px;
+    }
+
+    .rp-logo-name span{ color:var(--green); }
+
+    /* back link */
+    .back-link{
+      display:inline-flex; align-items:center;
+      gap:7px; font-size:13px; font-weight:700;
+      color:var(--ink-3); margin-bottom:28px;
+      transition:color 0.15s;
+    }
+
+    .back-link:hover{ color:var(--green); }
+    .back-link i{ font-size:14px; }
+
+    /* heading */
+    .rp-title{
+      font-family:'Baloo 2',sans-serif;
+      font-size:26px; font-weight:800;
+      color:var(--ink); letter-spacing:-0.5px;
+      line-height:1.15; margin-bottom:8px;
+    }
+
+    .rp-sub{
+      font-size:14px; color:var(--ink-3);
+      line-height:1.6; margin-bottom:20px;
+    }
+
+    /* phone pill */
+    .phone-pill{
+      display:inline-flex; align-items:center;
+      gap:8px;
+      background:var(--green-50);
+      border:1.5px solid var(--green-100);
+      border-radius:999px;
+      padding:9px 16px;
+      font-size:13px; font-weight:700;
+      color:var(--green-deeper);
+      margin-bottom:28px;
+    }
+
+    .phone-pill i{ font-size:15px; color:var(--green); }
+
+    /* demo OTP display card */
+    .demo-otp-card{
+      background:linear-gradient(135deg, var(--green-50), #F0FFF8);
+      border:1.5px solid var(--green-100);
+      border-radius:18px;
+      padding:16px 18px;
+      margin-bottom:26px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .demo-otp-icon{
+      width:44px; height:44px;
+      border-radius:14px;
+      background:var(--green-100);
+      color:var(--green-deeper);
+      display:flex; align-items:center;
+      justify-content:center;
+      font-size:20px; flex-shrink:0;
+    }
+
+    .demo-otp-text{ flex:1; }
+
+    .demo-otp-label{
+      font-size:10.5px; font-weight:800;
+      letter-spacing:0.6px; text-transform:uppercase;
+      color:var(--green-deeper); margin-bottom:4px;
+    }
+
+    .demo-otp-digits{
+      font-family:'Baloo 2',sans-serif;
+      font-size:28px; font-weight:800;
+      color:var(--green-deeper);
+      letter-spacing:6px; line-height:1;
+    }
+
+    .demo-otp-note{
+      font-size:11px; color:var(--ink-3);
+      margin-top:4px; font-weight:500;
+    }
+
+    /* alerts */
+    .gc-alert{
+      border-radius:14px; border:none;
+      padding:12px 16px;
+      font-size:13px; font-weight:600;
+      margin-bottom:18px;
+      display:flex; align-items:center; gap:9px;
+    }
+
+    .gc-alert-danger{ background:var(--red-light); color:#991B1B; }
+
+    /* OTP input boxes */
+    .otp-row{
+      display:flex; justify-content:center;
+      gap:12px; margin-bottom:26px;
+    }
+
+    .otp-box{
+      width:62px; height:68px;
+      border:2px solid var(--border);
+      border-radius:18px;
+      background:#FAFBFC;
+      text-align:center;
+      font-family:'Baloo 2',sans-serif;
+      font-size:28px; font-weight:800;
+      color:var(--ink);
+      outline:none;
+      transition:border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      caret-color:var(--green);
+    }
+
+    .otp-box:focus{
+      border-color:var(--green);
+      background:var(--white);
+      box-shadow:0 0 0 4px rgba(16,185,129,0.12);
+    }
+
+    .otp-box.filled{
+      border-color:var(--green);
+      background:var(--green-50);
+      color:var(--green-deeper);
+    }
+
+    /* verify btn */
+    .btn-verify{
+      width:100%;
+      height:56px;
+      border:none;
+      border-radius:16px;
+      background:var(--green);
+      color:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:15px; font-weight:800;
+      display:flex; align-items:center;
+      justify-content:center; gap:9px;
+      cursor:pointer;
+      transition:background 0.15s, transform 0.1s;
+      box-shadow:0 8px 24px rgba(16,185,129,0.25);
+      letter-spacing:-0.2px;
+    }
+
+    .btn-verify i{ font-size:18px; }
+    .btn-verify:hover{ background:var(--green-dark); transform:translateY(-1px); }
+    .btn-verify:active{ transform:scale(0.98); }
+    .btn-verify:disabled{ opacity:0.7; cursor:not-allowed; transform:none; }
+
+    /* progress dots under btn */
+    .otp-progress{
+      display:flex; justify-content:center;
+      gap:6px; margin-top:14px;
+    }
+
+    .otp-dot{
+      width:8px; height:8px;
+      border-radius:50%;
+      background:var(--border);
+      transition:background 0.2s, transform 0.2s;
+    }
+
+    .otp-dot.active{
+      background:var(--green);
+      transform:scale(1.2);
+    }
+
+    /* timer + resend */
+    .resend-row{
+      margin-top:22px;
+      text-align:center;
+    }
+
+    .timer-text{
+      font-size:13px; font-weight:600;
+      color:var(--ink-3);
+    }
+
+    #resendBtn{
+      display:none;
+      background:none;
+      border:none;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:13px; font-weight:800;
+      color:var(--green);
+      cursor:pointer;
+      padding:0;
+    }
+
+    #resendBtn:hover{ color:var(--green-dark); text-decoration:underline; }
+
+    .change-link{
+      margin-top:14px;
+      text-align:center;
+      font-size:12.5px;
+      color:var(--ink-3);
+    }
+
+    .change-link a{
+      color:var(--ink-2);
+      font-weight:700;
+      text-decoration:underline;
+    }
+
+    /* ── MOBILE ── */
+    @media(max-width:860px){
+      body{ flex-direction:column; }
+
+      .left-panel{
+        min-height:auto; flex:none;
+        padding:28px 24px 30px;
+      }
+
+      .lp-centre{ padding:22px 0; }
+      .lp-headline{ font-size:24px; }
+      .lp-trust{ display:none; }
+      .phone-mockup{ display:none; }
+
+      .right-panel{ width:100%; padding:34px 24px 40px; }
+      .rp-scroll{ max-width:100%; }
+    }
+
+    @media(min-width:861px){
+      .rp-logo-row{ display:none; }
+    }
+
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  </style>
 </head>
-
 <body>
 
-<div class="otp-card">
+  <!-- ════════ LEFT PANEL ════════ -->
+  <div class="left-panel">
 
-
-<a href="{% url 'request_otp' %}" class="back-link">
-    <i class="fas fa-arrow-left"></i>
-    Change Number
-</a>
-
-<div class="brand">
-
-    <div class="brand-icon">
+    <div class="lp-brand">
+      <div class="lp-logo">
         <img src="{% static 'images/logo.png' %}" alt="GramaCart">
+      </div>
+      <div class="lp-brand-name">Grama<span>Cart</span></div>
     </div>
 
-    <h1 class="brand-name">
-        GRAMA<span>CART</span>
-    </h1>
+    <div class="lp-centre">
 
-</div>
-
-<h2 class="otp-title">
-    Verify Mobile Number
-</h2>
-
-<p class="otp-subtitle">
-    Enter the 4-digit verification code
-</p>
-
-<div class="phone-pill">
-    <i class="fas fa-mobile-screen me-2"></i>
-    +91 {{ request.session.phone }}
-</div>
-
-<div class="sms-card">
-
-    <div class="sms-header">
-
-        <div class="sms-avatar">
-            <i class="fas fa-shield-check"></i>
+      <!-- phone mockup showing SMS -->
+      <div class="phone-mockup">
+        <div class="pm-notch"></div>
+        <div class="pm-sms-bubble">
+          <div class="pm-sms-sender">
+            <i class="bi bi-shield-fill-check"></i>
+            GramaCart Security
+          </div>
+          <div class="pm-otp-digits">{{ demo_otp|default:"••••" }}</div>
+          <div class="pm-sms-text">Use this code to sign in. Do not share with anyone.</div>
         </div>
+        <div class="pm-time">just now</div>
+      </div>
 
-        <div>
-            <div class="sms-title">
-                GramaCart Security
-            </div>
+      <div class="lp-headline">
+        One code.<br>
+        <em>You're in.</em>
+      </div>
 
-            <div class="sms-time">
-                verification Code
-            </div>
+      <div class="lp-tagline">
+        We sent a 4-digit OTP to your mobile. Enter it to verify your number and start shopping.
+      </div>
+
+    </div>
+
+    <div class="lp-trust">
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-shield-fill-check"></i></div>
+        OTP expires in 5 minutes — never share it with anyone
+      </div>
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-lock-fill"></i></div>
+        No passwords — secure OTP login every time
+      </div>
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-telephone-fill"></i></div>
+        Having trouble? Use another number below
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════ RIGHT PANEL ════════ -->
+  <div class="right-panel">
+    <div class="rp-scroll">
+
+      <!-- mobile logo -->
+      <div class="rp-logo-row">
+        <div class="rp-logo-img">
+          <img src="{% static 'images/logo.png' %}" alt="GramaCart">
         </div>
+        <div class="rp-logo-name">Grama<span>Cart</span></div>
+      </div>
 
-    </div>
+      <!-- back -->
+      <a href="{% url 'request_otp' %}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Change number
+      </a>
 
-    <div class="otp-highlight">
-        {{ demo_otp }}
-    </div>
+      <!-- heading -->
+      <div class="rp-title">Enter your OTP 🔐</div>
+      <div class="rp-sub">We sent a 4-digit code to your mobile number.</div>
 
-    <div class="sms-note">
-        Use this code to securely sign in to your GramaCart account.
-    </div>
+      <!-- phone pill -->
+      <div class="phone-pill">
+        <i class="bi bi-telephone-fill"></i>
+        +91 {{ request.session.phone }}
+      </div>
 
-</div>
+      <!-- demo OTP card (shown during dev) -->
+      {% if demo_otp %}
+      <div class="demo-otp-card">
+        <div class="demo-otp-icon">
+          <i class="bi bi-chat-left-dots-fill"></i>
+        </div>
+        <div class="demo-otp-text">
+          <div class="demo-otp-label">Your OTP</div>
+          <div class="demo-otp-digits" id="demoDigits">{{ demo_otp }}</div>
+          <div class="demo-otp-note">Tap to auto-fill</div>
+        </div>
+      </div>
+      {% endif %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-danger mb-3">
+      <!-- alerts -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gc-alert gc-alert-danger">
+            <i class="bi bi-exclamation-circle-fill"></i>
             {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- form -->
+      <form method="POST" id="otpForm">
+        {% csrf_token %}
+
+        <!-- 4 digit boxes -->
+        <div class="otp-row">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="one-time-code">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
         </div>
-    {% endfor %}
-{% endif %}
 
-<form method="POST" id="otpForm">
+        <!-- live progress dots -->
+        <div class="otp-progress">
+          <div class="otp-dot" id="dot0"></div>
+          <div class="otp-dot" id="dot1"></div>
+          <div class="otp-dot" id="dot2"></div>
+          <div class="otp-dot" id="dot3"></div>
+        </div>
 
-    {% csrf_token %}
+        <input type="hidden" name="otp" id="fullOtp">
 
-    <div class="otp-wrapper">
+        <button type="submit" class="btn-verify" id="verifyBtn" style="margin-top:22px;" disabled>
+          <i class="bi bi-check-circle-fill"></i>
+          Verify & Continue
+        </button>
 
-        <input type="text" maxlength="1" class="otp-input">
-        <input type="text" maxlength="1" class="otp-input">
-        <input type="text" maxlength="1" class="otp-input">
-        <input type="text" maxlength="1" class="otp-input">
+      </form>
+
+      <!-- timer / resend -->
+      <div class="resend-row">
+        <div class="timer-text" id="timerText">
+          Resend OTP in <strong id="countdown">30</strong>s
+        </div>
+        <button id="resendBtn" onclick="resendOTP()">
+          <i class="bi bi-arrow-clockwise"></i> Resend OTP
+        </button>
+      </div>
+
+      <div class="change-link">
+        <a href="{% url 'request_otp' %}">Use another mobile number</a>
+      </div>
 
     </div>
+  </div>
 
-    <input type="hidden" name="otp" id="fullOtp">
+  <script>
 
-    <button type="submit" class="verify-btn" id="verifyBtn">
-        Verify & Continue
-    </button>
+    const inputs  = document.querySelectorAll('.otp-box');
+    const fullOtp = document.getElementById('fullOtp');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const dots    = document.querySelectorAll('.otp-dot');
 
-</form>
+    /* ── focus first box ── */
+    inputs[0].focus();
 
-<div class="timer">
-    Resend OTP in <span id="countdown">30</span>s
-</div>
-
-<div class="change-number">
-    <a href="{% url 'request_otp' %}">
-        Use another mobile number
-    </a>
-</div>
-
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-
-const inputs = document.querySelectorAll('.otp-input');
-
-inputs[0].focus();
-
-inputs.forEach((input,index)=>{
-
-    input.addEventListener('input',function(e){
-
-        let value = this.value.replace(/\D/g,'');
-
-        this.value = value;
-
-        if(value && index < inputs.length - 1){
-            inputs[index + 1].focus();
-        }
-
-        updateOTP();
-
-        checkAutoSubmit();
-
-    });
-
-    input.addEventListener('keydown',function(e){
-
-        if(
-            e.key === 'Backspace' &&
-            this.value === '' &&
-            index > 0
-        ){
-            inputs[index - 1].focus();
-        }
-
-    });
-
-});
-
-function updateOTP(){
-
-    let otp='';
-
-    inputs.forEach(input=>{
-        otp += input.value;
-    });
-
-    document.getElementById('fullOtp').value = otp;
-
-}
-
-function checkAutoSubmit(){
-
-    const otp =
-    document.getElementById('fullOtp').value;
-
-    if(otp.length === 4){
-
-        const btn =
-        document.getElementById('verifyBtn');
-
-        btn.innerHTML =
-        '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
-
-        btn.disabled = true;
-
-        document.getElementById('otpForm').submit();
-
+    /* ── update progress dots & hidden field ── */
+    function syncState(){
+      let val = '';
+      inputs.forEach((inp, i) => {
+        val += inp.value;
+        inp.classList.toggle('filled', inp.value !== '');
+        dots[i].classList.toggle('active', inp.value !== '');
+      });
+      fullOtp.value = val;
+      verifyBtn.disabled = val.length < 4;
     }
 
-}
+    /* ── input handling ── */
+    inputs.forEach((inp, i) => {
 
-/* Allow pasting full OTP */
+      inp.addEventListener('input', function(){
+        // keep only digit
+        this.value = this.value.replace(/\D/g,'').slice(-1);
+        syncState();
+        if(this.value && i < inputs.length - 1) inputs[i+1].focus();
+        if(fullOtp.value.length === 4) autoSubmit();
+      });
 
-inputs[0].addEventListener('paste',function(e){
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Backspace' && this.value === '' && i > 0){
+          inputs[i-1].focus();
+          inputs[i-1].value = '';
+          syncState();
+        }
+      });
 
-    e.preventDefault();
+      inp.addEventListener('focus', function(){
+        this.select();
+      });
 
-    const pasted =
-    (e.clipboardData || window.clipboardData)
-    .getData('text')
-    .replace(/\D/g,'');
+    });
 
-    if(pasted.length === 4){
+    /* ── paste support ── */
+    inputs[0].addEventListener('paste', function(e){
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData)
+        .getData('text').replace(/\D/g,'').slice(0,4);
+      pasted.split('').forEach((d, i) => {
+        if(inputs[i]) inputs[i].value = d;
+      });
+      syncState();
+      if(pasted.length === 4) autoSubmit();
+      else inputs[pasted.length]?.focus();
+    });
 
-        pasted.split('').forEach((digit,index)=>{
-
-            inputs[index].value = digit;
-
-        });
-
-        updateOTP();
-
-        checkAutoSubmit();
-
+    /* ── auto-fill from demo card tap ── */
+    const demoCard = document.getElementById('demoDigits');
+    if(demoCard){
+      demoCard.closest('.demo-otp-card').style.cursor = 'pointer';
+      demoCard.closest('.demo-otp-card').addEventListener('click', function(){
+        const digits = demoCard.innerText.trim().split('');
+        digits.forEach((d,i)=>{ if(inputs[i]) inputs[i].value=d; });
+        syncState();
+        if(digits.length === 4) autoSubmit();
+      });
     }
 
-});
+    /* ── auto submit ── */
+    function autoSubmit(){
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML =
+        '<span style="width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;flex-shrink:0;"></span> Verifying…';
+      document.getElementById('otpForm').submit();
+    }
 
-/* Countdown */
+    /* ── countdown + resend ── */
+    let seconds = 30;
+    const countEl   = document.getElementById('countdown');
+    const timerText = document.getElementById('timerText');
+    const resendBtn = document.getElementById('resendBtn');
 
-let seconds = 30;
-
-const countdown =
-document.getElementById('countdown');
-
-const timer = setInterval(()=>{
-
-    seconds--;
-
-    countdown.innerText = seconds;
-
-    if(seconds <= 0){
-
+    const timer = setInterval(()=>{
+      seconds--;
+      countEl.innerText = seconds;
+      if(seconds <= 0){
         clearInterval(timer);
+        timerText.style.display = 'none';
+        resendBtn.style.display = 'inline-flex';
+        resendBtn.style.alignItems = 'center';
+        resendBtn.style.gap = '5px';
+      }
+    }, 1000);
 
-        countdown.innerText = '0';
-
+    function resendOTP(){
+      window.location.href = "{% url 'request_otp' %}";
     }
 
-},1000);
-
-</script>
-
-<!-- Paste your existing OTP JS here -->
+  </script>
 
 </body>
 </html>

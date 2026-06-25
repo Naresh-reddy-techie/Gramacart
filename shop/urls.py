@@ -1,5 +1,5 @@
 from django.urls import path
-from .import views
+from .import views,legal_views
 
 urlpatterns = [
 
@@ -45,4 +45,16 @@ urlpatterns = [
     path('order-success/<int:order_id>/', views.order_success, name='order_success'),
     path('order/track/<int:order_id>/', views.track_order, name='track_order'),
     path('api/order/status/<int:order_id>/', views.get_order_status_json, name='order_status_api'),
-    path('product/<int:id>/rate/', views.rate_product, name='rate_product')]
+    path('product/<int:id>/rate/', views.rate_product, name='rate_product'),
+    
+    #6 . legal policy for customers
+    path( "terms-and-conditions/",legal_views.terms_conditions,name="terms_conditions"),
+    path("privacy-policy/",legal_views.privacy_policy,name="privacy_policy"),
+    path("refund-cancellation-policy/",legal_views.refund_cancellation_policy,name="refund_cancellation_policy"),
+    path("delivery-policy/",legal_views.delivery_policy,name="delivery_policy"),
+
+    #7 . legal policy for sellers
+    path("legal/seller-terms/",legal_views.seller_terms,name="seller_terms"),
+    path("legal/seller-commission-policy/",legal_views.seller_commission_policy,name="seller_commission_policy"),
+    path("legal/seller-privacy-policy/",legal_views.seller_privacy_policy,name="seller_privacy_policy"),
+]

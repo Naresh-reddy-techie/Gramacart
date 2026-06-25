@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'inventory',
     'core',
     'hub_partner',
+    'settlements',
 ]
 
 MIDDLEWARE = [

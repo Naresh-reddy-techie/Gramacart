@@ -501,7 +501,7 @@ def company_info_update(request):
 @superuser_required
 def add_category(request):
     if request.method == 'POST':
-        form = CategoryForm(request.POST)
+        form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request,'Category added succesfully...')
@@ -513,7 +513,7 @@ def add_category(request):
 def edit_category(request,id):
     category = get_object_or_404(Category,id=id)
     if request.method == 'POST':
-        form = CategoryForm(request.POST,instance=category)
+        form = CategoryForm(request.POST,request.FILES,instance=category)
         if form.is_valid():
             form.save()
             messages.success(request,"Category updated successfully")

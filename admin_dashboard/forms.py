@@ -1,5 +1,5 @@
 from django import forms
-from .models import Category,CompanyInfo
+from .models import Category,CompanyInfo,Banner,DeliveryHub
 
 class CompanyInfoForm(forms.ModelForm):
     class Meta:
@@ -41,12 +41,118 @@ class CompanyInfoForm(forms.ModelForm):
                 self.fields['logo'].initial = self.instance.logo
 
 
+class BannerForm(forms.ModelForm):
+
+    class Meta:
+        model  = Banner
+        fields = [
+            'hub', 'title', 'subtitle', 'eyebrow', 'offer_label',
+            'image', 'cta_text', 'cta_url',
+            'page', 'banner_type',
+            'start_date', 'end_date',
+            'is_active', 'order',
+        ]
+        widgets = {
+            'hub': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Fresh vegetables at your doorstep',
+            }),
+            'subtitle': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Order now · delivered in 30–45 min',
+            }),
+            'eyebrow': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. 🌿 Fresh today',
+            }),
+            'offer_label': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. 20% OFF — leave blank to hide',
+            }),
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
+            }),
+            'cta_text': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Shop now',
+            }),
+            'cta_url': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. /shop/',
+            }),
+            'page': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'banner_type': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'start_date': forms.DateTimeInput(
+                attrs={
+                    'class': 'form-control',
+                    'type': 'datetime-local',
+                },
+                format='%Y-%m-%dT%H:%M',
+            ),
+            'end_date': forms.DateTimeInput(
+                attrs={
+                    'class': 'form-control',
+                    'type': 'datetime-local',
+                },
+                format='%Y-%m-%dT%H:%M',
+            ),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+            }),
+            'order': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # blank option so admin can choose global
+        self.fields['hub'].empty_label = '🌐 Global (all hubs)'
+        self.fields['hub'].required    = False
+        self.fields['hub'].queryset    = DeliveryHub.objects.filter(
+            is_active=True
+        ).order_by('name')
+
+        # pre-fill datetime fields correctly on edit
+        if self.instance and self.instance.pk:
+            if self.instance.start_date:
+                self.initial['start_date'] = (
+                    self.instance.start_date.strftime('%Y-%m-%dT%H:%M')
+                )
+            if self.instance.end_date:
+                self.initial['end_date'] = (
+                    self.instance.end_date.strftime('%Y-%m-%dT%H:%M')
+                )
+
+    def clean(self):
+        cleaned = super().clean()
+        start   = cleaned.get('start_date')
+        end     = cleaned.get('end_date')
+
+        if start and end and end <= start:
+            raise forms.ValidationError(
+                'End date must be after start date.'
+            )
+        return cleaned
+
+
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields=['name']
+        fields=['name','image']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter category name'}),
+            'image':forms.FileInput(attrs={'class': 'form-control',}),
         }
 
 

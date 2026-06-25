@@ -92,6 +92,12 @@
             {% endif %}
         </a>
 
+         <a href="{% url 'banner_list' %}"
+           class="menu-item {% if 'banners' in request.path %}active{% endif %}">
+            <i class="bi bi-images"></i>
+            <span>Banners</span>
+        </a>
+
     </div>
 
     <!-- DELIVERY -->
@@ -104,6 +110,12 @@
         <a href="{% url 'list_delivery_hubs' %}" class="menu-item">
             <i class="bi bi-geo-alt-fill"></i>
             <span>Village Hubs</span>
+        </a>
+
+        <a href="{% url 'shipping_cost_list' %}"
+                class="menu-item {% if request.resolver_match.url_name == 'shipping_cost' %}active{% endif %}">
+                    <i class="bi bi-truck"></i>
+                    <span>Shipping Cost</span>
         </a>
 
         <a href="{% url 'delivery_boy_list' %}" class="menu-item">
@@ -155,6 +167,12 @@
             <span class="badge bg-primary ms-auto">
                 {{ total_customers }}
             </span>
+        </a>
+
+         <a href="#"
+           class="menu-item {% if 'ledger' in request.path %}active{% endif %}">
+            <i class="bi bi-journal-text"></i>
+            <span>Shop Ledger</span>
         </a>
 
     </div>

@@ -1,0 +1,324 @@
+{% extends "homepage/base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy | GramaCart{% endblock %}
+
+{% block content %}
+
+<style>
+:root{
+    --primary:#16a34a;
+    --primary-light:#dcfce7;
+    --dark:#0f172a;
+    --text:#475569;
+    --border:#e2e8f0;
+    --bg:#f8fafc;
+    --white:#ffffff;
+}
+
+.privacy-wrapper{
+    max-width:1100px;
+    margin:40px auto;
+    padding:0 15px;
+}
+
+.hero{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#fff;
+    border-radius:24px;
+    padding:60px 40px;
+    margin-bottom:30px;
+}
+
+.hero h1{
+    font-size:3rem;
+    font-weight:800;
+    margin-bottom:10px;
+}
+
+.hero p{
+    opacity:.9;
+    font-size:1.05rem;
+    margin-bottom:0;
+}
+
+.badge-date{
+    display:inline-block;
+    margin-top:20px;
+    padding:10px 18px;
+    background:rgba(255,255,255,.15);
+    border-radius:999px;
+    font-size:.9rem;
+}
+
+.policy-card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:30px;
+    margin-bottom:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.04);
+}
+
+.policy-card h2{
+    color:var(--dark);
+    font-size:1.4rem;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.policy-card h4{
+    color:var(--dark);
+    font-size:1.05rem;
+    font-weight:600;
+    margin-top:20px;
+}
+
+.policy-card p{
+    color:var(--text);
+    line-height:1.8;
+}
+
+.policy-card ul{
+    margin-top:10px;
+}
+
+.policy-card li{
+    margin-bottom:10px;
+    color:var(--text);
+}
+
+.notice{
+    background:var(--primary-light);
+    border-left:5px solid var(--primary);
+    padding:18px;
+    border-radius:12px;
+    margin-top:15px;
+}
+
+.contact-box{
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+    color:#fff;
+    border-radius:20px;
+    padding:35px;
+    text-align:center;
+}
+
+.contact-box h2{
+    margin-bottom:15px;
+    font-weight:800;
+}
+
+.contact-box p{
+    color:#fff;
+    margin-bottom:8px;
+}
+
+@media(max-width:768px){
+
+    .hero{
+        padding:40px 25px;
+    }
+
+    .hero h1{
+        font-size:2rem;
+    }
+
+    .policy-card{
+        padding:22px;
+    }
+}
+</style>
+
+<div class="privacy-wrapper">
+
+    <div class="hero">
+        <h1>Privacy Policy</h1>
+        <p>
+            Your privacy matters to us. This Privacy Policy explains how
+            GramaCart collects, uses, stores, and protects your information.
+        </p>
+
+        <div class="badge-date">
+            Effective Date: July 2026
+        </div>
+    </div>
+
+    <div class="policy-card">
+        <h2>1. Introduction</h2>
+
+        <p>
+            GramaCart ("GramaCart", "we", "our", or "us") respects your privacy
+            and is committed to protecting your personal information.
+            By using GramaCart services, you agree to the practices described
+            in this Privacy Policy.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>2. Information We Collect</h2>
+
+        <h4>Personal Information</h4>
+
+        <ul>
+            <li>Full Name</li>
+            <li>Mobile Number</li>
+            <li>Email Address (if provided)</li>
+            <li>Delivery Address</li>
+            <li>Customer Support Communications</li>
+        </ul>
+
+        <h4>Order Information</h4>
+
+        <ul>
+            <li>Order History</li>
+            <li>Products Ordered</li>
+            <li>Payment Status</li>
+            <li>Delivery Preferences</li>
+        </ul>
+
+        <h4>Location Information</h4>
+
+        <p>
+            With your permission, GramaCart may collect location information
+            to improve delivery accuracy and provide location-based services.
+        </p>
+
+        <h4>Technical Information</h4>
+
+        <ul>
+            <li>IP Address</li>
+            <li>Browser Type</li>
+            <li>Device Information</li>
+            <li>Operating System</li>
+            <li>Usage Analytics</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>3. How We Use Your Information</h2>
+
+        <ul>
+            <li>Create and manage customer accounts.</li>
+            <li>Process and fulfill orders.</li>
+            <li>Facilitate deliveries.</li>
+            <li>Provide customer support.</li>
+            <li>Improve platform functionality.</li>
+            <li>Prevent fraud and abuse.</li>
+            <li>Maintain platform security.</li>
+            <li>Comply with legal obligations.</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>4. Sharing of Information</h2>
+
+        <p>
+            GramaCart does not sell, rent, or trade your personal information.
+        </p>
+
+        <p>
+            Information may be shared only when necessary with:
+        </p>
+
+        <ul>
+            <li>Sellers fulfilling your orders.</li>
+            <li>Delivery partners.</li>
+            <li>Payment service providers.</li>
+            <li>Government or legal authorities where required by law.</li>
+        </ul>
+
+        <div class="notice">
+            Only information reasonably required to provide services
+            will be shared.
+        </div>
+    </div>
+
+    <div class="policy-card">
+        <h2>5. Data Security</h2>
+
+        <p>
+            GramaCart implements reasonable security measures designed to
+            protect personal information from unauthorized access, misuse,
+            disclosure, or loss.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>6. Cookies</h2>
+
+        <p>
+            We may use cookies and similar technologies to improve website
+            performance, remember preferences, maintain sessions, and
+            enhance user experience.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>7. Data Retention</h2>
+
+        <p>
+            Information may be retained for as long as necessary to provide
+            services, maintain records, resolve disputes, enforce agreements,
+            and comply with legal requirements.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>8. Children's Privacy</h2>
+
+        <p>
+            GramaCart services are intended for individuals aged 18 years
+            or older or those using the platform under parental supervision.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>9. Third-Party Services</h2>
+
+        <p>
+            GramaCart may integrate with third-party payment gateways,
+            logistics providers, analytics providers, and other service
+            providers. Their services may be governed by separate privacy
+            policies.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>10. Your Rights</h2>
+
+        <ul>
+            <li>Access your information.</li>
+            <li>Update account information.</li>
+            <li>Request correction of inaccurate information.</li>
+            <li>Request deletion where legally permissible.</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>11. Changes to this Privacy Policy</h2>
+
+        <p>
+            GramaCart reserves the right to update this Privacy Policy.
+            Updated versions will be published on this page with a revised
+            effective date.
+        </p>
+    </div>
+
+    <div class="contact-box">
+        <h2>Contact Us</h2>
+
+        <p>For privacy-related questions or concerns:</p>
+
+        <p><strong>Email:</strong> contact.gramacart@gmail.com</p>
+        <p><strong>Website:</strong>www.gramacart.com</p>
+
+        <p class="mt-3">
+            By using GramaCart, you acknowledge that you have read,
+            understood, and agreed to this Privacy Policy.
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}

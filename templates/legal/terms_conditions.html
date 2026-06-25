@@ -1,0 +1,366 @@
+{% extends "homepage/base.html" %}
+{% load static %}
+
+{% block title %}Terms & Conditions | GramaCart{% endblock %}
+
+{% block content %}
+<style>
+:root{
+    --primary:#16A34A;
+    --primary-light:#DCFCE7;
+    --dark:#0F172A;
+    --text:#334155;
+    --border:#E2E8F0;
+    --bg:#F8FAFC;
+    --white:#FFFFFF;
+}
+
+body{
+    background:var(--bg);
+}
+
+.terms-hero{
+    background:linear-gradient(135deg,#0F172A,#1E293B);
+    color:white;
+    border-radius:24px;
+    padding:60px 40px;
+    margin-bottom:40px;
+    position:relative;
+    overflow:hidden;
+}
+
+.terms-hero::before{
+    content:'';
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:rgba(22,163,74,.15);
+    border-radius:50%;
+    top:-100px;
+    right:-100px;
+}
+
+.terms-title{
+    font-size:3rem;
+    font-weight:800;
+    margin-bottom:15px;
+}
+
+.terms-subtitle{
+    font-size:1.05rem;
+    opacity:.9;
+    max-width:700px;
+}
+
+.updated-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+    padding:10px 18px;
+    border-radius:999px;
+    margin-top:20px;
+}
+
+.terms-wrapper{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 15px 80px;
+}
+
+.terms-grid{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:30px;
+}
+
+.toc{
+    position:sticky;
+    top:100px;
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    border:1px solid var(--border);
+    height:fit-content;
+}
+
+.toc h5{
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.toc a{
+    display:block;
+    text-decoration:none;
+    color:var(--text);
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:6px;
+    transition:.3s;
+}
+
+.toc a:hover{
+    background:var(--primary-light);
+    color:var(--primary);
+}
+
+.term-card{
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    margin-bottom:25px;
+    border:1px solid var(--border);
+    box-shadow:0 4px 15px rgba(0,0,0,.03);
+}
+
+.term-card h3{
+    color:var(--dark);
+    font-weight:800;
+    margin-bottom:15px;
+}
+
+.term-card p{
+    color:var(--text);
+    line-height:1.8;
+}
+
+.term-card ul{
+    padding-left:20px;
+}
+
+.term-card li{
+    margin-bottom:10px;
+    color:var(--text);
+}
+
+.highlight{
+    background:#FEFCE8;
+    border-left:4px solid #EAB308;
+    padding:18px;
+    border-radius:12px;
+    margin-top:15px;
+}
+
+.footer-note{
+    text-align:center;
+    margin-top:40px;
+    color:#64748B;
+}
+
+.contact-card{
+    background:linear-gradient(135deg,#16A34A,#22C55E);
+    color:white;
+    border-radius:24px;
+    padding:35px;
+    text-align:center;
+}
+
+.contact-card h3{
+    font-weight:800;
+}
+
+.contact-card a{
+    color:white;
+    text-decoration:none;
+}
+
+@media(max-width:991px){
+
+    .terms-grid{
+        grid-template-columns:1fr;
+    }
+
+    .toc{
+        position:relative;
+        top:0;
+    }
+
+    .terms-title{
+        font-size:2rem;
+    }
+
+    .terms-hero{
+        padding:40px 25px;
+    }
+}
+</style>
+
+<div class="container terms-wrapper">
+
+    <!-- HERO -->
+    <div class="terms-hero">
+        <h1 class="terms-title">Terms & Conditions</h1>
+
+        <p class="terms-subtitle">
+            These Terms & Conditions govern your use of GramaCart and
+            explain your rights, responsibilities, ordering process,
+            delivery policies, and platform rules.
+        </p>
+
+        <div class="updated-badge">
+            📄 Effective Date: July 2026
+        </div>
+    </div>
+
+    <div class="terms-grid">
+
+        <!-- TABLE OF CONTENTS -->
+        <div class="toc">
+            <h5>Contents</h5>
+
+            <a href="#about">1. About GramaCart</a>
+            <a href="#eligibility">2. Eligibility</a>
+            <a href="#account">3. User Account</a>
+            <a href="#orders">4. Orders</a>
+            <a href="#pricing">5. Pricing</a>
+            <a href="#delivery">6. Delivery</a>
+            <a href="#products">7. Product Information</a>
+            <a href="#refunds">8. Refunds</a>
+            <a href="#prohibited">9. Prohibited Activities</a>
+            <a href="#liability">10. Liability</a>
+            <a href="#law">11. Governing Law</a>
+            <a href="#contact">12. Contact</a>
+        </div>
+
+        <!-- CONTENT -->
+        <div>
+
+            <div id="about" class="term-card">
+                <h3>1. About GramaCart</h3>
+                <p>
+                    GramaCart is a hyperlocal commerce platform connecting
+                    customers with local retailers, fulfillment centers,
+                    sellers, and delivery partners.
+                </p>
+
+                <div class="highlight">
+                    GramaCart may supply products through its own fulfillment
+                    centers as well as through independent third-party sellers.
+                </div>
+            </div>
+
+            <div id="eligibility" class="term-card">
+                <h3>2. Eligibility</h3>
+                <p>
+                    You must be at least 18 years old or use the platform
+                    under parental supervision.
+                </p>
+            </div>
+
+            <div id="account" class="term-card">
+                <h3>3. User Account</h3>
+
+                <ul>
+                    <li>Maintain accurate account information.</li>
+                    <li>Protect your login credentials.</li>
+                    <li>Report unauthorized access immediately.</li>
+                </ul>
+            </div>
+
+            <div id="orders" class="term-card">
+                <h3>4. Orders</h3>
+
+                <p>
+                    Orders are subject to availability, seller acceptance,
+                    operational feasibility, and payment verification.
+                </p>
+            </div>
+
+            <div id="pricing" class="term-card">
+                <h3>5. Pricing</h3>
+
+                <ul>
+                    <li>Prices may change without notice.</li>
+                    <li>Taxes and delivery fees may apply.</li>
+                    <li>Promotional offers may have restrictions.</li>
+                </ul>
+            </div>
+
+            <div id="delivery" class="term-card">
+                <h3>6. Delivery</h3>
+
+                <p>
+                    Delivery estimates are indicative and may vary due to
+                    weather, traffic, demand, seller delays, or unforeseen
+                    circumstances.
+                </p>
+            </div>
+
+            <div id="products" class="term-card">
+                <h3>7. Product Information</h3>
+
+                <p>
+                    Product images, descriptions, and specifications are
+                    provided for reference purposes.
+                </p>
+
+                <div class="highlight">
+                    Third-party sellers remain responsible for product
+                    quality, authenticity, freshness, packaging, and
+                    legal compliance.
+                </div>
+            </div>
+
+            <div id="refunds" class="term-card">
+                <h3>8. Refunds & Cancellations</h3>
+
+                <p>
+                    Refunds and cancellations are governed by the
+                    GramaCart Refund Policy.
+                </p>
+            </div>
+
+            <div id="prohibited" class="term-card">
+                <h3>9. Prohibited Activities</h3>
+
+                <ul>
+                    <li>Fraudulent transactions.</li>
+                    <li>Misuse of promotions.</li>
+                    <li>Abusive behavior.</li>
+                    <li>Unauthorized access attempts.</li>
+                </ul>
+            </div>
+
+            <div id="liability" class="term-card">
+                <h3>10. Limitation of Liability</h3>
+
+                <p>
+                    To the extent permitted by law, GramaCart's liability
+                    shall be limited to the value of the affected order.
+                </p>
+            </div>
+
+            <div id="law" class="term-card">
+                <h3>11. Governing Law</h3>
+
+                <p>
+                    These Terms shall be governed by the laws of India.
+                </p>
+            </div>
+
+            <div id="contact" class="contact-card">
+                <h3>Need Help?</h3>
+
+                <p>
+                    Contact our support team for any questions regarding
+                    these Terms & Conditions.
+                </p>
+
+                <p>
+                    📧 contact.gramacart@gmail.com<br>
+                    🌐 www.gramacart.com
+                </p>
+            </div>
+
+            <div class="footer-note">
+                © 2026 GramaCart. All Rights Reserved.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

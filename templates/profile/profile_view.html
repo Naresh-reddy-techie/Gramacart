@@ -1,688 +1,680 @@
 {% extends "shop/base.html" %}
 {% load static %}
 
-{% block title %}
-My Account | GramaCart
-{% endblock %}
+{% block title %}My Account | GramaCart{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
 
+/* ── TOKENS ── */
 :root{
-    --primary:#10B981;
-    --primary-dark:#059669;
+    --green:#10B981;
+    --green-dark:#059669;
+    --green-deeper:#065F46;
+    --green-50:#ECFDF5;
+    --green-100:#D1FAE8;
 
-    --navy:#0F172A;
-    --slate:#64748B;
+    --amber:#F59E0B;
+    --amber-light:#FFFBEB;
 
-    --danger:#EF4444;
+    --red:#EF4444;
+    --red-light:#FFF1F2;
+    --red-border:#FECACA;
 
-    --bg:#F8FAFC;
-    --card:#FFFFFF;
-    --border:#E2E8F0;
+    --paper:#F5F7FA;
+    --white:#FFFFFF;
+    --ink:#0F172A;
+    --ink-2:#334155;
+    --ink-3:#64748B;
+    --ink-4:#94A3B8;
+    --ink-5:#CBD5E1;
 
-    --shadow:
-        0 10px 30px rgba(15,23,42,0.04);
+    --border:#E8EDF2;
+    --border2:#F1F5F9;
 
-    --radius:24px;
+    --sh-card:0 2px 12px rgba(15,23,42,0.06);
+    --sh-hero:0 16px 48px rgba(5,150,105,0.28);
+
+    --r-xl:28px;
+    --r-lg:22px;
+    --r-md:16px;
+    --r-sm:12px;
 }
+
+*{ margin:0; padding:0; box-sizing:border-box; }
 
 body{
-    background:var(--bg);
-    color:var(--navy);
     font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:40px;
 }
 
-.profile-page{
-    max-width:860px;
-    margin:auto;
-    padding-bottom:140px;
-}
+a{ text-decoration:none; color:inherit; }
 
-/* =========================================================
-NAV
-========================================================= */
-
+/* ── STICKY TOP NAV ── */
 .top-nav{
     position:sticky;
     top:0;
-    z-index:1000;
-
-    background:rgba(255,255,255,0.92);
-    backdrop-filter:blur(16px);
-
-    border-bottom:1px solid rgba(226,232,240,0.7);
-}
-
-.top-nav-inner{
-    max-width:860px;
-    margin:auto;
-
+    z-index:200;
+    background:rgba(245,247,250,0.92);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    padding:13px 18px;
     display:flex;
     align-items:center;
     gap:14px;
-
-    padding:14px 16px;
 }
 
 .back-btn{
-    width:44px;
-    height:44px;
-
-    border-radius:16px;
-
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    border:1.5px solid var(--border);
+    background:var(--white);
+    color:var(--ink);
     display:flex;
     align-items:center;
     justify-content:center;
-
-    text-decoration:none;
-
-    border:1px solid var(--border);
-    background:#fff;
-
-    color:var(--navy);
+    font-size:17px;
+    flex-shrink:0;
+    transition:background 0.15s;
 }
+
+.back-btn:hover{ background:var(--border2); }
 
 .nav-title{
+    font-family:'Baloo 2',sans-serif;
     font-size:20px;
     font-weight:800;
-    margin:0;
+    letter-spacing:-0.4px;
+    color:var(--ink);
 }
 
-/* =========================================================
-PROFILE HERO
-========================================================= */
+/* ── HERO CARD ── */
+.hero-wrap{ padding:18px 16px 0; }
 
-.profile-hero{
-    margin:18px 14px;
-    padding:26px 22px;
-
-    border-radius:32px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #10B981,
-            #059669
-        );
-
-    color:#fff;
-
+.hero-card{
+    border-radius:var(--r-xl);
+    background:linear-gradient(140deg, #059669 0%, #10B981 55%, #34D399 100%);
+    padding:26px 22px 22px;
     position:relative;
     overflow:hidden;
+    box-shadow:var(--sh-hero);
 }
 
-.profile-hero::after{
+/* decorative blobs */
+.hero-card::before{
     content:"";
-
     position:absolute;
-
-    width:220px;
-    height:220px;
-
+    width:180px;
+    height:180px;
     border-radius:50%;
-
-    background:rgba(255,255,255,0.08);
-
-    right:-80px;
-    top:-80px;
+    background:rgba(255,255,255,0.07);
+    top:-70px;
+    right:-50px;
 }
 
-.hero-content{
+.hero-card::after{
+    content:"";
+    position:absolute;
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    bottom:-40px;
+    left:-30px;
+}
+
+/* ── AVATAR + NAME ROW ── */
+.hero-top{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
     position:relative;
     z-index:2;
 }
 
+.avatar-wrap{ position:relative; flex-shrink:0; }
+
 .avatar{
-    width:92px;
-    height:92px;
-
-    border-radius:28px;
-
-    overflow:hidden;
-
-    background:rgba(255,255,255,0.14);
-
+    width:80px;
+    height:80px;
+    border-radius:24px;
+    background:rgba(255,255,255,0.18);
+    border:2.5px solid rgba(255,255,255,0.35);
     display:flex;
     align-items:center;
     justify-content:center;
-
-    font-size:34px;
+    font-family:'Baloo 2',sans-serif;
+    font-size:30px;
     font-weight:800;
-
-    margin-bottom:16px;
-
-    border:3px solid rgba(255,255,255,0.15);
+    color:#fff;
+    overflow:hidden;
 }
 
-.avatar img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+
+/* little verified ring on avatar */
+.avatar-verified{
+    position:absolute;
+    bottom:-5px;
+    right:-5px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:var(--amber);
+    border:2.5px solid #fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    color:#fff;
 }
 
-.profile-name{
-    font-size:24px;
+.hero-identity{ flex:1; min-width:0; }
+
+.hero-name{
+    font-family:'Baloo 2',sans-serif;
+    font-size:22px;
     font-weight:800;
+    color:#fff;
+    letter-spacing:-0.4px;
+    line-height:1.1;
 }
 
-.profile-email{
-    font-size:13px;
-    opacity:0.9;
-    margin-top:4px;
+.hero-handle{
+    font-size:12.5px;
+    color:rgba(255,255,255,0.8);
+    margin-top:3px;
+    font-weight:500;
 }
 
-.profile-phone{
-    font-size:13px;
-    opacity:0.9;
-    margin-top:2px;
-}
-
-.location-chip{
-    margin-top:16px;
-
+.hero-phone{
+    margin-top:6px;
     display:inline-flex;
     align-items:center;
-    gap:8px;
-
-    background:rgba(255,255,255,0.14);
-
-    padding:10px 14px;
-
-    border-radius:999px;
-
+    gap:5px;
     font-size:12px;
     font-weight:700;
+    color:rgba(255,255,255,0.85);
 }
 
-/* =========================================================
-STATS
-========================================================= */
+.edit-btn{
+    flex-shrink:0;
+    background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.3);
+    border-radius:12px;
+    padding:8px 14px;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    transition:background 0.15s;
+    white-space:nowrap;
+    text-decoration:none;
+}
 
-.stats-grid{
+.edit-btn:hover{ background:rgba(255,255,255,0.28); color:#fff; }
+
+/* ── HERO PILLS ROW ── */
+.hero-pills{
+    display:flex;
+    gap:8px;
+    margin-top:18px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index:2;
+}
+
+.hero-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:999px;
+    padding:7px 13px;
+    font-size:11.5px;
+    font-weight:700;
+    color:#fff;
+}
+
+.hero-pill i{ font-size:13px; }
+
+/* ── STATS ROW ── */
+.stats-row{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:12px;
-
-    padding:0 14px;
-    margin-bottom:18px;
+    gap:10px;
+    padding:16px 16px 0;
 }
 
 .stat-card{
-    background:#fff;
-
-    border-radius:24px;
-
+    background:var(--white);
+    border-radius:var(--r-lg);
     border:1px solid var(--border);
-
-    padding:16px;
-
-    box-shadow:var(--shadow);
+    padding:16px 14px;
+    box-shadow:var(--sh-card);
+    text-align:center;
 }
 
-.stat-icon{
-    width:42px;
-    height:42px;
-
-    border-radius:14px;
-
-    background:#F0FDF4;
-
-    color:var(--primary);
-
+.stat-icon-box{
+    width:40px;
+    height:40px;
+    border-radius:13px;
+    background:var(--green-50);
+    color:var(--green-dark);
     display:flex;
     align-items:center;
     justify-content:center;
-
-    font-size:18px;
-
-    margin-bottom:12px;
+    font-size:17px;
+    margin:0 auto 10px;
 }
 
-.stat-value{
-    font-size:20px;
+.stat-num{
+    font-family:'Baloo 2',sans-serif;
+    font-size:22px;
     font-weight:800;
+    color:var(--ink);
+    line-height:1;
 }
 
-.stat-label{
-    font-size:12px;
-    color:var(--slate);
-    margin-top:4px;
+.stat-lbl{
+    font-size:11px;
     font-weight:600;
+    color:var(--ink-3);
+    margin-top:3px;
 }
 
-/* =========================================================
-SECTION
-========================================================= */
+/* ── SECTION GROUPS ── */
+.section-group{ padding:20px 16px 0; }
 
-.section-wrapper{
-    padding:0 14px;
-    margin-bottom:18px;
-}
-
-.section-title{
-    font-size:13px;
+.section-eyebrow{
+    font-size:10.5px;
     font-weight:800;
-
-    color:var(--slate);
-
-    margin-bottom:10px;
-    padding-left:4px;
-
+    letter-spacing:0.9px;
     text-transform:uppercase;
-    letter-spacing:0.4px;
+    color:var(--ink-4);
+    margin-bottom:10px;
+    padding-left:2px;
 }
 
-.section-card{
-    background:#fff;
-
-    border-radius:28px;
-
+.menu-card{
+    background:var(--white);
+    border-radius:var(--r-xl);
     border:1px solid var(--border);
-
     overflow:hidden;
-
-    box-shadow:var(--shadow);
+    box-shadow:var(--sh-card);
 }
 
-/* =========================================================
-MENU
-========================================================= */
-
-.menu-item{
+/* ── MENU ITEMS ── */
+.menu-row{
     display:flex;
     align-items:center;
-
-    padding:18px;
-
+    gap:14px;
+    padding:15px 18px;
+    border-bottom:1px solid var(--border2);
     text-decoration:none;
-
-    color:var(--navy);
-
-    border-bottom:1px solid #F8FAFC;
+    color:var(--ink);
+    transition:background 0.12s;
+    cursor:pointer;
 }
 
-.menu-item:last-child{
-    border-bottom:none;
-}
+.menu-row:last-child{ border-bottom:none; }
+.menu-row:hover{ background:var(--border2); }
+.menu-row:active{ background:#EEF2F7; }
 
-.menu-icon{
+.menu-icon-box{
     width:46px;
     height:46px;
-
-    border-radius:16px;
-
-    background:#F8FAFC;
-
+    border-radius:15px;
     display:flex;
     align-items:center;
     justify-content:center;
-
-    margin-right:14px;
-
-    font-size:18px;
-
+    font-size:19px;
     flex-shrink:0;
 }
 
-.menu-content{
-    flex:1;
-}
+/* icon colour themes */
+.ic-green{ background:var(--green-50); color:var(--green-dark); }
+.ic-blue{ background:#EFF6FF; color:#1D4ED8; }
+.ic-purple{ background:#F5F3FF; color:#6D28D9; }
+.ic-amber{ background:var(--amber-light); color:#B45309; }
+.ic-slate{ background:#F1F5F9; color:#475569; }
+.ic-red{ background:var(--red-light); color:var(--red); }
+
+.menu-text{ flex:1; min-width:0; }
 
 .menu-label{
     font-size:14px;
     font-weight:700;
+    color:var(--ink);
 }
 
-.menu-subtitle{
-    font-size:12px;
-    color:var(--slate);
+.menu-sub{
+    font-size:11.5px;
+    color:var(--ink-3);
     margin-top:2px;
+    font-weight:500;
 }
 
 .menu-arrow{
-    color:#CBD5E1;
+    font-size:15px;
+    color:var(--ink-5);
+    flex-shrink:0;
 }
 
-/* =========================================================
-LOGOUT
-========================================================= */
-
-.logout-wrapper{
-    padding:0 14px 30px;
+/* badge pill on menu row */
+.menu-badge{
+    font-size:10px;
+    font-weight:800;
+    padding:3px 9px;
+    border-radius:999px;
+    flex-shrink:0;
 }
+
+.badge-green{ background:var(--green-100); color:var(--green-deeper); }
+.badge-amber{ background:#FEF3C7; color:#92400E; }
+
+/* ── HUB ROW — special treatment ── */
+.hub-row{
+    background:linear-gradient(135deg, var(--green-50), #F0FFF8);
+    border-top:1px solid var(--green-100);
+    border-bottom:1px solid var(--green-100);
+}
+
+.hub-row .menu-label{ color:var(--green-deeper); }
+.hub-row .menu-sub{ color:var(--green-dark); }
+.hub-row .menu-arrow{ color:var(--green); }
+
+/* ── LOGOUT ── */
+.logout-section{ padding:20px 16px 0; }
 
 .btn-logout{
     width:100%;
-    min-height:58px;
-
-    border:none;
-
-    border-radius:24px;
-
-    background:#FFF1F2;
-
-    border:1px solid #FECACA;
-
-    color:var(--danger);
-
+    height:56px;
+    border-radius:var(--r-lg);
+    border:1.5px solid var(--red-border);
+    background:var(--red-light);
+    color:var(--red);
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:15px;
     font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
 }
 
-.version{
+.btn-logout i{ font-size:18px; }
+.btn-logout:hover{ background:#FFE4E6; }
+.btn-logout:active{ transform:scale(0.98); }
+
+/* ── VERSION ── */
+.version-line{
     text-align:center;
-    margin-top:14px;
-
+    padding:18px 0 8px;
     font-size:11px;
-    color:#94A3B8;
+    color:var(--ink-4);
+    font-weight:500;
+    letter-spacing:0.2px;
 }
 
-/* =========================================================
-RESPONSIVE
-========================================================= */
-
-@media(max-width:640px){
-
-    .stats-grid{
-        grid-template-columns:1fr;
-    }
+/* ── RESPONSIVE ── */
+@media(max-width:400px){
+    .stats-row{ grid-template-columns:repeat(3,1fr); gap:8px; }
+    .stat-num{ font-size:18px; }
+    .hero-name{ font-size:19px; }
+    .avatar{ width:68px; height:68px; font-size:24px; border-radius:20px; }
 }
 
 </style>
-
 {% endblock %}
+
 
 {% block content %}
 
-<div class="profile-page">
+<div style="max-width:520px; margin:0 auto;">
 
-    <!-- NAV -->
+    <!-- ── TOP NAV ── -->
+    <nav class="top-nav">
+        <a href="javascript:history.back()" class="back-btn" aria-label="Go back">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <span class="nav-title">My Account</span>
+    </nav>
 
-    <header class="top-nav">
+    <!-- ── HERO ── -->
+    <div class="hero-wrap">
+        <div class="hero-card">
 
-        <div class="top-nav-inner">
+            <div class="hero-top">
 
-            <a
-                href="javascript:history.back()"
-                class="back-btn"
-            >
-                <i class="bi bi-chevron-left"></i>
-            </a>
-
-            <h1 class="nav-title">
-                Account
-            </h1>
-
-        </div>
-
-    </header>
-
-    <!-- HERO -->
-
-    <section class="profile-hero">
-
-        <div class="hero-content">
-
-            <div class="avatar">
-
-                {% if profile.avatar %}
-                    <img src="{{ profile.avatar.url }}">
-                {% else %}
-                    {{ user.username|slice:":1"|upper }}
-                {% endif %}
-
-            </div>
-
-            <div class="profile-name">
-                {{ user.username }}
-            </div>
-
-            {% if user.email %}
-            <div class="profile-email">
-                {{ user.email }}
-            </div>
-            {% endif %}
-
-            {% if profile.phone_number %}
-            <div class="profile-phone">
-                {{ profile.phone_number }}
-            </div>
-            {% endif %}
-
-            <div class="location-chip">
-
-                <i class="bi bi-geo-alt-fill"></i>
-
-                {% if default_address %}
-                    Delivering to {{ default_address.city }}
-                {% else %}
-                    Delivery location not set
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- STATS -->
-
-    <section class="stats-grid">
-
-        <div class="stat-card">
-
-            <div class="stat-icon">
-                <i class="bi bi-bag-check"></i>
-            </div>
-
-            <div class="stat-value">
-                {{ orders_count|default:"0" }}
-            </div>
-
-            <div class="stat-label">
-                Orders
-            </div>
-
-        </div>
-
-        <div class="stat-card">
-
-            <div class="stat-icon">
-                <i class="bi bi-heart"></i>
-            </div>
-
-            <div class="stat-value">
-                {{ wishlist_count|default:"0" }}
-            </div>
-
-            <div class="stat-label">
-                Wishlist
-            </div>
-
-        </div>
-
-        <div class="stat-card">
-
-            <div class="stat-icon">
-                <i class="bi bi-geo-alt"></i>
-            </div>
-
-            <div class="stat-value">
-                {{ address_count|default:"0" }}
-            </div>
-
-            <div class="stat-label">
-                Addresses
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- ACCOUNT -->
-
-    <section class="section-wrapper">
-
-        <div class="section-title">
-            Account
-        </div>
-
-        <div class="section-card">
-
-            <a href="{% url 'manage_profile' %}" class="menu-item">
-
-                <div class="menu-icon">
-                    <i class="bi bi-person-circle"></i>
+                <div class="avatar-wrap">
+                    <div class="avatar">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Profile photo">
+                        {% else %}
+                            {{ user.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="avatar-verified" title="Verified member">
+                        <i class="bi bi-star-fill" style="font-size:9px;"></i>
+                    </div>
                 </div>
 
-                <div class="menu-content">
-
-                    <div class="menu-label">
-                        Personal Information
-                    </div>
-
-                    <div class="menu-subtitle">
-                        Manage your profile
-                    </div>
-
+                <div class="hero-identity">
+                    <div class="hero-name">{{ user.get_full_name|default:user.username }}</div>
+                    {% if user.email %}
+                        <div class="hero-handle">{{ user.email }}</div>
+                    {% endif %}
+                    {% if profile.phone_number %}
+                        <div class="hero-phone">
+                            <i class="bi bi-telephone-fill"></i>
+                            {{ profile.phone_number }}
+                        </div>
+                    {% endif %}
                 </div>
 
-                <i class="bi bi-chevron-right menu-arrow"></i>
+                <a href="{% url 'manage_profile' %}" class="edit-btn">
+                    <i class="bi bi-pencil-fill"></i>
+                    Edit
+                </a>
 
-            </a>
+            </div>
 
-            <a href="{% url 'address_list' %}" class="menu-item">
+            <!-- PILLS -->
+            <div class="hero-pills">
 
-                <div class="menu-icon">
+                <div class="hero-pill">
                     <i class="bi bi-geo-alt-fill"></i>
+                    {% if default_address %}
+                        {{ default_address.city }}
+                    {% else %}
+                        No address set
+                    {% endif %}
                 </div>
 
-                <div class="menu-content">
+                {% if active_hub %}
+                <div class="hero-pill">
+                    <i class="bi bi-shop"></i>
+                    {{ active_hub.name }}
+                </div>
+                {% endif %}
 
-                    <div class="menu-label">
-                        Saved Addresses
-                    </div>
-
-                    <div class="menu-subtitle">
-                        Manage delivery locations
-                    </div>
-
+                <div class="hero-pill">
+                    <i class="bi bi-bag-check-fill"></i>
+                    {{ orders_count|default:"0" }} orders
                 </div>
 
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── STATS ROW ── -->
+    <div class="stats-row">
+
+        <div class="stat-card">
+            <div class="stat-icon-box">
+                <i class="bi bi-bag-check-fill"></i>
+            </div>
+            <div class="stat-num">{{ orders_count|default:"0" }}</div>
+            <div class="stat-lbl">Orders</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-box">
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <div class="stat-num">{{ wishlist_count|default:"0" }}</div>
+            <div class="stat-lbl">Wishlist</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-box">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="stat-num">{{ address_count|default:"0" }}</div>
+            <div class="stat-lbl">Addresses</div>
+        </div>
+
+    </div>
+
+    <!-- ── SECTION: MY ORDERS ── -->
+    <div class="section-group">
+        <div class="section-eyebrow">Shopping</div>
+        <div class="menu-card">
+
+            <a href="{% url 'orders_list' %}" class="menu-row">
+                <div class="menu-icon-box ic-green">
+                    <i class="bi bi-bag-check-fill"></i>
+                </div>
+                <div class="menu-text">
+                    <div class="menu-label">My Orders</div>
+                    <div class="menu-sub">Track and manage your orders</div>
+                </div>
+                {% if orders_count > 0 %}
+                    <span class="menu-badge badge-green">{{ orders_count }}</span>
+                {% endif %}
                 <i class="bi bi-chevron-right menu-arrow"></i>
-
             </a>
 
-            <a href="{% url 'wishlist_view' %}" class="menu-item">
-
-                <div class="menu-icon">
+            <a href="{% url 'wishlist_view' %}" class="menu-row">
+                <div class="menu-icon-box ic-purple">
                     <i class="bi bi-heart-fill"></i>
                 </div>
-
-                <div class="menu-content">
-
-                    <div class="menu-label">
-                        Wishlist
-                    </div>
-
-                    <div class="menu-subtitle">
-                        Saved products
-                    </div>
-
+                <div class="menu-text">
+                    <div class="menu-label">Wishlist</div>
+                    <div class="menu-sub">Products you've saved</div>
                 </div>
-
+                {% if wishlist_count > 0 %}
+                    <span class="menu-badge badge-amber">{{ wishlist_count }}</span>
+                {% endif %}
                 <i class="bi bi-chevron-right menu-arrow"></i>
-
             </a>
 
-            <a href="{% url 'orders_list' %}" class="menu-item">
-
-                <div class="menu-icon">
-                    <i class="bi bi-box-seam"></i>
+            <a href="{% url 'cart_view' %}" class="menu-row">
+                <div class="menu-icon-box ic-amber">
+                    <i class="bi bi-basket3-fill"></i>
                 </div>
-
-                <div class="menu-content">
-
-                    <div class="menu-label">
-                        My Orders
-                    </div>
-
-                    <div class="menu-subtitle">
-                        Track and manage orders
-                    </div>
-
+                <div class="menu-text">
+                    <div class="menu-label">My Cart</div>
+                    <div class="menu-sub">Items waiting to be ordered</div>
                 </div>
-
                 <i class="bi bi-chevron-right menu-arrow"></i>
-
             </a>
 
         </div>
+    </div>
 
-    </section>
+    <!-- ── SECTION: DELIVERY ── -->
+    <div class="section-group">
+        <div class="section-eyebrow">Delivery</div>
+        <div class="menu-card">
 
-    <!-- SECURITY -->
-
-    <section class="section-wrapper">
-
-        <div class="section-title">
-            Security
-        </div>
-
-        <div class="section-card">
-
-            <a href="{% url 'password_reset' %}" class="menu-item">
-
-                <div class="menu-icon">
-                    <i class="bi bi-shield-lock"></i>
+            <!-- HUB CHANGE ROW — visually distinct -->
+            <a href="{% url 'where_we_deliver' %}" class="menu-row hub-row">
+                <div class="menu-icon-box ic-green">
+                    <i class="bi bi-shop-window"></i>
                 </div>
-
-                <div class="menu-content">
-
+                <div class="menu-text">
                     <div class="menu-label">
-                        Security Settings
+                        {% if active_hub %}{{ active_hub.name }}{% else %}Select Delivery Hub{% endif %}
                     </div>
-
-                    <div class="menu-subtitle">
-                        Password and account security
-                    </div>
-
+                    <div class="menu-sub">Tap to change your delivery area</div>
                 </div>
+                <i class="bi bi-arrow-left-right menu-arrow"></i>
+            </a>
 
+            <a href="{% url 'address_list' %}" class="menu-row">
+                <div class="menu-icon-box ic-blue">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="menu-text">
+                    <div class="menu-label">Saved Addresses</div>
+                    <div class="menu-sub">Manage your delivery locations</div>
+                </div>
+                {% if address_count > 0 %}
+                    <span class="menu-badge badge-green">{{ address_count }}</span>
+                {% endif %}
                 <i class="bi bi-chevron-right menu-arrow"></i>
-
             </a>
 
         </div>
+    </div>
 
-    </section>
+    <!-- ── SECTION: ACCOUNT ── -->
+    <div class="section-group">
+        <div class="section-eyebrow">Account</div>
+        <div class="menu-card">
 
-    <!-- LOGOUT -->
+            <a href="{% url 'manage_profile' %}" class="menu-row">
+                <div class="menu-icon-box ic-slate">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="menu-text">
+                    <div class="menu-label">Personal Information</div>
+                    <div class="menu-sub">Name, photo, email, phone</div>
+                </div>
+                <i class="bi bi-chevron-right menu-arrow"></i>
+            </a>
 
-    <section class="logout-wrapper">
+            <a href="{% url 'password_reset' %}" class="menu-row">
+                <div class="menu-icon-box ic-slate">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div class="menu-text">
+                    <div class="menu-label">Security Settings</div>
+                    <div class="menu-sub">Password and account security</div>
+                </div>
+                <i class="bi bi-chevron-right menu-arrow"></i>
+            </a>
 
-        <form
-            method="POST"
-            action="{% url 'user_logout' %}"
-        >
+        </div>
+    </div>
 
+    <!-- ── LOGOUT ── -->
+    <div class="logout-section">
+        <form method="POST" action="{% url 'user_logout' %}">
             {% csrf_token %}
-
-            <button class="btn-logout">
-
-                <i class="bi bi-power"></i>
-                Logout
-
+            <button type="submit" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                Sign out
             </button>
-
         </form>
+    </div>
 
-        <div class="version">
-            GramaCart v2.0
-        </div>
-
-    </section>
+    <div class="version-line">GramaCart v2.0 &nbsp;·&nbsp; Made for Bharat 🇮🇳</div>
 
 </div>
 

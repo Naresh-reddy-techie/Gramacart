@@ -200,72 +200,85 @@
 .route-badge-row strong{ color:var(--brand); font-size:.92rem; }
 .route-badge-row span{ font-size:.8rem; color:var(--ink-soft); }
 
-/* =======================================================
-   CATEGORY GRID
+/* ======================================================= 
+   CATEGORY GRID — image fill style
 ======================================================= */
 
-.category-card{
-    background:var(--white);
-    border:1px solid var(--border-soft);
-    border-radius:var(--r-lg);
-    padding:24px 14px;
-    text-align:center;
-    height:100%;
-    box-shadow:var(--shadow-sm);
-    transition:.3s cubic-bezier(.2,.8,.2,1);
-    position:relative;
-    overflow:hidden;
+.cat-card {
+    display: block;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+    text-decoration: none;
+    background: var(--brand-soft);
 }
 
-.category-card::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:linear-gradient(135deg, var(--brand-soft), transparent 60%);
-    opacity:0;
-    transition:.3s;
+.cat-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--shadow-md);
 }
 
-.category-card:hover{
-    transform:translateY(-6px);
-    box-shadow:var(--shadow-md);
-    border-color:var(--brand-light);
+.cat-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .35s ease;
 }
 
-.category-card:hover::before{ opacity:1; }
+.cat-card:hover img { transform: scale(1.08); }
 
-.category-card .cat-img-wrap{
-    width:72px;
-    height:72px;
-    margin:0 auto 14px;
-    border-radius:18px;
-    background:var(--brand-soft);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    z-index:1;
-    transition:.3s;
+.cat-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 80%,
+        rgba(10,30,20,.55) 65%,
+        rgba(5,20,12,.85) 100%
+    );
 }
 
-.category-card:hover .cat-img-wrap{
-    background:var(--brand-light);
-    transform:scale(1.05);
+.cat-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 10px 14px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.25;
+    z-index: 2;
+    text-shadow: 0 1px 4px rgba(0,0,0,.4);
 }
 
-.category-card img{
-    width:42px;
-    height:42px;
-    object-fit:contain;
+/* Shop badge on hover */
+.cat-card::after {
+    content: 'Shop →';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--brand);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all .2s;
+    z-index: 3;
+    letter-spacing: .03em;
 }
 
-.category-card h6{
-    font-size:.86rem;
-    font-weight:700;
-    color:var(--ink);
-    margin:0;
-    position:relative;
-    z-index:1;
+.cat-card:hover::after {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* =======================================================
@@ -1079,76 +1092,43 @@
 </section>
 
 <!-- ===================== CATEGORIES ===================== -->
-<section class="section-pad" style="background:var(--white);">
+<section class="section-pad" style="background:var(--sand);">
     <div class="container">
 
-        <div class="text-center mb-5 reveal">
+        <div class="text-center mb-4 reveal">
             <span class="eyebrow mb-3">Shop By Category</span>
             <h2 class="fw-semibold mt-3 mb-2" style="font-size:1.9rem;">Everything your family needs</h2>
-            <p class="text-secondary" style="color:var(--ink-soft);">In one place, ready in minutes</p>
+            <p style="color:var(--ink-soft);">In one place, ready in minutes</p>
         </div>
 
-        <a href="{% url 'public_dashboard' %}" class="text-decoration-none">
-            <div class="row g-3 g-md-4 reveal">
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/groceries.png' %}" alt="Groceries"></div>
-                        <h6>Groceries</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/women essentials.png' %}" alt="Women Essentials"></div>
-                        <h6>Women Essentials</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/dairy & breakfast.png' %}" alt="Dairy & Breakfast"></div>
-                        <h6>Dairy &amp; Breakfast</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/babycare.png' %}" alt="Baby Care"></div>
-                        <h6>Baby Care</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/personalcare.png' %}" alt="Personal Care"></div>
-                        <h6>Personal Care</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/snacks.png' %}" alt="Snacks & Beverages"></div>
-                        <h6>Snacks &amp; Beverages</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/household.png' %}" alt="Household Essentials"></div>
-                        <h6>Household Essentials</h6>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="category-card tap-scale">
-                        <div class="cat-img-wrap"><img src="{% static 'images/vegetables.png' %}" alt="Vegetables & Fruits"></div>
-                        <h6>Vegetables &amp; Fruits</h6>
-                    </div>
-                </div>
-
+        <div class="row g-3 reveal">
+            {% for category in categories %}
+            <div class="col-6 col-md-3">
+                <a href="{% url 'public_dashboard' %}?category={{ category.slug }}" class="cat-card text-decoration-none">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                    {% endif %}
+                    <div class="cat-overlay"></div>
+                    <div class="cat-name">{{ category.name }}</div>
+                </a>
             </div>
-        </a>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p style="color:var(--ink-soft);">No categories yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if total_categories > 8 %}
+        <div class="text-center mt-4 reveal">
+            <a href="{% url 'public_dashboard' %}" class="btn btn-shop tap-scale d-inline-flex px-5" style="width:auto;">
+                <i class="bi bi-grid"></i>
+                Explore All Categories
+                <span style="background:rgba(255,255,255,.2);color:#fff;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:4px;">{{ total_categories }}+</span>
+            </a>
+        </div>
+        {% endif %}
+
     </div>
 </section>
 

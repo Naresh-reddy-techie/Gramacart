@@ -112,6 +112,89 @@ body{
     padding-top:90px;
 }
 
+.page-subheading{
+    color:var(--muted);
+    font-size:0.86rem;
+    font-weight:600;
+    margin:-4px 4px 16px;
+}
+
+/* =========================================
+   STEP PROGRESS BAR
+========================================= */
+
+.steps-bar{
+    display:flex;
+    align-items:center;
+
+    background:var(--card);
+    border:1px solid var(--border-soft);
+    border-radius:20px;
+
+    padding:14px 12px;
+    margin-bottom:16px;
+
+    box-shadow:var(--shadow-sm);
+}
+
+.step-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    flex:1;
+    text-align:center;
+}
+
+.step-circle{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--bg);
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-family:'Baloo 2',sans-serif;
+    font-size:0.85rem;
+    border:2px solid var(--border-soft);
+    transition:.2s ease;
+}
+
+.step-label{
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--muted);
+}
+
+.step-line{
+    height:2px;
+    flex:0 0 14%;
+    background:var(--border-soft);
+    margin-top:-20px;
+}
+
+.step-item.active .step-circle{
+    background:var(--dark);
+    border-color:var(--dark);
+    color:#fff;
+}
+
+.step-item.active .step-label{
+    color:var(--dark);
+}
+
+.step-item.done .step-circle{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+}
+
+.step-item.done .step-label{
+    color:var(--primary-dark);
+}
+
 /* =========================================
    SECTION CARD
 ========================================= */
@@ -132,11 +215,11 @@ body{
 
 .section-title{
     font-family:'Baloo 2',sans-serif;
-    font-size:1rem;
+    font-size:1.05rem;
     font-weight:700;
     color:var(--dark);
 
-    margin-bottom:16px;
+    margin-bottom:4px;
 
     display:flex;
     align-items:center;
@@ -145,6 +228,13 @@ body{
 
 .section-title i{
     color:var(--primary-dark);
+}
+
+.section-helper{
+    font-size:0.82rem;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:14px;
 }
 
 /* =========================================
@@ -156,7 +246,7 @@ body{
 
     border-radius:18px;
 
-    padding:14px 16px;
+    padding:14px 40px 14px 16px;
 
     cursor:pointer;
 
@@ -185,8 +275,8 @@ body{
 }
 
 .address-radio-dot{
-    width:20px;
-    height:20px;
+    width:22px;
+    height:22px;
     border-radius:50%;
     border:2px solid var(--border);
     background:#fff;
@@ -213,17 +303,38 @@ body{
     flex-grow:1;
 }
 
+.default-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    background:var(--marigold-soft);
+    color:#B45309;
+    border:1px solid var(--marigold-soft-border);
+    font-size:0.68rem;
+    font-weight:800;
+    border-radius:999px;
+    padding:3px 10px;
+    margin-bottom:6px;
+}
+
 .address-name{
     font-weight:800;
     color:var(--dark);
     margin-bottom:4px;
-    font-size:0.92rem;
+    font-size:0.95rem;
 }
 
 .address-text{
     color:var(--muted);
-    font-size:0.84rem;
+    font-size:0.86rem;
     line-height:1.5;
+}
+
+.tap-hint{
+    font-size:0.74rem;
+    color:var(--muted-soft);
+    font-weight:600;
+    margin-top:6px;
 }
 
 .check-icon{
@@ -240,6 +351,26 @@ body{
 
 .address-card.active .check-icon{
     display:block;
+}
+
+.add-address-card{
+    border:1.5px dashed var(--primary-soft-border);
+    border-radius:18px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    color:var(--primary-dark);
+    font-weight:700;
+    font-size:0.9rem;
+    background:var(--primary-soft);
+    text-decoration:none;
+    margin-top:10px;
+}
+
+.add-address-card i{
+    font-size:1.2rem;
 }
 
 /* =========================================
@@ -277,8 +408,8 @@ body{
 }
 
 .payment-option input[type="radio"]{
-    width:19px;
-    height:19px;
+    width:22px;
+    height:22px;
     accent-color:var(--primary);
     flex-shrink:0;
     cursor:pointer;
@@ -288,7 +419,7 @@ body{
     font-weight:700;
     color:var(--dark);
     cursor:pointer;
-    font-size:0.9rem;
+    font-size:0.95rem;
     flex-grow:1;
 }
 
@@ -324,11 +455,11 @@ body{
 .item-name{
     font-weight:700;
     color:var(--dark);
-    font-size:0.9rem;
+    font-size:0.92rem;
 }
 
 .item-meta{
-    font-size:0.78rem;
+    font-size:0.8rem;
     color:var(--muted);
     margin-top:2px;
 }
@@ -336,7 +467,7 @@ body{
 .item-price{
     font-weight:800;
     color:var(--dark);
-    font-size:0.92rem;
+    font-size:0.94rem;
     white-space:nowrap;
 }
 
@@ -351,7 +482,7 @@ body{
 
     margin-bottom:12px;
 
-    font-size:0.88rem;
+    font-size:0.9rem;
 }
 
 .summary-label{
@@ -437,12 +568,24 @@ body{
 
     border-top:1px solid var(--border-soft);
 
-    padding:16px;
+    padding:14px 16px 16px;
 }
 
 .place-order-inner{
     max-width:920px;
     margin:auto;
+}
+
+.security-note{
+    text-align:center;
+    font-size:0.74rem;
+    font-weight:600;
+    color:var(--muted-soft);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
 }
 
 .place-btn{
@@ -491,7 +634,7 @@ body{
 }
 
 /* =========================================
-   ADD ADDRESS BUTTON
+   ADD ADDRESS BUTTON (header pill)
 ========================================= */
 
 .add-address-btn{
@@ -547,6 +690,17 @@ body{
     }
 }
 
+@media(max-width:420px){
+
+    .step-label{
+        font-size:0.66rem;
+    }
+
+    .header-title{
+        font-size:1.05rem;
+    }
+}
+
 </style>
 {% endblock %}
 
@@ -572,6 +726,34 @@ body{
 
 <div class="checkout-page">
 
+<div class="page-subheading">
+    Just 3 simple steps - choose address, pick payment and confirm.
+</div>
+
+<!-- STEP PROGRESS -->
+<div class="steps-bar">
+
+    <div class="step-item active" id="step-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Address</div>
+    </div>
+
+    <div class="step-line"></div>
+
+    <div class="step-item" id="step-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Payment</div>
+    </div>
+
+    <div class="step-line"></div>
+
+    <div class="step-item" id="step-3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Confirm</div>
+    </div>
+
+</div>
+
 <form method="POST" id="checkout-form">
 
     {% csrf_token %}
@@ -583,11 +765,11 @@ body{
     <div class="section-card">
 
         <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
 
             <div class="section-title mb-0">
                 <i class="bi bi-geo-alt-fill"></i>
-                Delivery Address
+                Where should we deliver?
             </div>
 
             <a href="{% url 'address_create' %}?next={{ request.get_full_path }}"
@@ -600,16 +782,27 @@ body{
 
         </div>
 
+        <div class="section-helper">
+            Tap an address below to select it.
+        </div>
+
         <!-- ADDRESS LIST -->
         {% for address in user_addresses %}
 
         <div
-            class="address-card"
+            class="address-card {% if address.is_default %}active{% endif %}"
             data-id="{{ address.id }}">
 
             <div class="address-radio-dot"></div>
 
             <div class="address-body">
+
+                {% if address.is_default %}
+                <div class="default-badge">
+                    <i class="bi bi-house-fill"></i>
+                    Default Address
+                </div>
+                {% endif %}
 
                 <div class="address-name">
                     {{ address.recipient_name }}
@@ -618,6 +811,10 @@ body{
                 <div class="address-text">
                     {{ address.address_line }},
                     {{ address.city }}
+                </div>
+
+                <div class="tap-hint">
+                    Tap to deliver here
                 </div>
 
             </div>
@@ -633,6 +830,15 @@ body{
         </div>
 
         {% endfor %}
+
+        <a
+            href="{% url 'address_create' %}?next={{ request.get_full_path }}"
+            class="add-address-card">
+
+            <i class="bi bi-plus-circle"></i>
+            Add a New Delivery Address
+
+        </a>
 
         <input
             type="hidden"
@@ -650,7 +856,11 @@ body{
 
         <div class="section-title">
             <i class="bi bi-wallet2"></i>
-            Payment Method
+            How will you pay?
+        </div>
+
+        <div class="section-helper">
+            Choose one payment option below.
         </div>
 
         {% for method in payment_methods %}
@@ -682,7 +892,7 @@ body{
 
         <div class="section-title">
             <i class="bi bi-basket3-fill"></i>
-            Basket Items
+            Your Order
         </div>
 
         {% for item in cart_items %}
@@ -720,13 +930,13 @@ body{
 
         <div class="section-title">
             <i class="bi bi-receipt"></i>
-            Price Details
+            Order Summary
         </div>
 
         <div class="summary-row">
 
             <div class="summary-label">
-                Subtotal
+                Item Total
             </div>
 
             <div
@@ -742,7 +952,7 @@ body{
         <div class="summary-row">
 
             <div class="summary-label">
-                Shipping
+                Delivery Charge
             </div>
 
             <div
@@ -758,7 +968,7 @@ body{
         <div class="total-row">
 
             <div class="total-label">
-                Total
+                Total Amount
             </div>
 
             <div
@@ -789,6 +999,11 @@ body{
     <div class="place-order-bar">
 
         <div class="place-order-inner">
+
+            <div class="security-note">
+                <i class="bi bi-shield-check"></i>
+                Safe &amp; secure checkout
+            </div>
 
             <button
                 type="submit"
@@ -846,6 +1061,42 @@ const serviceAlert = document.getElementById(
 );
 
 /* =========================================
+   STEP PROGRESS HELPERS
+========================================= */
+
+function setStep(n){
+
+    document.querySelectorAll(".step-item").forEach((el, idx) => {
+
+        el.classList.remove("active", "done");
+
+        if (idx < n - 1) {
+            el.classList.add("done");
+        }
+
+        if (idx === n - 1) {
+            el.classList.add("active");
+        }
+
+    });
+}
+
+function refreshStep(){
+
+    const paymentSelected = document.querySelector(
+        'input[name="payment_method"]:checked'
+    );
+
+    if (!selectedAddress) {
+        setStep(1);
+    } else if (!paymentSelected) {
+        setStep(2);
+    } else {
+        setStep(3);
+    }
+}
+
+/* =========================================
    UPDATE BUTTON
 ========================================= */
 
@@ -860,6 +1111,8 @@ function updateButtonState(){
         paymentSelected &&
         shippingValid
     );
+
+    refreshStep();
 }
 
 /* =========================================
@@ -880,93 +1133,117 @@ document.querySelectorAll(
    ADDRESS SELECT
 ========================================= */
 
+function selectAddressCard(card){
+
+    document.querySelectorAll(
+        ".address-card"
+    ).forEach(c => {
+        c.classList.remove("active");
+    });
+
+    card.classList.add("active");
+
+    const addressId = card.dataset.id;
+
+    selectedAddress = addressId;
+
+    addressInput.value = addressId;
+
+    placeBtn.disabled = true;
+
+    refreshStep();
+
+    fetch(
+        "{% url 'get_shipping_cost' %}?address_id=" + addressId,
+        {
+            headers:{
+                "X-Requested-With":"XMLHttpRequest"
+            }
+        }
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.success){
+
+            shippingValid = true;
+
+            document.getElementById(
+                "shipping_cost"
+            ).innerText =
+                "₹" + Number(data.shipping_cost).toFixed(2);
+
+            document.getElementById(
+                "final_total"
+            ).innerText =
+                "₹" + Number(data.final_total).toFixed(2);
+
+            document.getElementById(
+                "btn-total"
+            ).innerText =
+                "₹" + Number(data.final_total).toFixed(2);
+
+            serviceAlert.classList.remove("show");
+
+        }else{
+
+            shippingValid = false;
+
+            serviceAlert.innerText =
+                data.message ||
+                "Delivery unavailable for selected address.";
+
+            serviceAlert.classList.add("show");
+        }
+
+        updateButtonState();
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        shippingValid = false;
+
+        serviceAlert.innerText =
+            "Unable to calculate delivery fee.";
+
+        serviceAlert.classList.add("show");
+
+        updateButtonState();
+
+    });
+
+}
+
 document.querySelectorAll(
     ".address-card"
 ).forEach(card => {
 
     card.addEventListener("click", function(){
-
-        document.querySelectorAll(
-            ".address-card"
-        ).forEach(c => {
-            c.classList.remove("active");
-        });
-
-        this.classList.add("active");
-
-        const addressId = this.dataset.id;
-
-        selectedAddress = addressId;
-
-        addressInput.value = addressId;
-
-        placeBtn.disabled = true;
-
-        fetch(
-            "{% url 'get_shipping_cost' %}?address_id=" + addressId,
-            {
-                headers:{
-                    "X-Requested-With":"XMLHttpRequest"
-                }
-            }
-        )
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            if(data.success){
-
-                shippingValid = true;
-
-                document.getElementById(
-                    "shipping_cost"
-                ).innerText =
-                    "₹" + Number(data.shipping_cost).toFixed(2);
-
-                document.getElementById(
-                    "final_total"
-                ).innerText =
-                    "₹" + Number(data.final_total).toFixed(2);
-
-                document.getElementById(
-                    "btn-total"
-                ).innerText =
-                    "₹" + Number(data.final_total).toFixed(2);
-
-                serviceAlert.classList.remove("show");
-
-            }else{
-
-                shippingValid = false;
-
-                serviceAlert.innerText =
-                    data.message ||
-                    "Delivery unavailable for selected address.";
-
-                serviceAlert.classList.add("show");
-            }
-
-            updateButtonState();
-
-        })
-
-        .catch(error => {
-
-            console.error(error);
-
-            shippingValid = false;
-
-            serviceAlert.innerText =
-                "Unable to calculate delivery fee.";
-
-            serviceAlert.classList.add("show");
-
-            updateButtonState();
-
-        });
-
+        selectAddressCard(this);
     });
+
+});
+
+/* =========================================
+   INIT - AUTO SELECT DEFAULT ADDRESS
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const defaultCard = document.querySelector(
+        ".address-card.active"
+    );
+
+    if (defaultCard) {
+        selectAddressCard(defaultCard);
+    } else {
+        refreshStep();
+    }
 
 });
 

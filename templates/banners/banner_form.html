@@ -1,0 +1,279 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="max-width:780px;">
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{% url 'banner_list' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="fw-bold mb-0">{{ title }}</h4>
+            <p class="text-muted small mb-0">
+                {% if banner %}Editing existing banner{% else %}Fill in the details below to create a new banner{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- MESSAGES -->
+    {% for msg in messages %}
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>{{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-8">
+
+                <!-- CONTENT CARD -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold text-muted mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-type"></i> Content
+                        </h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Title <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                {{ form.title.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Subtitle</label>
+                            {{ form.subtitle }}
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Eyebrow tag</label>
+                                {{ form.eyebrow }}
+                                <div class="form-text">Small label above title e.g. 🌿 Fresh today</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Offer label</label>
+                                {{ form.offer_label }}
+                                <div class="form-text">e.g. 20% OFF — leave blank to hide</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- IMAGE & CTA CARD -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold text-muted mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-image"></i> Image & CTA
+                        </h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Banner image</label>
+                            {{ form.image }}
+                            <div class="form-text">
+                                Recommended: 800×300px · Max 2MB · JPG or PNG
+                            </div>
+                            {% if form.image.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                {{ form.image.errors.0 }}
+                            </div>
+                            {% endif %}
+
+                            <!-- IMAGE PREVIEW -->
+                            {% if banner.image %}
+                            <div class="mt-2 position-relative d-inline-block">
+                                <img src="{{ banner.image.url }}"
+                                     id="imagePreview"
+                                     class="rounded"
+                                     style="max-height:120px;object-fit:cover;border:1px solid #dee2e6;">
+                                <div class="text-muted small mt-1">Current image</div>
+                            </div>
+                            {% else %}
+                            <div id="imagePreviewWrap" class="mt-2" style="display:none;">
+                                <img id="imagePreview"
+                                     class="rounded"
+                                     style="max-height:120px;object-fit:cover;border:1px solid #dee2e6;">
+                                <div class="text-muted small mt-1">Preview</div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">CTA button text</label>
+                                {{ form.cta_text }}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">CTA URL</label>
+                                {{ form.cta_url }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SCHEDULE CARD -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold text-muted mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar-range"></i> Schedule
+                        </h6>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Start date & time</label>
+                                {{ form.start_date }}
+                                <div class="form-text">Leave blank to go live immediately</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">End date & time</label>
+                                {{ form.end_date }}
+                                <div class="form-text">Leave blank to run indefinitely</div>
+                            </div>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-3 py-2 small">
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            {{ form.non_field_errors.0 }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-lg-4">
+
+                <!-- PUBLISH CARD -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold text-muted mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-toggles"></i> Publish
+                        </h6>
+
+                        <div class="d-flex align-items-center justify-content-between
+                                    p-3 rounded mb-3"
+                             style="background:#F0FDF4;border:1px solid #D1FAE5;">
+                            <div>
+                                <div class="fw-semibold small">Active</div>
+                                <div class="text-muted" style="font-size:.75rem;">
+                                    Visible to customers
+                                </div>
+                            </div>
+                            {{ form.is_active }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Display order</label>
+                            {{ form.order }}
+                            <div class="form-text">Lower number shows first</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success fw-bold">
+                                <i class="bi bi-check-lg me-1"></i>
+                                {% if banner %}Save Changes{% else %}Create Banner{% endif %}
+                            </button>
+                            <a href="{% url 'banner_list' %}"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CLASSIFICATION CARD -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold text-muted mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-diagram-3"></i> Classification
+                        </h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Hub</label>
+                            {{ form.hub }}
+                            <div class="form-text">
+                                Leave as Global to show across all hubs
+                            </div>
+                            {% if form.hub.errors %}
+                            <div class="text-danger small mt-1">{{ form.hub.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Show on page</label>
+                            {{ form.page }}
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Banner type</label>
+                            {{ form.banner_type }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TIPS CARD -->
+                <div class="card border-0 shadow-sm"
+                     style="background:#FFFBEB;border:1px solid #FDE68A !important;">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-2" style="color:#92400E;">
+                            <i class="bi bi-lightbulb-fill me-1"></i> Tips
+                        </h6>
+                        <ul class="small mb-0 ps-3" style="color:#78350F;line-height:1.8;">
+                            <li>Use 800×300px images for best results</li>
+                            <li>Keep titles under 50 characters</li>
+                            <li>Set end date for seasonal offers</li>
+                            <li>Use Global hub for platform-wide promos</li>
+                            <li>Lower order number = shown first</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+// Live image preview on file select
+document.querySelector('input[type="file"]').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        const img  = document.getElementById('imagePreview');
+        const wrap = document.getElementById('imagePreviewWrap');
+        if(img){ img.src = ev.target.result; }
+        if(wrap){ wrap.style.display = 'block'; }
+    };
+    reader.readAsDataURL(file);
+});
+</script>
+
+{% endblock %}

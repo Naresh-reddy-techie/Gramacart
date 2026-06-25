@@ -1,575 +1,894 @@
 {% extends 'homepage/base.html' %}
 {% load static %}
 
+{% block title %}Sell on GramaCart | Grow Your Local Business{% endblock %}
+
 {% block content %}
-
-<!-- HERO SECTION -->
-
-<section class="seller-hero py-5">
-
-
-<div class="container">
-
-    <div class="row align-items-center g-5">
-
-        <div class="col-lg-6">
-
-            <span class="badge seller-badge mb-3">
-                🚀 Start Selling On GramaCart
-            </span>
-
-            <h1 class="display-4 fw-bold mb-4">
-                Grow Your Local Business
-                <span class="text-success">With GramaCart</span>
-            </h1>
-
-            <p class="lead text-muted mb-4">
-
-                Whether you're a farmer, food maker, craft creator,
-                cloud kitchen owner or small business entrepreneur,
-                GramaCart helps you reach customers in your village
-                and nearby communities.
-
-            </p>
-
-            <div class="row g-3">
-
-                <div class="col-6">
-                    <div class="mini-feature">
-                        <i class="bi bi-shop"></i>
-                        <span>Online Store</span>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="mini-feature">
-                        <i class="bi bi-people-fill"></i>
-                        <span>More Customers</span>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="mini-feature">
-                        <i class="bi bi-truck"></i>
-                        <span>Delivery Support</span>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="mini-feature">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <span>Grow Revenue</span>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-6">
-
-            <div class="seller-form-card">
-
-                <div class="text-center mb-4">
-
-                    <h3 class="fw-bold">
-                        Seller Application
-                    </h3>
-
-                    <p class="text-muted">
-                        Submit your details and our team will review your application.
-                    </p>
-
-                </div>
-
-                <form method="post">
-
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label class="form-label">Owner Name</label>
-                        {{ form.owner_name }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Mobile Number</label>
-                        {{ form.phone }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        {{ form.email }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Village</label>
-                        {{ form.village }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Business Name</label>
-                        {{ form.business_name }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Business Type</label>
-                        {{ form.business_type }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Select Hub</label>
-                        {{ form.hub }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">
-                            Tell Us About Your Products
-                        </label>
-                        {{ form.description }}
-                    </div>
-
-                    <button type="submit"
-                            class="btn btn-success btn-lg w-100">
-
-                        Submit Application
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-</section>
-
-<!-- WHO CAN SELL -->
-
-<section class="py-5 bg-light">
-
-
-<div class="container">
-
-    <div class="text-center mb-5">
-
-        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-3">
-            WHO CAN SELL
-        </span>
-
-        <h2 class="fw-bold">
-            Perfect For Local Entrepreneurs
-        </h2>
-
-        <p class="text-muted">
-            Turn your skills, products and passion into income.
-        </p>
-
-    </div>
-
-    <div class="row g-4">
-
-        <div class="col-6 col-lg-3">
-
-            <div class="seller-card">
-
-                <div class="seller-icon">
-                    <i class="bi bi-flower1"></i>
-                </div>
-
-                <h5>Farmers</h5>
-
-                <p>
-                    Rice, grains, pulses,
-                    vegetables and farm produce.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-6 col-lg-3">
-
-            <div class="seller-card">
-
-                <div class="seller-icon">
-                    <i class="bi bi-cake2"></i>
-                </div>
-
-                <h5>Homemade Foods</h5>
-
-                <p>
-                    Pickles, snacks,
-                    sweets and traditional foods.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-6 col-lg-3">
-
-            <div class="seller-card">
-
-                <div class="seller-icon">
-                    <i class="bi bi-gem"></i>
-                </div>
-
-                <h5>Handmade Crafts</h5>
-
-                <p>
-                    Silk thread bangles,
-                    gifts and handmade products.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-6 col-lg-3">
-
-            <div class="seller-card">
-
-                <div class="seller-icon">
-                    <i class="bi bi-shop"></i>
-                </div>
-
-                <h5>Cloud Kitchens</h5>
-
-                <p>
-                    Home kitchens and
-                    local food businesses.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-</section>
-
-<!-- BENEFITS -->
-
-<section class="py-5">
-
-
-<div class="container">
-
-    <div class="text-center mb-5">
-
-        <h2 class="fw-bold">
-            Why Sell Through GramaCart?
-        </h2>
-
-    </div>
-
-    <div class="row g-4">
-
-        <div class="col-md-4">
-
-            <div class="benefit-card">
-
-                <i class="bi bi-phone"></i>
-
-                <h5>
-                    Online Visibility
-                </h5>
-
-                <p>
-                    Get discovered by customers searching online.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="benefit-card">
-
-                <i class="bi bi-truck"></i>
-
-                <h5>
-                    Delivery Network
-                </h5>
-
-                <p>
-                    Local delivery support through GramaCart hubs.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="benefit-card">
-
-                <i class="bi bi-graph-up-arrow"></i>
-
-                <h5>
-                    Business Growth
-                </h5>
-
-                <p>
-                    Reach more customers without opening new branches.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-</section>
 <style>
 
-:root{
-    --primary:#16a34a;
-    --primary-dark:#15803d;
-    --light-green:#ecfdf5;
-    --dark:#0f172a;
-    --gray:#64748b;
-    --border:#e5e7eb;
+/* =======================================================
+   SELLER APPLICATION — DESIGN TOKENS
+   Inherits brand tokens from base.html
+======================================================= */
+
+.sa-page {
+    background: var(--sand);
+    min-height: 100vh;
 }
 
-body{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    background:#fff;
-    color:var(--dark);
+/* ── HERO SPLIT ─────────────────────────────────────── */
+
+.sa-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
 }
 
-/* HERO */
-
-.seller-hero{
-    background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
-    padding-top:80px;
-    padding-bottom:80px;
+@media (max-width: 991px) {
+    .sa-hero { grid-template-columns: 1fr; min-height: auto; }
 }
 
-.seller-badge{
-    background:var(--light-green);
-    color:var(--primary);
-    border:none;
-    padding:10px 18px;
-    border-radius:999px;
-    font-weight:600;
+/* LEFT — dark brand panel */
+.sa-left {
+    background: var(--ink);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.display-4{
-    line-height:1.15;
+.sa-left::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -80px;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(11,107,79,.35), transparent 70%);
+    pointer-events: none;
 }
 
-/* FEATURE BOXES */
-
-.mini-feature{
-    background:#fff;
-    border-radius:18px;
-    padding:18px;
-    display:flex;
-    align-items:center;
-    gap:14px;
-    border:1px solid #eef2f7;
-    box-shadow:0 10px 30px rgba(15,23,42,.05);
-    transition:.3s;
+.sa-left::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: -60px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(199,93,61,.18), transparent 70%);
+    pointer-events: none;
 }
 
-.mini-feature:hover{
-    transform:translateY(-5px);
+@media (max-width: 991px) {
+    .sa-left { padding: 48px 24px 40px; }
+    .sa-left::before, .sa-left::after { display: none; }
 }
 
-.mini-feature i{
-    color:var(--primary);
-    font-size:1.5rem;
+.sa-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    color: #A8E0C5;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 999px;
+    margin-bottom: 28px;
 }
 
-.mini-feature span{
-    font-weight:600;
+.sa-headline {
+    font-size: clamp(2rem, 3.2vw, 2.9rem);
+    font-weight: 800;
+    line-height: 1.12;
+    color: #fff;
+    letter-spacing: -.02em;
+    margin-bottom: 18px;
 }
 
-/* FORM */
+.sa-headline .sa-accent { color: #4ACD96; }
 
-.seller-form-card{
-    background:#fff;
-    padding:40px;
-    border-radius:30px;
-    border:1px solid #eef2f7;
-    box-shadow:0 20px 50px rgba(15,23,42,.08);
+.sa-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,.65);
+    line-height: 1.65;
+    max-width: 400px;
+    margin-bottom: 40px;
 }
 
-.seller-form-card label{
-    font-weight:600;
-    margin-bottom:6px;
+/* Stat row */
+.sa-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 44px;
 }
 
-.seller-form-card input,
-.seller-form-card select,
-.seller-form-card textarea{
-    width:100%;
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:14px 16px;
-    transition:.3s;
-    background:#fff;
+@media (max-width: 480px) { .sa-stats { gap: 20px; } }
+
+.sa-stat strong {
+    display: block;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.03em;
+    line-height: 1;
 }
 
-.seller-form-card textarea{
-    min-height:120px;
+.sa-stat span {
+    font-size: .78rem;
+    color: rgba(255,255,255,.5);
+    margin-top: 4px;
+    display: block;
 }
 
-.seller-form-card input:focus,
-.seller-form-card select:focus,
-.seller-form-card textarea:focus{
-    border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(22,163,74,.12);
-    outline:none;
+.sa-stat-divider {
+    width: 1px;
+    background: rgba(255,255,255,.12);
+    align-self: stretch;
 }
 
-.btn-success{
-    background:var(--primary);
-    border:none;
-    border-radius:14px;
-    font-weight:600;
+/* Who can sell — icon pills */
+.sa-who {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.btn-success:hover{
-    background:var(--primary-dark);
+.sa-who-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--r-md);
+    padding: 13px 16px;
+    transition: .2s;
 }
 
-/* SELLER CARDS */
-
-.seller-card{
-    background:#fff;
-    border-radius:28px;
-    padding:30px 22px;
-    text-align:center;
-    height:100%;
-    border:1px solid #eef2f7;
-    box-shadow:0 10px 30px rgba(15,23,42,.05);
-    transition:.35s;
+.sa-who-item:hover {
+    background: rgba(255,255,255,.09);
 }
 
-.seller-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 20px 45px rgba(15,23,42,.10);
+.sa-who-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(74,205,150,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.seller-icon{
-    width:85px;
-    height:85px;
-    background:var(--light-green);
-    border-radius:24px;
-    margin:0 auto 18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.sa-who-icon i { font-size: 1rem; color: #4ACD96; }
+
+.sa-who-text strong {
+    display: block;
+    font-size: .9rem;
+    font-weight: 700;
+    color: #fff;
 }
 
-.seller-icon i{
-    font-size:2rem;
-    color:var(--primary);
+.sa-who-text span {
+    font-size: .78rem;
+    color: rgba(255,255,255,.5);
 }
 
-.seller-card h5{
-    font-weight:700;
-    margin-bottom:10px;
+/* RIGHT — form panel */
+.sa-right {
+    background: var(--sand);
+    padding: 56px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.seller-card p{
-    color:var(--gray);
-    margin-bottom:0;
+@media (max-width: 1200px) { .sa-right { padding: 48px 40px; } }
+@media (max-width: 991px)  { .sa-right { padding: 40px 24px 56px; } }
+
+.sa-form-head {
+    margin-bottom: 32px;
 }
 
-/* BENEFITS */
-
-.benefit-card{
-    background:#fff;
-    border-radius:28px;
-    padding:35px 25px;
-    text-align:center;
-    height:100%;
-    border:1px solid #eef2f7;
-    box-shadow:0 10px 30px rgba(15,23,42,.05);
-    transition:.35s;
+.sa-form-head h2 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
 }
 
-.benefit-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 20px 45px rgba(15,23,42,.10);
+.sa-form-head p {
+    font-size: .9rem;
+    color: var(--ink-soft);
 }
 
-.benefit-card i{
-    font-size:3rem;
-    color:var(--primary);
-    display:block;
-    margin-bottom:15px;
+/* Step indicator */
+.sa-steps-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 32px;
 }
 
-.benefit-card h5{
-    font-weight:700;
-    margin-bottom:10px;
+.sa-step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
 }
 
-/* SECTION SPACING */
-
-section{
-    overflow:hidden;
+.sa-step-dot .dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 800;
+    color: var(--ink-faint);
+    transition: .3s;
 }
 
-/* MOBILE */
-
-@media(max-width:991px){
-
-    .seller-form-card{
-        margin-top:25px;
-    }
-
+.sa-step-dot.active .dot {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(11,107,79,.3);
 }
 
-@media(max-width:768px){
+.sa-step-dot.done .dot {
+    background: var(--brand-light);
+    border-color: var(--brand);
+    color: var(--brand);
+}
 
-    .seller-hero{
-        padding-top:50px;
-        padding-bottom:50px;
-    }
+.sa-step-dot .label {
+    font-size: .68rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    text-align: center;
+    letter-spacing: .02em;
+}
 
-    .display-4{
-        font-size:2.2rem;
-    }
+.sa-step-dot.active .label { color: var(--brand); }
 
-    .seller-form-card{
-        padding:25px;
-    }
+.sa-step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 18px;
+    transition: .3s;
+}
 
-    .seller-card{
-        padding:20px 15px;
-    }
+.sa-step-line.done { background: var(--brand); }
 
-    .benefit-card{
-        padding:25px 20px;
-    }
+/* Form fields */
+.sa-field {
+    margin-bottom: 18px;
+}
 
-    .seller-icon{
-        width:65px;
-        height:65px;
-    }
+.sa-field label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 7px;
+    letter-spacing: .01em;
+}
 
-    .seller-icon i{
-        font-size:1.5rem;
-    }
+.sa-field input,
+.sa-field select,
+.sa-field textarea {
+    width: 100%;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 13px 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .93rem;
+    color: var(--ink);
+    transition: .2s;
+    -webkit-appearance: none;
+    appearance: none;
+}
 
+.sa-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234B5A53' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+}
+
+.sa-field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.sa-field input:focus,
+.sa-field select:focus,
+.sa-field textarea:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px rgba(11,107,79,.1);
+    outline: none;
+}
+
+.sa-field input::placeholder,
+.sa-field textarea::placeholder {
+    color: var(--ink-faint);
+}
+
+/* Two column field row */
+.sa-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 540px) {
+    .sa-field-row { grid-template-columns: 1fr; }
+}
+
+/* Submit button */
+.sa-submit {
+    width: 100%;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 16px 24px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 10px 28px rgba(11,107,79,.25);
+    transition: .2s ease;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: .01em;
+}
+
+.sa-submit:hover {
+    background: var(--brand-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(11,107,79,.32);
+}
+
+.sa-submit:active { transform: scale(.98); }
+
+/* Trust note below form */
+.sa-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: .78rem;
+    color: var(--ink-faint);
+}
+
+.sa-trust i { color: var(--brand); }
+
+/* ── BENEFITS STRIP ──────────────────────────────────── */
+
+.sa-benefits {
+    background: var(--white);
+    border-top: 1px solid var(--border-soft);
+    padding: 64px 0;
+}
+
+.sa-benefit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .sa-benefit-grid { grid-template-columns: 1fr; gap: 16px; }
+}
+
+.sa-benefit-card {
+    background: var(--sand);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    padding: 28px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    transition: .25s;
+}
+
+.sa-benefit-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--brand-light);
+    box-shadow: var(--shadow-md);
+}
+
+.sa-benefit-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--brand-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sa-benefit-icon i { font-size: 1.25rem; color: var(--brand); }
+
+.sa-benefit-body h5 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 5px;
+}
+
+.sa-benefit-body p {
+    font-size: .86rem;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* ── STEP NAV (multi-step form) ─────────────────────── */
+.sa-form-step { display: none; }
+.sa-form-step.active { display: block; }
+
+.sa-nav-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.sa-btn-back {
+    flex: 0 0 auto;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    color: var(--ink);
+    border-radius: var(--r-md);
+    padding: 14px 22px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.sa-btn-back:hover { background: var(--brand-soft); border-color: var(--brand-light); }
+
+.sa-btn-next {
+    flex: 1;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 14px 22px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.sa-btn-next:hover { background: var(--brand); }
+
+/* Section heading shared */
+.sa-section-head {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.sa-section-head .sa-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 7px 15px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+}
+
+.sa-section-head h2 {
+    font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -.02em;
+    margin-bottom: 10px;
+}
+
+.sa-section-head p {
+    color: var(--ink-soft);
+    font-size: .95rem;
+}
+
+/* Mobile hero adjustments */
+@media (max-width: 991px) {
+    .sa-headline { font-size: 1.8rem; }
+    .sa-stats { flex-wrap: wrap; gap: 16px; }
+    .sa-who { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+    .sa-left { padding: 36px 20px 32px; }
+    .sa-right { padding: 32px 16px 48px; }
+    .sa-who { grid-template-columns: 1fr; }
+    .sa-headline { font-size: 1.55rem; }
 }
 
 </style>
+
+<div class="sa-page">
+
+    <!-- ══ HERO SPLIT ══════════════════════════════════════ -->
+    <div class="sa-hero">
+
+        <!-- LEFT: Brand pitch -->
+        <div class="sa-left">
+
+            <span class="sa-eyebrow">
+                <i class="bi bi-stars"></i>
+                Seller Programme
+            </span>
+
+            <h1 class="sa-headline">
+                Sell local.<br>
+                Reach <span class="sa-accent">everyone</span><br>
+                around you.
+            </h1>
+
+            <p class="sa-sub">
+                Farmers, home cooks, artisans, cloud kitchens —
+                list your products on GramaCart and get orders
+                delivered right within your village.
+            </p>
+
+            <div class="sa-stats">
+                <div class="sa-stat">
+                    <strong>₹0</strong>
+                    <span>Setup cost</span>
+                </div>
+                <div class="sa-stat-divider"></div>
+                <div class="sa-stat">
+                    <strong>30 min</strong>
+                    <span>To list your first product</span>
+                </div>
+                <div class="sa-stat-divider"></div>
+                <div class="sa-stat">
+                    <strong>Local</strong>
+                    <span>Customers near you</span>
+                </div>
+            </div>
+
+            <div class="sa-who">
+                <div class="sa-who-item">
+                    <div class="sa-who-icon"><i class="bi bi-flower1"></i></div>
+                    <div class="sa-who-text">
+                        <strong>Farmers</strong>
+                        <span>Rice, vegetables, pulses</span>
+                    </div>
+                </div>
+                <div class="sa-who-item">
+                    <div class="sa-who-icon"><i class="bi bi-cake2"></i></div>
+                    <div class="sa-who-text">
+                        <strong>Home Cooks</strong>
+                        <span>Pickles, sweets, snacks</span>
+                    </div>
+                </div>
+                <div class="sa-who-item">
+                    <div class="sa-who-icon"><i class="bi bi-gem"></i></div>
+                    <div class="sa-who-text">
+                        <strong>Artisans</strong>
+                        <span>Bangles, crafts, gifts</span>
+                    </div>
+                </div>
+                <div class="sa-who-item">
+                    <div class="sa-who-icon"><i class="bi bi-shop"></i></div>
+                    <div class="sa-who-text">
+                        <strong>Cloud Kitchens</strong>
+                        <span>Home kitchens, local food</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Multi-step form -->
+        <div class="sa-right">
+
+            <div class="sa-form-head">
+                <h2>Apply to sell</h2>
+                <p>Takes about 2 minutes. Our team reviews within 24 hours.</p>
+            </div>
+
+            <!-- Step indicator -->
+            <div class="sa-steps-indicator">
+                <div class="sa-step-dot active" id="dot1">
+                    <div class="dot">1</div>
+                    <span class="label">You</span>
+                </div>
+                <div class="sa-step-line" id="line1"></div>
+                <div class="sa-step-dot" id="dot2">
+                    <div class="dot">2</div>
+                    <span class="label">Business</span>
+                </div>
+                <div class="sa-step-line" id="line2"></div>
+                <div class="sa-step-dot" id="dot3">
+                    <div class="dot">3</div>
+                    <span class="label">Products</span>
+                </div>
+            </div>
+
+            <form method="post" id="saForm">
+                {% csrf_token %}
+
+                <!-- STEP 1: Personal details -->
+                <div class="sa-form-step active" id="step1">
+
+                    <div class="sa-field">
+                        <label for="{{ form.owner_name.id_for_label }}">Your full name</label>
+                        {{ form.owner_name }}
+                    </div>
+
+                    <div class="sa-field-row">
+                        <div class="sa-field">
+                            <label for="{{ form.phone.id_for_label }}">Mobile number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="sa-field">
+                            <label for="{{ form.email.id_for_label }}">Email address</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="sa-field">
+                        <label for="{{ form.village.id_for_label }}">Your village</label>
+                        {{ form.village }}
+                    </div>
+
+                    <div class="sa-nav-btns">
+                        <button type="button" class="sa-btn-next" onclick="saNext(1)">
+                            Continue
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- STEP 2: Business details -->
+                <div class="sa-form-step" id="step2">
+
+                    <div class="sa-field">
+                        <label for="{{ form.business_name.id_for_label }}">Business name</label>
+                        {{ form.business_name }}
+                    </div>
+
+                    <div class="sa-field-row">
+                        <div class="sa-field">
+                            <label for="{{ form.business_type.id_for_label }}">Business type</label>
+                            {{ form.business_type }}
+                        </div>
+                        <div class="sa-field">
+                            <label for="{{ form.hub.id_for_label }}">Nearest hub</label>
+                            {{ form.hub }}
+                        </div>
+                    </div>
+
+                    <div class="sa-nav-btns">
+                        <button type="button" class="sa-btn-back" onclick="saBack(2)">
+                            <i class="bi bi-arrow-left"></i>
+                            Back
+                        </button>
+                        <button type="button" class="sa-btn-next" onclick="saNext(2)">
+                            Continue
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- STEP 3: Products & submit -->
+                <div class="sa-form-step" id="step3">
+
+                    <div class="sa-field">
+                        <label for="{{ form.description.id_for_label }}">Tell us about your products</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="form-check mt-4">
+
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            required
+                            id="seller_accept"
+                        >
+
+                        <label class="form-check-label" for="seller_accept">
+
+                            I have read and agree to the
+                            <a href="{% url 'seller_terms' %}">Seller Terms & Conditions</a> and
+                            <a href="{% url 'seller_commission_policy' %}">Seller Commission Policy</a> and
+                            <a href="{% url 'seller_privacy_policy' %}">Seller Privacy & Data Policy</a>.
+
+                        </label>
+
+                    </div>
+
+                    <div class="sa-nav-btns">
+                        <button type="button" class="sa-btn-back" onclick="saBack(3)">
+                            <i class="bi bi-arrow-left"></i>
+                            Back
+                        </button>
+                        <button type="submit" class="sa-submit">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Submit Application
+                        </button>
+                    </div>
+
+                    <div class="sa-trust">
+                        <i class="bi bi-shield-check"></i>
+                        Reviewed by our team within 24 hours — no spam, ever.
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ══ BENEFITS STRIP ═══════════════════════════════════ -->
+    <div class="sa-benefits">
+        <div class="container">
+
+            <div class="sa-section-head">
+                <div class="sa-tag"><i class="bi bi-lightning-fill"></i> Why GramaCart</div>
+                <h2>Built for local sellers, not big brands</h2>
+                <p>Everything you need to sell in your village — without the complexity.</p>
+            </div>
+
+            <div class="sa-benefit-grid">
+
+                <div class="sa-benefit-card">
+                    <div class="sa-benefit-icon"><i class="bi bi-phone"></i></div>
+                    <div class="sa-benefit-body">
+                        <h5>Customers find you online</h5>
+                        <p>Your products appear to buyers searching in your village and surrounding areas.</p>
+                    </div>
+                </div>
+
+                <div class="sa-benefit-card">
+                    <div class="sa-benefit-icon"><i class="bi bi-truck"></i></div>
+                    <div class="sa-benefit-body">
+                        <h5>Delivery handled for you</h5>
+                        <p>GramaCart hub partners pick up and deliver your orders — no vehicle needed.</p>
+                    </div>
+                </div>
+
+                <div class="sa-benefit-card">
+                    <div class="sa-benefit-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div class="sa-benefit-body">
+                        <h5>Grow without a shop</h5>
+                        <p>Reach more customers every month without renting a storefront or hiring staff.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+(function(){
+
+    function applyFormStyles(){
+        const inputs = document.querySelectorAll('.sa-field input, .sa-field select, .sa-field textarea');
+        inputs.forEach(el => {
+            el.style.cssText += `
+                width:100%;
+                background:#fff;
+                border:1.5px solid #E8E2D6;
+                border-radius:16px;
+                padding:13px 16px;
+                font-family:'Plus Jakarta Sans',sans-serif;
+                font-size:.93rem;
+                color:#13201C;
+                transition:.2s;
+                -webkit-appearance:none;
+                appearance:none;
+                box-sizing:border-box;
+            `;
+            if(el.tagName === 'SELECT'){
+                el.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234B5A53' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")";
+                el.style.backgroundRepeat = 'no-repeat';
+                el.style.backgroundPosition = 'right 14px center';
+                el.style.paddingRight = '38px';
+                el.style.cursor = 'pointer';
+            }
+            el.addEventListener('focus', () => {
+                el.style.borderColor = '#0B6B4F';
+                el.style.boxShadow = '0 0 0 4px rgba(11,107,79,.1)';
+                el.style.outline = 'none';
+            });
+            el.addEventListener('blur', () => {
+                el.style.borderColor = '#E8E2D6';
+                el.style.boxShadow = 'none';
+            });
+        });
+    }
+
+    applyFormStyles();
+
+    window.saNext = function(from){
+        const step = document.getElementById('step' + from);
+        const fields = step.querySelectorAll('input[required], select[required], textarea[required]');
+        let valid = true;
+        fields.forEach(f => {
+            if(!f.value.trim()){
+                f.style.borderColor = '#C0392B';
+                f.addEventListener('input', () => f.style.borderColor = '#E8E2D6', {once:true});
+                valid = false;
+            }
+        });
+        if(!valid) return;
+
+        const next = from + 1;
+        document.getElementById('step' + from).classList.remove('active');
+        document.getElementById('step' + next).classList.add('active');
+
+        document.getElementById('dot' + from).classList.remove('active');
+        document.getElementById('dot' + from).classList.add('done');
+        document.getElementById('dot' + from).querySelector('.dot').innerHTML = '<i class="bi bi-check" style="font-size:.75rem;"></i>';
+        document.getElementById('line' + from).classList.add('done');
+        document.getElementById('dot' + next).classList.add('active');
+
+        document.querySelector('.sa-right').scrollIntoView({behavior:'smooth', block:'start'});
+    };
+
+    window.saBack = function(from){
+        const prev = from - 1;
+        document.getElementById('step' + from).classList.remove('active');
+        document.getElementById('step' + prev).classList.add('active');
+
+        document.getElementById('dot' + from).classList.remove('active');
+        document.getElementById('dot' + prev).classList.remove('done');
+        document.getElementById('dot' + prev).classList.add('active');
+        document.getElementById('dot' + prev).querySelector('.dot').textContent = prev;
+        document.getElementById('line' + prev).classList.remove('done');
+    };
+
+})();
+</script>
+
 {% endblock %}

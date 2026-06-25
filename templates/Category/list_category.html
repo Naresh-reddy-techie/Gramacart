@@ -58,7 +58,7 @@
                     Vegetables and more.
                 </p>
 
-                <form method="post"
+                <form method="post" enctype="multipart/form-data"
                       action="{% url 'add_category' %}">
 
                     {% csrf_token %}
@@ -77,6 +77,12 @@
                                    required
                                    autofocus>
 
+                        </div>
+                        <div class="col-lg-9 mt-3">
+                            <input type="file"
+                                name="image"
+                                class="form-control"
+                                accept="image/*">
                         </div>
 
                         <div class="col-lg-3">
@@ -172,11 +178,15 @@
 
                             <div class="d-flex align-items-center gap-3">
 
-                                <div class="category-badge">
-
-                                    {{ category.name|slice:":1"|upper }}
-
-                                </div>
+                                {% if category.image %}
+                                    <img src="{{ category.image.url }}"
+                                        alt="{{ category.name }}"
+                                        class="category-image">
+                                {% else %}
+                                    <div class="category-badge">
+                                        {{ category.name|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
 
                                 <div>
 
@@ -712,7 +722,13 @@
     background:var(--dark);
     color:#fff;
 }
-
+.category-image{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    object-fit:cover;
+    border:1px solid #e5e7eb;
+}
 /* =========================================
    MOBILE
 ========================================= */

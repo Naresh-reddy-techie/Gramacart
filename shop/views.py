@@ -210,6 +210,9 @@ def get_hub_products(hub, query=None, category_slug=None):
 # PUBLIC DASHBOARD
 # =========================================================
 
+from admin_dashboard.models import Banner
+from django.db.models import Q
+
 def public_dashboard(request, category_slug=None):
 
     # -----------------------------------------------------
@@ -250,6 +253,7 @@ def public_dashboard(request, category_slug=None):
         "id",
         "name"
     ).first()
+    
 
     # -----------------------------------------------------
     # HUB REQUIRED
@@ -257,6 +261,17 @@ def public_dashboard(request, category_slug=None):
 
     if not active_hub:
         return redirect("where_we_deliver")
+
+    
+
+    all_banners = Banner.objects.filter(
+        is_active=True,
+        page__in=['shop', 'all']
+    ).filter(
+        Q(hub=active_hub) | Q(hub__isnull=True)
+    ).select_related('hub')
+
+    banners = [banner for banner in all_banners if banner.is_live()]
 
     # -----------------------------------------------------
     # SELECTED CATEGORY
@@ -364,6 +379,8 @@ def public_dashboard(request, category_slug=None):
         "star_range": range(1, 6),
 
         "catalog_version": catalog_version,
+
+        'banners': banners,
 
     }
 

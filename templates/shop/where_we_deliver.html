@@ -2,1272 +2,1021 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-    >
-
-    <title>GramaCart | Delivery Area</title>
-
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <!-- Bootstrap Icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    >
-
-    <!-- Font -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <style>
-
-        :root{
-
-            --primary:#10B981;
-            --primary-dark:#059669;
-
-            --dark:#0f172a;
-            --muted:#64748b;
-
-            --bg:#f8fafc;
-            --card:#ffffff;
-
-            --border:#e2e8f0;
-
-            --danger:#dc2626;
-            --success:#065f46;
-
-            --shadow:
-                0 10px 25px rgba(0,0,0,0.05),
-                0 2px 10px rgba(0,0,0,0.03);
-        }
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
-
-        body{
-
-            background:var(--bg);
-
-            font-family:'Plus Jakarta Sans',sans-serif;
-
-            color:var(--dark);
-
-            min-height:100vh;
-        }
-
-        .main-wrapper{
-
-            min-height:100vh;
-
-            display:flex;
-
-            align-items:center;
-
-            justify-content:center;
-
-            padding:24px;
-        }
-
-        .delivery-card{
-
-            width:100%;
-
-            max-width:540px;
-
-            background:var(--card);
-
-            border-radius:32px;
-
-            padding:32px 26px;
-
-            box-shadow:var(--shadow);
-
-            position:relative;
-
-            overflow:hidden;
-        }
-
-        .brand{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:12px;
-
-            margin-bottom:24px;
-        }
-
-        .brand img{
-
-            width:46px;
-
-            height:46px;
-
-            object-fit:contain;
-        }
-
-        .brand-title{
-
-            font-size:1.55rem;
-
-            font-weight:800;
-
-            letter-spacing:-0.5px;
-        }
-
-        .brand-title span{
-            color:var(--primary);
-        }
-
-        .hero-badge{
-
-            display:inline-flex;
-
-            align-items:center;
-
-            gap:8px;
-
-            padding:10px 16px;
-
-            border-radius:999px;
-
-            background:#ecfdf5;
-
-            color:var(--primary-dark);
-
-            font-size:0.8rem;
-
-            font-weight:700;
-
-            margin-bottom:20px;
-        }
-
-        .title{
-
-            font-size:2rem;
-
-            font-weight:800;
-
-            line-height:1.2;
-
-            letter-spacing:-1px;
-        }
-
-        .subtitle{
-
-            margin-top:14px;
-
-            color:var(--muted);
-
-            line-height:1.7;
-
-            font-size:0.95rem;
-        }
-
-        .option-btn{
-
-            width:100%;
-
-            border:none;
-
-            border-radius:26px;
-
-            padding:20px;
-
-            margin-top:18px;
-
-            display:flex;
-
-            align-items:center;
-
-            justify-content:space-between;
-
-            transition:0.25s ease;
-
-            cursor:pointer;
-        }
-
-        .option-btn:hover{
-            transform:translateY(-2px);
-        }
-
-        .option-btn:active{
-            transform:scale(0.98);
-        }
-
-        .current-btn{
-
-            background:var(--primary);
-
-            color:#fff;
-
-            box-shadow:
-                0 10px 20px rgba(16,185,129,0.22);
-        }
-
-        .remote-btn{
-
-            background:#fff;
-
-            border:1px solid var(--border);
-
-            color:var(--dark);
-        }
-
-        .btn-left{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:16px;
-        }
-
-        .icon-box{
-
-            width:58px;
-
-            height:58px;
-
-            border-radius:18px;
-
-            display:flex;
-
-            align-items:center;
-
-            justify-content:center;
-
-            font-size:1.35rem;
-        }
-
-        .current-btn .icon-box{
-            background:rgba(255,255,255,0.15);
-        }
-
-        .remote-btn .icon-box{
-            background:#f8fafc;
-        }
-
-        .btn-title{
-
-            font-size:1rem;
-
-            font-weight:800;
-
-            text-align:left;
-        }
-
-        .btn-sub{
-
-            margin-top:4px;
-
-            font-size:0.78rem;
-
-            text-align:left;
-
-            opacity:0.9;
-        }
-
-        .footer-note{
-
-            margin-top:28px;
-
-            text-align:center;
-
-            color:var(--muted);
-
-            font-size:0.82rem;
-
-            line-height:1.6;
-        }
-
-        /* STATUS */
-
-        .status-box{
-
-            display:none;
-
-            margin-top:24px;
-
-            border-radius:22px;
-
-            padding:18px;
-
-            text-align:center;
-        }
-
-        .status-loading{
-            background:#f8fafc;
-        }
-
-        .status-success{
-            background:#ecfdf5;
-            color:var(--success);
-        }
-
-        .status-error{
-            background:#fef2f2;
-            color:#991b1b;
-        }
-
-        .status-title{
-
-            margin-top:12px;
-
-            font-weight:800;
-        }
-
-        .status-sub{
-
-            margin-top:8px;
-
-            font-size:0.88rem;
-
-            line-height:1.7;
-        }
-
-        /* MODAL */
-
-        .modal-content{
-
-            border:none;
-
-            border-radius:30px;
-        }
-
-        .modal-header{
-
-            border-bottom:none;
-
-            padding:24px 24px 8px;
-        }
-
-        .modal-title{
-
-            font-weight:800;
-        }
-
-        .modal-body{
-            padding:10px 24px 24px;
-        }
-
-        .field-label{
-
-            font-size:0.82rem;
-
-            font-weight:700;
-
-            color:var(--muted);
-
-            margin-bottom:8px;
-        }
-
-        .form-select{
-
-            height:56px;
-
-            border-radius:16px;
-
-            border:1px solid var(--border);
-
-            font-weight:600;
-
-            box-shadow:none !important;
-        }
-
-        .form-select:focus{
-            border-color:var(--primary);
-        }
-
-        .disabled-select{
-            background:#f1f5f9 !important;
-            cursor:not-allowed;
-        }
-
-        .submit-btn{
-
-            width:100%;
-
-            height:56px;
-
-            border:none;
-
-            border-radius:18px;
-
-            background:var(--primary);
-
-            color:#fff;
-
-            font-weight:800;
-
-            margin-top:18px;
-
-            transition:0.2s ease;
-        }
-
-        .submit-btn:hover{
-            background:var(--primary-dark);
-        }
-
-        .submit-btn:disabled{
-
-            opacity:0.7;
-
-            cursor:not-allowed;
-        }
-
-        @media(max-width:576px){
-
-            .delivery-card{
-                padding:28px 20px;
-            }
-
-            .title{
-                font-size:1.7rem;
-            }
-
-            .modal-body{
-                padding:10px 18px 20px;
-            }
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>GramaCart | Delivery Area</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --green: #10B981;
+      --green-dark: #059669;
+      --green-light: #ECFDF5;
+      --green-text: #065F46;
+      --amber: #D97706;
+      --amber-light: #FFF7ED;
+      --amber-border: #FDE68A;
+      --amber-text: #92400E;
+      --red-light: #FEF2F2;
+      --red-border: #FCA5A5;
+      --red-text: #991B1B;
+      --bg: #F0FDF4;
+      --surface: #FFFFFF;
+      --surface2: #F8FAFC;
+      --border: #E2E8F0;
+      --border2: #CBD5E1;
+      --text: #0F172A;
+      --text2: #64748B;
+      --text3: #94A3B8;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: var(--surface);
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .logo-name {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .logo-name span { color: var(--green); }
+
+    .topbar-actions { display: flex; gap: 8px; }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 17px;
+      color: var(--text2);
+      text-decoration: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 28px 20px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-light);
+      color: var(--green-text);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .hero-title em {
+      color: var(--green);
+      font-style: normal;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* ── INFO STRIP ── */
+    .info-strip {
+      margin: 20px 20px 0;
+      background: var(--amber-light);
+      border: 1px solid var(--amber-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .info-strip i {
+      color: var(--amber);
+      font-size: 17px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .info-strip p {
+      font-size: 12.5px;
+      color: var(--amber-text);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text3);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 24px 20px 10px;
+    }
+
+    /* ── OPTION CARDS ── */
+    .cards { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+
+    .opt-card {
+      width: 100%;
+      border: none;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      text-align: left;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .opt-card:hover { transform: translateY(-2px); }
+    .opt-card:active { transform: scale(0.97); }
+
+    .opt-card.primary {
+      background: var(--green);
+      box-shadow: 0 8px 28px rgba(16,185,129,0.28);
+    }
+
+    .opt-card.secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .card-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .primary .card-icon {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+    }
+
+    .secondary .card-icon {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .card-text { flex: 1; }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .primary .card-title { color: #fff; }
+    .secondary .card-title { color: var(--text); }
+
+    .card-desc {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .primary .card-desc { color: rgba(255,255,255,0.78); }
+    .secondary .card-desc { color: var(--text2); }
+
+    .card-arrow {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .primary .card-arrow { color: rgba(255,255,255,0.6); }
+    .secondary .card-arrow { color: var(--text3); }
+
+    /* ── STATUS BOX ── */
+    .status-box {
+      margin: 20px 20px 0;
+      border-radius: 16px;
+      padding: 14px;
+      display: none;
+    }
+
+    .status-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    .status-box.loading { background: var(--surface2); border: 1px solid var(--border); }
+    .status-box.loading .status-icon-wrap { background: var(--surface); }
+
+    .status-box.success { background: var(--green-light); border: 1px solid #6EE7B7; }
+    .status-box.success .status-icon-wrap { background: #D1FAE5; color: var(--green-text); }
+
+    .status-box.error { background: var(--red-light); border: 1px solid var(--red-border); }
+    .status-box.error .status-icon-wrap { background: #FEE2E2; color: var(--red-text); }
+
+    .status-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .status-box.loading .status-title { color: var(--text); }
+    .status-box.success .status-title { color: var(--green-text); }
+    .status-box.error .status-title { color: var(--red-text); }
+
+    .status-sub {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .status-box.loading .status-sub { color: var(--text2); }
+    .status-box.success .status-sub { color: var(--green-text); }
+    .status-box.error .status-sub { color: var(--red-text); }
+
+    .spin {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid var(--green);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TRUST ROW ── */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 28px 20px 24px;
+    }
+
+    .trust-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .trust-item + .trust-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .trust-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--green-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--green);
+    }
+
+    .trust-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text3);
+      text-align: center;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── OVERLAY & MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.5);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 28px 28px 0 0;
+      width: 100%;
+      max-width: 430px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding-bottom: 32px;
+    }
+
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border2);
+      border-radius: 2px;
+      margin: 14px auto 0;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 12px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 17px;
+      color: var(--text2);
+    }
+
+    /* ── FORM FIELDS ── */
+    .modal-body { padding: 0 20px; }
+
+    .field { margin-bottom: 14px; }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text3);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .field-label i { font-size: 13px; }
+
+    .select-wrap { position: relative; }
+
+    .select-wrap .chevron {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--text3);
+      pointer-events: none;
+    }
+
+    .field-select {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 0 40px 0 14px;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .field-select:focus {
+      border-color: var(--green);
+      background: var(--surface);
+    }
+
+    .field-select:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* ── HUB HIGHLIGHT ── */
+    .hub-highlight {
+      margin-bottom: 16px;
+      border-radius: 16px;
+      background: var(--green-light);
+      border: 1.5px solid var(--green);
+      padding: 14px;
+      display: none;
+    }
+
+    .hub-highlight-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-text);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hub-highlight-label i { font-size: 13px; }
+
+    .hub-select {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--green-text);
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    /* ── SUBMIT BTN ── */
+    .submit-btn {
+      width: 100%;
+      height: 56px;
+      border: none;
+      border-radius: 18px;
+      background: var(--green);
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: -0.2px;
+      margin-top: 4px;
+    }
+
+    .submit-btn i { font-size: 18px; }
+    .submit-btn:hover { background: var(--green-dark); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 430px) {
+      body { align-items: center; min-height: 100vh; padding: 24px 0; }
+      .screen { border-radius: 40px; min-height: unset; box-shadow: 0 20px 60px rgba(0,0,0,0.1); overflow: hidden; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="main-wrapper">
+<div class="screen">
 
-    <div class="delivery-card">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">
+      <img src="{% static 'images/logo.png' %}" alt="GramaCart Logo">
+      <div class="logo-name">Grama<span>Cart</span></div>
+    </div>
+    <div class="topbar-actions">
+      <a href="#" class="icon-btn" title="Help">
+        <i class="bi bi-question-circle"></i>
+      </a>
+    </div>
+  </div>
 
-        <!-- BRAND -->
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">
+      <i class="bi bi-lightning-charge-fill"></i>
+      Village-first delivery
+    </div>
+    <div class="hero-title">
+      Where should we<br>deliver to <em>you?</em>
+    </div>
+    <div class="hero-sub">
+      Choose your location — stock and prices may vary by hub.
+    </div>
+  </div>
 
-        <div class="brand">
+  <!-- INFO STRIP -->
+  <div class="info-strip">
+    <i class="bi bi-info-circle-fill"></i>
+    <p>Products and availability vary by delivery area. Pick your hub to see what's in stock near you.</p>
+  </div>
 
-            <img
-                src="{% static 'images/logo.png' %}"
-                alt="GramaCart"
-            >
+  <!-- SECTION LABEL -->
+  <div class="section-label">Choose a method</div>
 
-            <div class="brand-title">
-                Grama<span>Cart</span>
-            </div>
+  <!-- OPTION CARDS -->
+  <div class="cards">
 
-        </div>
+    <button class="opt-card primary" onclick="detectLocation()">
+      <div class="card-icon">
+        <i class="bi bi-crosshair2"></i>
+      </div>
+      <div class="card-text">
+        <div class="card-title">Use my location</div>
+        <div class="card-desc">We'll find the nearest hub automatically</div>
+      </div>
+      <i class="bi bi-chevron-right card-arrow"></i>
+    </button>
 
-        <!-- BADGE -->
+    <button class="opt-card secondary" onclick="openModal()">
+      <div class="card-icon">
+        <i class="bi bi-house-heart-fill"></i>
+      </div>
+      <div class="card-text">
+        <div class="card-title">Order for family or friends</div>
+        <div class="card-desc">Pick a village and delivery hub manually</div>
+      </div>
+      <i class="bi bi-chevron-right card-arrow"></i>
+    </button>
 
-        <div class="hero-badge">
+  </div>
 
-            
+  <!-- STATUS BOX -->
+  <div id="statusBox" class="status-box loading">
+    <div class="status-inner">
+      <div class="status-icon-wrap">
+        <div id="statusIcon" class="spin"></div>
+      </div>
+      <div>
+        <div id="statusTitle" class="status-title">Detecting your location…</div>
+        <div id="statusSub" class="status-sub">Please allow GPS access when prompted</div>
+      </div>
+    </div>
+  </div>
 
-            ⚡ Fast Delivery Through Local Village Hubs
+  <!-- TRUST ROW -->
+  <div class="trust-row">
+    <div class="trust-item">
+      <div class="trust-icon"><i class="bi bi-shield-fill-check"></i></div>
+      <div class="trust-label">Trusted<br>hubs</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+      <div class="trust-label">Fast<br>delivery</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="bi bi-lock-fill"></i></div>
+      <div class="trust-label">Secure<br>orders</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="bi bi-geo-alt-fill"></i></div>
+      <div class="trust-label">Local<br>network</div>
+    </div>
+  </div>
 
-        </div>
+</div><!-- /screen -->
 
-        <!-- TITLE -->
 
-        <div class="title">
-            Where Should We Deliver?
-        </div>
-        <div class="small text-danger mt-3">
-            <i class="bi bi-info-circle me-1"></i>
-            Products and availability may vary by delivery area.
-        </div>
-        <div class="subtitle">
+<!-- MODAL OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
 
-            Order for yourself or send essentials to your family by selecting a delivery location.
+    <div class="modal-handle"></div>
 
-        </div>
-
-        <!-- CURRENT LOCATION -->
-
-        <button
-            class="option-btn current-btn"
-            onclick="detectLocation()"
-        >
-
-            <div class="btn-left">
-
-                <div class="icon-box">
-                    <i class="bi bi-geo-alt-fill"></i>
-                </div>
-
-                <div>
-
-                    <div class="btn-title">
-                        Use My Location
-                    </div>
-
-                    <div class="btn-sub">
-                        Detect nearest delivery hub automatically
-                    </div>
-
-                </div>
-
-            </div>
-
-            <i class="bi bi-chevron-right"></i>
-
-        </button>
-
-        <!-- REMOTE -->
-
-        <button
-            class="option-btn remote-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#remoteModal"
-        >
-
-            <div class="btn-left">
-
-                <div class="icon-box">
-                    <i class="bi bi-house-heart-fill"></i>
-                </div>
-
-                <div>
-
-                    <div class="btn-title">
-                        Order For Family & Friends?
-                    </div>
-
-                    <div class="btn-sub">
-                        Select a village and delivery hub manually
-                    </div>
-
-                </div>
-
-            </div>
-
-            <i class="bi bi-chevron-right"></i>
-
-        </button>
-        <div class="text-center mt-4 small text-muted">
-            <i class="bi bi-shield-check text-success"></i>
-            Trusted local hubs • Fast delivery • Secure ordering
-        </div>
-
-        <!-- STATUS -->
-
-        <div
-            id="statusBox"
-            class="status-box status-loading"
-        >
-
-            <div
-                class="spinner-border text-success"
-                role="status"
-            ></div>
-
-            <div
-                id="statusTitle"
-                class="status-title"
-            >
-                Detecting delivery area...
-            </div>
-
-            <div
-                id="statusSub"
-                class="status-sub"
-            >
-                Please wait...
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-
-        <div class="footer-note">
-
-            Fast delivery from trusted local village hubs.
-        </div>
-
+    <div class="modal-head">
+      <div class="modal-title">Select delivery area</div>
+      <div class="modal-close" onclick="closeModal()">
+        <i class="bi bi-x-lg"></i>
+      </div>
     </div>
 
-</div>
+    <div class="modal-body">
 
-<!-- REMOTE DELIVERY MODAL -->
-
-<div
-    class="modal fade"
-    id="remoteModal"
-    tabindex="-1"
->
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    Select Delivery Area
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <!-- STATE -->
-
-                <div class="mb-3">
-
-                    <div class="field-label">
-                        State
-                    </div>
-
-                    <select
-                        id="stateSelect"
-                        class="form-select"
-                    >
-
-                        <option value="">
-                            Select State
-                        </option>
-
-                        {% regroup hubs by state as state_list %}
-
-                        {% for state in state_list %}
-
-                            {% if state.grouper %}
-
-                                <option value="{{ state.grouper }}">
-                                    {{ state.grouper }}
-                                </option>
-
-                            {% endif %}
-
-                        {% endfor %}
-
-                    </select>
-
-                </div>
-
-                <!-- DISTRICT -->
-
-                <div class="mb-3">
-
-                    <div class="field-label">
-                        District
-                    </div>
-
-                    <select
-                        id="districtSelect"
-                        class="form-select disabled-select"
-                        disabled
-                    >
-                        <option value="">
-                            Select District
-                        </option>
-                    </select>
-
-                </div>
-
-                <!-- MANDAL -->
-
-                <div class="mb-3">
-
-                    <div class="field-label">
-                        Mandal
-                    </div>
-
-                    <select
-                        id="mandalSelect"
-                        class="form-select disabled-select"
-                        disabled
-                    >
-                        <option value="">
-                            Select Mandal
-                        </option>
-                    </select>
-
-                </div>
-
-                <!-- VILLAGE -->
-
-                <div class="mb-3">
-
-                    <div class="field-label">
-                        Village
-                    </div>
-
-                    <select
-                        id="villageSelect"
-                        class="form-select disabled-select"
-                        disabled
-                    >
-                        <option value="">
-                            Select Village
-                        </option>
-                    </select>
-
-                </div>
-
-                <!-- HUB -->
-
-                <div
-                    class="mb-3"
-                    id="hubBlock"
-                    style="display:none;"
-                >
-
-                    <div class="field-label">
-                        Available Delivery Hubs
-                    </div>
-
-                    <select
-                        id="hubDropdown"
-                        class="form-select"
-                    >
-                        <option value="">
-                            Choose / Select Delivery Hub
-                        </option>
-                    </select>
-
-                </div>
-
-                <!-- SUBMIT -->
-
-                <button
-                    class="submit-btn"
-                    id="submitBtn"
-                >
-                    <i class="bi bi-cart3 me-2"></i>
-                        Continue To Shop
-                </button>
-
-            </div>
-
+      <!-- STATE -->
+      <div class="field">
+        <div class="field-label">
+          <i class="bi bi-map"></i> State
         </div>
+        <div class="select-wrap">
+          <select class="field-select" id="stateSelect">
+            <option value="">Select state</option>
+            {% regroup hubs by state as state_list %}
+            {% for state in state_list %}
+              {% if state.grouper %}
+                <option value="{{ state.grouper }}">{{ state.grouper }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+      </div>
 
-    </div>
+      <!-- DISTRICT -->
+      <div class="field">
+        <div class="field-label">
+          <i class="bi bi-buildings"></i> District
+        </div>
+        <div class="select-wrap">
+          <select class="field-select" id="districtSelect" disabled>
+            <option value="">Select district</option>
+          </select>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+      </div>
 
-</div>
+      <!-- MANDAL -->
+      <div class="field">
+        <div class="field-label">
+          <i class="bi bi-signpost-split"></i> Mandal
+        </div>
+        <div class="select-wrap">
+          <select class="field-select" id="mandalSelect" disabled>
+            <option value="">Select mandal</option>
+          </select>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+      </div>
 
-<!-- BOOTSTRAP -->
+      <!-- VILLAGE -->
+      <div class="field">
+        <div class="field-label">
+          <i class="bi bi-tree"></i> Village
+        </div>
+        <div class="select-wrap">
+          <select class="field-select" id="villageSelect" disabled>
+            <option value="">Select village</option>
+          </select>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+      </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- HUB HIGHLIGHT -->
+      <div class="hub-highlight" id="hubHighlight">
+        <div class="hub-highlight-label">
+          <i class="bi bi-shop"></i> Delivery hub
+        </div>
+        <select class="hub-select" id="hubSelect">
+          <option value="">Choose a hub</option>
+        </select>
+      </div>
+
+      <!-- SUBMIT -->
+      <button class="submit-btn" id="submitBtn" onclick="submitRemote()">
+        <i class="bi bi-bag-check-fill"></i>
+        Continue to shop
+      </button>
+
+    </div><!-- /modal-body -->
+  </div><!-- /modal -->
+</div><!-- /overlay -->
+
 
 {{ hubs|json_script:"hubs-data" }}
 
 <script>
-
-/*
-=====================================================
-GRAMACART HUB-FIRST DELIVERY ENGINE
-
-1. User selects current location OR remote hub
-2. Active hub stored in session
-3. Entire shopping experience tied to hub
-4. Address validation restricted to active hub
-5. Shipping calculated using selected address
-6. Orders routed to active hub
-
-Scalable for:
-- Multi-village hubs
-- Dark stores
-- Rider routing
-- Dynamic inventory mapping
-- Multi-city expansion
-=====================================================
-*/
-
 const HUBS = JSON.parse(
-    document.getElementById("hubs-data")?.textContent || "[]"
+  document.getElementById('hubs-data')?.textContent || '[]'
 );
 
-const norm = (v) =>
-    (v ?? "").toString().trim().toLowerCase();
+const norm = v => (v ?? '').toString().trim().toLowerCase();
 
-const el = {
+let selectedHubId = null;
 
-    state:
-        document.getElementById("stateSelect"),
+const $ = id => document.getElementById(id);
 
-    district:
-        document.getElementById("districtSelect"),
-
-    mandal:
-        document.getElementById("mandalSelect"),
-
-    village:
-        document.getElementById("villageSelect"),
-
-    hubDropdown:
-        document.getElementById("hubDropdown"),
-
-    hubBlock:
-        document.getElementById("hubBlock"),
-
-    submitBtn:
-        document.getElementById("submitBtn"),
-
-    selectedHubId:null
-};
-
-const select = {
-
-    reset(elm, text){
-
-        elm.innerHTML =
-            `<option value="">${text}</option>`;
-
-        elm.disabled = true;
-
-        elm.classList.add("disabled-select");
-    },
-
-    fill(elm, items, placeholder){
-
-        this.reset(elm, placeholder);
-
-        items.forEach(v => {
-
-            const opt =
-                document.createElement("option");
-
-            opt.value = v;
-            opt.textContent = v;
-
-            elm.appendChild(opt);
-        });
-
-        elm.disabled = items.length === 0;
-
-        if(elm.disabled){
-
-            elm.classList.add("disabled-select");
-
-        }else{
-
-            elm.classList.remove("disabled-select");
-        }
-    }
-};
-
-const filter = {
-
-    districts(state){
-
-        return [...new Set(
-
-            HUBS.filter(h =>
-                norm(h.state) === norm(state)
-            ).map(h => h.district)
-
-        )];
-    },
-
-    mandals(state, district){
-
-        return [...new Set(
-
-            HUBS.filter(h =>
-
-                norm(h.state) === norm(state)
-                &&
-                norm(h.district) === norm(district)
-
-            ).map(h => h.mandal)
-
-        )];
-    },
-
-    villages(state, district, mandal){
-
-        return [...new Set(
-
-            HUBS.filter(h =>
-
-                norm(h.state) === norm(state)
-                &&
-                norm(h.district) === norm(district)
-                &&
-                norm(h.mandal) === norm(mandal)
-
-            ).map(h => h.village)
-
-        )];
-    },
-
-    hubs(state, district, mandal, village){
-
-        return HUBS.filter(h =>
-
-            norm(h.state) === norm(state)
-            &&
-            norm(h.district) === norm(district)
-            &&
-            norm(h.mandal) === norm(mandal)
-            &&
-            norm(h.village) === norm(village)
-
-        );
-    }
-};
-
-function renderHubs(hubs){
-
-    el.hubDropdown.innerHTML =
-        `<option value="">Choose / Select Delivery Hub</option>`;
-
-    el.selectedHubId = null;
-
-    if(!hubs.length){
-
-        el.hubBlock.style.display = "none";
-
-        return;
-    }
-
-    el.hubBlock.style.display = "block";
-
-    hubs.forEach(h => {
-
-        const opt =
-            document.createElement("option");
-
-        opt.value = h.id;
-
-        opt.textContent =
-            h.name || h.village;
-
-        el.hubDropdown.appendChild(opt);
-    });
+/* ── HELPERS ── */
+function fillSelect(sel, items, placeholder) {
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  items.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    o.textContent = v;
+    sel.appendChild(o);
+  });
+  sel.disabled = items.length === 0;
 }
 
-async function submitRemoteDelivery(){
+function resetSelect(sel, placeholder) {
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  sel.disabled = true;
+}
 
-    if(!el.selectedHubId){
+/* ── CASCADE FILTERS ── */
+function getDistricts(state) {
+  return [...new Set(
+    HUBS.filter(h => norm(h.state) === norm(state)).map(h => h.district)
+  )];
+}
 
-        alert("Please select a delivery hub");
+function getMandals(state, district) {
+  return [...new Set(
+    HUBS.filter(h =>
+      norm(h.state) === norm(state) &&
+      norm(h.district) === norm(district)
+    ).map(h => h.mandal)
+  )];
+}
 
-        return;
+function getVillages(state, district, mandal) {
+  return [...new Set(
+    HUBS.filter(h =>
+      norm(h.state) === norm(state) &&
+      norm(h.district) === norm(district) &&
+      norm(h.mandal) === norm(mandal)
+    ).map(h => h.village)
+  )];
+}
+
+function getHubs(state, district, mandal, village) {
+  return HUBS.filter(h =>
+    norm(h.state) === norm(state) &&
+    norm(h.district) === norm(district) &&
+    norm(h.mandal) === norm(mandal) &&
+    norm(h.village) === norm(village)
+  );
+}
+
+/* ── EVENT LISTENERS ── */
+$('stateSelect').addEventListener('change', function () {
+  resetSelect($('districtSelect'), 'Select district');
+  resetSelect($('mandalSelect'), 'Select mandal');
+  resetSelect($('villageSelect'), 'Select village');
+  $('hubHighlight').style.display = 'none';
+  selectedHubId = null;
+  if (!this.value) return;
+  fillSelect($('districtSelect'), getDistricts(this.value), 'Select district');
+});
+
+$('districtSelect').addEventListener('change', function () {
+  resetSelect($('mandalSelect'), 'Select mandal');
+  resetSelect($('villageSelect'), 'Select village');
+  $('hubHighlight').style.display = 'none';
+  selectedHubId = null;
+  if (!this.value) return;
+  fillSelect(
+    $('mandalSelect'),
+    getMandals($('stateSelect').value, this.value),
+    'Select mandal'
+  );
+});
+
+$('mandalSelect').addEventListener('change', function () {
+  resetSelect($('villageSelect'), 'Select village');
+  $('hubHighlight').style.display = 'none';
+  selectedHubId = null;
+  if (!this.value) return;
+  fillSelect(
+    $('villageSelect'),
+    getVillages($('stateSelect').value, $('districtSelect').value, this.value),
+    'Select village'
+  );
+});
+
+$('villageSelect').addEventListener('change', function () {
+  $('hubHighlight').style.display = 'none';
+  selectedHubId = null;
+  if (!this.value) return;
+
+  const hubs = getHubs(
+    $('stateSelect').value,
+    $('districtSelect').value,
+    $('mandalSelect').value,
+    this.value
+  );
+
+  if (!hubs.length) return;
+
+  const hs = $('hubSelect');
+  hs.innerHTML = '<option value="">Choose a hub</option>';
+  hubs.forEach(h => {
+    const o = document.createElement('option');
+    o.value = h.id;
+    o.textContent = h.name || h.village;
+    hs.appendChild(o);
+  });
+
+  if (hubs.length === 1) {
+    hs.value = hubs[0].id;
+    selectedHubId = String(hubs[0].id);
+  }
+
+  $('hubHighlight').style.display = 'block';
+});
+
+$('hubSelect').addEventListener('change', function () {
+  selectedHubId = this.value;
+});
+
+/* ── MODAL ── */
+function openModal() {
+  $('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  $('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+$('overlay').addEventListener('click', function (e) {
+  if (e.target === this) closeModal();
+});
+
+/* ── REMOTE SUBMIT ── */
+async function submitRemote() {
+  if (!selectedHubId) {
+    alert('Please select a delivery hub to continue.');
+    return;
+  }
+
+  const btn = $('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Please wait…';
+
+  try {
+    const res = await fetch("{% url 'check_delivery_availability' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ type: 'remote', hub_id: selectedHubId })
+    });
+
+    const data = await res.json();
+
+    if (!data.success || !data.deliverable) {
+      alert(data.message || 'Delivery unavailable to this area.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-bag-check-fill"></i> Continue to shop';
+      return;
     }
 
-    el.submitBtn.disabled = true;
+    if (data.redirect_url) window.location.href = data.redirect_url;
 
-    el.submitBtn.innerHTML =
-        "Please wait...";
+  } catch (err) {
+    console.error(err);
+    alert('Server error. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-bag-check-fill"></i> Continue to shop';
+  }
+}
 
-    try{
+/* ── DETECT LOCATION ── */
+function detectLocation() {
+  const box = $('statusBox');
+  box.style.display = 'block';
+  box.className = 'status-box loading';
+  $('statusIcon').outerHTML = '<div id="statusIcon" class="spin"></div>';
+  $('statusTitle').textContent = 'Detecting your location…';
+  $('statusSub').textContent = 'Please allow GPS access when prompted';
 
-        const res = await fetch(
-            "{% url 'check_delivery_availability' %}",
-            {
-                method:"POST",
+  if (!navigator.geolocation) {
+    showStatus('error', 'Geolocation not supported', 'Please choose your area manually above');
+    return;
+  }
 
-                headers:{
-                    "Content-Type":"application/json",
-                    "X-CSRFToken":"{{ csrf_token }}"
-                },
-
-                body:JSON.stringify({
-
-                    type:"remote",
-
-                    hub_id:el.selectedHubId
-                })
-            }
-        );
+  navigator.geolocation.getCurrentPosition(
+    async position => {
+      try {
+        const res = await fetch("{% url 'check_delivery_availability' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({
+            type: 'local',
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          })
+        });
 
         const data = await res.json();
 
-        if(!data.success || !data.deliverable){
-
-            alert(data.message || "Delivery unavailable");
-
-            el.submitBtn.disabled = false;
-
-            el.submitBtn.innerHTML =
-                "Continue To Shop";
-
-            return;
+        if (!data.success) {
+          showStatus('error', 'No hub found nearby', data.message || 'Try selecting manually');
+          return;
         }
 
-        if(data.redirect_url){
+        showStatus(
+          'success',
+          'We deliver here! 🎉',
+          `Hub: ${data.hub_name} · ${data.distance_km} km away · ${data.location_note || ''}`
+        );
 
-            window.location.href =
-                data.redirect_url;
-        }
+        setTimeout(() => {
+          if (data.redirect_url) window.location.href = data.redirect_url;
+        }, 900);
 
-    }catch(err){
-
+      } catch (err) {
         console.error(err);
-
-        alert("Server error. Please try again.");
-
-        el.submitBtn.disabled = false;
-
-        el.submitBtn.innerHTML =
-            "Continue To Shop";
-    }
+        showStatus('error', 'Something went wrong', 'Please try again');
+      }
+    },
+    () => showStatus('error', 'Location access denied', 'Enable GPS or choose manually above'),
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
 }
 
-function detectLocation(){
+function showStatus(type, title, sub) {
+  const box = $('statusBox');
+  box.className = 'status-box ' + type;
 
-    const statusBox =
-        document.getElementById("statusBox");
+  const iconWrap = box.querySelector('.status-icon-wrap');
 
-    const statusTitle =
-        document.getElementById("statusTitle");
+  if (type === 'loading') {
+    iconWrap.innerHTML = '<div class="spin"></div>';
+  } else if (type === 'success') {
+    iconWrap.innerHTML = '<i class="bi bi-check-circle-fill" style="font-size:22px;"></i>';
+  } else {
+    iconWrap.innerHTML = '<i class="bi bi-exclamation-circle-fill" style="font-size:22px;"></i>';
+  }
 
-    const statusSub =
-        document.getElementById("statusSub");
-
-    statusBox.style.display = "block";
-
-    statusBox.className =
-        "status-box status-loading";
-
-    statusTitle.textContent =
-        "Detecting your location...";
-
-    statusSub.textContent =
-        "Please allow GPS access";
-
-    if(!navigator.geolocation){
-
-        statusBox.className =
-            "status-box status-error";
-
-        statusTitle.textContent =
-            "Geolocation unsupported";
-
-        statusSub.textContent =
-            "Please select manually";
-
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-
-        async(position)=>{
-
-            try{
-
-                const res = await fetch(
-                    "{% url 'check_delivery_availability' %}",
-                    {
-                        method:"POST",
-
-                        headers:{
-                            "Content-Type":"application/json",
-                            "X-CSRFToken":"{{ csrf_token }}"
-                        },
-
-                        body:JSON.stringify({
-
-                            type:"local",
-
-                            latitude:
-                                position.coords.latitude,
-
-                            longitude:
-                                position.coords.longitude
-                        })
-                    }
-                );
-
-                const data = await res.json();
-
-                if(!data.success){
-
-                    statusBox.className =
-                        "status-box status-error";
-
-                    statusTitle.textContent =
-                        "Delivery unavailable";
-
-                    statusSub.textContent =
-                        data.message || "Try another area";
-
-                    return;
-                }
-
-                statusBox.className =
-                    "status-box status-success";
-
-                statusTitle.textContent =
-                    "Great News! We Deliver Here 🎉";
-
-                statusSub.innerHTML = `
-                    📍 Hub: <b>${data.hub_name}</b><br>
-                    📏 Distance: <b>${data.distance_km} km</b><br>
-                    🏠 ${data.hub_location || ""}<br>
-                    🚚 ${data.location_note || ""}
-                `;
-
-                setTimeout(()=>{
-
-                    if(data.redirect_url){
-
-                        window.location.href =
-                            data.redirect_url;
-                    }
-
-                },800);
-
-            }catch(error){
-
-                console.error(error);
-
-                statusBox.className =
-                    "status-box status-error";
-
-                statusTitle.textContent =
-                    "Server error";
-
-                statusSub.textContent =
-                    "Please try again";
-            }
-        },
-
-        ()=>{
-
-            statusBox.className =
-                "status-box status-error";
-
-            statusTitle.textContent =
-                "Location access denied";
-
-            statusSub.textContent =
-                "Enable GPS and try again";
-        },
-
-        {
-            enableHighAccuracy:true,
-            timeout:10000,
-            maximumAge:0
-        }
-    );
+  $('statusTitle').textContent = title;
+  $('statusSub').textContent = sub;
 }
-
-function init(){
-
-    el.state.addEventListener("change",()=>{
-
-        select.reset(el.district,"Select District");
-
-        select.reset(el.mandal,"Select Mandal");
-
-        select.reset(el.village,"Select Village");
-
-        el.hubBlock.style.display = "none";
-
-        if(!el.state.value) return;
-
-        select.fill(
-
-            el.district,
-
-            filter.districts(el.state.value),
-
-            "Select District"
-        );
-    });
-
-    el.district.addEventListener("change",()=>{
-
-        select.reset(el.mandal,"Select Mandal");
-
-        select.reset(el.village,"Select Village");
-
-        el.hubBlock.style.display = "none";
-
-        if(!el.district.value) return;
-
-        select.fill(
-
-            el.mandal,
-
-            filter.mandals(
-                el.state.value,
-                el.district.value
-            ),
-
-            "Select Mandal"
-        );
-    });
-
-    el.mandal.addEventListener("change",()=>{
-
-        select.reset(el.village,"Select Village");
-
-        el.hubBlock.style.display = "none";
-
-        if(!el.mandal.value) return;
-
-        select.fill(
-
-            el.village,
-
-            filter.villages(
-                el.state.value,
-                el.district.value,
-                el.mandal.value
-            ),
-
-            "Select Village"
-        );
-    });
-
-    el.village.addEventListener("change",()=>{
-
-        el.selectedHubId = null;
-
-        el.hubDropdown.value = "";
-
-        const hubs = filter.hubs(
-
-            el.state.value,
-            el.district.value,
-            el.mandal.value,
-            el.village.value
-        );
-
-        renderHubs(hubs);
-    });
-
-    el.hubDropdown.addEventListener("change",()=>{
-
-        el.selectedHubId =
-            el.hubDropdown.value;
-    });
-
-    el.submitBtn.addEventListener(
-        "click",
-        submitRemoteDelivery
-    );
-}
-
-document.addEventListener(
-    "DOMContentLoaded",
-    init
-);
-
 </script>
 
 </body>

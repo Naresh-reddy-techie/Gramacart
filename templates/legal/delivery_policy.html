@@ -1,0 +1,308 @@
+{% extends "homepage/base.html" %}
+{% load static %}
+
+{% block title %}Delivery Policy | GramaCart{% endblock %}
+
+{% block content %}
+
+<style>
+:root{
+    --primary:#16a34a;
+    --primary-light:#dcfce7;
+    --dark:#0f172a;
+    --text:#475569;
+    --border:#e2e8f0;
+    --bg:#f8fafc;
+}
+
+.delivery-wrapper{
+    max-width:1100px;
+    margin:40px auto 80px;
+    padding:0 15px;
+}
+
+.hero{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#fff;
+    border-radius:28px;
+    padding:60px 45px;
+    margin-bottom:30px;
+}
+
+.hero h1{
+    font-size:3rem;
+    font-weight:800;
+    margin-bottom:12px;
+}
+
+.hero p{
+    opacity:.9;
+    margin:0;
+    font-size:1.05rem;
+}
+
+.effective-date{
+    display:inline-block;
+    margin-top:20px;
+    padding:10px 18px;
+    background:rgba(255,255,255,.15);
+    border-radius:999px;
+    font-size:.9rem;
+}
+
+.policy-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:32px;
+    margin-bottom:20px;
+    box-shadow:0 6px 24px rgba(15,23,42,.05);
+}
+
+.policy-card h2{
+    color:var(--dark);
+    font-size:1.4rem;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.policy-card p{
+    color:var(--text);
+    line-height:1.8;
+    margin-bottom:14px;
+}
+
+.policy-card ul{
+    margin-bottom:0;
+}
+
+.policy-card li{
+    color:var(--text);
+    margin-bottom:10px;
+}
+
+.notice{
+    background:var(--primary-light);
+    border-left:5px solid var(--primary);
+    padding:18px;
+    border-radius:14px;
+    margin-top:15px;
+}
+
+.contact-box{
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+    color:#fff;
+    border-radius:24px;
+    padding:40px;
+    text-align:center;
+}
+
+.contact-box h2{
+    font-weight:800;
+    margin-bottom:15px;
+}
+
+.contact-box p{
+    margin-bottom:8px;
+}
+
+@media(max-width:768px){
+
+    .hero{
+        padding:40px 25px;
+    }
+
+    .hero h1{
+        font-size:2rem;
+    }
+
+    .policy-card{
+        padding:24px;
+    }
+}
+</style>
+
+<div class="delivery-wrapper">
+
+    <div class="hero">
+        <h1>Delivery Policy</h1>
+
+        <p>
+            This Delivery Policy explains how GramaCart processes,
+            manages, and delivers orders placed through our platform.
+        </p>
+
+        <div class="effective-date">
+            Effective Date: July 2026
+        </div>
+    </div>
+
+    <div class="policy-card">
+        <h2>1. Overview</h2>
+
+        <p>
+            GramaCart is a hyperlocal commerce platform that facilitates
+            the delivery of products from local retailers, sellers,
+            fulfillment centers, and GramaCart-operated facilities
+            within supported service areas.
+        </p>
+
+        <div class="notice">
+            Delivery availability may vary depending on your location,
+            seller availability, operational conditions, and service coverage.
+        </div>
+    </div>
+
+    <div class="policy-card">
+        <h2>2. Service Availability</h2>
+
+        <p>
+            Deliveries are available only in locations where GramaCart
+            currently operates.
+        </p>
+
+        <p>
+            Service areas may be expanded, modified, restricted,
+            suspended, or discontinued at any time without prior notice.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>3. Delivery Time Estimates</h2>
+
+        <p>
+            Delivery times displayed on the Platform are estimated
+            and provided solely for customer convenience.
+        </p>
+
+        <ul>
+            <li>Weather conditions</li>
+            <li>Traffic congestion</li>
+            <li>Road closures</li>
+            <li>Seller preparation delays</li>
+            <li>Peak demand periods</li>
+            <li>Technical disruptions</li>
+        </ul>
+
+        <p class="mt-3">
+            Delivery estimates are not guaranteed delivery commitments.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>4. Delivery Charges</h2>
+
+        <p>
+            Delivery charges may vary depending on:
+        </p>
+
+        <ul>
+            <li>Order value</li>
+            <li>Distance</li>
+            <li>Delivery location</li>
+            <li>Promotional offers</li>
+            <li>Operational requirements</li>
+        </ul>
+
+        <p class="mt-3">
+            Applicable charges will be displayed before checkout.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>5. Customer Responsibilities</h2>
+
+        <ul>
+            <li>Provide accurate delivery information.</li>
+            <li>Provide a reachable contact number.</li>
+            <li>Be available during delivery.</li>
+            <li>Respond to delivery-related communication.</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>6. Failed Deliveries</h2>
+
+        <p>
+            A delivery may be considered unsuccessful if:
+        </p>
+
+        <ul>
+            <li>Customer is unavailable.</li>
+            <li>Phone number is unreachable.</li>
+            <li>Address details are incorrect.</li>
+            <li>Delivery location is inaccessible.</li>
+        </ul>
+
+        <p>
+            In such cases, GramaCart reserves the right to cancel the order,
+            charge applicable delivery fees, or deny refund requests where appropriate.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>7. Order Verification</h2>
+
+        <p>
+            Customers are encouraged to verify delivered items at the time
+            of delivery wherever operationally feasible.
+        </p>
+
+        <p>
+            Any concerns regarding missing, damaged, or incorrect products
+            should be reported promptly through GramaCart Support.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>8. Risk & Ownership</h2>
+
+        <p>
+            Ownership and responsibility for products transfer to the customer
+            upon successful delivery and acceptance of the order.
+        </p>
+    </div>
+
+    <div class="policy-card">
+        <h2>9. Force Majeure</h2>
+
+        <p>
+            GramaCart shall not be liable for delays or delivery failures caused by:
+        </p>
+
+        <ul>
+            <li>Natural disasters</li>
+            <li>Floods or storms</li>
+            <li>Government restrictions</li>
+            <li>Strikes</li>
+            <li>Network outages</li>
+            <li>Public emergencies</li>
+            <li>Transportation disruptions</li>
+        </ul>
+    </div>
+
+    <div class="policy-card">
+        <h2>10. Limitation of Liability</h2>
+
+        <p>
+            To the maximum extent permitted by applicable law,
+            GramaCart's liability relating to delivery services
+            shall be limited to the value of the affected order.
+        </p>
+    </div>
+
+    <div class="contact-box">
+        <h2>Need Delivery Assistance?</h2>
+
+        <p>Email: conatact.gramacat@gmail.com</p>
+        <p>Website: www.gramacart.com</p>
+
+        <p class="mt-3">
+            By placing an order through GramaCart, you acknowledge and agree
+            to this Delivery Policy.
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}

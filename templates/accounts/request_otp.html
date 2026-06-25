@@ -1,336 +1,643 @@
 {% load static %}
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GramaCart | Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>GramaCart | Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
 
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<style>
     :root{
-        --emerald:#00c853;
-        --emerald-dark:#00a846;
-        --navy:#0f172a;
-        --bg:#f8fafc;
-        --border:#e2e8f0;
-        --muted:#64748b;
+      --green:#10B981;
+      --green-dark:#059669;
+      --green-deeper:#065F46;
+      --green-50:#ECFDF5;
+      --green-100:#D1FAE8;
+      --amber:#F59E0B;
+      --paper:#F0FDF6;
+      --white:#FFFFFF;
+      --ink:#0F172A;
+      --ink-2:#334155;
+      --ink-3:#64748B;
+      --ink-4:#94A3B8;
+      --ink-5:#CBD5E1;
+      --border:#E2E8F0;
     }
 
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-    }
+    *, *::before, *::after{ margin:0; padding:0; box-sizing:border-box; }
 
     body{
-        font-family:'Plus Jakarta Sans',sans-serif;
-        background:var(--bg);
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:24px;
-        color:var(--navy);
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:var(--paper);
+      min-height:100vh;
+      display:flex;
+      align-items:stretch;
+      color:var(--ink);
+      -webkit-font-smoothing:antialiased;
     }
 
-    .auth-card{
-        width:100%;
-        max-width:460px;
-        background:#fff;
-        border-radius:32px;
-        padding:48px 42px;
-        border:1px solid rgba(0,0,0,.04);
-        box-shadow:0 20px 60px rgba(15,23,42,.06);
+    /* ══════════════════════════════════════
+       LEFT PANEL — illustrated / brand side
+    ══════════════════════════════════════ */
+    .left-panel{
+      flex:1;
+      background:linear-gradient(160deg, #059669 0%, #10B981 50%, #34D399 100%);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:40px 44px 44px;
+      position:relative;
+      overflow:hidden;
+      min-height:100vh;
     }
 
-    .brand{
-        text-align:center;
-        margin-bottom:32px;
+    /* decorative circles */
+    .left-panel::before{
+      content:"";
+      position:absolute;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.06);
+      top:-120px;
+      right:-120px;
     }
 
-    .brand-icon{
-        width:64px;
-        height:64px;
-        margin:0 auto 18px;
-        border-radius:18px;
-        overflow:hidden;
-        box-shadow:0 12px 24px rgba(15,23,42,.10);
+    .left-panel::after{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.05);
+      bottom:-80px;
+      left:-60px;
     }
 
-    .brand-icon img{
-        width:100%;
-        height:100%;
-        object-fit:contain;
+    /* brand mark */
+    .lp-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      position:relative;
+      z-index:2;
     }
 
-    .brand-name{
-        font-size:32px;
-        font-weight:800;
-        letter-spacing:-1px;
-        margin-bottom:8px;
+    .lp-logo{
+      width:48px;
+      height:48px;
+      border-radius:15px;
+      background:rgba(255,255,255,0.18);
+      border:1.5px solid rgba(255,255,255,0.3);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
     }
 
-    .brand-name span{
-        color:var(--emerald);
+    .lp-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
     }
 
-    .welcome-title{
-        text-align:center;
-        font-size:24px;
-        font-weight:800;
-        margin-bottom:8px;
+    .lp-brand-name{
+      font-family:'Baloo 2',sans-serif;
+      font-size:22px;
+      font-weight:800;
+      color:#fff;
+      letter-spacing:-0.4px;
     }
 
-    .welcome-subtitle{
-        text-align:center;
-        color:var(--muted);
-        font-size:14px;
-        line-height:1.6;
-        margin-bottom:30px;
+    .lp-brand-name span{ opacity:0.75; }
+
+    /* centre illustration block */
+    .lp-centre{
+      position:relative;
+      z-index:2;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:32px 0;
     }
 
+    /* big decorative icon stack */
+    .illus-stack{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      margin-bottom:40px;
+    }
+
+    .illus-row{
+      display:flex;
+      gap:14px;
+    }
+
+    .illus-row:nth-child(2){
+      padding-left:36px;
+    }
+
+    .illus-chip{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      background:rgba(255,255,255,0.14);
+      border:1px solid rgba(255,255,255,0.22);
+      border-radius:999px;
+      padding:10px 16px;
+      color:#fff;
+      font-size:13px;
+      font-weight:700;
+      backdrop-filter:blur(4px);
+    }
+
+    .illus-chip i{
+      font-size:16px;
+    }
+
+    .illus-chip.highlight{
+      background:rgba(255,255,255,0.92);
+      color:var(--green-deeper);
+      border-color:transparent;
+      box-shadow:0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .illus-chip.highlight i{
+      color:var(--green-dark);
+    }
+
+    /* big headline */
+    .lp-headline{
+      font-family:'Baloo 2',sans-serif;
+      font-size:34px;
+      font-weight:800;
+      color:#fff;
+      line-height:1.15;
+      letter-spacing:-0.8px;
+      margin-bottom:14px;
+    }
+
+    .lp-headline em{
+      font-style:normal;
+      opacity:0.7;
+    }
+
+    .lp-tagline{
+      font-size:14px;
+      color:rgba(255,255,255,0.78);
+      line-height:1.65;
+      max-width:320px;
+      font-weight:500;
+    }
+
+    /* trust strip */
+    .lp-trust{
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .trust-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+      color:rgba(255,255,255,0.82);
+      font-weight:600;
+    }
+
+    .trust-icon{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+      color:#fff;
+      flex-shrink:0;
+    }
+
+    /* ══════════════════════════════════════
+       RIGHT PANEL — form side
+    ══════════════════════════════════════ */
+    .right-panel{
+      width:440px;
+      flex-shrink:0;
+      background:var(--white);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:52px 44px;
+      position:relative;
+    }
+
+    .rp-scroll{
+      width:100%;
+      max-width:340px;
+      margin:0 auto;
+    }
+
+    /* small logo for mobile / top of form */
+    .rp-logo-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:36px;
+    }
+
+    .rp-logo-img{
+      width:42px;
+      height:42px;
+      border-radius:13px;
+      overflow:hidden;
+      border:1px solid var(--border);
+    }
+
+    .rp-logo-img img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .rp-logo-name{
+      font-family:'Baloo 2',sans-serif;
+      font-size:20px;
+      font-weight:800;
+      color:var(--ink);
+      letter-spacing:-0.3px;
+    }
+
+    .rp-logo-name span{ color:var(--green); }
+
+    /* heading */
+    .rp-title{
+      font-family:'Baloo 2',sans-serif;
+      font-size:28px;
+      font-weight:800;
+      color:var(--ink);
+      letter-spacing:-0.6px;
+      line-height:1.15;
+      margin-bottom:8px;
+    }
+
+    .rp-sub{
+      font-size:14px;
+      color:var(--ink-3);
+      line-height:1.6;
+      margin-bottom:32px;
+    }
+
+    /* alerts */
+    .gc-alert{
+      border-radius:14px;
+      border:none;
+      padding:12px 16px;
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:18px;
+      display:flex;
+      align-items:center;
+      gap:9px;
+    }
+
+    .gc-alert-danger{ background:#FEF2F2; color:#991B1B; }
+    .gc-alert-success{ background:var(--green-50); color:var(--green-deeper); }
+    .gc-alert-info{ background:#EFF6FF; color:#1E40AF; }
+
+    /* field */
     .field-label{
-        font-size:12px;
-        font-weight:700;
-        margin-bottom:8px;
-        display:block;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:0.7px;
+      text-transform:uppercase;
+      color:var(--ink-4);
+      display:block;
+      margin-bottom:8px;
     }
 
-    .input-wrapper{
-        position:relative;
-        margin-bottom:20px;
+    .input-row{
+      display:flex;
+      align-items:center;
+      border:1.5px solid var(--border);
+      border-radius:16px;
+      background:#FAFBFC;
+      overflow:hidden;
+      transition:border-color 0.15s, box-shadow 0.15s;
+      margin-bottom:20px;
     }
 
-    .country-code{
-        position:absolute;
-        left:18px;
-        top:50%;
-        transform:translateY(-50%);
-        font-weight:700;
-        color:var(--navy);
-        z-index:2;
+    .input-row:focus-within{
+      border-color:var(--green);
+      background:var(--white);
+      box-shadow:0 0 0 4px rgba(16,185,129,0.1);
     }
+
+    .cc-box{
+      padding:0 14px;
+      height:56px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border-right:1.5px solid var(--border);
+      font-size:14px;
+      font-weight:700;
+      color:var(--ink);
+      flex-shrink:0;
+      background:transparent;
+    }
+
+    .cc-box i{ font-size:16px; color:var(--ink-3); }
 
     .phone-input{
-        width:100%;
-        height:58px;
-        border-radius:14px;
-        border:1px solid var(--border);
-        background:#fcfdfe;
-        padding:0 18px 0 68px;
-        font-size:16px;
-        font-weight:600;
-        transition:.25s ease;
+      flex:1;
+      height:56px;
+      border:none;
+      background:transparent;
+      padding:0 16px;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:16px;
+      font-weight:700;
+      color:var(--ink);
+      outline:none;
     }
 
-    .phone-input:focus{
-        outline:none;
-        border-color:var(--emerald);
-        background:#fff;
-        box-shadow:0 0 0 4px rgba(0,200,83,.08);
+    .phone-input::placeholder{ color:var(--ink-5); font-weight:500; }
+
+    /* CTA */
+    .btn-continue{
+      width:100%;
+      height:56px;
+      border:none;
+      border-radius:16px;
+      background:var(--green);
+      color:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:15px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      cursor:pointer;
+      transition:background 0.15s, transform 0.1s;
+      box-shadow:0 8px 24px rgba(16,185,129,0.25);
+      letter-spacing:-0.2px;
     }
 
-    .phone-input::placeholder{
-        color:#94a3b8;
-    }
+    .btn-continue i{ font-size:18px; }
+    .btn-continue:hover{ background:var(--green-dark); transform:translateY(-1px); }
+    .btn-continue:active{ transform:scale(0.98); }
+    .btn-continue:disabled{ opacity:0.75; cursor:not-allowed; transform:none; }
 
-    .continue-btn{
-        width:100%;
-        height:58px;
-        border:none;
-        border-radius:14px;
-        background:var(--emerald);
-        color:#fff;
-        font-weight:800;
-        font-size:16px;
-        transition:.25s ease;
-        box-shadow:0 12px 24px rgba(0,200,83,.18);
-    }
-
-    .continue-btn:hover{
-        background:var(--emerald-dark);
-        transform:translateY(-1px);
-    }
-
-    .continue-btn:disabled{
-        opacity:.8;
-    }
-
+    /* helper */
     .helper-text{
-        margin-top:18px;
-        text-align:center;
-        color:var(--muted);
-        font-size:12px;
-        line-height:1.7;
+      margin-top:20px;
+      font-size:11.5px;
+      color:var(--ink-4);
+      text-align:center;
+      line-height:1.65;
     }
 
-    .helper-text strong{
-        color:var(--navy);
+    .helper-text a{ color:var(--ink-3); font-weight:700; text-decoration:underline; }
+
+    /* feature pills row */
+    .feature-pills{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:24px;
     }
 
-    .features{
-        display:flex;
-        justify-content:center;
-        gap:14px;
-        margin-top:24px;
-        flex-wrap:wrap;
+    .fp{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      background:var(--green-50);
+      border:1px solid var(--green-100);
+      border-radius:999px;
+      padding:6px 12px;
+      font-size:11px;
+      font-weight:700;
+      color:var(--green-deeper);
     }
 
-    .feature{
-        background:#f8fafc;
-        border:1px solid #eef2f7;
-        padding:8px 12px;
-        border-radius:999px;
-        font-size:11px;
-        font-weight:700;
-        color:#475569;
+    .fp i{ font-size:12px; }
+
+    /* ══════════════════════════════════════
+       MOBILE — stack vertically
+    ══════════════════════════════════════ */
+    @media(max-width:860px){
+      body{ flex-direction:column; align-items:stretch; }
+
+      .left-panel{
+        min-height:auto;
+        padding:28px 24px 32px;
+        flex:none;
+      }
+
+      .lp-centre{ padding:24px 0; }
+
+      .lp-headline{ font-size:26px; }
+
+      .illus-stack{ margin-bottom:24px; }
+
+      .lp-trust{ display:none; }
+
+      .right-panel{
+        width:100%;
+        padding:36px 24px 40px;
+      }
+
+      .rp-scroll{ max-width:100%; }
     }
 
-    .alert{
-        border-radius:14px;
-        border:none;
-        font-size:13px;
-        font-weight:600;
+    @media(min-width:861px){
+      /* hide the in-form logo on desktop — left panel has the brand */
+      .rp-logo-row{ display:none; }
     }
 
-    @media(max-width:576px){
-
-        body{
-            padding:16px;
-        }
-
-        .auth-card{
-            padding:36px 24px;
-            border-radius:24px;
-        }
-
-        .brand-name{
-            font-size:28px;
-        }
-
-        .welcome-title{
-            font-size:22px;
-        }
-    }
-</style>
-
-
+  </style>
 </head>
-
 <body>
 
-<div class="auth-card">
+  <!-- ════════════ LEFT PANEL ════════════ -->
+  <div class="left-panel">
 
-
-<div class="brand">
-    <div class="brand-icon">
+    <!-- brand -->
+    <div class="lp-brand">
+      <div class="lp-logo">
         <img src="{% static 'images/logo.png' %}" alt="GramaCart">
+      </div>
+      <div class="lp-brand-name">Grama<span>Cart</span></div>
     </div>
 
-    <h1 class="brand-name">
-        GRAMA<span>CART</span>
-    </h1>
-</div>
+    <!-- illustrated chips + headline -->
+    <div class="lp-centre">
 
-<h2 class="welcome-title">
-    Login or Sign Up
-</h2>
-
-<p class="welcome-subtitle">
-    Enter your mobile number to continue shopping with GramaCart.
-</p>
-
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
-            {{ message }}
+      <div class="illus-stack">
+        <div class="illus-row">
+          <div class="illus-chip highlight">
+            <i class="bi bi-lightning-charge-fill"></i>
+            Fast delivery
+          </div>
+          <div class="illus-chip">
+            <i class="bi bi-shop-window"></i>
+            Local hubs
+          </div>
         </div>
-    {% endfor %}
-{% endif %}
+        <div class="illus-row">
+          <div class="illus-chip">
+            <i class="bi bi-geo-alt-fill"></i>
+            Village-first
+          </div>
+          <div class="illus-chip highlight">
+            <i class="bi bi-shield-fill-check"></i>
+            OTP login
+          </div>
+        </div>
+        <div class="illus-row">
+          <div class="illus-chip">
+            <i class="bi bi-basket3-fill"></i>
+            Fresh produce
+          </div>
+          <div class="illus-chip">
+            <i class="bi bi-currency-rupee"></i>
+            Fair prices
+          </div>
+        </div>
+      </div>
 
-<form method="POST" id="otpForm">
+      <div class="lp-headline">
+        Bharat's own<br>
+        <em>delivery network.</em>
+      </div>
 
-    {% csrf_token %}
+      <div class="lp-tagline">
+        Order groceries, staples, and daily essentials — delivered fresh from your nearest village hub.
+      </div>
 
-    <label class="field-label">
-        MOBILE NUMBER
-    </label>
+    </div>
 
-    <div class="input-wrapper">
+    <!-- trust strip at bottom -->
+    <div class="lp-trust">
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-people-fill"></i></div>
+        Trusted by farmers and families across rural India
+      </div>
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-lock-fill"></i></div>
+        Secure OTP login — no passwords needed
+      </div>
+      <div class="trust-row">
+        <div class="trust-icon"><i class="bi bi-clock-fill"></i></div>
+        30–45 min delivery from your nearest hub
+      </div>
+    </div>
 
-        <span class="country-code">
+  </div>
+
+  <!-- ════════════ RIGHT PANEL ════════════ -->
+  <div class="right-panel">
+    <div class="rp-scroll">
+
+      <!-- logo (mobile only) -->
+      <div class="rp-logo-row">
+        <div class="rp-logo-img">
+          <img src="{% static 'images/logo.png' %}" alt="GramaCart">
+        </div>
+        <div class="rp-logo-name">Grama<span>Cart</span></div>
+      </div>
+
+      <!-- heading -->
+      <div class="rp-title">Welcome back 👋</div>
+      <div class="rp-sub">Enter your mobile number to get an OTP and continue shopping.</div>
+
+      <!-- django messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gc-alert gc-alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+            <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle-fill{% elif message.tags == 'success' %}check-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- form -->
+      <form method="POST" id="otpForm">
+        {% csrf_token %}
+
+        <label class="field-label" for="phone">Mobile number</label>
+
+        <div class="input-row">
+          <div class="cc-box">
+            <i class="bi bi-telephone-fill"></i>
             +91
-        </span>
-
-        <input
+          </div>
+          <input
             type="tel"
             name="phone"
             id="phone"
             class="phone-input"
-            placeholder="Enter mobile number"
+            placeholder="10-digit number"
             maxlength="10"
             inputmode="numeric"
             pattern="[0-9]{10}"
+            autocomplete="tel"
             required
-        >
+          >
+        </div>
+
+        <button type="submit" class="btn-continue" id="submitBtn">
+          <i class="bi bi-send-fill"></i>
+          Send OTP
+        </button>
+
+      </form>
+
+      <!-- feature pills -->
+      <div class="feature-pills">
+        <span class="fp"><i class="bi bi-lightning-charge-fill"></i> Fast delivery</span>
+        <span class="fp"><i class="bi bi-shield-fill-check"></i> Secure login</span>
+        <span class="fp"><i class="bi bi-shop-window"></i> Local stores</span>
+      </div>
+
+      <p class="helper-text">
+        By continuing, you agree to GramaCart's
+        <a href="{% url 'terms_conditions' %}">Terms of Service</a> and 
+        <a href="{% url 'privacy_policy' %}">Privacy Policy</a> and 
+        <a href="{% url 'refund_cancellation_policy' %}">Refund & Cancellation Policy</a> and 
+        <a href="{% url 'delivery_policy' %}">Delivery Policy</a> .
+      </p>
+
     </div>
+  </div>
 
-    <button type="submit" class="continue-btn" id="submitBtn">
-        Continue
-    </button>
+  <script>
+    // Only digits
+    document.getElementById('phone').addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g,'');
+    });
 
-</form>
+    // Loading state on submit
+    document.getElementById('otpForm').addEventListener('submit', function(){
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span style="width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></span> Sending OTP…';
+    });
+  </script>
 
-<div class="features">
-    <span class="feature">
-        <i class="fas fa-bolt me-1"></i> Fast Delivery
-    </span>
-
-    <span class="feature">
-        <i class="fas fa-shield-check me-1"></i> Secure Login
-    </span>
-
-    <span class="feature">
-        <i class="fas fa-store me-1"></i> Local Stores
-    </span>
-</div>
-
-<p class="helper-text">
-    By continuing, you agree to GramaCart's
-    <strong>Terms of Service</strong> and
-    <strong>Privacy Policy</strong>.
-</p>
-
-
-</div>
-
-<script>
-
-document.getElementById('otpForm').addEventListener('submit', function(){
-
-    const btn = document.getElementById('submitBtn');
-
-    btn.disabled = true;
-
-    btn.innerHTML =
-        '<span class="spinner-border spinner-border-sm me-2"></span>Sending OTP...';
-
-});
-
-document.getElementById('phone').addEventListener('input', function(){
-
-    this.value = this.value.replace(/[^0-9]/g,'');
-
-});
-
-</script>
+  <style>
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+  </style>
 
 </body>
 </html>

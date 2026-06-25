@@ -6,60 +6,233 @@
 {% block extra_css %}
 <style>
 
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root{
-    --primary:#10B981;
+    --primary:#15803D;       /* fresh green - trust, produce */
+    --primary-light:#ECFDF5;
+    --marigold:#F59E0B;       /* festive accent - default/highlight */
+    --marigold-light:#FFFBEB;
     --navy:#0F172A;
-    --gray:#9CA3AF;
+    --gray:#64748B;
+    --gray-light:#94A3B8;
+    --cream:#FFFBF5;
+    --border:#E7E9EE;
 }
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--cream);
+}
+
+.checkout-wrap{
+    font-family:'Inter', system-ui, sans-serif;
+    color:var(--navy);
+    font-size:16px;
+    line-height:1.55;
+}
+
+.page-heading{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:clamp(22px, 4vw, 28px);
+    margin-bottom:4px;
+}
+
+.page-subheading{
+    color:var(--gray);
+    font-size:14px;
+    margin-bottom:18px;
+}
+
+/* =========================================
+   STEP PROGRESS BAR
+========================================= */
+
+.steps-bar{
+    display:flex;
+    align-items:center;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px 14px;
+    margin-bottom:18px;
+}
+
+.step-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    flex:1;
+    text-align:center;
+}
+
+.step-circle{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#F1F5F9;
+    color:var(--gray);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-family:'Baloo 2', sans-serif;
+    border:2px solid var(--border);
+    transition:.25s ease;
+}
+
+.step-label{
+    font-size:12px;
+    font-weight:700;
+    color:var(--gray);
+}
+
+.step-line{
+    height:2px;
+    flex:0 0 16%;
+    background:var(--border);
+    margin-top:-22px;
+}
+
+.step-item.active .step-circle{
+    background:var(--navy);
+    border-color:var(--navy);
+    color:#fff;
+}
+
+.step-item.active .step-label{
+    color:var(--navy);
+}
+
+.step-item.done .step-circle{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+}
+
+.step-item.done .step-label{
+    color:var(--primary);
+}
+
+/* =========================================
+   LAYOUT
+========================================= */
 
 .checkout-grid{
     display:grid;
     grid-template-columns:1.5fr 1fr;
-    gap:24px;
+    gap:20px;
 }
 
 @media (max-width:991px){
     .checkout-grid{
         grid-template-columns:1fr;
-        margin-bottom:140px;
     }
 }
 
 .glass-card{
     background:#fff;
     border-radius:18px;
-    padding:18px;
-    margin-bottom:15px;
-    border:1px solid #eef2f6;
+    padding:20px;
+    margin-bottom:16px;
+    border:1px solid var(--border);
+    box-shadow:0 1px 2px rgba(15,23,42,0.03);
 }
+
+.card-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:4px;
+}
+
+.card-helper-text{
+    font-size:13px;
+    color:var(--gray);
+    margin-bottom:14px;
+}
+
+/* =========================================
+   PRODUCT
+========================================= */
 
 .product-strip{
     display:flex;
-    gap:14px;
+    gap:16px;
 }
 
 .product-img{
-    width:85px;
-    height:85px;
+    width:90px;
+    height:90px;
     border-radius:14px;
     object-fit:cover;
+    border:1px solid var(--border);
+    flex-shrink:0;
 }
 
-.add-address-btn{
-    font-size:13px;
+.product-name{
     font-weight:700;
-    color:var(--primary);
-    text-decoration:none;
-    padding:6px 10px;
-    border-radius:10px;
-    background:#ECFDF5;
+    font-size:16px;
 }
+
+.product-price{
+    color:var(--primary);
+    font-weight:800;
+    font-size:18px;
+    margin-top:4px;
+}
+
+.stock-line{
+    color:var(--gray);
+    font-size:13px;
+    margin-top:4px;
+}
+
+.qty-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:12px;
+}
+
+.qty-btn{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#F8FAFC;
+    font-weight:800;
+    font-size:18px;
+}
+
+.qty-btn:active{
+    background:var(--border);
+}
+
+#qty{
+    min-width:28px;
+    text-align:center;
+    font-weight:800;
+    font-size:16px;
+}
+
+/* =========================================
+   ADDRESS LIST
+========================================= */
 
 .address-item{
-    border:2px solid #f1f5f9;
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:10px;
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:16px 44px 16px 16px;
+    margin-bottom:12px;
     cursor:pointer;
     position:relative;
     transition:.2s ease;
@@ -67,74 +240,167 @@
 
 .address-item.active{
     border-color:var(--primary);
-    background:#f0fdf4;
+    background:var(--primary-light);
+}
+
+.default-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    background:var(--marigold-light);
+    color:#B45309;
+    font-size:11px;
+    font-weight:800;
+    border-radius:20px;
+    padding:3px 10px;
+    margin-bottom:8px;
+}
+
+.address-name{
+    font-weight:700;
+    font-size:15px;
+}
+
+.address-text{
+    color:var(--gray);
+    font-size:13px;
+    margin-top:2px;
+}
+
+.tap-hint{
+    font-size:12px;
+    color:var(--gray-light);
+    margin-top:8px;
+    font-weight:600;
 }
 
 .tick{
     position:absolute;
-    right:12px;
-    top:12px;
-    width:22px;
-    height:22px;
+    right:14px;
+    top:14px;
+    width:26px;
+    height:26px;
     border-radius:50%;
     background:var(--primary);
     color:#fff;
     display:none;
     align-items:center;
     justify-content:center;
-    font-size:12px;
+    font-size:13px;
 }
 
 .address-item.active .tick{
     display:flex;
 }
 
-.payment-item{
-    border:2px solid #f1f5f9;
-    border-radius:14px;
-    padding:14px;
+.add-address-card{
+    border:2px dashed var(--border);
+    border-radius:16px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
     cursor:pointer;
-    margin-bottom:10px;
+    color:var(--primary);
+    font-weight:700;
+    background:#F8FFFB;
+}
+
+.add-address-card .add-icon{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:800;
+    flex-shrink:0;
+}
+
+/* =========================================
+   PAYMENT LIST
+========================================= */
+
+.payment-item{
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:16px 44px 16px 16px;
+    cursor:pointer;
+    margin-bottom:12px;
     position:relative;
     transition:.2s ease;
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
 .payment-item.active{
     border-color:var(--navy);
-    background:#f8fafc;
+    background:#F8FAFC;
+}
+
+.payment-icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#F1F5F9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+}
+
+.payment-name{
+    font-weight:700;
+    font-size:15px;
 }
 
 .payment-tick{
     position:absolute;
-    right:12px;
-    top:12px;
-    width:22px;
-    height:22px;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    width:26px;
+    height:26px;
     border-radius:50%;
     background:var(--primary);
     color:#fff;
     display:none;
     align-items:center;
     justify-content:center;
-    font-size:12px;
+    font-size:13px;
 }
 
 .payment-item.active .payment-tick{
     display:flex;
 }
 
-.qty-btn{
-    width:32px;
-    height:32px;
-    border-radius:8px;
-    border:none;
-    background:#f1f5f9;
-    font-weight:800;
-}
+/* =========================================
+   SUMMARY
+========================================= */
 
 .summary-card{
     position:sticky;
     top:20px;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:15px;
+    padding:6px 0;
+}
+
+.summary-total-row{
+    display:flex;
+    justify-content:space-between;
+    font-weight:800;
+    font-size:19px;
+    font-family:'Baloo 2', sans-serif;
 }
 
 .btn-confirm{
@@ -145,33 +411,48 @@
     color:white;
     border:none;
     font-weight:800;
+    font-size:16px;
     transition:.2s ease;
 }
 
-.mobile-bar{
-    display:none;
+.btn-confirm:active{
+    transform:scale(.98);
 }
 
-@media (max-width:991px){
-    .mobile-bar{
-        display:block;
-        position:fixed;
-        bottom:0;
-        left:0;
-        right:0;
-        padding:14px;
-        background:white;
-        border-top:1px solid #eee;
-        z-index:9999;
+.security-note{
+    text-align:center;
+    font-size:12px;
+    color:var(--gray-light);
+    margin-top:10px;
+}
+
+@media (max-width:480px){
+    .glass-card{
+        padding:16px;
+        border-radius:14px;
+    }
+    .step-label{
+        font-size:11px;
+    }
+    .product-img{
+        width:72px;
+        height:72px;
     }
 }
+
+/* =========================================
+   MESSAGE BOX
+========================================= */
 
 .checkout-message{
     padding:12px 14px;
     border-radius:12px;
     font-size:14px;
     margin-bottom:14px;
-    font-weight:600;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
 }
 
 .checkout-message.error{
@@ -181,7 +462,7 @@
 }
 
 .checkout-message.success{
-    background:#ECFDF5;
+    background:var(--primary-light);
     color:#059669;
     border:1px solid #A7F3D0;
 }
@@ -191,16 +472,39 @@
     pointer-events:none;
 }
 
-.shipping-loading{
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
 </style>
 {% endblock %}
 
 {% block content %}
+
+<div class="checkout-wrap">
+
+<div class="page-heading">Complete Your Order</div>
+<div class="page-subheading">Just 3 simple steps - choose address, pick payment and confirm.</div>
+
+<!-- STEP PROGRESS -->
+<div class="steps-bar">
+
+    <div class="step-item active" id="step-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Address</div>
+    </div>
+
+    <div class="step-line"></div>
+
+    <div class="step-item" id="step-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Payment</div>
+    </div>
+
+    <div class="step-line"></div>
+
+    <div class="step-item" id="step-3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Confirm</div>
+    </div>
+
+</div>
 
 <form method="POST" class="checkout-grid">
 
@@ -210,15 +514,14 @@
 <input type="hidden" name="payment_method" id="payment_method">
 <input type="hidden" name="variant_id" value="{{ variant.id }}">
 <input type="hidden" name="next" value="{{ next }}">
+
 <!-- LEFT -->
 <div>
 
     <!-- PRODUCT -->
     <div class="glass-card">
 
-        <div class="fw-bold mb-2">
-            Item Details
-        </div>
+        <div class="card-title">🛍️ Your Item</div>
 
         <div class="product-strip">
 
@@ -229,7 +532,7 @@
 
             <div>
 
-                <div class="fw-bold">
+                <div class="product-name">
                     {{ product.name }}
 
                     <span class="text-muted small">
@@ -237,26 +540,21 @@
                     </span>
                 </div>
 
-                <div class="text-success fw-bold mt-1">
+                <div class="product-price">
                     ₹<span id="unitPrice">{{ inventory.selling_price }}</span>
                 </div>
 
-                <div class="text-muted small">
-                    Available Stock:
-                    {{ inventory.stock }}
+                <div class="stock-line">
+                    In stock: {{ inventory.stock }} &nbsp;•&nbsp; Max per order: {{ inventory.max_order_quantity }}
                 </div>
 
-                <div class="small text-muted">
-                    Max Order:
-                    {{ inventory.max_order_quantity }}
-                </div>
-
-                <div class="d-flex align-items-center gap-2 mt-2">
+                <div class="qty-row">
 
                     <button
                         type="button"
                         onclick="changeQty(-1)"
                         class="qty-btn"
+                        aria-label="Decrease quantity"
                     >
                         -
                     </button>
@@ -269,6 +567,7 @@
                         type="button"
                         onclick="changeQty(1)"
                         class="qty-btn"
+                        aria-label="Increase quantity"
                     >
                         +
                     </button>
@@ -291,20 +590,8 @@
     <!-- ADDRESS -->
     <div class="glass-card">
 
-        <div class="d-flex justify-content-between mb-2">
-
-            <div class="fw-bold">
-                Delivery Address
-            </div>
-
-            <a
-                href="{% url 'address_create' %}?next={{ next }}"
-                class="add-address-btn"
-            >
-                + Add New
-            </a>
-
-        </div>
+        <div class="card-title">📍 Step 1: Where should we deliver?</div>
+        <div class="card-helper-text">Tap on an address below to select it.</div>
 
         {% for addr in user_addresses %}
 
@@ -318,26 +605,43 @@
                 ✓
             </div>
 
-            <div class="fw-bold">
+            {% if addr.is_default %}
+            <div class="default-badge">
+                🏠 Default Address
+            </div>
+            {% endif %}
+
+            <div class="address-name">
                 {{ addr.recipient_name }}
             </div>
 
-            <div class="small text-muted">
+            <div class="address-text">
                 {{ addr.address_line }}
+            </div>
+
+            <div class="tap-hint">
+                Tap to deliver here
             </div>
 
         </div>
 
         {% endfor %}
 
+        <div
+            class="add-address-card"
+            onclick="window.location.href='{% url 'address_create' %}?next={{ next }}'"
+        >
+            <div class="add-icon">+</div>
+            <div>Add a New Delivery Address</div>
+        </div>
+
     </div>
 
     <!-- PAYMENT -->
     <div class="glass-card">
 
-        <div class="fw-bold mb-2">
-            Payment Method
-        </div>
+        <div class="card-title">💳 Step 2: How will you pay?</div>
+        <div class="card-helper-text">Tap to choose your payment method.</div>
 
         {% for method in payment_methods %}
 
@@ -347,11 +651,15 @@
             onclick="selectPayment(this)"
         >
 
+            <div class="payment-icon">💰</div>
+
+            <div class="payment-name">
+                {{ method.name }}
+            </div>
+
             <div class="payment-tick">
                 ✓
             </div>
-
-            {{ method.name }}
 
         </div>
 
@@ -366,9 +674,7 @@
 
     <div class="glass-card summary-card">
 
-        <div class="fw-bold mb-3">
-            Summary
-        </div>
+        <div class="card-title">🧾 Step 3: Order Summary</div>
 
         <!-- MESSAGE BOX -->
         <div
@@ -376,42 +682,21 @@
             class="checkout-message d-none"
         ></div>
 
-        <div class="d-flex justify-content-between">
-
-            <span>
-                Subtotal
-            </span>
-
-            <span id="sub_total">
-                ₹{{ order_totals.sub_total }}
-            </span>
-
+        <div class="summary-row">
+            <span>Item Total</span>
+            <span id="sub_total">₹{{ order_totals.sub_total }}</span>
         </div>
 
-        <div class="d-flex justify-content-between mt-2">
-
-            <span>
-                Shipping
-            </span>
-
-            <span id="shipping">
-                ₹{{ order_totals.shipping_cost }}
-            </span>
-
+        <div class="summary-row">
+            <span>Delivery Charge</span>
+            <span id="shipping">₹{{ order_totals.shipping_cost }}</span>
         </div>
 
         <hr>
 
-        <div class="d-flex justify-content-between fw-bold fs-5">
-
-            <span>
-                Total
-            </span>
-
-            <span id="total">
-                ₹{{ order_totals.final_total }}
-            </span>
-
+        <div class="summary-total-row">
+            <span>Total Amount</span>
+            <span id="total">₹{{ order_totals.final_total }}</span>
         </div>
 
         <button
@@ -419,27 +704,20 @@
             id="desktop-btn"
             class="btn-confirm mt-3"
         >
-            Place Order
+            ✅ Place My Order
         </button>
+
+        <div class="security-note">
+            🔒 Safe &amp; secure checkout
+        </div>
 
     </div>
 
 </div>
 
-<!-- MOBILE -->
-<div class="mobile-bar">
-
-    <button
-        type="submit"
-        id="mobile-btn"
-        class="btn-confirm"
-    >
-        Confirm Order • ₹{{ order_totals.final_total }}
-    </button>
+</form>
 
 </div>
-
-</form>
 
 {% endblock %}
 
@@ -448,6 +726,29 @@
 <script>
 
 let SHIPPING_CACHE = null;
+
+
+/* =========================================
+   STEP PROGRESS HELPERS
+========================================= */
+
+function setStep(n) {
+
+    const steps = document.querySelectorAll('.step-item');
+
+    steps.forEach((el, idx) => {
+
+        el.classList.remove('active', 'done');
+
+        if (idx < n - 1) {
+            el.classList.add('done');
+        }
+
+        if (idx === n - 1) {
+            el.classList.add('active');
+        }
+    });
+}
 
 
 /* =========================================
@@ -468,7 +769,8 @@ function showMessage(message, type="error") {
 
     box.classList.add(type);
 
-    box.innerText = message;
+    box.innerHTML =
+        (type === "success" ? "✅ " : "⚠️ ") + message;
 }
 
 function hideMessage() {
@@ -487,26 +789,22 @@ function hideMessage() {
    BUTTON HELPERS
 ========================================= */
 
-function disableButtons(d, m) {
+function disableButtons(d) {
 
-    if (!d || !m) return;
+    if (!d) return;
 
     d.disabled = true;
-    m.disabled = true;
 
     d.classList.add("btn-disabled");
-    m.classList.add("btn-disabled");
 }
 
-function enableButtons(d, m) {
+function enableButtons(d) {
 
-    if (!d || !m) return;
+    if (!d) return;
 
     d.disabled = false;
-    m.disabled = false;
 
     d.classList.remove("btn-disabled");
-    m.classList.remove("btn-disabled");
 }
 
 
@@ -528,10 +826,14 @@ document.addEventListener(
                 'address_id'
             ).value = defaultAddr.dataset.id;
 
+            setStep(2);
+
             setTimeout(() => {
                 updateTotals(true);
             }, 50);
         } else {
+
+            setStep(1);
 
             updateTotals(false);
         }
@@ -554,6 +856,8 @@ function selectAddress(el) {
         'address_id'
     ).value = el.dataset.id;
 
+    setStep(2);
+
     updateTotals(true);
 }
 
@@ -572,6 +876,8 @@ function selectPayment(el) {
     document.getElementById(
         'payment_method'
     ).value = el.dataset.id;
+
+    setStep(3);
 }
 
 
@@ -662,10 +968,6 @@ function updateTotals(fetchShipping = false) {
         'desktop-btn'
     );
 
-    const mobileBtn = document.getElementById(
-        'mobile-btn'
-    );
-
     // =====================================
     // ADDRESS REQUIRED
     // =====================================
@@ -678,13 +980,12 @@ function updateTotals(fetchShipping = false) {
             "₹" + subtotal.toFixed(2);
 
         showMessage(
-            "Please select delivery address.",
+            "Please select a delivery address to continue.",
             "error"
         );
 
         disableButtons(
-            desktopBtn,
-            mobileBtn
+            desktopBtn
         );
 
         return;
@@ -737,7 +1038,7 @@ function updateTotals(fetchShipping = false) {
             hideMessage();
 
             showMessage(
-                "Delivery available",
+                "Delivery available at this address",
                 "success"
             );
 
@@ -754,16 +1055,15 @@ function updateTotals(fetchShipping = false) {
             totalEl.innerText =
                 "₹" + total.toFixed(2);
 
-            if (mobileBtn) {
+            if (desktopBtn) {
 
-                mobileBtn.innerText =
-                    "Confirm Order • ₹"
+                desktopBtn.innerText =
+                    "✅ Place My Order • ₹"
                     + total.toFixed(2);
             }
 
             enableButtons(
-                desktopBtn,
-                mobileBtn
+                desktopBtn
             );
 
         } else {
@@ -783,8 +1083,7 @@ function updateTotals(fetchShipping = false) {
             );
 
             disableButtons(
-                desktopBtn,
-                mobileBtn
+                desktopBtn
             );
         }
 
@@ -802,13 +1101,12 @@ function updateTotals(fetchShipping = false) {
             "₹" + subtotal.toFixed(2);
 
         showMessage(
-            "Unable to calculate shipping right now.",
+            "Unable to calculate delivery charge right now.",
             "error"
         );
 
         disableButtons(
-            desktopBtn,
-            mobileBtn
+            desktopBtn
         );
     });
 }

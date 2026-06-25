@@ -1,6 +1,6 @@
 from django.urls import path
 from .import views
-from admin_dashboard import hub_partner_views,seller_application_views
+from admin_dashboard import banner,hub_partner_views,seller_application_views
 
 urlpatterns = [
     path('',views.dashboard,name='admin_dashboard'),
@@ -18,6 +18,18 @@ urlpatterns = [
     path('company-info/',views.company_info_update, name='company_info_update'),
 
 
+    # Banner management
+    path('banners/',banner.banner_list,name='banner_list'),
+    path('banners/create/',banner.banner_create,name='banner_create'),
+    path('banners/<int:pk>/edit/',banner.banner_edit,name='banner_edit'),
+    path('banners/<int:pk>/delete/',banner.banner_delete,name='banner_delete'),
+    path('banners/<int:pk>/toggle/',banner.banner_toggle,name='banner_toggle'),
+    path('banners/<int:pk>/duplicate/',banner.banner_duplicate,name='banner_duplicate'),
+
+    # ── click tracking (public) ────────────────────
+    path('b/<int:pk>/click/',banner.banner_click,name='banner_click'),
+
+    #categores section
     path('add_category/',views.add_category,name='add_category'),
     path('edit_category/<int:id>/,',views.edit_category,name='edit_category'),
     path('list_category/',views.list_category,name='list_category'),

@@ -648,6 +648,172 @@ main{
 /* =======================================================
    RESPONSIVE TWEAKS
 ======================================================= */
+/* =======================================================
+   GRAMACART — MOBILE FIXES
+   Drop this AFTER your existing <style> block in base.html
+   and after the homepage styles in index.html.
+   Targets only ≤767px (phones). Desktop is untouched.
+======================================================= */
+
+@media (max-width: 767px) {
+
+    /* ── GLOBAL ───────────────────────────────────────── */
+
+    .section-pad { padding: 40px 0; }
+
+    /* ── HERO ────────────────────────────────────────── */
+
+    .hero-section { padding: 32px 0 28px; }
+
+    .hero-title {
+        font-size: 1.65rem;   /* was clamp(2.1rem…3.1rem) — still bold, not cramped */
+        line-height: 1.2;
+    }
+
+    .hero-sub {
+        font-size: .95rem;
+        max-width: 100%;
+    }
+
+    /* Eyebrow pill — shrink text so it doesn't wrap */
+    .eyebrow { font-size: .76rem; padding: 7px 13px; }
+
+    /* Shop Now button — full width already, just ensure padding feels native */
+    .hero-section .btn-shop { padding: 15px 20px; font-size: 1rem; }
+
+    /* ── ROUTE CARD (hero visual) ──────────────────── */
+
+    .route-card { padding: 10px 10px 22px; }
+
+    .route-toggle button {
+        font-size: .78rem;
+        padding: 9px 6px;
+        gap: 4px;
+    }
+
+    .route-panels { padding: 0 12px; }
+
+    .route-place { font-size: .96rem; }
+
+    .route-badge-row {
+        padding: 10px 13px;
+    }
+
+    .route-badge-row strong { font-size: .85rem; }
+
+    /* ── CATEGORY GRID ──────────────────────────────── */
+
+    /* Keep 2-col but taller touch targets, bigger icon */
+    .category-card { padding: 20px 10px 16px; }
+
+    .category-card .cat-img-wrap {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        margin-bottom: 11px;
+    }
+
+    .category-card img { width: 36px; height: 36px; }
+
+    .category-card h6 { font-size: .82rem; }
+
+    /* ── FAMILY / SELF SECTION ──────────────────────── */
+
+    .family-card { padding: 28px 20px; }
+    .self-card   { padding: 28px 20px; }
+
+    /* Tighten city pills on small screen */
+    .city-pill { font-size: .78rem; padding: 6px 13px; }
+
+    /* ── STAT STRIP ─────────────────────────────────── */
+
+    .stat-item i  { font-size: 1.45rem; }
+    .stat-item h6 { font-size: .88rem; margin: 8px 0 1px; }
+    .stat-item small { font-size: .78rem; }
+
+    /* ── HOW IT WORKS ───────────────────────────────── */
+
+    /* Steps become a clean vertical list — no connector line */
+    .step-card { padding: 20px; }
+    .step-card h5 { font-size: 1rem; }
+    .step-card p  { font-size: .88rem; }
+    .step-card img { aspect-ratio: 16/9; }
+
+    /* ── PRODUCTS RAIL ──────────────────────────────── */
+
+    .products-rail { gap: 12px; }
+
+    /* Show a bit of the next card so users know it scrolls */
+    .product-card { flex: 0 0 68%; }
+
+    .product-name { font-size: .88rem; }
+    .product-tag  { font-size: .74rem; }
+    .product-cta  { font-size: .8rem; padding: 9px; }
+
+    /* ── SELLER PANEL ───────────────────────────────── */
+
+    /* Force single column on all phones (not just <900px) */
+    .seller-panel {
+        grid-template-columns: 1fr !important;
+    }
+
+    .seller-main { padding: 28px 20px 24px; }
+
+    .seller-category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .seller-cat-item { padding: 12px 8px; }
+    .seller-cat-item i   { font-size: 1.15rem; margin-bottom: 6px; }
+    .seller-cat-item span { font-size: .74rem; }
+
+    .btn-seller-cta { padding: 12px 20px; font-size: .9rem; margin-top: 22px; }
+
+    /* Hide the showcase stats panel on mobile — they're nice on desktop
+       but on mobile they just add scroll without action */
+    .seller-showcase { display: none; }
+
+    /* ── PARTNER PANEL ──────────────────────────────── */
+
+    /* Force single column on phones */
+    .partner-panel-inner {
+        grid-template-columns: 1fr !important;
+    }
+
+    .partner-copy { padding: 28px 20px 24px; }
+    .partner-copy h2 { font-size: 1.4rem; }
+
+    /* Hide the visual hub-network side panel on mobile — redundant */
+    .partner-visual { display: none; }
+
+    /* ── FOOTER ─────────────────────────────────────── */
+
+    .footer-brand { font-size: 1.4rem; }
+
+    /* Give footer columns full width on very small screens */
+    .main-footer .col-6 { width: 100% !important; }
+}
+
+/* ── EXTRA SMALL (≤400px, many village feature phones) ── */
+
+@media (max-width: 400px) {
+
+    .container { padding-left: 14px; padding-right: 14px; }
+
+    .hero-title { font-size: 1.45rem; }
+
+    .route-toggle button { font-size: .72rem; padding: 8px 4px; }
+
+    .seller-category-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .product-card { flex: 0 0 78%; }
+
+    /* Navbar brand shrinks further */
+    .navbar-brand { font-size: 1.15rem; }
+    .navbar-brand img { height: 28px; }
+}
 
 @media(max-width:768px){
 

@@ -69,7 +69,8 @@
             {% endfor %}
           {% endif %}
 
-          <form method="post" novalidate>
+          <form method="post" enctype="multipart/form-data" novalidate>
+
             {% csrf_token %}
 
             <div class="mb-3">
@@ -77,6 +78,18 @@
               {{ form.name}}
               {% if form.name.errors %}
                 <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              {{ form.image.label_tag }}
+              {{ form.image }}
+              <small class="text-muted">
+                  Upload a square PNG icon (recommended 128×128 or 256×256)
+              </small>
+              {% if form.image.errors %}
+                <div class="text-danger small mt-1">
+                  {{ form.image.errors.0 }}
+                </div>
               {% endif %}
             </div>
 

@@ -62,7 +62,7 @@ def add_hub_partner(request):
 
                     subscription = subscription_form.save(commit=False)
                     subscription.partner = partner
-                    start_date = subscription_form.cleaned_data("start_date")
+                    start_date = subscription_form.cleaned_data.get("start_date")
 
                     if not start_date:
                         start_date = date.today()

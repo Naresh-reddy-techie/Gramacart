@@ -572,6 +572,7 @@ def confirm_pickup(request, delivery_id):
 # =========================================================
 # COMPLETE DELIVERY
 # =========================================================
+from settlements.services import (create_order_settlements)
 
 @login_required
 @delivery_boy_required
@@ -702,6 +703,8 @@ def complete_delivery(request, delivery_id):
             order.save(
                 update_fields=["status"]
             )
+            
+            create_order_settlements(order)
 
             sync_order_status(
                 order,

@@ -58,7 +58,7 @@
           {% endfor %}
         {% endif %}
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
             {{ form.name.label_tag }}
@@ -66,6 +66,26 @@
             {% if form.name.errors %}
               <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
             {% endif %}
+          </div>
+          {% if form.instance.image %}
+          <div class="mb-3 text-center">
+              <img src="{{ form.instance.image.url }}"
+                  alt="{{ form.instance.name }}"
+                  style="max-width:120px;max-height:120px;"
+                  class="img-thumbnail">
+          </div>
+          {% endif %}
+          <div class="mb-3">
+              {{ form.image.label_tag }}
+              {{ form.image }}
+              <small class="text-muted">
+                Upload a square PNG icon (recommended 128×128 or 256×256)
+            </small>
+              {% if form.image.errors %}
+                  <div class="text-danger small mt-1">
+                      {{ form.image.errors.0 }}
+                  </div>
+              {% endif %}
           </div>
           <button type="submit" class="btn btn-warning w-100">Update Category</button>
         </form>

@@ -24,9 +24,91 @@ class CompanyInfo(models.Model):
         return self.name
 
 
+from django.utils import timezone
+
+from django.core.exceptions import ValidationError
+
+
+def validate_banner_image(image):
+    if image.size > 2 * 1024 * 1024:
+        raise ValidationError('Image must be under 2MB.')
+
+class Banner(models.Model):
+
+    PAGE_CHOICES = [
+        ('home',     'Homepage'),
+        ('shop',     'Shop / Dashboard'),
+        ('category', 'Category Page'),
+        ('all',      'All Pages'),
+    ]
+
+    TYPE_CHOICES = [
+        ('promo',        'Promo / Offer'),
+        ('announcement', 'Announcement'),
+        ('seasonal',     'Seasonal Greeting'),
+        ('app',          'App Download Nudge'),
+    ]
+
+    hub = models.ForeignKey(
+        'DeliveryHub',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='banners',
+        help_text='Leave blank for a global banner shown to all hubs'
+    )
+
+    # Content
+    title       = models.CharField(max_length=120)
+    subtitle    = models.CharField(max_length=200, blank=True)
+    eyebrow     = models.CharField(max_length=60,  blank=True)
+    offer_label = models.CharField(max_length=30,  blank=True)
+    image       = models.ImageField(
+        upload_to='banners/',
+        blank=True,
+        null=True,
+        validators=[validate_banner_image],
+        help_text='Recommended: 800×300px, under 2MB'
+    )
+
+    # CTA
+    cta_text = models.CharField(max_length=40,  blank=True, default='Shop now')
+    cta_url  = models.CharField(max_length=200, blank=True, default='/shop/')
+
+    # Classification
+    page        = models.CharField(max_length=20, choices=PAGE_CHOICES, default='shop')
+    banner_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='promo')
+
+    # Scheduling
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date   = models.DateTimeField(null=True, blank=True)
+
+    # Control
+    is_active = models.BooleanField(default=True)
+    order     = models.PositiveIntegerField(default=0)
+
+    # Analytics — editable=False keeps them out of the form
+    click_count      = models.PositiveIntegerField(default=0, editable=False)
+    impression_count = models.PositiveIntegerField(default=0, editable=False)
+
+    class Meta:
+        ordering = ['order', '-start_date']
+
+    def __str__(self):
+        hub_name = self.hub.name if self.hub else 'Global'
+        return f"{self.title} — {hub_name}"
+
+    def is_live(self):
+        now = timezone.now()
+        if self.start_date and now < self.start_date:
+            return False
+        if self.end_date and now > self.end_date:
+            return False
+        return self.is_active
 
 class Category(models.Model):
     name = models.CharField(max_length=100,unique=True)
+    image = models.ImageField(upload_to='categories/',blank=True,null=True)
     slug = models.SlugField(unique=True,blank=True,null=True)
 
     def save(self,*args,**kwargs):
@@ -271,42 +353,164 @@ class SellerApplication(models.Model):
 
 #Base of everything (ledger,dispatch,profit)
 
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.db.models import Q
+
 class Shop(models.Model):
+
     SHOP_TYPES = [
-        ('KIRANA','Kirana Store'),
-        ('DARK_STORE','Dark Store'),
-        ('WAREHOUSE','Warehouse')
+        ('KIRANA', 'Kirana Store'),
+        ('DARK_STORE', 'Dark Store'),
+        ('WAREHOUSE', 'Warehouse'),
     ]
-    seller_application = models.OneToOneField('SellerApplication',on_delete=models.SET_NULL,null=True,blank=True,related_name='shop')
-    name = models.CharField(max_length=150)
-    shop_type = models.CharField(max_length=25,choices =SHOP_TYPES,db_index=True)
-    hub = models.ForeignKey('DeliveryHub',on_delete=models.CASCADE,related_name='shops',db_index=True)
-    phone = models.CharField(max_length=15,blank=True,null=True)
-    address = models.TextField(blank=True,null=True)
-    is_internal = models.BooleanField(default=False,help_text="True = owned by GramaCart (Dark Store/Warehouse)")
-    is_active = models.BooleanField(default=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+    seller_application = models.OneToOneField(
+        'SellerApplication',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='shop'
+    )
+
+    name = models.CharField(
+        max_length=150
+    )
+
+    shop_type = models.CharField(
+        max_length=25,
+        choices=SHOP_TYPES,
+        db_index=True
+    )
+
+    hub = models.ForeignKey(
+        'DeliveryHub',
+        on_delete=models.CASCADE,
+        related_name='shops',
+        db_index=True
+    )
+
+    # Marketplace commission percentage.
+    # Used only for external shops.
+    commission_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=10.00,
+        help_text="Marketplace commission percentage for this shop."
+    )
+
+    phone = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True
+    )
+
+    address = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    is_internal = models.BooleanField(
+        default=False,
+        help_text="True if owned by GramaCart (Dark Store/Warehouse)."
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        db_index=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
-        unique_together = ('name', 'hub')  # prevent duplicates
+
+        ordering = ['name']
+
+        unique_together = (
+            'name',
+            'hub'
+        )
+
         indexes = [
             models.Index(fields=['hub', 'shop_type']),
+            models.Index(fields=['hub', 'is_active']),
         ]
-    def __str__(self):
-        return f"{self.name} ({self.shop_type})"
-    
+
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(commission_percent__gte=0),
+                name='shop_commission_gte_zero'
+            ),
+            models.CheckConstraint(
+                condition=Q(commission_percent__lte=100),
+                name='shop_commission_lte_hundred'
+            ),
+        ]
+
+    def clean(self):
+
+        super().clean()
+
+        if self.commission_percent < 0:
+            raise ValidationError(
+                "Commission cannot be negative."
+            )
+
+        if self.commission_percent > 100:
+            raise ValidationError(
+                "Commission cannot exceed 100%."
+            )
+
+        # Internal GramaCart shops do not require commission.
+        if self.is_internal:
+            self.commission_percent = 0
+
+    def save(self, *args, **kwargs):
+
+        self.full_clean()
+
+        super().save(*args, **kwargs)
+
+    # =====================================================
+    # BUSINESS HELPERS
+    # =====================================================
+
+    @property
     def requires_payout(self):
+
         return not self.is_internal
-    
+
+    @property
     def can_fulfill_orders(self):
-        return self.shop_type in ['KIRANA','DARK_STORE']
-    
+
+        return self.shop_type in (
+            'KIRANA',
+            'DARK_STORE'
+        )
+
+    @property
     def is_dark_store(self):
+
         return self.shop_type == 'DARK_STORE'
-    
+
+    @property
     def is_warehouse(self):
+
         return self.shop_type == 'WAREHOUSE'
-    
+
+    @property
+    def is_kirana(self):
+
+        return self.shop_type == 'KIRANA'
+
+    def __str__(self):
+
+        return (
+            f"{self.name} "
+            f"({self.get_shop_type_display()})"
+        )
 #==============================================================
 # Order → Delivered → Ledger → Money tracked [for warehouse]
 # Internal → No payout → Only profit tracking[for darkstore]
