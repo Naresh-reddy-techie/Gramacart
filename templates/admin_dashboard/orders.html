@@ -906,18 +906,64 @@ function openDrawer(data){
 
     document.getElementById("drawerContent").innerHTML = `
         <div class="card">
+
             <p><b>Order:</b> ${data.order_number}</p>
+
             <p><b>Customer:</b> ${data.customer}</p>
-            <p><b>Phone:</b> <a href="tel:${data.phone}">${data.phone}</a></p>
+
+            <p><b>Phone:</b>
+                <a href="tel:${data.phone}">
+                    ${data.phone}
+                </a>
+            </p>
+
             <p><b>Hub:</b> ${data.hub}</p>
+
             <p><b>Address:</b> ${data.address}</p>
-            <p><b>Total:</b> ₹${data.total}</p>
-            <p><b>Status:</b> ${data.status_label}</p>
+
             <hr>
+
+            <p><b>Payment Method:</b> ${data.payment_method}</p>
+
+            <p><b>Payment Status:</b> ${data.payment_status}</p>
+
+            ${
+                data.transaction_id
+                    ? `<p><b>Transaction ID:</b> ${data.transaction_id}</p>`
+                    : ""
+            }
+
+            ${
+                data.reference_id
+                    ? `<p><b>Reference ID:</b> ${data.reference_id}</p>`
+                    : ""
+            }
+
+            ${
+                data.paid_at
+                    ? `<p><b>Paid At:</b> ${data.paid_at}</p>`
+                    : ""
+            }
+
+            <hr>
+
+            <p><b>Total:</b> ₹${data.total}</p>
+
+            <p><b>Status:</b> ${data.status_label}</p>
+
+            <hr>
+
             <h4>Items</h4>
-            ${data.items.map(i=>`
-                <div>${i.product_name} x ${i.quantity} - ₹${i.price}</div>
+
+            ${data.items.map(i => `
+                <div>
+                    ${i.product_name}
+                    ${i.variant_name ? `(${i.variant_name})` : ""}
+                    × ${i.quantity}
+                    - ₹${i.price}
+                </div>
             `).join("")}
+
         </div>
     `;
 
@@ -933,21 +979,6 @@ function closeDrawer(){
 function printOrder(){
     window.print();
 }
-
-function showOrderDrawer(data){
-
-    document.getElementById("drawerContent").innerHTML = `
-        <p><b>Order:</b> ${data.order_number}</p>
-        <p><b>Customer:</b> ${data.customer}</p>
-        <p><b>Phone:</b> ${data.phone}</p>
-        <p><b>Total:</b> ₹${data.total}</p>
-        <p><b>Hub:</b> ${data.hub}</p>
-        <p><b>Address:</b> ${data.address}</p>
-    `;
-
-    document.getElementById("orderDrawer").classList.add("active");
-}
-
 
 
 // EVENTS

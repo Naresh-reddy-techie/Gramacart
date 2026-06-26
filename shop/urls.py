@@ -22,6 +22,9 @@ urlpatterns = [
     path('addresses/update/<int:pk>/', views.address_form, name='address_update'),
     path('addresses/delete/<int:pk>/', views.address_delete, name='address_delete'),
     # path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),
+
+    path("rate/<int:id>/",views.rate_product,name="rate_product",),
+    path("orders/<int:order_id>/track/",views.track_order,name="track_order",),
     
     # 3. Cart & Checkout (ALIGNED WITH JAVASCRIPT)
     path('cart/', views.cart_view, name='cart_view'),

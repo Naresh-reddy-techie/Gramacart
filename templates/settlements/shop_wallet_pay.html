@@ -1,0 +1,250 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}
+Process Shop Payout
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.page-header{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    padding:24px;
+    margin-bottom:24px;
+}
+
+.page-title{
+    font-size:1.7rem;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.page-subtitle{
+    color:#64748b;
+    margin-top:6px;
+}
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.summary-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:18px;
+    padding:20px;
+}
+
+.summary-label{
+    font-size:.9rem;
+    color:#64748b;
+}
+
+.summary-value{
+    font-size:2rem;
+    font-weight:800;
+    margin-top:8px;
+}
+
+.pending{
+    color:#f59e0b;
+}
+
+.paid{
+    color:#10b981;
+}
+
+.form-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    padding:24px;
+}
+
+.form-label{
+    font-weight:700;
+    color:#334155;
+}
+
+.btn-pay{
+    background:#10b981;
+    border:none;
+    padding:12px 22px;
+    font-weight:700;
+}
+
+.btn-pay:hover{
+    background:#059669;
+}
+
+.info-box{
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:24px;
+}
+
+.info-title{
+    font-weight:700;
+    color:#065f46;
+}
+
+.info-text{
+    color:#047857;
+    margin:0;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2 class="page-title">
+        Process Shop Payout
+    </h2>
+
+    <p class="page-subtitle">
+        Transfer settlement amount to seller account
+    </p>
+
+</div>
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Shop
+        </div>
+
+        <div class="summary-value">
+            {{ wallet.shop.name }}
+        </div>
+
+    </div>
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Pending Balance
+        </div>
+
+        <div class="summary-value pending">
+            ₹{{ wallet.pending_balance }}
+        </div>
+
+    </div>
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Total Paid
+        </div>
+
+        <div class="summary-value paid">
+            ₹{{ wallet.total_paid }}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="info-box">
+
+    <div class="info-title">
+        Settlement Notice
+    </div>
+
+    <p class="info-text">
+        After processing payout, the wallet balance will decrease and payout history will be recorded permanently.
+    </p>
+
+</div>
+
+<div class="form-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Amount
+            </label>
+
+            {{ form.amount }}
+
+            {% if form.amount.errors %}
+                <div class="text-danger mt-1">
+                    {{ form.amount.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                UPI / Bank Reference Number
+            </label>
+
+            {{ form.reference_number }}
+
+            {% if form.reference_number.errors %}
+                <div class="text-danger mt-1">
+                    {{ form.reference_number.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mb-4">
+
+            <label class="form-label">
+                Remarks
+            </label>
+
+            {{ form.remarks }}
+
+            {% if form.remarks.errors %}
+                <div class="text-danger mt-1">
+                    {{ form.remarks.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <button
+                type="submit"
+                class="btn btn-success btn-pay">
+
+                <i class="bi bi-cash-stack"></i>
+                Process Payout
+
+            </button>
+
+            <a href="{% url 'shop_wallet_detail' wallet.id %}"
+               class="btn btn-outline-secondary">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

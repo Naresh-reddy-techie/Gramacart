@@ -71,3 +71,87 @@ def create_order_settlements(order):
             "is_ledger_created"
         ]
     )
+
+
+
+from django.db import transaction
+from django.utils import timezone
+
+from .models import (
+    ShopWallet,
+    ShopSettlement,
+    ShopPayout
+)
+
+
+from django.db import transaction
+from django.utils import timezone
+
+from .models import (
+    ShopWallet,
+    ShopSettlement,
+    ShopPayout
+)
+
+
+@transaction.atomic
+def process_shop_payout(
+    shop,
+    amount,
+    reference_number,
+    paid_by,
+    remarks=""
+):
+
+    wallet = ShopWallet.objects.select_for_update().get(
+        shop=shop
+    )
+
+    if amount <= 0:
+        raise ValueError(
+            "Amount must be greater than zero"
+        )
+
+    if amount > wallet.pending_balance:
+        raise ValueError(
+            "Cannot pay more than pending balance"
+        )
+
+    payout = ShopPayout.objects.create(
+        shop=shop,
+        wallet=wallet,
+        amount=amount,
+        reference_number=reference_number,
+        remarks=remarks,
+        paid_by=paid_by,
+        status="SUCCESS"
+    )
+
+    # ===================================
+    # UPDATE WALLET
+    # ===================================
+
+    wallet.pending_balance -= amount
+    wallet.total_paid += amount
+
+    wallet.save(
+        update_fields=[
+            "pending_balance",
+            "total_paid",
+            "updated_at"
+        ]
+    )
+
+    # ===================================
+    # MARK SETTLEMENTS PAID
+    # ===================================
+
+    ShopSettlement.objects.filter(
+        shop=shop,
+        status="PENDING"
+    ).update(
+        status="PAID",
+        paid_at=timezone.now()
+    )
+
+    return payout

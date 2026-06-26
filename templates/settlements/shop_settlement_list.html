@@ -1,0 +1,239 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}
+Shop Settlements
+{% endblock %}
+
+{% block extra_css %}
+<!-- CSS ABOVE HERE -->
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2 class="page-title">
+        Shop Settlements
+    </h2>
+
+    <p class="page-subtitle">
+        Track seller commissions and payouts
+    </p>
+
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Pending Amount
+        </div>
+
+        <div class="stat-value">
+            ₹{{ total_pending|default:"0" }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Paid Amount
+        </div>
+
+        <div class="stat-value">
+            ₹{{ total_paid|default:"0" }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Total Records
+        </div>
+
+        <div class="stat-value">
+            {{ settlements.count }}
+        </div>
+    </div>
+
+</div>
+
+<input
+type="text"
+class="form-control search-box"
+placeholder="Search shop..."
+>
+
+<div class="data-card">
+
+<table class="table align-middle">
+
+<thead>
+
+<tr>
+    <th>Shop</th>
+    <th>Order</th>
+    <th>Gross</th>
+    <th>Commission</th>
+    <th>Net Amount</th>
+    <th>Status</th>
+    <th>Date</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for settlement in settlements %}
+
+<tr>
+
+    <td>
+        {{ settlement.shop.name }}
+    </td>
+
+    <td>
+        {{ settlement.order_item.order.order_number }}
+    </td>
+
+    <td>
+        ₹{{ settlement.gross_amount }}
+    </td>
+
+    <td>
+        ₹{{ settlement.commission_amount }}
+    </td>
+
+    <td class="fw-bold text-success">
+        ₹{{ settlement.net_amount }}
+    </td>
+
+    <td>
+
+        {% if settlement.status == 'PAID' %}
+
+        <span class="badge badge-paid">
+            Paid
+        </span>
+
+        {% elif settlement.status == 'PENDING' %}
+
+        <span class="badge badge-pending">
+            Pending
+        </span>
+
+        {% else %}
+
+        <span class="badge badge-cancelled">
+            Cancelled
+        </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>
+        {{ settlement.created_at|date:"d M Y" }}
+    </td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+    <td colspan="7" class="text-center py-5">
+        No settlements found
+    </td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+<style>
+.page-header{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    padding:24px;
+    margin-bottom:24px;
+}
+
+.page-title{
+    font-size:1.6rem;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.page-subtitle{
+    color:#64748b;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:18px;
+    padding:20px;
+}
+
+.stat-label{
+    color:#64748b;
+    font-size:.9rem;
+}
+
+.stat-value{
+    font-size:2rem;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.data-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.table{
+    margin-bottom:0;
+}
+
+.table thead{
+    background:#f8fafc;
+}
+
+.table th{
+    font-weight:700;
+    color:#334155;
+}
+
+.badge-pending{
+    background:#FEF3C7;
+    color:#92400E;
+}
+
+.badge-paid{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.badge-cancelled{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.search-box{
+    max-width:400px;
+    margin-bottom:20px;
+}
+</style>
+
+{% endblock %}

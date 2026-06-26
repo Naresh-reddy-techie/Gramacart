@@ -388,6 +388,7 @@ class Order(models.Model):
     notes = models.TextField(blank=True, null=True)
     placed_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    delivered_at = models.DateTimeField(null=True,blank=True)
     
     # Live Tracking for Village Riders
     current_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -459,39 +460,48 @@ class Order(models.Model):
 
         return mapping.get(self.status, 0)
     
+    
     @property
     def payment(self):
 
-        return self.payments.select_related(
-            "method"
-        ).first()
-        
-
+        return (
+            self.payments
+            .select_related("method")
+            .order_by("-created_at")
+            .first()
+        )
+    
     @property
     def payment_status_display(self):
-
 
         payment = self.payment
 
         if not payment:
             return "Unavailable"
 
-        # COD LOGIC
-        if payment.method.name.lower() == "cod":
-
-            if self.status == "delivered":
-                return "Paid At Delivery"
-
-            return "Cash On Delivery"
-
-        # ONLINE PAYMENTS
         if payment.status == "success":
             return "Paid"
 
         if payment.status == "failed":
             return "Failed"
 
+        if payment.status == "refunded":
+            return "Refunded"
+
+        if payment.method.name.lower() == "cod":
+            return "Cash On Delivery"
+
         return "Pending"
+    
+    @property
+    def payment_method_display(self):
+
+        payment = self.payment
+
+        if not payment:
+            return "-"
+
+        return payment.method.display_name
     
 
     @property

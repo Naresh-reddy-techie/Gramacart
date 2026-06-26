@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from django.db import models
 from django.db.models import Q
 from django.core.exceptions import ValidationError
@@ -282,3 +281,58 @@ class ShopWallet(models.Model):
             f"{self.shop.name} | "
             f"Pending ₹{self.pending_balance}"
         )
+    
+
+class ShopPayout(models.Model):
+
+    STATUS_CHOICES = [
+        ('PENDING','Pending'),
+        ('SUCCESS','Success'),
+        ('FAILED','Failed'),
+    ]
+
+    shop = models.ForeignKey(
+        'admin_dashboard.Shop',
+        on_delete=models.CASCADE,
+        related_name='payouts'
+    )
+
+    wallet = models.ForeignKey(
+        'settlements.ShopWallet',
+        on_delete=models.CASCADE,
+        related_name='payouts'
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    reference_number = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    remarks = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='SUCCESS'
+    )
+
+    paid_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.shop.name} - ₹{self.amount}"

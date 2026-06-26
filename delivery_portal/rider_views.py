@@ -573,6 +573,7 @@ def confirm_pickup(request, delivery_id):
 # COMPLETE DELIVERY
 # =========================================================
 from settlements.services import (create_order_settlements)
+from payments.models import Payment
 
 @login_required
 @delivery_boy_required
@@ -701,8 +702,32 @@ def complete_delivery(request, delivery_id):
             order.status = "delivered"
 
             order.save(
-                update_fields=["status"]
+                update_fields=[
+                    "status",
+                    "delivered_at",
+                    ]
             )
+
+            # =============================================
+            # PAYMENT UPDATE
+            # =============================================
+
+            payment = (
+                order.payments
+                .order_by("-created_at")
+                .first()
+            )
+
+            if (payment and payment.status == "pending"and payment.method.name.lower() in ["cod", "upi"]):
+                payment.status = "success"
+                payment.paid_at = timezone.now()
+
+                payment.save(
+                    update_fields=[
+                        "status",
+                        "paid_at",
+                    ]
+                )
             
             create_order_settlements(order)
 

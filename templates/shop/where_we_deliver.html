@@ -976,19 +976,43 @@ function detectLocation() {
         const data = await res.json();
 
         if (!data.success) {
-          showStatus('error', 'No hub found nearby', data.message || 'Try selecting manually');
-          return;
-        }
 
         showStatus(
-          'success',
-          'We deliver here! 🎉',
-          `Hub: ${data.hub_name} · ${data.distance_km} km away · ${data.location_note || ''}`
+        'error',
+        'No hub found nearby',
+        data.message || 'Try selecting manually'
+        );
+
+        return;
+        }
+
+        /* OUTSIDE DELIVERY RADIUS */
+        if (!data.deliverable) {
+
+        showStatus(
+          'error',
+          'Delivery unavailable',
+          `GramaCart currently delivers only within ${data.delivery_radius_km} km of ${data.hub_name}. Your location is ${data.distance_km} km away.`
+        );
+
+        return;
+        }
+
+        /* DELIVERY AVAILABLE */
+        showStatus(
+        'success',
+        'We deliver here! 🎉',
+        `Hub: ${data.hub_name} · ${data.distance_km} km away`
         );
 
         setTimeout(() => {
-          if (data.redirect_url) window.location.href = data.redirect_url;
+
+        if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+        }
+
         }, 900);
+
 
       } catch (err) {
         console.error(err);

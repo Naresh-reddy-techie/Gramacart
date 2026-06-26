@@ -31,6 +31,7 @@ class Payment(models.Model):
         ('pending', 'Pending'),
         ('success', 'Success'),
         ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
     ]
 
     order = models.ForeignKey("shop.Order", on_delete=models.CASCADE, related_name="payments")
@@ -47,9 +48,31 @@ class Payment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(blank=True,null=True)
 
     def __str__(self):
         return f"{self.order.order_number} - {self.method.name} - {self.status}"
+
+    @property
+    def is_paid(self):
+        return self.status == "success"
+
+
+    @property
+    def is_pending(self):
+        return self.status == "pending"
+
+
+    @property
+    def is_failed(self):
+        return self.status == "failed"
+
+
+    @property
+    def is_refunded(self):
+        return self.status == "refunded"
+
+
 
 class FinancialWallet(models.Model):
     """The 'Account Balance' for each Rider or Shopkeeper."""

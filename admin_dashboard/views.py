@@ -995,7 +995,7 @@ from django.core.cache import cache
 
 from shop.models import Order
 from delivery_portal.models import DeliveryProfile
-
+from payments.models import Payment
 from .services.order_service import OrderService, InvoiceService, PDFService
 
 @staff_member_required
@@ -1022,6 +1022,8 @@ STATUS_PIPELINE = {
 from django.utils.timezone import localtime
 
 def serialize_order(order):
+
+    payment = order.payment
 
     return {
 
@@ -1106,6 +1108,53 @@ def serialize_order(order):
             if order.show_otp else None
         ),
 
+         # =====================================================
+        # PAYMENT
+        # =====================================================
+
+        "payment_method": (
+            payment.method.display_name
+            if payment and payment.method
+            else "-"
+        ),
+        
+        "payment_method_code": (
+            payment.method.name
+            if payment and payment.method
+            else ""
+        ),
+
+        "payment_status": order.payment_status_display,
+
+        "payment_status_code": (
+            payment.status
+            if payment else ""
+        ),
+
+        "transaction_id": (
+            payment.transaction_id
+            if payment else ""
+        ),
+
+        "reference_id": (
+            payment.reference_id
+            if payment else ""
+        ),
+
+        "payment_amount": (
+            float(payment.amount)
+            if payment else 0
+        ),
+
+        "paid_at": (
+
+            localtime(payment.paid_at).strftime("%d %b %Y • %I:%M %p")
+
+            if payment and payment.paid_at
+
+            else None
+        ),
+
         # =====================================================
         # TIMESTAMPS
         # =====================================================
@@ -1171,7 +1220,8 @@ def admin_order_list_json(request, order_number=None):
         "address",
         "hub"
     ).prefetch_related(
-        "items__product__product_images"
+        "items__product__product_images",
+        "payments__method"
     )
 
     # =====================================================
@@ -1286,8 +1336,10 @@ def admin_order_list_json(request, order_number=None):
         return metrics_qs.filter(status__in=status_list).count()
 
     # revenue
-    revenue = metrics_qs.filter(status="delivered").aggregate(
-        total=Sum("total")
+    revenue = Payment.objects.filter(
+        status="success"
+    ).aggregate(
+        total=Sum("amount")
     )["total"] or 0
 
     # =====================================================

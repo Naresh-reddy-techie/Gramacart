@@ -1,0 +1,133 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-body">
+
+        <h3>
+
+            {{ wallet.shop.name }}
+
+        </h3>
+
+        <hr>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <h6>
+                    Pending Balance
+                </h6>
+
+                <h2 class="text-warning">
+
+                    ₹{{ wallet.pending_balance }}
+
+                </h2>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <h6>
+                    Total Paid
+                </h6>
+
+                <h2 class="text-success">
+
+                    ₹{{ wallet.total_paid }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card mt-4 border-0 shadow-sm">
+
+    <div class="card-header">
+
+        Pending Settlements
+
+    </div>
+
+    <div class="card-body">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Order</th>
+
+                    <th>Gross</th>
+
+                    <th>Commission</th>
+
+                    <th>Net</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for settlement in settlements %}
+
+                <tr>
+
+                    <td>
+                        {{ settlement.order_item.order.order_number }}
+                    </td>
+
+                    <td>
+                        ₹{{ settlement.gross_amount }}
+                    </td>
+
+                    <td>
+                        ₹{{ settlement.commission_amount }}
+                    </td>
+
+                    <td>
+                        ₹{{ settlement.net_amount }}
+                    </td>
+
+                    <td>
+                        {{ settlement.status }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5">
+
+                        No settlements
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

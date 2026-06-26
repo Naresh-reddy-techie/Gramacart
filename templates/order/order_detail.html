@@ -7,6 +7,8 @@ Order Details | GramaCart
 
 {% block extra_css %}
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <style>
 
 :root{
@@ -290,7 +292,7 @@ OTP CARD
 
 .gc-otp-title{
 
-    font-size:13px;
+    font-size:14px;
     font-weight:800;
 
     color:#166534;
@@ -314,9 +316,22 @@ OTP CARD
 
     margin-top:10px;
 
-    font-size:12px;
+    font-size:13px;
+
+    font-weight:600;
 
     color:#166534;
+}
+
+.gc-otp-warning{
+
+    margin-top:6px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:#B45309;
 }
 
 /* =========================================================
@@ -384,6 +399,19 @@ COMMON CARD
     font-weight:900;
 
     margin-bottom:20px;
+}
+
+.gc-section-helper{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:var(--slate);
+
+    margin-top:-12px;
+
+    margin-bottom:18px;
 }
 
 /* =========================================================
@@ -641,6 +669,219 @@ SUPPORT
 }
 
 /* =========================================================
+RATING / REVIEW
+========================================================= */
+
+.gc-rating-helper{
+
+    text-align:center;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:var(--slate);
+
+    margin-bottom:14px;
+}
+
+.gc-star-row{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    margin-bottom:10px;
+}
+
+.gc-star-btn{
+
+    width:48px;
+    height:48px;
+
+    border:none;
+    background:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:28px;
+
+    color:#E2E8F0;
+
+    cursor:pointer;
+
+    transition:0.15s ease;
+
+    padding:0;
+}
+
+.gc-star-btn:active{
+
+    transform:scale(0.9);
+}
+
+.gc-star-btn.filled{
+
+    color:#F59E0B;
+}
+
+.gc-rating-label{
+
+    text-align:center;
+
+    font-weight:800;
+
+    font-size:15px;
+
+    color:var(--navy);
+
+    margin-bottom:16px;
+
+    min-height:20px;
+}
+
+.gc-review-textarea{
+
+    width:100%;
+
+    border-radius:16px;
+
+    border:1.5px solid var(--border);
+
+    background:var(--bg);
+
+    padding:14px;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    color:var(--navy);
+
+    margin-bottom:14px;
+
+    resize:none;
+}
+
+.gc-review-textarea:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
+    background:#fff;
+}
+
+.gc-review-submit{
+
+    width:100%;
+
+    min-height:54px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color:#fff;
+
+    font-weight:800;
+
+    font-size:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    box-shadow:0 10px 24px rgba(16,185,129,0.28);
+
+    transition:0.15s ease;
+}
+
+.gc-review-submit:disabled{
+
+    background:#E2E8F0;
+
+    color:#94A3B8;
+
+    box-shadow:none;
+
+    cursor:not-allowed;
+}
+
+.gc-review-submit:active{
+
+    transform:scale(0.98);
+}
+
+.gc-review-done{
+
+    text-align:center;
+
+    padding:8px 0;
+}
+
+.gc-review-stars-display{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:6px;
+
+    font-size:26px;
+
+    margin-bottom:12px;
+
+    color:#E2E8F0;
+}
+
+.gc-review-stars-display i.filled{
+
+    color:#F59E0B;
+}
+
+.gc-review-thanks{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    font-weight:800;
+
+    color:var(--primary-dark);
+
+    font-size:14px;
+}
+
+.gc-review-feedback-saved{
+
+    margin-top:10px;
+
+    font-size:13px;
+
+    color:var(--slate);
+
+    font-style:italic;
+}
+
+/* =========================================================
 POST DELIVERY
 ========================================================= */
 
@@ -648,7 +889,7 @@ POST DELIVERY
 
     display:grid;
 
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:1fr;
 
     gap:14px;
 }
@@ -667,13 +908,6 @@ POST DELIVERY
     text-decoration:none;
 
     font-weight:800;
-}
-
-.gc-rate-btn{
-
-    background:#FEF3C7;
-
-    color:#92400E;
 }
 
 .gc-reorder-btn{
@@ -726,10 +960,17 @@ RESPONSIVE
         letter-spacing:8px;
     }
 
-    .gc-support-grid,
-    .gc-post-actions{
+    .gc-support-grid{
 
         grid-template-columns:1fr;
+    }
+
+    .gc-star-btn{
+
+        width:44px;
+        height:44px;
+
+        font-size:26px;
     }
 }
 
@@ -826,7 +1067,8 @@ RESPONSIVE
     <div class="gc-otp-card">
 
         <div class="gc-otp-title">
-            DELIVERY VERIFICATION PIN
+            <i class="bi bi-shield-lock-fill"></i>
+            Share This Code With Delivery Person
         </div>
 
         <div class="gc-otp-number">
@@ -834,7 +1076,12 @@ RESPONSIVE
         </div>
 
         <div class="gc-otp-sub">
-            Share this OTP only after receiving your order.
+            Tell this number to the delivery person only after you receive your order.
+        </div>
+
+        <div class="gc-otp-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Do not share this before your order arrives.
         </div>
 
     </div>
@@ -1053,22 +1300,38 @@ RESPONSIVE
         </div>
 
     
-            <div class="gc-payment-row">
+        <div class="gc-payment-row">
+
+            <span>Payment Method</span>
+
+            <strong>
+                {{ order.payment_method_display }}
+            </strong>
+
+        </div>
+
+        <div class="gc-payment-row">
 
             <span>Payment Status</span>
 
             <strong>
 
-                {% if order.is_paid %}
+                {% if order.payment.status == "success" %}
 
                     <span style="color:#16A34A;">
-                        Paid
+                        {{ order.payment_status_display }}
+                    </span>
+
+                {% elif order.payment.status == "failed" %}
+
+                    <span style="color:#DC2626;">
+                        {{ order.payment_status_display }}
                     </span>
 
                 {% else %}
 
                     <span style="color:#F59E0B;">
-                        Pending
+                        {{ order.payment_status_display }}
                     </span>
 
                 {% endif %}
@@ -1077,26 +1340,114 @@ RESPONSIVE
 
         </div>
 
-        {% if order.tax > 0 %}
+    </div>
 
-        <div class="gc-payment-row">
+    <!-- =====================================================
+    RATE YOUR ORDER (DELIVERED ONLY)
+    ====================================================== -->
 
-            <span>Taxes</span>
-            <strong>₹{{ order.tax }}</strong>
+    {% if order.status == "delivered" %}
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+            <i class="bi bi-stars"></i>
+            How Was Your Order?
+        </div>
+
+        {% if order.review %}
+
+        <div class="gc-review-done">
+
+            <div class="gc-review-stars-display">
+
+                {% for i in "12345" %}
+                <i class="bi bi-star-fill {% if forloop.counter <= order.review.rating %}filled{% endif %}"></i>
+                {% endfor %}
+
+            </div>
+
+            <div class="gc-review-thanks">
+                <i class="bi bi-check-circle-fill"></i>
+                Thank you for your feedback!
+            </div>
+
+            {% if order.review.feedback %}
+            <div class="gc-review-feedback-saved">
+                "{{ order.review.feedback }}"
+            </div>
+            {% endif %}
 
         </div>
+
+        {% else %}
+
+        <div class="gc-section-helper" style="text-align:center;margin-top:-6px;">
+            Your feedback helps other village customers shop with confidence.
+        </div>
+
+        <form
+            method="post"
+            action="#"
+            id="review-form"
+        >
+
+            {% csrf_token %}
+
+            <div class="gc-rating-helper">
+                Tap the stars to rate your order
+            </div>
+
+            <div class="gc-star-row" id="star-row">
+
+                {% for i in "12345" %}
+                <button
+                    type="button"
+                    class="gc-star-btn"
+                    data-value="{{ forloop.counter }}"
+                >
+                    <i class="bi bi-star-fill"></i>
+                </button>
+                {% endfor %}
+
+            </div>
+
+            <div class="gc-rating-label" id="rating-label">
+                Tap a star above
+            </div>
+
+            <input
+                type="hidden"
+                name="rating"
+                id="rating-input"
+                value=""
+            >
+
+            <textarea
+                name="feedback"
+                id="review-feedback"
+                class="gc-review-textarea"
+                placeholder="Tell us more (optional)"
+                rows="3"
+            ></textarea>
+
+            <button
+                type="submit"
+                class="gc-review-submit"
+                id="review-submit"
+                disabled
+            >
+                <i class="bi bi-send-fill"></i>
+                Submit Rating
+            </button>
+
+        </form>
 
         {% endif %}
-           
-
-        <div class="gc-payment-row gc-total">
-
-            <span>Total Paid</span>
-            <span>₹{{ order.total }}</span>
-
-        </div>
 
     </div>
+
+    {% endif %}
 
     <!-- =====================================================
     SUPPORT
@@ -1143,20 +1494,12 @@ RESPONSIVE
 
         <div class="gc-section-title">
 
-            <i class="bi bi-stars"></i>
-            Post Delivery Actions
+            <i class="bi bi-arrow-repeat"></i>
+            Want The Same Order Again?
 
         </div>
 
         <div class="gc-post-actions">
-
-            <a
-                href="#"
-                class="gc-post-btn gc-rate-btn"
-            >
-                <i class="bi bi-star-fill"></i>
-                Rate Products
-            </a>
 
             <a
                 href="#"
@@ -1184,5 +1527,67 @@ RESPONSIVE
     </a>
 
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+/* =========================================================
+STAR RATING WIDGET
+========================================================= */
+
+const starRow = document.getElementById("star-row");
+
+if(starRow){
+
+    const starButtons = document.querySelectorAll(".gc-star-btn");
+
+    const ratingInput = document.getElementById("rating-input");
+
+    const ratingLabel = document.getElementById("rating-label");
+
+    const submitBtn = document.getElementById("review-submit");
+
+    const labels = {
+
+        1:"😞 Poor",
+        2:"😐 Okay",
+        3:"🙂 Good",
+        4:"😊 Very Good",
+        5:"🤩 Excellent"
+
+    };
+
+    starButtons.forEach(btn => {
+
+        btn.addEventListener("click", function(){
+
+            const value = parseInt(this.dataset.value);
+
+            ratingInput.value = value;
+
+            starButtons.forEach((b, idx) => {
+
+                if(idx < value){
+                    b.classList.add("filled");
+                } else {
+                    b.classList.remove("filled");
+                }
+
+            });
+
+            ratingLabel.innerText = labels[value];
+
+            submitBtn.disabled = false;
+
+        });
+
+    });
+
+}
+
+</script>
 
 {% endblock %}

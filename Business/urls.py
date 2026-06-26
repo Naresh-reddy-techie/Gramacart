@@ -16,7 +16,7 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path('core/',include('core.urls')),
     path('hub_partner/',include('hub_partner.urls')),
-    # path('settlements/',include('settlements.urls')),
+    path('settlements/',include('settlements.urls')),
    
 ]
 if settings.DEBUG:

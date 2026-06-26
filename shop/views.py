@@ -603,9 +603,8 @@ def check_delivery_availability(request):
                     "deliverable": False,
                     "message": "Sorry, we are not serving this area yet.",
                     "hub_name": hub_check.delivery_hub.name,
-                    "distance_km": float(
-                        hub_check.distance_km or 0
-                    )
+                    "distance_km": round(float(hub_check.distance_km or 0),2),
+                    "delivery_radius_km": float(hub_check.delivery_hub.max_delivery_radius_km),
                 })
 
             active_hub = hub_check.delivery_hub
@@ -733,6 +732,8 @@ def check_delivery_availability(request):
             "success": False,
             "message": "Something went wrong. Please try again."
         })
+
+
 #----------my profile------------------------
 
 from .forms import CustomerProfileForm
@@ -4107,6 +4108,8 @@ from .utils import calculate_shipping_cost
 # =========================================================
 # CART CHECKOUT (PRODUCTION READY)
 # =========================================================
+from payments.models import Payment
+
 
 @login_required
 def cart_checkout(request):
@@ -4452,6 +4455,21 @@ def cart_checkout(request):
                             "display_name",
                             ""
                         )
+                    )
+                    # =========================================
+                    # CREATE PAYMENT RECORD
+                    # =========================================
+
+                    Payment.objects.create(
+
+                        order=order,
+
+                        method=payment_method,
+
+                        amount=final_total,
+
+                        status="pending"
+
                     )
 
                 # =========================================

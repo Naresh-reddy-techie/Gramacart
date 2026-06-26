@@ -2,47 +2,36 @@
 {% load static %}
 
 {% block title %}
-GramaCart | Add Address
+Order Details | GramaCart
 {% endblock %}
 
 {% block extra_css %}
 
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
-    --primary:#0E9F6E;
-    --primary-dark:#065F46;
-    --primary-soft:#ECFDF5;
-    --primary-soft-border:#D1FAE8;
 
-    --marigold:#F59E0B;
-    --marigold-soft:#FFFBEB;
-    --marigold-soft-border:#FDE7BD;
+    --primary:#10B981;
+    --primary-dark:#059669;
 
-    --danger:#C2410C;
-    --danger-soft:#FFF1EC;
-    --danger-soft-border:#FFE0D1;
+    --secondary:#0EA5E9;
 
-    --success-soft:#ECFDF5;
+    --navy:#0F172A;
+    --slate:#64748B;
 
-    --dark:#1C1917;
-    --muted:#78716C;
-    --muted-soft:#A8A29E;
-    --border:#EDE6D8;
-    --border-soft:#F3EEE3;
-    --bg:#FBF8F3;
+    --border:#E2E8F0;
+
+    --bg:#F8FAFC;
     --card:#FFFFFF;
 
-    --shadow-sm:0 2px 8px rgba(28,25,23,0.05);
-    --shadow-md:0 10px 26px rgba(28,25,23,0.08);
+    --success:#16A34A;
+    --warning:#F59E0B;
+    --danger:#EF4444;
+
+    --shadow:
+        0 10px 35px rgba(15,23,42,0.06);
 }
 
 /* =========================================================
@@ -50,462 +39,752 @@ BASE
 ========================================================= */
 
 body{
+
     background:var(--bg);
-    font-family:'Inter',sans-serif;
-    color:var(--dark);
-}
-
-/* =========================================================
-HEADER
-========================================================= */
-
-.address-header{
-    position:sticky;
-    top:0;
-    z-index:1000;
-    background:rgba(255,255,255,0.94);
-    border-bottom:1px solid var(--border-soft);
-    backdrop-filter:blur(10px);
-}
-
-.address-header-inner{
-    max-width:920px;
-    margin:auto;
-    padding:14px 16px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.back-btn{
-    width:42px;
-    height:42px;
-    border-radius:14px;
-    border:1px solid var(--border-soft);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-decoration:none;
-    color:var(--dark);
-    background:#fff;
-    box-shadow:var(--shadow-sm);
-    flex-shrink:0;
-}
-
-.page-title{
-    margin:0;
-    font-family:'Baloo 2',sans-serif;
-    font-size:18px;
-    font-weight:700;
-    color:var(--dark);
+    color:var(--navy);
 }
 
 /* =========================================================
 LAYOUT
 ========================================================= */
 
-.address-wrapper{
-    max-width:920px;
+.gc-order-wrapper{
+
+    max-width:760px;
+
     margin:auto;
-    padding:18px 12px 130px;
+
+    padding:
+        18px
+        16px
+        120px;
 }
 
-.address-card{
-    background:var(--card);
-    border-radius:26px;
-    border:1px solid var(--border-soft);
+/* =========================================================
+HEADER CARD
+========================================================= */
+
+.gc-hero{
+
+    position:relative;
+
     overflow:hidden;
-    box-shadow:var(--shadow-sm);
+
+    background:
+        linear-gradient(
+            135deg,
+            #10B981 0%,
+            #059669 45%,
+            #0EA5E9 100%
+        );
+
+    border-radius:32px;
+
+    padding:26px;
+
+    color:#fff;
+
+    margin-bottom:18px;
+
+    box-shadow:
+        0 20px 45px rgba(16,185,129,0.25);
+}
+
+.gc-hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    right:-60px;
+    top:-60px;
+}
+
+.gc-order-badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:
+        rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(10px);
+
+    font-size:12px;
+    font-weight:800;
+
     margin-bottom:16px;
 }
 
-.card-section-label{
-    padding:18px 18px 4px;
-    font-family:'Baloo 2',sans-serif;
-    font-weight:700;
-    font-size:0.95rem;
-    color:var(--dark);
-    display:flex;
-    align-items:center;
-    gap:8px;
+.gc-order-title{
+
+    font-size:30px;
+    font-weight:900;
+
+    line-height:1.1;
+
+    margin-bottom:10px;
 }
 
-.card-section-label i{
-    color:var(--primary-dark);
+.gc-order-sub{
+
+    color:
+        rgba(255,255,255,0.9);
+
+    font-size:14px;
 }
 
 /* =========================================================
-MODE SELECTOR CARDS
+ETA CARD
 ========================================================= */
 
-.mode-section{
+.gc-eta-card{
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:20px;
+
+    margin-bottom:18px;
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+}
+
+.gc-eta-top{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:16px;
+}
+
+.gc-eta-title{
+
+    font-size:14px;
+    font-weight:800;
+}
+
+.gc-eta-time{
+
+    font-size:26px;
+    font-weight:900;
+
+    color:var(--primary);
+}
+
+.gc-status-pill{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:800;
+}
+
+.pending{
+    background:#FFF7ED;
+    color:#C2410C;
+}
+
+.confirmed{
+    background:#EFF6FF;
+    color:#1D4ED8;
+}
+
+.packed{
+    background:#FEF3C7;
+    color:#B45309;
+}
+
+.assigned{
+    background:#F3E8FF;
+    color:#7E22CE;
+}
+
+.out_for_delivery{
+    background:#E0F2FE;
+    color:#0369A1;
+}
+
+.delivered{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.cancelled,
+.declined{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.gc-live-dot{
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.35;
+    }
+
+    100%{
+        opacity:1;
+    }
+}
+
+/* =========================================================
+OTP CARD
+========================================================= */
+
+.gc-otp-card{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ECFDF5,
+            #F0FDF4
+        );
+
+    border:2px dashed #10B981;
+
+    border-radius:26px;
+
+    padding:24px;
+
+    margin-bottom:18px;
+
+    text-align:center;
+}
+
+.gc-otp-title{
+
+    font-size:14px;
+    font-weight:800;
+
+    color:#166534;
+
+    margin-bottom:8px;
+}
+
+.gc-otp-number{
+
+    font-size:40px;
+    font-weight:900;
+
+    letter-spacing:10px;
+
+    color:#064E3B;
+
+    line-height:1;
+}
+
+.gc-otp-sub{
+
+    margin-top:10px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:#166534;
+}
+
+.gc-otp-warning{
+
+    margin-top:6px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:#B45309;
+}
+
+/* =========================================================
+TRACK BUTTON
+========================================================= */
+
+.gc-track-btn{
+
+    width:100%;
+
+    min-height:58px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0EA5E9,
+            #0284C7
+        );
+
+    color:#fff;
+
+    text-decoration:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    font-weight:800;
+
+    margin-bottom:18px;
+
+    box-shadow:
+        0 12px 30px rgba(14,165,233,.28);
+}
+
+/* =========================================================
+COMMON CARD
+========================================================= */
+
+.gc-card{
+
+    background:#fff;
+
+    border-radius:28px;
+
+    border:1px solid var(--border);
+
+    padding:22px;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow);
+}
+
+.gc-section-title{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:18px;
+    font-weight:900;
+
+    margin-bottom:20px;
+}
+
+.gc-section-helper{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:var(--slate);
+
+    margin-top:-12px;
+
+    margin-bottom:18px;
+}
+
+/* =========================================================
+TIMELINE
+========================================================= */
+
+.gc-timeline{
+
+    position:relative;
+
+    margin-left:10px;
+}
+
+.gc-timeline::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:15px;
+    top:0;
+    bottom:0;
+
+    width:2px;
+
+    background:#E2E8F0;
+}
+
+.gc-step{
+
+    position:relative;
+
+    padding-left:50px;
+
+    padding-bottom:28px;
+}
+
+.gc-step:last-child{
+
+    padding-bottom:0;
+}
+
+.gc-step-dot{
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:32px;
+    height:32px;
+
+    border-radius:50%;
+
+    background:#E2E8F0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#94A3B8;
+}
+
+.gc-step.active .gc-step-dot{
+
+    background:var(--primary);
+
+    color:#fff;
+}
+
+.gc-step-title{
+
+    font-weight:800;
+
+    margin-bottom:4px;
+}
+
+.gc-step-time{
+
+    font-size:12px;
+
+    color:var(--slate);
+}
+
+/* =========================================================
+ADDRESS
+========================================================= */
+
+.gc-address-box{
+
+    background:#F8FAFC;
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
     padding:18px;
 }
 
-.mode-options{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
+.gc-address-top{
 
-.form-check{
-    position:relative;
-    margin:0;
-}
-
-.form-check-input{
-    position:absolute;
-    opacity:0;
-    width:100%;
-    height:100%;
-    top:0;
-    left:0;
-    margin:0;
-    cursor:pointer;
-    z-index:2;
-}
-
-.form-check-label{
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
+    align-items:flex-start;
+    justify-content:space-between;
 
-    text-align:center;
+    gap:12px;
 
-    padding:18px 10px;
-
-    border-radius:18px;
-    border:1.5px solid var(--border);
-    background:#fff;
-
-    font-weight:700;
-    font-size:0.82rem;
-    color:var(--muted);
-
-    cursor:pointer;
-    transition:0.15s ease;
+    margin-bottom:12px;
 }
 
-.form-check-label .mode-icon{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:var(--bg);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:1.2rem;
-    color:var(--muted);
-    transition:0.15s ease;
+.gc-address-name{
+
+    font-weight:900;
 }
 
-.form-check-input:checked + .form-check-label{
-    border-color:var(--primary);
-    background:var(--primary-soft);
-    color:var(--primary-dark);
+.gc-address-phone{
+
+    color:var(--slate);
+
+    font-size:14px;
 }
 
-.form-check-input:checked + .form-check-label .mode-icon{
-    background:var(--primary);
-    color:#fff;
+.gc-address-full{
+
+    line-height:1.7;
+
+    color:#334155;
+
+    font-size:14px;
 }
 
 /* =========================================================
-HOW IT WORKS
+ITEMS
 ========================================================= */
 
-.howitworks-card{
-    margin:0 18px 18px;
-    padding:16px;
-    border-radius:18px;
-    background:var(--marigold-soft);
-    border:1px solid var(--marigold-soft-border);
-}
+.gc-item{
 
-.howitworks-card .hiw-title{
-    font-weight:800;
-    font-size:0.85rem;
-    color:#92400E;
     display:flex;
-    align-items:center;
-    gap:7px;
-    margin-bottom:10px;
+    gap:16px;
+
+    padding:16px 0;
+
+    border-bottom:1px solid #F1F5F9;
 }
 
-.hiw-steps{
-    list-style:none;
-    margin:0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+.gc-item:last-child{
+
+    border-bottom:none;
 }
 
-.hiw-steps li{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:0.8rem;
-    font-weight:600;
-    color:#78350F;
-}
+.gc-item-image{
 
-.hiw-num{
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:#fff;
-    color:#92400E;
-    font-size:0.7rem;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-}
+    width:74px;
+    height:74px;
 
-/* =========================================================
-MAP
-========================================================= */
-
-.map-section{
-    padding:0 18px 18px;
-}
-
-.btn-location{
-    width:100%;
-    border:none;
-    background:linear-gradient(150deg,var(--dark),#3a3531);
-    color:#fff;
-    min-height:54px;
-    border-radius:16px;
-    font-weight:700;
-    font-size:0.88rem;
-    margin-bottom:14px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    transition:0.15s ease;
-}
-
-.btn-location:active{
-    transform:scale(0.98);
-}
-
-#map{
-    width:100%;
-    height:380px;
     border-radius:20px;
-    border:2px solid var(--primary-soft-border);
+
+    object-fit:cover;
+
+    background:#F8FAFC;
 }
 
-.delivery-status{
+.gc-item-name{
+
+    font-weight:800;
+
+    margin-bottom:4px;
+}
+
+.gc-item-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+}
+
+.gc-rate-item-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    margin-top:8px;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    background:#FEF3C7;
+
+    color:#92400E;
+
+    font-size:12px;
+
+    font-weight:800;
+
+    text-decoration:none;
+}
+
+.gc-item-meta{
+
+    font-size:13px;
+
+    color:var(--slate);
+}
+
+.gc-item-price{
+
+    margin-left:auto;
+
+    font-weight:900;
+}
+
+/* =========================================================
+PAYMENT
+========================================================= */
+
+.gc-payment-row{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+.gc-payment-row:last-child{
+
+    margin-bottom:0;
+}
+
+.gc-total{
+
+    padding-top:14px;
+
+    border-top:1px dashed #CBD5E1;
+
     margin-top:14px;
-    border-radius:16px;
-    padding:14px;
-    text-align:center;
-    font-weight:700;
-    font-size:0.85rem;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-}
 
-.status-inside{
-    background:var(--success-soft);
-    border:1px solid var(--primary-soft-border);
-    color:var(--primary-dark);
-}
-
-.status-outside{
-    background:var(--danger-soft);
-    border:1px solid var(--danger-soft-border);
-    color:var(--danger);
+    font-size:20px;
+    font-weight:900;
 }
 
 /* =========================================================
-REMOTE
+SUPPORT
 ========================================================= */
 
-.remote-card{
-    margin:0 18px 18px;
-    padding:16px;
+.gc-support-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+}
+
+.gc-support-btn{
+
+    min-height:56px;
+
     border-radius:18px;
-    background:#fff;
-    border:1.5px dashed var(--border);
-}
 
-.remote-card .remote-title{
-    font-weight:700;
-    font-size:0.86rem;
-    color:var(--dark);
-    display:flex;
-    align-items:center;
-    gap:7px;
-    margin-bottom:10px;
-}
+    text-decoration:none;
 
-.btn-outline-primary{
-    border:1.5px solid var(--primary);
-    color:var(--primary-dark);
-    background:#fff;
-    border-radius:14px;
-    font-weight:700;
-    font-size:0.85rem;
-    min-height:48px;
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:7px;
-}
+    gap:10px;
 
-.btn-outline-primary:hover{
-    background:var(--primary-soft);
-    color:var(--primary-dark);
-}
-
-/* =========================================================
-FORM
-========================================================= */
-
-.form-section{
-    padding:4px 18px 24px;
-}
-
-.form-label{
-    font-size:0.78rem;
-    font-weight:700;
-    color:var(--muted);
-    margin-bottom:6px;
-    display:block;
-}
-
-.input-icon-wrap{
-    position:relative;
-}
-
-.input-icon-wrap i{
-    position:absolute;
-    left:16px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--muted-soft);
-    font-size:1rem;
-    z-index:2;
-    pointer-events:none;
-}
-
-.input-icon-wrap .form-control,
-.input-icon-wrap .form-select{
-    padding-left:44px;
-}
-
-.form-control,
-.form-select{
-    width:100%;
-    min-height:52px;
-    border-radius:15px;
-    border:1.5px solid var(--border);
-    background:var(--bg);
-    font-weight:600;
-    font-size:0.9rem;
-    color:var(--dark);
-    box-shadow:none !important;
-    padding:0 16px;
-}
-
-.form-control:focus,
-.form-select:focus{
-    border-color:var(--primary);
-    background:#fff;
-    outline:none;
-}
-
-.form-control::placeholder{
-    color:var(--muted-soft);
-    font-weight:500;
-}
-
-/* =========================================================
-SUBMIT
-========================================================= */
-
-.submit-wrapper{
-    position:sticky;
-    bottom:0;
-    background:
-        linear-gradient(
-            to top,
-            var(--bg) 65%,
-            transparent
-        );
-    padding-top:30px;
-    padding-bottom:4px;
-}
-
-.btn-save{
-    width:100%;
-    min-height:58px;
-    border:none;
-    border-radius:20px;
-    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
-    color:#fff;
     font-weight:800;
-    font-size:0.95rem;
-    box-shadow:0 12px 26px rgba(14,159,110,0.28);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    transition:0.15s ease;
 }
 
-.btn-save:active{
-    transform:scale(0.98);
+.gc-support-call{
+
+    background:#ECFDF5;
+
+    color:#166534;
 }
 
-.btn-save:disabled{
-    background:#E5DFD2;
-    color:var(--muted-soft);
-    box-shadow:none;
-    cursor:not-allowed;
+.gc-support-chat{
+
+    background:#EFF6FF;
+
+    color:#1D4ED8;
 }
 
 /* =========================================================
-LEAFLET
+POST DELIVERY
 ========================================================= */
 
-.leaflet-control-attribution{
-    display:none;
+.gc-post-actions{
+
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:14px;
 }
 
-.leaflet-popup-content{
-    font-weight:700;
-    font-family:'Inter',sans-serif;
+.gc-post-btn{
+
+    min-height:56px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    text-decoration:none;
+
+    font-weight:800;
 }
 
-.leaflet-popup-content-wrapper{
-    border-radius:14px;
+.gc-reorder-btn{
+
+    background:#DCFCE7;
+
+    color:#166534;
 }
 
-@media (max-width:480px){
+/* =========================================================
+BACK BUTTON
+========================================================= */
 
-    .mode-options{
-        gap:8px;
+.gc-back-btn{
+
+    width:100%;
+
+    min-height:60px;
+
+    border-radius:22px;
+
+    background:var(--navy);
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    font-weight:900;
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media(max-width:576px){
+
+    .gc-order-title{
+
+        font-size:24px;
     }
 
-    .form-check-label{
-        padding:14px 8px;
-        font-size:0.76rem;
+    .gc-otp-number{
+
+        font-size:34px;
+
+        letter-spacing:8px;
     }
 
-    #map{
-        height:320px;
-    }
+    .gc-support-grid{
 
+        grid-template-columns:1fr;
+    }
 }
 
 </style>
@@ -513,645 +792,458 @@ LEAFLET
 {% endblock %}
 
 {% block content %}
-<div class="address-header">
 
-    <div class="address-header-inner">
-
-        <a href="{{ request.GET.next|default:'address_list' }}"
-            class="back-btn">
-          
-            <i class="bi bi-arrow-left"></i>
-        </a>
-
-        <h1 class="page-title">
-
-            {% if form.instance.pk %}
-                Edit Address
-            {% else %}
-                Add Delivery Address
-            {% endif %}
-
-        </h1>
-
-    </div>
-
-</div>
-
-<div class="address-wrapper">
-
-<form method="post" id="address-form">
-
-{% csrf_token %}
-
-{{ form.latitude }}
-{{ form.longitude }}
-{{ form.state }}
-{{ form.country }}
-<input type="hidden" name="next" value="{{ request.GET.next }}">
-
-<div class="address-card">
-
-    <div class="mode-section">
-
-        <label class="card-section-label" style="padding:0 0 12px;">
-            <i class="bi bi-signpost-split-fill"></i>
-            Where should we deliver?
-        </label>
-
-        <div class="mode-options">
-
-            <div class="form-check">
-
-                <input
-                    class="form-check-input"
-                    type="radio"
-                    name="delivery_mode"
-                    id="current_location"
-                    value="current"
-                    checked
-                >
-
-                <label
-                    class="form-check-label"
-                    for="current_location"
-                >
-                    <span class="mode-icon"><i class="bi bi-crosshair"></i></span>
-                    Use My Current Location
-                </label>
-
-            </div>
-
-            <div class="form-check">
-
-                <input
-                    class="form-check-input"
-                    type="radio"
-                    name="delivery_mode"
-                    id="another_location"
-                    value="another"
-                >
-
-                <label
-                    class="form-check-label"
-                    for="another_location"
-                >
-                    <span class="mode-icon"><i class="bi bi-house-door-fill"></i></span>
-                    Deliver To Another Location
-                </label>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="howitworks-card">
-
-        <div class="hiw-title">
-            <i class="bi bi-lightbulb-fill"></i>
-            How it works
-        </div>
-
-        <ol class="hiw-steps">
-
-            <li><span class="hiw-num">1</span> Choose delivery location</li>
-            <li><span class="hiw-num">2</span> Select location on map or use GPS</li>
-            <li><span class="hiw-num">3</span> Fill address details</li>
-            <li><span class="hiw-num">4</span> Save address</li>
-
-        </ol>
-
-    </div>
+<div class="gc-order-wrapper">
 
     <!-- =====================================================
-    MAP
+    HERO
     ====================================================== -->
 
-    <div class="map-section">
+    <div class="gc-hero">
 
-        <button
-            type="button"
-            class="btn-location"
-            id="btn-locate"
-        >
-            <i class="bi bi-geo-alt-fill"></i>
-            Detect My Location
-        </button>
+        <div class="gc-order-badge">
+            <i class="bi bi-bag-check-fill"></i>
+            ORDER #{{ order.order_number }}
+        </div>
 
-        <div id="map"></div>
+        <div class="gc-order-title">
+            {{ order.display_status }}
+        </div>
 
-        <div
-            id="delivery-status"
-            class="delivery-status status-outside"
-        >
-            <i class="bi bi-info-circle-fill"></i>
-            Select your location
+        <div class="gc-order-sub">
+
+            Placed on
+            {{ order.placed_at|date:"d M Y • h:i A" }}
+
         </div>
 
     </div>
 
     <!-- =====================================================
-    REMOTE MODE
+    DELIVERY ETA
     ====================================================== -->
 
-    <div class="remote-card">
+    <div class="gc-eta-card">
 
-        <div class="remote-title">
-            <i class="bi bi-pin-map-fill"></i>
-            Need to adjust the location?
+        <div class="gc-eta-top">
+
+            <div>
+
+                <div class="gc-eta-title">
+                    Delivery Status
+                </div>
+
+                <div class="gc-eta-time">
+
+                    {% if order.status == "delivered" %}
+
+                        Delivered
+
+                    {% elif order.status == "out_for_delivery" %}
+
+                        Arriving Soon
+
+                    {% elif order.status == "packed" %}
+
+                        Preparing
+
+                    {% else %}
+
+                        Processing
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <div class="gc-status-pill {{ order.status }}">
+
+                {% if order.status != "delivered" and order.status != "cancelled" and order.status != "declined" %}
+                <span class="gc-live-dot"></span>
+                {% endif %}
+
+                {{ order.get_status_display }}
+
+            </div>
+
         </div>
-
-        <button
-            type="button"
-            class="btn btn-outline-primary w-100"
-            id="adjust-location-btn"
-        >
-            <i class="bi bi-geo-fill"></i>
-            Adjust Pin Location
-        </button>
-
-        <small class="text-muted d-block mt-2">
-            Use this if the pin is not exactly on the delivery location.
-        </small>
 
     </div>
 
     <!-- =====================================================
-    FORM
+    OTP
     ====================================================== -->
 
-    <div class="card-section-label">
-        <i class="bi bi-person-fill"></i>
-        Contact Details
-    </div>
+    {% if order.status == "out_for_delivery" %}
 
-    <div class="form-section">
+    <div class="gc-otp-card">
 
-        <div class="row g-3">
+        <div class="gc-otp-title">
+            <i class="bi bi-shield-lock-fill"></i>
+            Share This Code With Delivery Person
+        </div>
 
-            <div class="col-12">
-                <label class="form-label">
-                    Recipient Name
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-person"></i>
-                    {{ form.recipient_name }}
-                </div>
-            </div>
+        <div class="gc-otp-number">
+            {{ order.delivery_token }}
+        </div>
 
-            <div class="col-12">
-                <label class="form-label">
-                    Phone Number
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-telephone"></i>
-                    {{ form.phone_number }}
-                </div>
-            </div>
+        <div class="gc-otp-sub">
+            Tell this number to the delivery person only after you receive your order.
+        </div>
 
+        <div class="gc-otp-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Do not share this before your order arrives.
         </div>
 
     </div>
 
-    <div class="card-section-label">
-        <i class="bi bi-house-door-fill"></i>
-        Address Details
-    </div>
+    {% endif %}
 
-    <div class="form-section">
+    <!-- =====================================================
+    LIVE TRACKING
+    ====================================================== -->
 
-        <div class="row g-3">
+    {% if order.status == "assigned" or order.status == "out_for_delivery" %}
 
-            <div class="col-12">
-                <label class="form-label">
-                    Address
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-geo-alt"></i>
-                    {{ form.address_line }}
-                </div>
-            </div>
-
-            <div class="col-12">
-                <label class="form-label">
-                    Landmark
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-signpost-2"></i>
-                    {{ form.landmark }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">
-                    City
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-building"></i>
-                    {{ form.city }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">
-                    Pincode
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-mailbox"></i>
-                    {{ form.pincode }}
-                </div>
-            </div>
-
-            <div class="col-12">
-                <label class="form-label">
-                    Address Type
-                </label>
-                <div class="input-icon-wrap">
-                    <i class="bi bi-tag"></i>
-                    {{ form.address_type }}
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="submit-wrapper">
-
-    <button
-        type="submit"
-        id="save-btn"
-        class="btn-save"
-        disabled
+    <a
+        href="{% url 'track_order' order_id=order.id %}"
+        class="gc-track-btn"
     >
-        <i class="bi bi-check-circle-fill"></i>
-        Save Address
-    </button>
+        <i class="bi bi-geo-alt-fill"></i>
+        Track Delivery Live
+    </a>
 
-</div>
+    {% endif %}
 
-</form>
+    <!-- =====================================================
+    TIMELINE
+    ====================================================== -->
 
-</div>
+    <div class="gc-card">
 
-{% endblock %}
+        <div class="gc-section-title">
 
-{% block extra_js %}
+            <i class="bi bi-truck"></i>
+            Order Timeline
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        </div>
 
-<script>
-
-/* =========================================================
-DATA
-========================================================= */
-
-const hubs = {{ delivery_hubs_json|safe }};
-
-/* =========================================================
-ACTIVE HUB (FIXED)
-========================================================= */
-
-let activeHub =
-
-{% if active_hub %}
-{
-    id: {{ active_hub.id }},
-    lat: {{ active_hub.lat }},
-    lon: {{ active_hub.lon }},
-    name: "{{ active_hub.name }}"
-}
-{% else %}
-null
-{% endif %};
-
-/* fallback */
-if(!activeHub && hubs.length){
-
-    activeHub = {
-        lat: hubs[0].lat,
-        lon: hubs[0].lon,
-        name: hubs[0].name
-    };
-}
-
-/* final fallback */
-if(!activeHub){
-
-    activeHub = {
-        lat:16.5,
-        lon:80.6,
-        name:"Default Hub"
-    };
-}
-
-/* =========================================================
-GLOBALS
-========================================================= */
-
-let map;
-let userMarker = null;
-let isRemote = false;
-
-/* =========================================================
-MAP INIT
-========================================================= */
-
-function initMap(){
-
-    map = L.map("map", {
-        zoomControl:true
-    }).setView(
-        [activeHub.lat, activeHub.lon],
-        13
-    );
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    ).addTo(map);
-
-    renderHubs();
-    bindEvents();
-}
-
-/* =========================================================
-HUBS
-========================================================= */
+        <div class="gc-timeline">
 
-function renderHubs(){
+            <div class="gc-step active">
 
-    hubs.forEach(h=>{
+                <div class="gc-step-dot">
+                    <i class="bi bi-check"></i>
+                </div>
 
-        const isActive =
-            h.id === activeHub.id;
+                <div class="gc-step-title">
+                    Order Placed
+                </div>
 
-        L.circle(
-            [h.lat, h.lon],
-            {
-                radius:h.radius,
-                color:isActive
-                    ? "#0E9F6E"
-                    : "#A8A29E",
-                fillOpacity:0.08,
-                weight:2
-            }
-        ).addTo(map);
-
-        L.marker(
-            [h.lat, h.lon],
-            {
-                interactive:false
-            }
-        )
-        .addTo(map)
-        .bindPopup(
-            isActive
-            ? `✅ Active Hub: ${h.name}`
-            : h.name
-        );
-
-    });
-}
+                <div class="gc-step-time">
+                    {{ order.placed_at|date:"d M Y • h:i A" }}
+                </div>
 
-/* =========================================================
-PIN
-========================================================= */
-function setPin(lat, lon){
+            </div>
 
-    /* SAFE ROUNDING */
-    lat = parseFloat(lat).toFixed(8);
-    lon = parseFloat(lon).toFixed(8);
+            <div class="gc-step {% if order.status != 'pending' %}active{% endif %}">
 
-    /* hidden fields */
-    document.getElementById(
-        "id_latitude"
-    ).value = lat;
+                <div class="gc-step-dot">
+                    <i class="bi bi-box"></i>
+                </div>
 
-    document.getElementById(
-        "id_longitude"
-    ).value = lon;
+                <div class="gc-step-title">
+                    Packed & Ready
+                </div>
 
-    /* marker create */
-    if(!userMarker){
+                <div class="gc-step-time">
+                    Your order is prepared for dispatch
+                </div>
 
-        userMarker = L.marker(
-            [lat, lon],
-            {
-                draggable:isRemote
-            }
-        ).addTo(map);
+            </div>
 
-        userMarker.on("dragend", e=>{
+            <div class="gc-step {% if order.status == 'assigned' or order.status == 'out_for_delivery' or order.status == 'delivered' %}active{% endif %}">
 
-            const p =
-                e.target.getLatLng();
+                <div class="gc-step-dot">
+                    <i class="bi bi-bicycle"></i>
+                </div>
 
-            setPin(
-                p.lat,
-                p.lng
-            );
+                <div class="gc-step-title">
+                    Out For Delivery
+                </div>
 
-        });
+                <div class="gc-step-time">
+                    Rider is on the way
+                </div>
 
-    } else {
+            </div>
 
-        userMarker.setLatLng([lat, lon]);
+            <div class="gc-step {% if order.status == 'delivered' %}active{% endif %}">
 
-        if(isRemote){
-            userMarker.dragging.enable();
-        } else {
-            userMarker.dragging.disable();
-        }
-    }
+                <div class="gc-step-dot">
+                    <i class="bi bi-house-check"></i>
+                </div>
 
-    map.panTo([lat, lon]);
+                <div class="gc-step-title">
+                    Delivered
+                </div>
 
-    checkDelivery(lat, lon);
-}
+                <div class="gc-step-time">
+                    Delivered successfully
+                </div>
 
-/* =========================================================
-DELIVERY CHECK
-========================================================= */
+            </div>
 
-function checkDelivery(lat, lon){
+        </div>
 
-    let deliverable = false;
+    </div>
 
-    hubs.forEach(h=>{
+    <!-- =====================================================
+    ADDRESS
+    ====================================================== -->
 
-        const distance =
-            map.distance(
-                [lat, lon],
-                [h.lat, h.lon]
-            );
+    <div class="gc-card">
 
-        if(distance <= h.radius){
-            deliverable = true;
-        }
+        <div class="gc-section-title">
 
-    });
+            <i class="bi bi-geo-alt-fill"></i>
+            Delivery Address
 
-    const box =
-        document.getElementById(
-            "delivery-status"
-        );
+        </div>
 
-    const btn =
-        document.getElementById(
-            "save-btn"
-        );
+        <div class="gc-address-box">
 
-    if(deliverable){
+            <div class="gc-address-top">
 
-        box.className =
-            "delivery-status status-inside";
+                <div>
 
-        box.innerHTML =
-             '<i class="bi bi-check-circle-fill"></i> Great! We deliver to this location';
+                    <div class="gc-address-name">
+                        {{ order.address.recipient_name }}
+                    </div>
 
-        btn.disabled = false;
+                    <div class="gc-address-phone">
+                        +91 {{ order.address.phone_number }}
+                    </div>
 
-    } else {
+                </div>
 
-        box.className =
-            "delivery-status status-outside";
+                <span class="gc-status-pill confirmed">
 
-        box.innerHTML =
-            '<i class="bi bi-exclamation-triangle-fill"></i> Sorry, delivery is currently unavailable in this area';
+                    {{ order.address.get_address_type_display }}
 
-        btn.disabled = true;
-    }
-}
+                </span>
 
-/* =========================================================
-EVENTS
-========================================================= */
+            </div>
 
-function bindEvents(){
+            <div class="gc-address-full">
 
-    /* map click */
-    map.on("click", e=>{
+                {{ order.address.address_line }}
 
-        /* first placement always */
-        if(!userMarker){
+                {% if order.address.landmark %}
+                    , {{ order.address.landmark }}
+                {% endif %}
 
-            setPin(
-                e.latlng.lat,
-                e.latlng.lng
-            );
+                <br>
 
-            return;
-        }
+                {{ order.address.city }},
+                {{ order.address.state }}
 
-        /* remote mode only */
-        if(isRemote){
+                - {{ order.address.pincode }}
 
-            setPin(
-                e.latlng.lat,
-                e.latlng.lng
-            );
-        }
+                <br>
 
-    });
+                {{ order.address.country }}
 
-    /* gps */
-    document.getElementById(
-        "btn-locate"
-    ).onclick = function(){
+            </div>
 
-        navigator.geolocation.getCurrentPosition(
+        </div>
 
-            pos=>{
+    </div>
 
-                const lat =
-                    pos.coords.latitude;
+    <!-- =====================================================
+    ITEMS
+    ====================================================== -->
 
-                const lon =
-                    pos.coords.longitude;
+    <div class="gc-card">
 
-                setPin(lat, lon);
+        <div class="gc-section-title">
 
-                map.setView(
-                    [lat, lon],
-                    15
-                );
-            },
+            <i class="bi bi-bag"></i>
+            Ordered Items
 
-            ()=>{
+        </div>
 
-                alert(
-                    "Unable to fetch current location."
-                );
-            }
+        {% for item in order.items.all %}
 
-        );
-    };
+        <div class="gc-item">
 
-    /* remote toggle */
-    document.getElementById(
-        "adjust-location-btn"
-    ).onclick = function(){
+            <img
+                src="{% if item.product.product_images.first %}{{ item.product.product_images.first.image.url }}{% else %}{% static 'images/default-product.png' %}{% endif %}"
+                class="gc-item-image"
+            >
 
-        isRemote = true;
+            <div class="gc-item-info">
 
-        if(userMarker){
-            userMarker.dragging.enable();
-        }
+                <div class="gc-item-name">
+                    {{ item.product.name }}
+                </div>
 
-        alert(
-            "You can now drag the pin to the exact delivery location."
-        );
+                <div class="gc-item-meta">
 
-    };
-}
+                    Qty: {{ item.quantity }}
 
+                    {% if item.variant_name %}
+                    • {{ item.variant_name }}
+                    {% endif %}
 
-document.getElementById(
-    "another_location"
-).addEventListener("change", function(){
+                </div>
 
-    isRemote = true;
+                {% if order.status == "delivered" %}
 
-    if(userMarker){
-        userMarker.dragging.enable();
-    }
+                <a
+                    href="{% url 'rate_product' id=item.product.id %}"
+                    class="gc-rate-item-btn"
+                >
+                    <i class="bi bi-star-fill"></i>
+                    Rate This Product
+                </a>
 
-    document.getElementById(
-        "btn-locate"
-    ).style.display = "none";
-});
-document.getElementById(
-    "current_location"
-).addEventListener("change", function(){
+                {% endif %}
 
-    document.getElementById(
-        "btn-locate"
-    ).style.display = "block";
-});
-/* =========================================================
-BOOT
-========================================================= */
+            </div>
 
-document.addEventListener(
-    "DOMContentLoaded",
-    ()=>{
+            <div class="gc-item-price">
+                ₹{{ item.get_total }}
+            </div>
 
-        initMap();
+        </div>
 
-        {% if form.instance.latitude and form.instance.longitude %}
+        {% endfor %}
 
-        setPin(
-            {{ form.instance.latitude }},
-            {{ form.instance.longitude }}
-        );
+        <div class="gc-payment-row">
+
+            <span>Payment Status</span>
+
+            <strong>
+
+                {% if order.is_paid %}
+
+                    <span style="color:#16A34A;">
+                        Paid
+                    </span>
+
+                {% else %}
+
+                    <span style="color:#F59E0B;">
+                        Pending
+                    </span>
+
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+        {% if order.tax > 0 %}
+
+        <div class="gc-payment-row">
+
+            <span>Taxes</span>
+            <strong>₹{{ order.tax }}</strong>
+
+        </div>
 
         {% endif %}
+           
 
-    }
-);
+        <div class="gc-payment-row gc-total">
 
-</script>
+            <span>Total Paid</span>
+            <span>₹{{ order.total }}</span>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    SUPPORT
+    ====================================================== -->
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-headset"></i>
+            Need Help?
+
+        </div>
+
+        <div class="gc-support-grid">
+
+            <a
+                href="tel:+919999999999"
+                class="gc-support-btn gc-support-call"
+            >
+                <i class="bi bi-telephone-fill"></i>
+                Call Support
+            </a>
+
+            <a
+                href="#"
+                class="gc-support-btn gc-support-chat"
+            >
+                <i class="bi bi-chat-dots-fill"></i>
+                Chat Support
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+    POST DELIVERY
+    ====================================================== -->
+
+    {% if order.status == "delivered" %}
+
+    <div class="gc-card">
+
+        <div class="gc-section-title">
+
+            <i class="bi bi-arrow-repeat"></i>
+            Want The Same Order Again?
+
+        </div>
+
+        <div class="gc-post-actions">
+
+            <a
+                href="#"
+                class="gc-post-btn gc-reorder-btn"
+            >
+                <i class="bi bi-arrow-repeat"></i>
+                Reorder
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- =====================================================
+    BACK
+    ====================================================== -->
+
+    <a
+        href="{% url 'orders_list' %}"
+        class="gc-back-btn"
+    >
+        Back To Orders
+    </a>
+
+</div>
 
 {% endblock %}
