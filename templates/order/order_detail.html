@@ -1388,7 +1388,7 @@ RESPONSIVE
 
         <form
             method="post"
-            action="#"
+            action="{% url 'rate_product' order.items.first.product.id %}"
             id="review-form"
         >
 
@@ -1418,13 +1418,13 @@ RESPONSIVE
 
             <input
                 type="hidden"
-                name="rating"
+                name="score"
                 id="rating-input"
                 value=""
             >
 
             <textarea
-                name="feedback"
+                name="review"
                 id="review-feedback"
                 class="gc-review-textarea"
                 placeholder="Tell us more (optional)"

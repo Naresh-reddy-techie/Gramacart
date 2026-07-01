@@ -1815,3 +1815,32 @@ def delete_shop(request, pk):
 
     return render(request, 'shops/shop_confirm_delete.html', context)
 
+
+#============================================
+# whatsapp catlogue generator for non technical 
+#============================================
+
+from django.http import HttpResponse
+
+from .services.catalogue_generator import CatalogueGenerator
+from .models import DeliveryHub
+
+
+def generate_catalogue(request, hub_id):
+
+    hub = DeliveryHub.objects.get(id=hub_id)
+
+    generator = CatalogueGenerator(hub)
+
+    pdf = generator.generate()
+
+    response = HttpResponse(
+        pdf,
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{hub.name}_catalogue.pdf"'
+    )
+
+    return response

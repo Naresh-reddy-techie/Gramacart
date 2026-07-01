@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+
+from decouple import config
+import dj_database_url
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +25,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@-tp=mt^=#0gcjpil@xgpw)=o5xs7(_$hj@+jgqf!*02o_cq5t'
+
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost",
+    cast=lambda v: [s.strip() for s in v.split(",")]
+)
 
 
 # Application definition
@@ -51,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     
     # 'django.middleware.locale.LocaleMiddleware', # for language translation
@@ -88,16 +99,29 @@ WSGI_APPLICATION = 'Business.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Gramackart',
-        'PASSWORD':'Naresh@2001.',
-        'HOST': 'localhost',
-        'USER': 'root'
-    }
-}
+DATABASE_URL = config("DATABASE_URL", default=None)
 
+if DATABASE_URL:
+    # Production (Render / VPS)
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # Local Development (MySQL)
+    DATABASES = {
+        "default": {
+            "ENGINE": config("DB_ENGINE"),
+            "NAME": config("DB_NAME"),
+            "USER": config("DB_USER"),
+            "PASSWORD": config("DB_PASSWORD"),
+            "HOST": config("DB_HOST"),
+            "PORT": config("DB_PORT"),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -144,14 +168,17 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+
+STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-import os
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT= os.path.join(BASE_DIR,'media')
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -167,10 +194,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'contact.gramacart@gmail.com'
-EMAIL_HOST_PASSWORD = 'obyfvdarsdhtezfj'
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 
 #payment gateway fields based on the different platforms
 PAYMENT_GATEWAY_CONFIG_FIELDS = {
@@ -183,7 +209,7 @@ PAYMENT_GATEWAY_CONFIG_FIELDS = {
 
 #for location map
 
-LOCATIONIQ_ACCESS_TOKEN = 'pk.2209c37736cdcffcfbb98ebef3fd43c4'
+LOCATIONIQ_ACCESS_TOKEN = config("LOCATIONIQ_ACCESS_TOKEN")
 
 # maintaining sessions
 
@@ -197,3 +223,13 @@ SESSION_COOKIE_AGE = 2592000  # 30 days in seconds
 
 LOGIN_REDIRECT_URL = 'post_login_redirect'
 LOGOUT_REDIRECT_URL = 'home'
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}

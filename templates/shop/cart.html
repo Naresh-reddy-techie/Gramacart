@@ -4,36 +4,66 @@
 {% block title %}My Basket | GramaCart{% endblock %}
 
 {% block extra_css %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 
 :root{
-    --primary:#10B981;
+    --primary:#0E9F6E;
+    --primary-dark:#06513F;
+    --primary-soft:#EAFBF3;
+    --primary-soft-border:#CDF3E2;
+
     --navy:#0F172A;
     --bg:#F8FAFC;
-    --border:#E2E8F0;
+    --card:#FFFFFF;
+    --border:#E7ECF2;
+    --border-soft:#F0F3F7;
     --muted:#64748B;
-    --danger:#EF4444;
+    --muted-soft:#94A3B8;
+
+    --danger:#DC4A2C;
+    --danger-soft:#FEF1ED;
+
+    --shadow-xs:0 1px 2px rgba(15,23,42,0.04);
+    --shadow-sm:0 4px 16px rgba(15,23,42,0.05);
+    --shadow-md:0 14px 32px rgba(15,23,42,0.08);
+    --shadow-lg:0 20px 44px rgba(6,81,63,0.18);
+
+    --ease:cubic-bezier(.25,.8,.25,1);
 }
 
 /* =========================================
-   GLOBAL
+GLOBAL
 ========================================= */
+
+*{
+    -webkit-tap-highlight-color:transparent;
+}
 
 body{
     background:var(--bg);
-    padding-bottom:190px;
+    padding-bottom:198px;
     -webkit-font-smoothing:antialiased;
+    font-family:'Inter',sans-serif;
+    color:var(--navy);
+}
+
+h1,h2,h3,.font-display{
+    font-family:'Sora',sans-serif;
 }
 
 .cart-page{
     max-width:920px;
     margin:auto;
     padding:16px;
-    padding-top:90px;
+    padding-top:92px;
 }
 
 /* =========================================
-   HEADER
+HEADER
 ========================================= */
 
 .cart-header{
@@ -43,12 +73,13 @@ body{
     right:0;
     z-index:1200;
 
-    background:rgba(255,255,255,0.96);
-    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,0.94);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
 
-    border-bottom:1px solid var(--border);
+    border-bottom:1px solid var(--border-soft);
 
-    padding:14px 16px;
+    padding:15px 18px;
 }
 
 .cart-header-inner{
@@ -60,50 +91,80 @@ body{
     justify-content:space-between;
 }
 
+.cart-title-wrap{
+    display:flex;
+    flex-direction:column;
+}
+
 .cart-title{
-    font-size:1.2rem;
-    font-weight:900;
+    font-family:'Sora',sans-serif;
+    font-size:1.15rem;
+    font-weight:800;
+    letter-spacing:-0.01em;
     color:var(--navy);
 }
 
+.cart-subtitle{
+    font-size:0.76rem;
+    font-weight:600;
+    color:var(--muted);
+    margin-top:1px;
+}
+
 .add-more-btn{
-    background:#ECFDF5;
-    color:#047857;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
+    color:var(--primary-dark);
 
     text-decoration:none;
 
-    padding:10px 14px;
+    padding:10px 16px;
     border-radius:999px;
 
-    font-size:0.85rem;
+    font-size:0.82rem;
     font-weight:800;
+
+    transition:transform 0.15s var(--ease);
+}
+
+.add-more-btn:active{
+    transform:scale(0.95);
 }
 
 /* =========================================
-   ITEM CARD
+ITEM CARD
 ========================================= */
 
 .cart-card{
-    background:#fff;
+    background:var(--card);
 
-    border-radius:24px;
+    border-radius:22px;
 
     padding:16px;
 
-    margin-bottom:16px;
+    margin-bottom:14px;
 
-    border:1px solid rgba(0,0,0,0.05);
+    border:1px solid var(--border-soft);
 
-    box-shadow:0 6px 24px rgba(15,23,42,0.05);
+    box-shadow:var(--shadow-sm);
 
     position:relative;
 
-    transition:0.2s ease;
+    transition:opacity 0.2s var(--ease), transform 0.25s var(--ease);
 }
 
 .cart-card.updating{
-    opacity:0.6;
+    opacity:0.55;
     pointer-events:none;
+}
+
+.cart-card.removing{
+    opacity:0;
+    transform:scale(0.94) translateY(4px);
 }
 
 .cart-main{
@@ -112,16 +173,18 @@ body{
 }
 
 .product-image{
-    width:92px;
-    height:92px;
+    width:84px;
+    height:84px;
 
-    border-radius:18px;
+    border-radius:16px;
 
     overflow:hidden;
 
-    background:#F1F5F9;
+    background:var(--border-soft);
 
     flex-shrink:0;
+
+    border:1px solid var(--border-soft);
 }
 
 .product-image img{
@@ -131,55 +194,66 @@ body{
 }
 
 /* =========================================
-   PRODUCT DETAILS
+PRODUCT DETAILS
 ========================================= */
 
 .product-details{
     flex:1;
     min-width:0;
+    padding-right:34px;
 }
 
 .product-name{
-    font-size:1rem;
-    font-weight:900;
+    font-size:0.96rem;
+    font-weight:700;
     color:var(--navy);
     line-height:1.4;
+    letter-spacing:-0.005em;
 }
 
 .variant-chip{
     display:inline-flex;
     align-items:center;
+    gap:5px;
 
-    background:#F0FDF4;
-    color:#047857;
+    background:var(--primary-soft);
+    color:var(--primary-dark);
 
-    padding:6px 12px;
+    padding:5px 11px;
 
     border-radius:999px;
 
-    font-size:0.78rem;
+    font-size:0.74rem;
     font-weight:800;
 
     margin-top:8px;
 }
 
+.variant-chip i{
+    font-size:0.68rem;
+}
+
 .price-row{
-    margin-top:12px;
+    margin-top:10px;
+    display:flex;
+    align-items:baseline;
+    gap:6px;
 }
 
 .price-label{
-    font-size:0.8rem;
-    color:var(--muted);
+    font-size:0.76rem;
+    color:var(--muted-soft);
+    font-weight:600;
 }
 
 .price-value{
-    font-size:1.1rem;
-    font-weight:900;
-    color:var(--primary);
+    font-size:0.98rem;
+    font-weight:800;
+    color:var(--navy);
 }
 
 /* =========================================
-   DELETE BUTTON
+DELETE BUTTON
 ========================================= */
 
 .delete-btn{
@@ -188,86 +262,120 @@ body{
     top:14px;
     right:14px;
 
-    width:36px;
-    height:36px;
+    width:34px;
+    height:34px;
 
     border:none;
+    border:1px solid var(--border-soft);
 
     border-radius:50%;
 
-    background:#F8FAFC;
+    background:var(--bg);
 
-    color:#64748B;
+    color:var(--muted);
+    font-size:0.95rem;
 
-    transition:0.2s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:0.15s var(--ease);
 }
 
-.delete-btn:hover{
-    background:#FEE2E2;
+.delete-btn:active{
+    transform:scale(0.9);
+    background:var(--danger-soft);
     color:var(--danger);
+    border-color:#FBDCCB;
 }
 
 /* =========================================
-   ACTION BAR
+ACTION BAR
 ========================================= */
 
 .action-bar{
-    margin-top:16px;
+    margin-top:14px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    background:#F8FAFC;
+    background:var(--bg);
 
-    padding:12px 14px;
+    padding:10px 10px 10px 14px;
 
-    border-radius:18px;
+    border-radius:16px;
 }
 
 /* =========================================
-   QUANTITY
+QUANTITY
 ========================================= */
 
 .qty-box{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:0;
+
+    background:#fff;
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:3px;
+    box-shadow:var(--shadow-xs);
 }
 
 .qty-btn{
-    width:36px;
-    height:36px;
+    width:32px;
+    height:32px;
 
     border:none;
 
-    border-radius:50%;
+    border-radius:10px;
 
-    background:#fff;
+    background:transparent;
+    color:var(--navy);
 
-    font-weight:900;
-    font-size:1rem;
+    font-weight:800;
+    font-size:1.05rem;
 
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
 
-    transition:0.2s ease;
+    transition:0.15s var(--ease);
+}
+
+.qty-btn:first-child{
+    color:var(--danger);
+}
+
+.qty-btn:last-child{
+    color:var(--primary-dark);
 }
 
 .qty-btn:active{
-    transform:scale(0.95);
+    transform:scale(0.88);
+    background:var(--border-soft);
 }
 
 .qty-number{
-    min-width:22px;
+    min-width:30px;
 
     text-align:center;
 
-    font-weight:900;
-    font-size:1rem;
+    font-weight:800;
+    font-size:0.95rem;
+    color:var(--navy);
+
+    transition:transform 0.15s var(--ease);
+}
+
+.qty-number.bump{
+    transform:scale(1.25);
 }
 
 /* =========================================
-   TOTAL
+TOTAL
 ========================================= */
 
 .line-total{
@@ -276,17 +384,24 @@ body{
 
 .line-total small{
     display:block;
-    color:var(--muted);
-    font-size:0.78rem;
+    color:var(--muted-soft);
+    font-size:0.72rem;
+    font-weight:600;
 }
 
 .line-total strong{
-    font-size:1.1rem;
+    font-size:1.02rem;
+    font-weight:800;
     color:var(--navy);
+    transition:color 0.2s var(--ease);
+}
+
+.line-total strong.flash{
+    color:var(--primary-dark);
 }
 
 /* =========================================
-   CHECKOUT BAR
+CHECKOUT BAR
 ========================================= */
 
 .checkout-bar{
@@ -301,11 +416,14 @@ body{
 
     background:rgba(255,255,255,0.96);
 
-    backdrop-filter:blur(12px);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
 
-    border-top:1px solid var(--border);
+    border-top:1px solid var(--border-soft);
 
-    padding:16px;
+    padding:16px 18px 18px;
+
+    box-shadow:0 -10px 30px rgba(15,23,42,0.06);
 }
 
 .checkout-inner{
@@ -323,31 +441,47 @@ body{
 
 .checkout-label{
     color:var(--muted);
-    font-size:0.92rem;
+    font-size:0.85rem;
     font-weight:700;
 }
 
+.checkout-label small{
+    display:block;
+    font-size:0.72rem;
+    font-weight:600;
+    color:var(--muted-soft);
+    margin-top:1px;
+}
+
 .checkout-total{
-    font-size:1.45rem;
-    font-weight:900;
+    font-family:'Sora',sans-serif;
+    font-size:1.4rem;
+    font-weight:800;
+    letter-spacing:-0.01em;
     color:var(--navy);
+    transition:color 0.2s var(--ease);
+}
+
+.checkout-total.flash{
+    color:var(--primary-dark);
 }
 
 /* =========================================
-   CHECKOUT BUTTON
+CHECKOUT BUTTON
 ========================================= */
 
 .checkout-btn{
     width:100%;
+    min-height:60px;
 
     border:none;
 
-    border-radius:20px;
+    border-radius:18px;
 
-    background:var(--navy);
+    background:linear-gradient(150deg,var(--navy),#1E293B);
     color:#fff;
 
-    padding:16px 18px;
+    padding:0 8px 0 20px;
 
     display:flex;
     align-items:center;
@@ -355,32 +489,88 @@ body{
 
     text-decoration:none;
 
-    font-size:1rem;
-    font-weight:900;
+    font-size:0.96rem;
+    font-weight:800;
 
-    transition:0.2s ease;
+    box-shadow:0 14px 28px rgba(15,23,42,0.22);
+
+    transition:0.15s var(--ease);
 }
 
 .checkout-btn:active{
-    transform:scale(0.99);
+    transform:scale(0.985);
+}
+
+.checkout-btn-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
 }
 
 .amount-pill{
     background:var(--primary);
 
-    padding:7px 14px;
+    padding:11px 16px;
 
-    border-radius:999px;
+    border-radius:14px;
 
     font-size:0.92rem;
+    font-weight:800;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
 }
 
 /* =========================================
-   EMPTY STATE
+TOAST (replaces blocking alert() popups)
+========================================= */
+
+.cart-toast{
+    position:fixed;
+    left:50%;
+    bottom:185px;
+    transform:translateX(-50%) translateY(12px);
+
+    z-index:1600;
+
+    background:var(--navy);
+    color:#fff;
+
+    padding:12px 18px;
+
+    border-radius:14px;
+
+    font-size:0.84rem;
+    font-weight:700;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    box-shadow:var(--shadow-md);
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.cart-toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+.cart-toast.is-danger{
+    background:var(--danger);
+}
+
+/* =========================================
+EMPTY STATE
 ========================================= */
 
 .empty-wrap{
-    min-height:70vh;
+    min-height:65vh;
 
     display:flex;
     align-items:center;
@@ -390,50 +580,77 @@ body{
 .empty-card{
     text-align:center;
 
-    padding:40px 20px;
+    padding:40px 24px;
+
+    max-width:340px;
 }
 
 .empty-icon{
-    font-size:4.5rem;
-    color:#CBD5E1;
+    width:96px;
+    height:96px;
+    margin:0 auto;
+
+    border-radius:50%;
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:2.4rem;
+    color:var(--primary-dark);
 }
 
 .empty-title{
-    margin-top:16px;
+    margin-top:20px;
 
-    font-size:1.4rem;
-    font-weight:900;
+    font-family:'Sora',sans-serif;
+    font-size:1.25rem;
+    font-weight:800;
 
     color:var(--navy);
 }
 
 .empty-sub{
-    margin-top:10px;
+    margin-top:8px;
 
     color:var(--muted);
+    font-size:0.9rem;
 
     line-height:1.6;
 }
 
 .shop-btn{
-    display:inline-block;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
 
     margin-top:24px;
 
-    background:var(--navy);
+    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
     color:#fff;
 
     text-decoration:none;
 
-    padding:14px 22px;
+    padding:14px 24px;
 
     border-radius:16px;
 
     font-weight:800;
+    font-size:0.92rem;
+
+    box-shadow:0 14px 28px rgba(6,81,63,0.24);
+
+    transition:0.15s var(--ease);
+}
+
+.shop-btn:active{
+    transform:scale(0.97);
 }
 
 /* =========================================
-   MOBILE
+MOBILE
 ========================================= */
 
 @media(max-width:768px){
@@ -444,31 +661,36 @@ body{
     }
 
     .cart-card{
-        border-radius:20px;
-        padding:14px;
+        border-radius:18px;
+        padding:13px;
     }
 
     .product-image{
-        width:78px;
-        height:78px;
+        width:72px;
+        height:72px;
+    }
+
+    .product-details{
+        padding-right:30px;
     }
 
     .product-name{
-        font-size:0.95rem;
+        font-size:0.9rem;
     }
 
     .checkout-total{
-        font-size:1.25rem;
+        font-size:1.2rem;
     }
 
     .checkout-btn{
-        border-radius:18px;
-        padding:15px;
-        font-size:0.95rem;
+        border-radius:16px;
+        padding-left:16px;
+        font-size:0.9rem;
     }
 
     .amount-pill{
-        font-size:0.85rem;
+        font-size:0.84rem;
+        padding:10px 13px;
     }
 }
 
@@ -482,12 +704,25 @@ body{
 
     <div class="cart-header-inner">
 
-        <div class="cart-title">
-            My Basket
+        <div class="cart-title-wrap">
+
+            <div class="cart-title">
+                My Basket
+            </div>
+
+            <div class="cart-subtitle">
+                {% if cart_items %}
+                    {{ cart_items|length }} item{{ cart_items|length|pluralize }} added
+                {% else %}
+                    నా బుట్ట
+                {% endif %}
+            </div>
+
         </div>
 
         <a href="{% url 'public_dashboard' %}" class="add-more-btn">
-            + Add More
+            <i class="bi bi-plus-lg"></i>
+            Add More
         </a>
 
     </div>
@@ -506,7 +741,8 @@ body{
         <button
             type="button"
             class="delete-btn"
-            onclick="deleteItem('{{ item.id }}')">
+            onclick="deleteItem('{{ item.id }}')"
+            aria-label="Remove item">
 
             <i class="bi bi-trash3"></i>
 
@@ -519,9 +755,9 @@ body{
             <div class="product-image">
 
                 {% if item.product.product_images.first %}
-                    <img src="{{ item.product.product_images.first.image.url }}">
+                    <img src="{{ item.product.product_images.first.image.url }}" alt="{{ item.product.name }}">
                 {% else %}
-                    <img src="{% static 'images/default-product.png' %}">
+                    <img src="{% static 'images/default-product.png' %}" alt="{{ item.product.name }}">
                 {% endif %}
 
             </div>
@@ -534,6 +770,7 @@ body{
                 </div>
 
                 <div class="variant-chip">
+                    <i class="bi bi-tag-fill"></i>
                     {{ item.variant.display_name }}
                 </div>
 
@@ -562,9 +799,10 @@ body{
                 <button
                     type="button"
                     class="qty-btn"
-                    onclick="updateQty('{{ item.id }}', -1)">
+                    onclick="updateQty('{{ item.id }}', -1)"
+                    aria-label="Decrease quantity">
 
-                    −
+                    <i class="bi bi-dash-lg"></i>
 
                 </button>
 
@@ -579,9 +817,10 @@ body{
                 <button
                     type="button"
                     class="qty-btn"
-                    onclick="updateQty('{{ item.id }}', 1)">
+                    onclick="updateQty('{{ item.id }}', 1)"
+                    aria-label="Increase quantity">
 
-                    +
+                    <i class="bi bi-plus-lg"></i>
 
                 </button>
 
@@ -611,7 +850,7 @@ body{
     <div class="empty-card">
 
         <div class="empty-icon">
-            <i class="bi bi-basket"></i>
+            <i class="bi bi-basket3"></i>
         </div>
 
         <div class="empty-title">
@@ -621,9 +860,12 @@ body{
         <div class="empty-sub">
             Add products from nearby village hubs
             and continue shopping.
+            <br>
+            మీ బుట్ట ఖాళీగా ఉంది
         </div>
 
         <a href="{% url 'public_dashboard' %}" class="shop-btn">
+            <i class="bi bi-shop"></i>
             Start Shopping
         </a>
 
@@ -646,6 +888,7 @@ body{
 
             <div class="checkout-label">
                 Basket Total
+                <small>Inclusive of all taxes</small>
             </div>
 
             <div
@@ -662,13 +905,17 @@ body{
             href="{% url 'cart_checkout' %}"
             class="checkout-btn">
 
-            Proceed to Checkout
+            <span class="checkout-btn-label">
+                <i class="bi bi-bag-check-fill"></i>
+                Proceed to Checkout
+            </span>
 
             <span
                 class="amount-pill"
                 id="ui-btn-amt">
 
                 ₹{{ order_totals.sub_total }}
+                <i class="bi bi-arrow-right"></i>
 
             </span>
 
@@ -680,11 +927,18 @@ body{
 
 {% endif %}
 
+<!-- TOAST -->
+<div class="cart-toast" id="cart-toast">
+    <i class="bi bi-info-circle-fill"></i>
+    <span id="cart-toast-text"></span>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 
 <script>
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -699,8 +953,35 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
 /* =========================================
-   UPDATE TOTALS
+TOAST (replaces blocking alert() popups so a
+mistap or network hiccup never interrupts the
+person with a modal dialog they have to dismiss)
+========================================= */
+
+let toastTimer = null;
+
+function showToast(message, isDanger){
+
+    const toast = document.getElementById("cart-toast");
+    const text = document.getElementById("cart-toast-text");
+
+    text.innerText = message;
+
+    toast.classList.toggle("is-danger", !!isDanger);
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(()=>{
+        toast.classList.remove("show");
+    }, 2600);
+
+}
+
+/* =========================================
+UPDATE TOTALS
 ========================================= */
 
 function updateTotals(total){
@@ -717,10 +998,12 @@ function updateTotals(total){
 
     if(totalUI){
         totalUI.innerText = "₹" + total;
+        totalUI.classList.add("flash");
+        setTimeout(()=> totalUI.classList.remove("flash"), 280);
     }
 
     if(pillUI){
-        pillUI.innerText = "₹" + total;
+        pillUI.innerHTML = "₹" + total + ' <i class="bi bi-arrow-right"></i>';
     }
 }
 
@@ -743,7 +1026,7 @@ function updateQty(itemId, delta){
     // =================================================
     if(newQty < 1){
 
-        alert("Minimum quantity is 1");
+        showToast("Minimum quantity is 1 · కనీసం 1 ఉండాలి", true);
 
         return;
     }
@@ -776,10 +1059,13 @@ function updateQty(itemId, delta){
         if(data.success){
 
             qtyEl.innerText = newQty;
+            qtyEl.classList.add("bump");
+            setTimeout(()=> qtyEl.classList.remove("bump"), 150);
 
-            document.getElementById(
-                "price-" + itemId
-            ).innerText = "₹" + data.item_total;
+            const priceEl = document.getElementById("price-" + itemId);
+            priceEl.innerText = "₹" + data.item_total;
+            priceEl.classList.add("flash");
+            setTimeout(()=> priceEl.classList.remove("flash"), 280);
 
             updateTotals(data.sub_total);
 
@@ -803,7 +1089,7 @@ function updateQty(itemId, delta){
 
         } else {
 
-            alert(data.message || "Unable to update quantity");
+            showToast(data.message || "Unable to update quantity", true);
 
         }
 
@@ -813,7 +1099,7 @@ function updateQty(itemId, delta){
 
         console.error(error);
 
-        alert("Something went wrong");
+        showToast("Something went wrong · ఏదో తప్పు జరిగింది", true);
 
     })
 
@@ -825,17 +1111,21 @@ function updateQty(itemId, delta){
 }
 
 /* =========================================
-   DELETE ITEM
+DELETE ITEM
 ========================================= */
 
 function deleteItem(itemId){
+
+    const row = document.getElementById(
+        "item-row-" + itemId
+    );
 
     fetch(`/shop/remove_from_cart/${itemId}/`,{
 
         method:"POST",
 
         headers:{
-            "X-CSRFToken":"{{ csrf_token }}",
+            "X-CSRFToken": getCookie("csrftoken"),
             "X-Requested-With":"XMLHttpRequest"
         }
 
@@ -847,23 +1137,20 @@ function deleteItem(itemId){
 
         if(data.success){
 
-            const row = document.getElementById(
-                "item-row-" + itemId
-            );
-
             if(row){
-                row.remove();
+                row.classList.add("removing");
+                setTimeout(()=> row.remove(), 220);
             }
 
             updateTotals(data.sub_total);
 
             if(data.cart_empty){
-                location.reload();
+                setTimeout(()=> location.reload(), 220);
             }
 
         } else {
 
-            alert(data.message || "Failed to remove item");
+            showToast(data.message || "Failed to remove item", true);
 
         }
 
@@ -873,7 +1160,7 @@ function deleteItem(itemId){
 
         console.error(error);
 
-        alert("Something went wrong");
+        showToast("Something went wrong · ఏదో తప్పు జరిగింది", true);
 
     });
 }

@@ -125,5 +125,10 @@ urlpatterns = [
 
     path("seller-applications/<int:pk>/reject/",seller_application_views.reject_seller_application,name="reject_seller_application"),
 
+    path(
+        "catalogue/<int:hub_id>/",
+        views.generate_catalogue,
+        name="generate_catalogue",
+    )
 ]
 

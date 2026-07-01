@@ -28,183 +28,7 @@ from shop.models import (
     WishlistItem,
 )
 
-
-# =========================================================
-# HUB PRODUCTS
-# =========================================================
-
-def get_hub_products(hub, query=None, category_slug=None):
-
-    # -----------------------------------------------------
-    # INVENTORY FOR CURRENT HUB
-    # -----------------------------------------------------
-
-    inventory_qs = Inventory.objects.select_related(
-        "shop",
-        "variant",
-        "variant__product",
-    ).filter(
-        shop__hub=hub,
-        shop__is_active=True,
-    )
-
-    # -----------------------------------------------------
-    # BASE PRODUCTS
-    # -----------------------------------------------------
-
-    products = Product.objects.filter(
-        is_active=True
-    ).select_related(
-        "category"
-    )
-
-    # -----------------------------------------------------
-    # CATEGORY FILTER
-    # -----------------------------------------------------
-
-    if category_slug:
-        products = products.filter(
-            category__slug=category_slug
-        )
-
-    # -----------------------------------------------------
-    # SEARCH FILTER
-    # -----------------------------------------------------
-
-    if query:
-        products = products.filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query) |
-            Q(category__name__icontains=query)
-        )
-
-    # -----------------------------------------------------
-    # RATINGS
-    # -----------------------------------------------------
-
-    products = products.annotate(
-        avg_rating_value=Avg("ratings__score"),
-        rating_count_value=Count("ratings", distinct=True),
-    )
-
-    # -----------------------------------------------------
-    # PREFETCH
-    # -----------------------------------------------------
-
-    products = products.prefetch_related(
-
-        Prefetch(
-            "product_images",
-            queryset=ProductImage.objects.all()
-        ),
-
-        Prefetch(
-            "variants",
-            queryset=ProductVariant.objects.filter(
-                is_active=True
-            ).prefetch_related(
-
-                Prefetch(
-                    "inventory_items",
-                    queryset=inventory_qs,
-                    to_attr="hub_inventory"
-                )
-
-            ),
-            to_attr="active_variants"
-        )
-    )
-
-    # -----------------------------------------------------
-    # PRODUCT CALCULATIONS
-    # -----------------------------------------------------
-
-    for product in products:
-
-        total_stock = 0
-        min_price = None
-        default_variant = None
-
-        # -------------------------------------------------
-        # VARIANTS
-        # -------------------------------------------------
-
-        for variant in getattr(product, "active_variants", []):
-
-            inventories = getattr(
-                variant,
-                "hub_inventory",
-                []
-            )
-
-            # ---------------------------------------------
-            # STOCK
-            # ---------------------------------------------
-
-            variant_stock = sum(
-                inv.stock for inv in inventories
-            )
-
-            total_stock += variant_stock
-
-            # ---------------------------------------------
-            # PRICE
-            # ---------------------------------------------
-
-            valid_prices = [
-
-                inv.selling_price
-
-                for inv in inventories
-
-                if inv.selling_price is not None
-
-            ]
-
-            # fallback to variant price if inventory
-            # price not available
-
-            if not valid_prices and getattr(variant, "price", None):
-                valid_prices.append(variant.price)
-
-            if valid_prices:
-
-                current_price = min(valid_prices)
-
-                if (
-                    min_price is None or
-                    current_price < min_price
-                ):
-
-                    min_price = current_price
-                    default_variant = variant
-
-        # -------------------------------------------------
-        # FINAL ATTRIBUTES
-        # -------------------------------------------------
-
-        product.total_stock = total_stock
-
-        # IMPORTANT:
-        # keep price even if stock = 0
-        # so product can still display as
-        # "Coming Soon"
-
-        product.min_price_value = min_price
-
-        product.default_variant_value = default_variant
-
-        # -------------------------------------------------
-        # IMAGE FALLBACK
-        # -------------------------------------------------
-
-        product.first_image = next(
-            iter(product.product_images.all()),
-            None
-        )
-
-    return products
-
+from shop.services.product_catalog import get_hub_products
 
 # =========================================================
 # PUBLIC DASHBOARD
@@ -1781,7 +1605,7 @@ def add_to_cart(request, product_id):
         return _fail(
             request,
             "Please select delivery location first.",
-            redirect_url="where_should_we_deliver"
+            redirect_url="where_we_deliver"
         )
 
     active_hub = DeliveryHub.objects.filter(
@@ -1795,7 +1619,7 @@ def add_to_cart(request, product_id):
         return _fail(
             request,
             "Selected delivery hub unavailable.",
-            redirect_url="where_should_we_deliver"
+            redirect_url="where_we_deliver"
         )
 
     # =====================================================
@@ -2143,7 +1967,7 @@ def buy_now(request, product_id):
         )
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     active_hub = DeliveryHub.objects.filter(
@@ -2160,7 +1984,7 @@ def buy_now(request, product_id):
         )
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     # =====================================================
@@ -2365,6 +2189,19 @@ def buy_now(request, product_id):
             }
         )
 
+    # =====================================================
+    # SAVE BUY NOW SESSION
+    # =====================================================
+
+    request.session["buy_now_checkout"] = {
+        "product_id": product.id,
+        "variant_id": variant.id,
+        "quantity": quantity,
+        "hub_id": active_hub.id,
+    }
+
+    request.session.modified = True
+    
     # =====================================================
     # ADDRESS
     # =====================================================
@@ -2745,6 +2582,7 @@ from admin_dashboard.models import (
 from inventory.models import Inventory
 from shop.models import WishlistItem
 
+from shop.services.product_catalog import get_similar_products
 
 def product_detail(request, slug):
 
@@ -2767,7 +2605,7 @@ def product_detail(request, slug):
     if not active_hub:
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     # =====================================================
@@ -3000,22 +2838,11 @@ def product_detail(request, slug):
     # =====================================================
     # RELATED PRODUCTS
     # =====================================================
-    related_products = Product.objects.filter(
-
-        category=product.category,
-
-        is_active=True
-
-    ).exclude(
-
-        id=product.id
-
-    ).prefetch_related(
-
-        "product_images"
-
-    )[:8]
-
+    related_products = get_similar_products(
+        product=product,
+        hub=active_hub,
+        limit=8,
+    )
     # =====================================================
     # CONTEXT
     # =====================================================
@@ -3047,7 +2874,7 @@ def product_detail(request, slug):
         "active_hub": active_hub,
 
         # RELATED PRODUCTS
-        "related_products": related_products,
+        "similar_products": related_products,
 
     }
 
@@ -3064,329 +2891,8 @@ def product_detail(request, slug):
 
     )
 
-    # =====================================================
-    # ACTIVE DELIVERY HUB
-    # =====================================================
-    active_hub_id = request.session.get(
-        "active_hub_id"
-    )
+ 
 
-    active_hub = DeliveryHub.objects.filter(
-        id=active_hub_id,
-        is_active=True,
-        is_accepting_orders=True
-    ).first()
-
-    # =====================================================
-    # NO ACTIVE HUB
-    # =====================================================
-    if not active_hub:
-
-        return redirect(
-            "where_should_we_deliver"
-        )
-
-    # =====================================================
-    # INVENTORY QUERY
-    #
-    # IMPORTANT:
-    # - DO NOT FILTER stock__gt=0
-    #   because we want out-of-stock variants visible
-    #
-    # - ONLY ACTIVE VARIANTS
-    # - ONLY ACTIVE SHOPS
-    # =====================================================
-    inventory_qs = Inventory.objects.select_related(
-        "shop",
-        "shop__hub",
-        "variant"
-    ).filter(
-
-        variant__is_active=True,
-
-        shop__is_active=True,
-
-        shop__hub=active_hub,
-
-        selling_price__isnull=False
-
-    )
-
-    # =====================================================
-    # PRODUCT QUERY
-    # =====================================================
-    product = get_object_or_404(
-
-        Product.objects.prefetch_related(
-
-            "product_images",
-
-            Prefetch(
-
-                "variants",
-
-                queryset=ProductVariant.objects.filter(
-                    is_active=True
-                ).prefetch_related(
-
-                    Prefetch(
-                        "inventory_items",
-                        queryset=inventory_qs,
-                        to_attr="hub_inventory"
-                    )
-
-                ),
-
-                to_attr="active_variants"
-
-            )
-
-        ),
-
-        slug=slug,
-        is_active=True
-
-    )
-
-    # =====================================================
-    # VARIANTS
-    # =====================================================
-    variants = []
-
-    for variant in product.active_variants:
-
-        # -------------------------------------------------
-        # SAFETY
-        # NEVER SHOW INACTIVE VARIANT
-        # -------------------------------------------------
-        if not variant.is_active:
-            continue
-
-        inventories = getattr(
-            variant,
-            "hub_inventory",
-            []
-        )
-
-        # -------------------------------------------------
-        # NO INVENTORY IN THIS HUB
-        # HIDE VARIANT COMPLETELY
-        # -------------------------------------------------
-        if not inventories:
-            continue
-
-        # -------------------------------------------------
-        # VALID PRICES
-        # -------------------------------------------------
-        valid_prices = [
-
-            Decimal(str(inv.selling_price))
-
-            for inv in inventories
-
-            if inv.selling_price is not None
-
-        ]
-
-        # -------------------------------------------------
-        # NO VALID PRICE
-        # -------------------------------------------------
-        if not valid_prices:
-            continue
-
-        # -------------------------------------------------
-        # LOWEST PRICE
-        # -------------------------------------------------
-        min_price = min(valid_prices)
-
-        # -------------------------------------------------
-        # TOTAL STOCK
-        # -------------------------------------------------
-        total_stock = sum(
-
-            int(inv.stock or 0)
-
-            for inv in inventories
-
-        )
-
-        # -------------------------------------------------
-        # STOCK STATUS
-        # -------------------------------------------------
-        in_stock = total_stock > 0
-
-        if total_stock <= 0:
-
-            stock_status = "Out of Stock"
-
-        elif total_stock <= 5:
-
-            stock_status = f"Only {total_stock} left"
-
-        else:
-
-            stock_status = "In Stock"
-
-        # -------------------------------------------------
-        # APPEND
-        # -------------------------------------------------
-        variants.append({
-
-            "id": variant.id,
-
-            "name": variant.display_name,
-
-            "price": min_price,
-
-            "stock": total_stock,
-
-            "in_stock": in_stock,
-
-            "status": stock_status,
-
-        })
-
-        # =====================================================
-        # SORT VARIANTS
-        #
-        # PRIORITY:
-        # 1. In-stock first
-        # 2. Lower price first
-        # =====================================================
-        variants.sort(
-
-            key=lambda x: (
-
-                not x["in_stock"],
-
-                x["price"]
-
-            )
-
-        )
-
-        # =====================================================
-        # PRODUCT STOCK STATUS
-        # =====================================================
-        is_in_stock = any(
-
-            variant["in_stock"]
-
-            for variant in variants
-
-        )
-
-        # =====================================================
-        # DEFAULT VARIANT
-        # =====================================================
-        default_variant = next(
-
-            (
-
-                variant
-
-                for variant in variants
-
-                if variant["in_stock"]
-
-            ),
-
-            variants[0] if variants else None
-
-        )
-
-    # =====================================================
-    # REVIEWS
-    # =====================================================
-    reviews = product.ratings.select_related(
-        "user"
-    ).order_by(
-        "-created_at"
-    )
-
-    # =====================================================
-    # WISHLIST
-    # =====================================================
-    wishlist_ids = []
-
-    if request.user.is_authenticated:
-
-        wishlist_ids = list(
-
-            WishlistItem.objects.filter(
-                user=request.user
-            ).values_list(
-                "product_id",
-                flat=True
-            )
-
-        )
-
-    # =====================================================
-    # RELATED PRODUCTS
-    # =====================================================
-    related_products = Product.objects.filter(
-
-        category=product.category,
-
-        is_active=True
-
-    ).exclude(
-
-        id=product.id
-
-    ).prefetch_related(
-
-        "product_images"
-
-    )[:8]
-
-    # =====================================================
-    # CONTEXT
-    # =====================================================
-    context = {
-
-        # PRODUCT
-        "product": product,
-
-        # VARIANTS
-        "variants": variants,
-
-        "default_variant": default_variant,
-
-        # STOCK
-        "is_in_stock": is_in_stock,
-
-        # REVIEWS
-        "reviews": reviews,
-
-        "avg_rating": product.avg_rating,
-
-        "rating_count": product.rating_count,
-
-        # WISHLIST
-        "wishlist_ids": wishlist_ids,
-
-        # HUB
-        "active_hub": active_hub,
-
-        # RELATED PRODUCTS
-        "related_products": related_products,
-
-    }
-
-    # =====================================================
-    # RENDER
-    # =====================================================
-    return render(
-
-        request,
-
-        "Public_view/product_detail.html",
-
-        context
-
-    )
 from django.views.decorators.http import require_POST
 # =================== CART VIEW ===================
 import json
@@ -3403,60 +2909,7 @@ from inventory.models import Inventory
 
 from .models import CartItem
 
-"""
-# =========================================================
-# CART TOTALS ENGINE
-# =========================================================
-def get_cart_totals(user, request):
 
-    active_hub_id = request.session.get("active_hub_id")
-
-    if not active_hub_id:
-        return {
-            "sub_total": Decimal("0.00"),
-            "cart_count": 0
-        }
-
-    cart_items = CartItem.objects.select_related(
-        "product",
-        "variant"
-    ).filter(
-        user=user
-    )
-
-    sub_total = Decimal("0.00")
-
-    for item in cart_items:
-
-        inventory = Inventory.objects.select_related(
-            "shop",
-            "shop__hub"
-        ).filter(
-            variant=item.variant,
-            stock__gt=0,
-            selling_price__isnull=False,
-            shop__is_active=True,
-            shop__hub_id=active_hub_id
-        ).order_by("selling_price").first()
-
-        # Skip unavailable inventory
-        if not inventory:
-            continue
-
-        item_price = Decimal(
-            str(inventory.selling_price)
-        )
-
-        item_total = item_price * item.quantity
-
-        sub_total += item_total
-
-    return {
-        "sub_total": sub_total,
-        "cart_count": cart_items.count()
-    }
-
-"""
 
 def get_cart_totals(user, request):
 
@@ -3545,7 +2998,7 @@ def cart_view(request):
         )
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     # =====================================================
@@ -4132,7 +3585,7 @@ def cart_checkout(request):
         )
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     cart_hub = DeliveryHub.objects.filter(
@@ -4149,7 +3602,7 @@ def cart_checkout(request):
         )
 
         return redirect(
-            "where_should_we_deliver"
+            "where_we_deliver"
         )
 
     # =====================================================

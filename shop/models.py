@@ -4,10 +4,11 @@ from admin_dashboard.models import Product,DeliveryHub
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='customer_profile')
-    phone_number = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=10,unique=True)
+    full_name = models.CharField(max_length=100,blank=True)
    
     def __str__(self):
-        return self.user.username
+        return self.full_name or self.phone_number
 
 
 # =========================================================

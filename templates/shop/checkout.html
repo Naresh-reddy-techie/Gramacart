@@ -651,10 +651,32 @@ body{
             onclick="selectPayment(this)"
         >
 
-            <div class="payment-icon">💰</div>
+            <div class="payment-icon">
+                <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Note -->
+                    <rect x="6" y="14" width="52" height="36" rx="5" fill="#22C55E"/>
+                    <rect x="10" y="18" width="44" height="28" rx="3" fill="#BBF7D0"/>
+
+                    <!-- Left & Right Security Marks -->
+                    <circle cx="16" cy="32" r="3" fill="#22C55E"/>
+                    <circle cx="48" cy="32" r="3" fill="#22C55E"/>
+
+                    <!-- Rupee Symbol -->
+                    <text x="32" y="38"
+                        text-anchor="middle"
+                        font-size="16"
+                        font-weight="700"
+                        font-family="Arial"
+                        fill="#15803D">₹</text>
+
+                    <!-- Decorative Lines -->
+                    <line x1="13" y1="22" x2="23" y2="22" stroke="#22C55E" stroke-width="2"/>
+                    <line x1="41" y1="42" x2="51" y2="42" stroke="#22C55E" stroke-width="2"/>
+                </svg>
+            </div>
 
             <div class="payment-name">
-                {{ method.name }}
+                {{ method.display_name }}
             </div>
 
             <div class="payment-tick">
