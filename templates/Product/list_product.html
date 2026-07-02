@@ -402,8 +402,7 @@ RESPONSIVE
 
                                         {% if first_image and first_image.image %}
 
-                                        <img src="{{ first_image.image.url }}"
-                                            alt="{{ product.name }}">
+                                        <img src="{{ first_image.image.url }}">
 
                                         {% else %}
 
@@ -571,9 +570,7 @@ RESPONSIVE
         PAGINATION
         ==================================================== -->
 
-        <!-- {% if products.has_other_pages %} -->
-
-        {% for product in products %}
+        {% if products.has_other_pages %}
 
         <div class="d-flex justify-content-end p-4">
 

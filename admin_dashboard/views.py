@@ -796,6 +796,7 @@ def delete_product(request, slug):
     return render(request, 'Product/delete_product.html', {'product': product})
 
 """
+
 def list_product(request):
     product_list = Product.objects.all().order_by('-id')  # newest first
 
@@ -810,9 +811,10 @@ def list_product(request):
     return render(request, 'Product/list_product.html', context)
 
 """
-
 def list_product(request):
-    product_list = Product.objects.all().order_by('-id')
+
+    product_list = Product.objects.exclude(category=None)
+    # product_list = Product.objects.all().order_by('-id')
 
     paginator = Paginator(product_list, 5)
     page_number = request.GET.get('page')
@@ -821,6 +823,7 @@ def list_product(request):
     return render(request, 'Product/list_product.html', {
         'products': page_obj,
     })
+
 #--------------------------------------------------------
 
 
