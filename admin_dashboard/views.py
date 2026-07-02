@@ -796,9 +796,9 @@ def delete_product(request, slug):
     return render(request, 'Product/delete_product.html', {'product': product})
 
 
-"""
+
 def list_product(request):
-    product_list = Product.objects.all().order_by('-id')  # newest first
+    product_list = Product.objects.all()
 
     # Set pagination: 10 products per page
     paginator = Paginator(product_list, 5)
@@ -809,15 +809,9 @@ def list_product(request):
         'products': page_obj,
     }
     return render(request, 'Product/list_product.html', context)
-"""
 
-def list_product(request):
-    try:
-        product_list = Product.objects.all().order_by('-id')
-        print("TOTAL PRODUCTS:", product_list.count())
-    except Exception as e:
-        print("ERROR:", e)
-        raise e
+
+
 #--------------------------------------------------------
 
 
