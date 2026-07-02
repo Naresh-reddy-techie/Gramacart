@@ -798,7 +798,9 @@ def delete_product(request, slug):
 
 
 def list_product(request):
-    product_list = Product.objects.all()
+
+    product_list = Product.objects.all().prefetch_related('product_images', 'variants').select_related('category').order_by('-id')
+    # product_list = Product.objects.all().order_by('-id')  # newest first
 
     # Set pagination: 10 products per page
     paginator = Paginator(product_list, 5)

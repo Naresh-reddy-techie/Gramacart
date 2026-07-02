@@ -398,7 +398,8 @@ RESPONSIVE
 
                                 <div class="product-thumb">
 
-                                    {% with first_image=product.product_images.first %}
+                                    <!-- {% with first_image=product.product_images.first %} -->
+                                    {% with first_image=product.product_images.all.0 %}
 
                                         {% if first_image and first_image.image %}
 
@@ -651,4 +652,4 @@ RESPONSIVE
 
 </div>
 
-{% endblock %}
+{% endblock %} 
