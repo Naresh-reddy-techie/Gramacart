@@ -229,23 +229,14 @@ SESSION_COOKIE_AGE = 2592000  # 30 days in seconds
 LOGIN_REDIRECT_URL = 'post_login_redirect'
 LOGOUT_REDIRECT_URL = 'home'
 
-
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-DATABASE_URL = config("DATABASE_URL", default=None)
-
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    }
-
 
 import cloudinary
 
@@ -255,5 +246,3 @@ cloudinary.config(
     api_secret=config("CLOUDINARY_API_SECRET"),
     secure=True,
 )
-
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
