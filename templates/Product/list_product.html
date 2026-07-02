@@ -400,18 +400,16 @@ RESPONSIVE
 
                                     {% with first_image=product.product_images.first %}
 
-                                        {% if first_image %}
+                                        {% if first_image and first_image.image %}
 
-                                            <img src="{{ first_image.image.url }}"
-                                                 alt="{{ product.name }}">
+                                        <img src="{{ first_image.image.url }}"
+                                            alt="{{ product.name }}">
 
                                         {% else %}
 
-                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-
-                                                <i class="bi bi-image text-muted"></i>
-
-                                            </div>
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                            No Image
+                                        </div>
 
                                         {% endif %}
 
@@ -471,7 +469,11 @@ RESPONSIVE
 
                                 <i class="bi bi-grid"></i>
 
-                                {{ product.category.name }}
+                                {% if product.category %}
+                                    {{ product.category.name }}
+                                {% else %}
+                                    <span class="text-muted small">No Category</span>
+                                {% endif %}
 
                             </span>
 
