@@ -245,3 +245,14 @@ CLOUDINARY_STORAGE = {
 }
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+
+# ==========================================================
+# EMAIL NOTIFICATIONS
+# ==========================================================
+
+ORDER_NOTIFICATION_EMAILS = config(
+    "ORDER_NOTIFICATION_EMAILS",
+    default=EMAIL_HOST_USER,
+    cast=lambda v: [email.strip() for email in v.split(",")]
+)
