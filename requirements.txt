@@ -5,10 +5,12 @@ CacheControl==0.14.4
 certifi==2026.2.25
 cffi==2.0.0
 charset-normalizer==3.4.7
+cloudinary==1.45.0
 colorama==0.4.6
 cryptography==49.0.0
 dj-database-url==3.1.2
 Django==6.0.4
+django-cloudinary-storage==0.3.0
 firebase_admin==7.4.0
 geographiclib==2.1
 geopy==2.4.1
@@ -46,6 +48,7 @@ qrcode==8.2
 razorpay==2.0.1
 reportlab==4.4.10
 requests==2.33.1
+six==1.17.0
 soupsieve==2.8.3
 sqlparse==0.5.5
 typing_extensions==4.15.0
