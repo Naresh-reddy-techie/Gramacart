@@ -811,16 +811,13 @@ def list_product(request):
     return render(request, 'Product/list_product.html', context)
 """
 
-from django.http import HttpResponse
-from .models import Product
-
 def list_product(request):
     try:
-        products = Product.objects.all()
-        return HttpResponse(f"TOTAL PRODUCTS: {products.count()}")
-
+        product_list = Product.objects.all().order_by('-id')
+        print("TOTAL PRODUCTS:", product_list.count())
     except Exception as e:
-        return HttpResponse(str(e))
+        print("ERROR:", e)
+        raise e
 #--------------------------------------------------------
 
 
