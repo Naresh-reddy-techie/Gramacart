@@ -571,7 +571,9 @@ RESPONSIVE
         PAGINATION
         ==================================================== -->
 
-        {% if products.has_other_pages %}
+        <!-- {% if products.has_other_pages %} -->
+
+        {% for product in products %}
 
         <div class="d-flex justify-content-end p-4">
 
