@@ -832,14 +832,41 @@ def address_form(request, pk=None):
 
     logger.info("========== ADDRESS FORM START ==========")
 
+    logger.info("===================================")
+    logger.info("USER: %s", request.user)
+    logger.info("AUTHENTICATED: %s", request.user.is_authenticated)
+    logger.info("USER ID: %s", request.user.id)
+
+    exists = CustomerProfile.objects.filter(user=request.user).exists()
+    logger.info("PROFILE EXISTS: %s", exists)
+    logger.info("===================================")
+
     # =====================================================
     # CUSTOMER
     # =====================================================
 
-    profile = get_object_or_404(
-        CustomerProfile,
-        user=request.user
+    # profile = get_object_or_404(
+    #     CustomerProfile,
+    #     user=request.user
+    # )
+
+    # User must be logged in
+    if not request.user.is_authenticated:
+        return redirect(f"/accounts/request-otp/?next={request.get_full_path()}")
+
+    # Get or create customer profile
+    profile, created = CustomerProfile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            "phone_number": request.user.username
+        }
     )
+
+    if created:
+        logger.info(
+            "CustomerProfile automatically created for %s",
+            request.user.username
+        )
 
     # =====================================================
     # EDIT MODE

@@ -1030,33 +1030,45 @@ document.getElementById("cartBtn").addEventListener("click", function () {
     const btn = this;
     btn.disabled = true;
 
-    fetch(ADD_TO_CART_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}",
-            "X-Requested-With": "XMLHttpRequest"
+    fetch(ADD_TO_CART_URL,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}",
+            "X-Requested-With":"XMLHttpRequest"
         },
-        body: JSON.stringify({
-            variant_id: selectedVariant.id,
-            quantity: 1
+        body:JSON.stringify({
+            variant_id:selectedVariant.id,
+            quantity:1
         })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(response=>{
 
-        if (data.success === true) {
-            showToast(data.message || "Added to cart");
-        } else {
-            showToast(data.message || "Failed to add to cart", false);
+        // User is not logged in
+        if(response.redirected){
+            window.location.href = response.url;
+            return;
+        }
+
+        return response.json();
+
+    })
+    .then(data=>{
+
+        if(!data) return;
+
+        if(data.success){
+            showToast(data.message);
+        }else{
+            showToast(data.message,false);
         }
 
     })
-    .catch(() => {
-        showToast("Server error", false);
+    .catch(()=>{
+        showToast("Server error",false);
     })
-    .finally(() => {
-        btn.disabled = false;
+    .finally(()=>{
+        btn.disabled=false;
     });
 });
 

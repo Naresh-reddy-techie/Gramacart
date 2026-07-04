@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=True, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
@@ -196,11 +196,17 @@ LOGIN_URL = 'request_otp'
 
 #Email configuration(for Reset Password)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+#maximun time (seconds) to wait for smtp connection
+EMAIL_TIMEOUT = 10
+
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #payment gateway fields based on the different platforms
@@ -223,6 +229,17 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Increase the time to 30 days
 SESSION_COOKIE_AGE = 2592000  # 30 days in seconds
+
+# ==========================================================
+# PRODUCTION SECURITY
+# ==========================================================
+
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+SESSION_COOKIE_HTTPONLY = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 

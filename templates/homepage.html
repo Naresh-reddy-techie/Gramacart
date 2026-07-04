@@ -1104,7 +1104,7 @@
         <div class="row g-3 reveal">
             {% for category in categories %}
             <div class="col-6 col-md-3">
-                <a href="{% url 'public_dashboard' %}?category={{ category.slug }}" class="cat-card text-decoration-none">
+                <a href="{% url 'public_dashboard' %}" class="cat-card text-decoration-none">
                     {% if category.image %}
                         <img src="{{ category.image.url }}" alt="{{ category.name }}">
                     {% endif %}
