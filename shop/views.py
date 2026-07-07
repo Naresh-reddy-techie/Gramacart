@@ -1960,6 +1960,7 @@ def remove_from_wishlist(request, item_id):
 #=============================================================
 
 from payments.models import Payment
+from shop.utils import calculate_final_shipping
 # =========================================================
 # BUY NOW CHECKOUT
 # =========================================================
@@ -2272,9 +2273,14 @@ def buy_now(request, product_id):
     # SHIPPING + GEO VALIDATION
     # =====================================================
 
-    shipping_data = calculate_shipping_cost(
+    # shipping_data = calculate_shipping_cost(
+    #     address=address,
+    #     delivery_hub=active_hub
+    # )
+    shipping_data = calculate_final_shipping(
+        subtotal=sub_total,
         address=address,
-        delivery_hub=active_hub
+        delivery_hub=active_hub,
     )
 
     if shipping_data.get("error"):
@@ -2529,9 +2535,20 @@ def get_buy_now_shipping_cost(
     # SHIPPING ENGINE
     # =====================================================
 
-    shipping_data = calculate_shipping_cost(
+    # shipping_data = calculate_shipping_cost(
+    #     address=address,
+    #     delivery_hub=active_hub
+    # )
+
+    subtotal = Decimal(
+        request.GET.get("subtotal", "0")
+    )
+
+
+    shipping_data = calculate_final_shipping(
+        subtotal=subtotal,
         address=address,
-        delivery_hub=active_hub
+        delivery_hub=active_hub,
     )
 
     if shipping_data.get("error"):
@@ -2549,38 +2566,46 @@ def get_buy_now_shipping_cost(
         "success": True,
 
         "shipping_cost": float(
-            shipping_data.get(
-                "customer_fee",
-                0
-            )
+            shipping_data["customer_fee"]
         ),
 
+        "original_shipping_fee": float(
+            shipping_data["original_shipping_fee"]
+        ),
+
+        "free_delivery": shipping_data["free_delivery"],
+
+        "free_delivery_threshold": (
+            float(shipping_data["free_delivery_threshold"])
+            if shipping_data["free_delivery_threshold"] is not None
+            else None
+        ),
+
+        "remaining_for_free_delivery": float(
+            shipping_data["remaining_for_free_delivery"]
+        ),
+
+        "delivery_message": shipping_data["delivery_message"],
+
         "rider_earning": float(
-            shipping_data.get(
-                "rider_earning",
-                0
-            )
+            shipping_data["rider_earning"]
         ),
 
         "platform_fee": float(
-            shipping_data.get(
-                "platform_fee",
-                0
-            )
+            shipping_data["platform_fee"]
         ),
 
         "distance": float(
-            shipping_data.get(
-                "distance_km",
-                0
-            )
+            shipping_data["distance_km"]
         ),
 
         "hub": shipping_data.get(
             "hub_name",
             active_hub.name
-        )
+        ),
     })
+
+
 #=================================
 from decimal import Decimal
 
@@ -3582,9 +3607,6 @@ from .models import (
     Order,
     OrderItem
 )
-
-from .utils import calculate_shipping_cost
-
 # =========================================================
 # CART CHECKOUT (PRODUCTION READY)
 # =========================================================
@@ -3778,9 +3800,10 @@ def cart_checkout(request):
         # DELIVERY VALIDATION
         # =================================================
 
-        shipping_data = calculate_shipping_cost(
+        shipping_data = calculate_final_shipping(
+            subtotal=sub_total,
             address=address,
-            delivery_hub=cart_hub
+            delivery_hub=cart_hub,
         )
 
         if shipping_data.get("error"):
@@ -3797,14 +3820,7 @@ def cart_checkout(request):
                 "cart_checkout"
             )
 
-        shipping_cost = Decimal(
-            str(
-                shipping_data.get(
-                    "customer_fee",
-                    0
-                )
-            )
-        )
+        shipping_cost = shipping_data["customer_fee"]
 
         final_total = (
             sub_total + shipping_cost
@@ -4049,7 +4065,8 @@ def get_shipping_cost(request):
     # =====================================================
 
     cart_items = CartItem.objects.filter(
-        user=user
+        user=user,
+        hub=cart_hub
     )
 
     if not cart_items.exists():
@@ -4089,13 +4106,25 @@ def get_shipping_cost(request):
             "message": "Invalid address."
         })
 
+   
     # =====================================================
+    # TOTALS
+    # =====================================================
+
+    subtotal = sum(
+        Decimal(str(item.unit_price or 0))
+        * item.quantity
+        for item in cart_items
+    )
+
+     # =====================================================
     # SHIPPING ENGINE
     # =====================================================
 
-    shipping_data = calculate_shipping_cost(
+    shipping_data = calculate_final_shipping(
+        subtotal=subtotal,
         address=address,
-        delivery_hub=cart_hub
+        delivery_hub=cart_hub,
     )
 
     if shipping_data.get("error"):
@@ -4108,15 +4137,8 @@ def get_shipping_cost(request):
             )
         })
 
-    # =====================================================
-    # TOTALS
-    # =====================================================
 
-    subtotal = sum(
-        Decimal(str(item.unit_price or 0))
-        * item.quantity
-        for item in cart_items
-    )
+  
 
     shipping_cost = Decimal(
         str(
@@ -4127,8 +4149,9 @@ def get_shipping_cost(request):
         )
     )
 
-    final_total = (
-        subtotal + shipping_cost
+    final_total = float(
+        subtotal +
+        Decimal(str(shipping_data["customer_fee"]))
     )
 
     # =====================================================
@@ -4141,18 +4164,37 @@ def get_shipping_cost(request):
 
         "sub_total": float(subtotal),
 
-        "shipping_cost": float(shipping_cost),
-
-        "final_total": float(final_total),
-
-        "distance": float(
-            shipping_data.get(
-                "distance_km",
-                0
-            )
+        "shipping_cost": float(
+            shipping_data["customer_fee"]
         ),
 
-        "hub": cart_hub.name
+        "original_shipping_fee": float(
+            shipping_data["original_shipping_fee"]
+        ),
+
+        "free_delivery": shipping_data["free_delivery"],
+
+        "free_delivery_threshold": (
+            float(shipping_data["free_delivery_threshold"])
+            if shipping_data["free_delivery_threshold"] is not None
+            else None
+        ),
+
+        "remaining_for_free_delivery": float(
+            shipping_data["remaining_for_free_delivery"]
+        ),
+
+        "delivery_message": shipping_data["delivery_message"],
+
+        "final_total": float(
+            subtotal + shipping_data["customer_fee"]
+        ),
+
+        "distance": float(
+            shipping_data["distance_km"]
+        ),
+
+        "hub": cart_hub.name,
     })
 #===========================================================
 

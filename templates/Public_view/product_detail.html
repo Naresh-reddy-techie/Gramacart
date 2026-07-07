@@ -124,6 +124,23 @@ a{
     object-fit:contain;
     background:var(--bg);
     display:block;
+    cursor:zoom-in;
+}
+
+.zoom-hint{
+    position:absolute;
+    bottom:12px;
+    left:12px;
+    background:rgba(28,25,23,0.72);
+    color:#fff;
+    font-size:0.7rem;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    z-index:4;
 }
 
 .action-icons{
@@ -161,6 +178,21 @@ a{
     border-color:#EF4444;
 }
 
+/* DISCOUNT BADGE ON IMAGE */
+.discount-badge{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background:var(--terracotta);
+    color:#fff;
+    font-size:0.78rem;
+    font-weight:800;
+    padding:6px 11px;
+    border-radius:10px;
+    z-index:5;
+    box-shadow:var(--shadow-sm);
+}
+
 /* THUMBNAILS */
 .thumb-strip{
     display:flex;
@@ -188,6 +220,56 @@ a{
 .thumb.active{
     border-color:var(--primary);
     box-shadow:0 4px 10px rgba(14,159,110,0.20);
+}
+
+/* ================= ZOOM LIGHTBOX ================= */
+.zoom-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,13,12,0.94);
+    z-index:999999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    touch-action:pinch-zoom;
+}
+
+.zoom-overlay.open{
+    display:flex;
+}
+
+.zoom-overlay img{
+    max-width:94%;
+    max-height:88%;
+    object-fit:contain;
+    touch-action:pinch-zoom;
+    transition:transform 0.2s var(--ease);
+}
+
+.zoom-close{
+    position:absolute;
+    top:18px;
+    right:18px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    border:none;
+}
+
+.zoom-tip{
+    position:absolute;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    color:rgba(255,255,255,0.7);
+    font-size:0.78rem;
+    font-weight:600;
 }
 
 /* ================= TITLE ================= */
@@ -244,13 +326,49 @@ a{
     color:var(--primary-dark);
 }
 
+/* ================= DELIVERY ESTIMATE ================= */
+.delivery-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:14px;
+    padding:12px 14px;
+    border:1px dashed var(--primary-soft-border);
+    border-radius:14px;
+    background:var(--primary-soft);
+}
+
+.delivery-box i{
+    font-size:1.3rem;
+    color:var(--primary-dark);
+}
+
+.delivery-box b{
+    font-size:0.86rem;
+    color:var(--dark);
+    display:block;
+}
+
+.delivery-box span{
+    font-size:0.74rem;
+    color:var(--muted);
+    font-weight:600;
+}
+
 /* ================= PRICE ================= */
+
+.price-row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
 
 .price{
     font-family:'Sora',sans-serif;
     font-size:2.05rem;
     font-weight:800;
-    margin-top:14px;
     color:var(--dark);
     line-height:1;
 }
@@ -261,6 +379,26 @@ a{
     font-weight:700;
     color:var(--muted);
     vertical-align:top;
+}
+
+.mrp-strike{
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--muted-soft);
+    text-decoration:line-through;
+}
+
+.discount-pct{
+    font-size:0.88rem;
+    font-weight:800;
+    color:var(--primary-dark);
+}
+
+.savings-line{
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--terracotta);
+    margin-top:6px;
 }
 
 #stockText{
@@ -373,6 +511,35 @@ a{
 
 /* ================= REVIEWS ================= */
 
+.review-summary{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:16px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border-soft);
+}
+
+.review-score{
+    font-family:'Sora',sans-serif;
+    font-size:2.4rem;
+    font-weight:800;
+    color:var(--dark);
+    line-height:1;
+}
+
+.review-score-sub{
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--muted-soft);
+    margin-top:4px;
+}
+
+.review-stars-row{
+    color:#B45309;
+    font-size:0.9rem;
+}
+
 .review{
     border:1px solid var(--border-soft);
     padding:14px;
@@ -397,6 +564,11 @@ a{
     flex-shrink:0;
 }
 
+.review-body{
+    flex:1;
+    min-width:0;
+}
+
 .review-body b{
     font-size:0.85rem;
     font-weight:700;
@@ -407,6 +579,17 @@ a{
     font-size:0.72rem;
     font-weight:800;
     color:#B45309;
+    margin-left:6px;
+}
+
+.review-verified{
+    font-size:0.68rem;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:var(--primary-soft);
+    border:1px solid var(--primary-soft-border);
+    padding:2px 7px;
+    border-radius:999px;
     margin-left:6px;
 }
 
@@ -421,6 +604,28 @@ a{
     font-size:0.84rem;
     color:var(--dark);
     line-height:1.4;
+}
+
+.review-photos{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    overflow-x:auto;
+    scrollbar-width:none;
+}
+
+.review-photos::-webkit-scrollbar{
+    display:none;
+}
+
+.review-photos img{
+    width:56px;
+    height:56px;
+    object-fit:cover;
+    border-radius:10px;
+    border:1px solid var(--border-soft);
+    flex-shrink:0;
+    cursor:pointer;
 }
 
 /* =========================================================
@@ -616,9 +821,15 @@ own detail page (image, name, and price all navigate together)
             </button>
         </div>
 
+        <span id="discountBadge" class="discount-badge" style="display:none;"></span>
+
         <img id="mainImage"
              class="hero-image"
+             onclick="openZoom()"
              src="{% if product.product_images.first %}{{ product.product_images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}">
+
+        <span class="zoom-hint"><i class="bi bi-zoom-in"></i> Tap to zoom</span>
+
     </div>
 
     <div class="thumb-strip">
@@ -629,6 +840,13 @@ own detail page (image, name, and price all navigate together)
         {% endfor %}
     </div>
 
+</div>
+
+<!-- ================= ZOOM LIGHTBOX ================= -->
+<div class="zoom-overlay" id="zoomOverlay" onclick="closeZoomIfBackground(event)">
+    <button class="zoom-close" onclick="closeZoom()"><i class="bi bi-x-lg"></i></button>
+    <img id="zoomImage" src="" onclick="event.stopPropagation()">
+    <div class="zoom-tip">Double-tap to zoom in/out</div>
 </div>
 
 <!-- ================= DETAILS ================= -->
@@ -652,6 +870,14 @@ own detail page (image, name, and price all navigate together)
         Sold and delivered by your local GramaCart hub
     </div>
 
+    <div class="delivery-box">
+        <i class="bi bi-truck"></i>
+        <div>
+            <b id="deliveryDate">Calculating delivery date...</b>
+            <span>Free hyperlocal delivery on this order</span>
+        </div>
+    </div>
+
 </div>
 
 <!-- ================= VARIANTS ================= -->
@@ -666,6 +892,7 @@ own detail page (image, name, and price all navigate together)
         <div class="variant-card"
              data-id="{{ v.id }}"
              data-price="{{ v.price }}"
+             data-mrp="{{ v.mrp|default:v.price }}"
              data-stock="{{ v.stock }}"
              onclick="selectVariant(this)">
 
@@ -687,16 +914,22 @@ own detail page (image, name, and price all navigate together)
 {% endif %}
 <div class="gc-card">
 
-    <div class="price">
-        <small>₹</small>
-        <span id="priceValue">
-            {% if default_variant %}
-                {{ default_variant.price }}
-            {% else %}
-                0
-            {% endif %}
-        </span>
+    <div class="price-row">
+        <div class="price">
+            <small>₹</small>
+            <span id="priceValue">
+                {% if default_variant %}
+                    {{ default_variant.price }}
+                {% else %}
+                    0
+                {% endif %}
+            </span>
+        </div>
+        <span id="mrpValue" class="mrp-strike" style="display:none;"></span>
+        <span id="discountPct" class="discount-pct" style="display:none;"></span>
     </div>
+
+    <div id="savingsLine" class="savings-line" style="display:none;"></div>
 
     <div id="stockText" class="text-muted">
         Select variant
@@ -735,6 +968,16 @@ own detail page (image, name, and price all navigate together)
 <div class="gc-card">
     <h6><i class="bi bi-chat-square-text-fill"></i> Reviews ({{ rating_count }})</h6>
 
+    {% if rating_count %}
+    <div class="review-summary">
+        <div>
+            <div class="review-score">{{ avg_rating|floatformat:1 }}</div>
+            <div class="review-stars-row">★★★★★</div>
+            <div class="review-score-sub">{{ rating_count }} ratings</div>
+        </div>
+    </div>
+    {% endif %}
+
     {% for review in reviews|slice:":5" %}
     <div class="review">
 
@@ -745,9 +988,20 @@ own detail page (image, name, and price all navigate together)
         <div class="review-body">
             <b>{{ review.user.username }}</b>
             <span class="review-stars">⭐ {{ review.rating }}</span>
+            {% if review.verified_purchase %}
+            <span class="review-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+            {% endif %}
             <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
             {% if review.comment %}
             <div class="review-comment">{{ review.comment }}</div>
+            {% endif %}
+
+            {% if review.review_images.all %}
+            <div class="review-photos">
+                {% for rimg in review.review_images.all %}
+                <img src="{{ rimg.image.url }}" onclick="openZoomSrc('{{ rimg.image.url }}')">
+                {% endfor %}
+            </div>
             {% endif %}
         </div>
 
@@ -860,6 +1114,92 @@ function switchImage(el) {
 }
 
 
+/* ================= ZOOM LIGHTBOX ================= */
+function openZoom() {
+    const main = document.getElementById("mainImage");
+    openZoomSrc(main.src);
+}
+
+function openZoomSrc(src) {
+    const overlay = document.getElementById("zoomOverlay");
+    const img = document.getElementById("zoomImage");
+    img.src = src;
+    img.style.transform = "scale(1)";
+    img.dataset.zoomed = "0";
+    overlay.classList.add("open");
+}
+
+function closeZoom() {
+    document.getElementById("zoomOverlay").classList.remove("open");
+}
+
+function closeZoomIfBackground(e) {
+    if (e.target.id === "zoomOverlay") closeZoom();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const zoomImg = document.getElementById("zoomImage");
+    if (zoomImg) {
+        zoomImg.addEventListener("dblclick", function () {
+            const zoomed = this.dataset.zoomed === "1";
+            this.style.transform = zoomed ? "scale(1)" : "scale(2.2)";
+            this.dataset.zoomed = zoomed ? "0" : "1";
+        });
+    }
+});
+
+
+/* ================= DELIVERY ESTIMATE ================= */
+function setDeliveryEstimate() {
+    const el = document.getElementById("deliveryDate");
+    if (!el) return;
+
+    const days = 3; // hyperlocal default window; wire to hub SLA if available
+    const target = new Date();
+    target.setDate(target.getDate() + days);
+
+    const options = { weekday: "short", month: "short", day: "numeric" };
+    el.innerText = "Delivery by " + target.toLocaleDateString("en-IN", options);
+}
+
+
+/* ================= PRICE / DISCOUNT ================= */
+function updatePriceDisplay(price, mrp) {
+
+    document.getElementById("priceValue").innerText = price;
+
+    const mrpEl = document.getElementById("mrpValue");
+    const pctEl = document.getElementById("discountPct");
+    const savingsEl = document.getElementById("savingsLine");
+    const badgeEl = document.getElementById("discountBadge");
+
+    if (mrp && mrp > price) {
+
+        const savings = mrp - price;
+        const pct = Math.round((savings / mrp) * 100);
+
+        mrpEl.innerText = "₹" + mrp;
+        mrpEl.style.display = "inline";
+
+        pctEl.innerText = pct + "% OFF";
+        pctEl.style.display = "inline";
+
+        savingsEl.innerText = "You save ₹" + savings + " on this order";
+        savingsEl.style.display = "block";
+
+        badgeEl.innerText = pct + "% OFF";
+        badgeEl.style.display = "inline-block";
+
+    } else {
+
+        mrpEl.style.display = "none";
+        pctEl.style.display = "none";
+        savingsEl.style.display = "none";
+        badgeEl.style.display = "none";
+    }
+}
+
+
 /* ================= VARIANT ================= */
 function selectVariant(el) {
 
@@ -872,10 +1212,11 @@ function selectVariant(el) {
     selectedVariant = {
         id: el.dataset.id,
         price: parseFloat(el.dataset.price),
+        mrp: parseFloat(el.dataset.mrp),
         stock: parseInt(el.dataset.stock)
     };
 
-    document.getElementById("priceValue").innerText = selectedVariant.price;
+    updatePriceDisplay(selectedVariant.price, selectedVariant.mrp);
 
     const stockText = document.getElementById("stockText");
     const cartBtn = document.getElementById("cartBtn");
@@ -910,6 +1251,8 @@ function selectVariant(el) {
 
 /* ================= AUTO SELECT BEST VARIANT ================= */
 document.addEventListener("DOMContentLoaded", function () {
+
+    setDeliveryEstimate();
 
     let best = null;
 

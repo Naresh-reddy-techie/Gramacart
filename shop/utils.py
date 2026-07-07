@@ -11,7 +11,8 @@ from geopy.distance import geodesic
 
 from admin_dashboard.models import (
     DeliveryHub,
-    ShippingCost
+    ShippingCost,
+    MarketplaceSettings,
 )
 
 logger = logging.getLogger(__name__)
@@ -309,6 +310,88 @@ def calculate_shipping_cost(
     })
 
     return response
+
+
+# for market place
+
+
+from decimal import Decimal
+from typing import Dict, Any
+
+
+def calculate_final_shipping(
+    subtotal: Decimal,
+    address,
+    delivery_hub,
+) -> Dict[str, Any]:
+    """
+    Calculate the final shipping payable by the customer after applying
+    marketplace-wide delivery rules.
+
+    Responsibilities:
+        1. Calculate shipping from distance.
+        2. Apply marketplace policies (Free Delivery etc.).
+        3. Return a complete shipping response.
+    """
+
+    shipping_data = calculate_shipping_cost(
+        address=address,
+        delivery_hub=delivery_hub,
+    )
+
+    # Delivery unavailable
+    if shipping_data["error"]:
+        return shipping_data
+
+    original_shipping_fee = Decimal(
+        str(shipping_data["customer_fee"])
+    )
+
+    marketplace_settings = MarketplaceSettings.objects.first()
+
+    # Default response
+    shipping_data.update({
+        "original_shipping_fee": original_shipping_fee,
+        "free_delivery": False,
+        "free_delivery_threshold": None,
+        "remaining_for_free_delivery": Decimal("0.00"),
+        "delivery_message": "",
+    })
+
+    # No configuration found
+    if not marketplace_settings:
+        return shipping_data
+
+    threshold = marketplace_settings.free_delivery_min_order
+
+    shipping_data["free_delivery_threshold"] = threshold
+
+    # Eligible for free delivery
+    if (
+        marketplace_settings.free_delivery_enabled
+        and subtotal >= threshold
+    ):
+        shipping_data["customer_fee"] = Decimal("0.00")
+        shipping_data["free_delivery"] = True
+        shipping_data["remaining_for_free_delivery"] = Decimal("0.00")
+        shipping_data["delivery_message"] = (
+            "Congratulations! You have unlocked FREE delivery."
+        )
+
+    else:
+
+        remaining = max(
+            Decimal("0.00"),
+            threshold - subtotal
+        )
+
+        shipping_data["remaining_for_free_delivery"] = remaining
+
+        shipping_data["delivery_message"] = (
+            f"Add ₹{remaining:.2f} more to unlock FREE delivery."
+        )
+
+    return shipping_data
 
 
 # =========================================================

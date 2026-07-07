@@ -1,0 +1,154 @@
+{% extends "admin_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Marketplace Settings{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">Marketplace Settings</h3>
+            <p class="text-muted mb-0">
+                Configure global marketplace behaviour.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <!-- Marketplace -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Marketplace</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="form-check mb-3">
+                    {{ form.marketplace_open }}
+                    <label class="form-check-label">
+                        {{ form.marketplace_open.label }}
+                    </label>
+
+                    {% if form.marketplace_open.help_text %}
+                        <div class="form-text">
+                            {{ form.marketplace_open.help_text }}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Delivery -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header">
+                <h5 class="mb-0">Delivery</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="form-check mb-3">
+                    {{ form.free_delivery_enabled }}
+                    <label class="form-check-label">
+                        {{ form.free_delivery_enabled.label }}
+                    </label>
+
+                    {% if form.free_delivery_enabled.help_text %}
+                        <div class="form-text">
+                            {{ form.free_delivery_enabled.help_text }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        {{ form.free_delivery_min_order.label }}
+                    </label>
+
+                    {{ form.free_delivery_min_order }}
+
+                    {% if form.free_delivery_min_order.help_text %}
+                        <div class="form-text">
+                            {{ form.free_delivery_min_order.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% if form.free_delivery_min_order.errors %}
+                        <div class="text-danger mt-1">
+                            {{ form.free_delivery_min_order.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Payments -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header">
+                <h5 class="mb-0">Payments</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="form-check">
+
+                    {{ form.cod_enabled }}
+
+                    <label class="form-check-label">
+                        {{ form.cod_enabled.label }}
+                    </label>
+
+                    {% if form.cod_enabled.help_text %}
+                        <div class="form-text">
+                            {{ form.cod_enabled.help_text }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="text-end">
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

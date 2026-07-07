@@ -8,86 +8,103 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
     :root{
-        --g7:#065F46; --g6:#0E9F6E; --g5:#16B981;
-        --g50:#ECFDF5; --g100:#D1FAE8;
-        --m5:#F59E0B; --m6:#D97706; --m50:#FFFBEB;
-        --t6:#C2410C; --t50:#FFF1EC;
-        --paper:#FBF8F3; --card:#FFFFFF;
-        --ink:#1C1917; --ink7:#44403C; --ink5:#78716C; --ink3:#A8A29E;
-        --border:#EDE6D8; --bs:#F3EEE3;
-        --rlg:22px; --rmd:16px; --rsm:12px;
-        --s1:0 2px 8px rgba(28,25,23,.05);
-        --s2:0 8px 24px rgba(28,25,23,.08);
-        --s3:0 16px 40px rgba(28,25,23,.12);
+        /* ── BRAND TOKENS ─────────────────────────
+           Marigold = energy / CTA. Peacock = trust,
+           freshness. Terracotta = urgency. Warm paper
+           ground instead of clinical white or grocery-green. */
+        --ink:#1C1420; --ink7:#463C4C; --ink5:#7A6E80; --ink3:#B3A9BA;
+        --paper:#FFFBF6; --card:#FFFFFF;
+        --border:#EFE4D8; --bs:#F5EBDD;
+
+        --marigold:#FF7A1A; --marigold-dark:#E85D04; --marigold-tint:#FFF1E2;
+        --peacock:#0F6E6E; --peacock-dark:#0B4F4F; --peacock-tint:#E8F5F3;
+        --terracotta:#C2410C; --terracotta-tint:#FDECE3;
+        --gold:#B7791F; --gold-tint:#FBF3DF;
+
+        --rlg:20px; --rmd:14px; --rsm:10px;
+        --s1:0 2px 10px rgba(28,20,32,.06);
+        --s2:0 10px 26px rgba(28,20,32,.10);
+        --s3:0 18px 44px rgba(28,20,32,.16);
+
+        --display:'Fraunces',serif;
+        --body:'Plus Jakarta Sans',sans-serif;
+
+        /* Content is centered within this width on large screens,
+           while bars/backgrounds stay full-bleed (see the calc()
+           side-padding pattern used throughout below). */
+        --container:1320px;
     }
 
     *{ margin:0; padding:0; box-sizing:border-box; }
 
     body{
-        font-family:'Inter',sans-serif;
+        font-family:var(--body);
         background:var(--paper);
         color:var(--ink);
-        padding-bottom:90px;
+        padding-bottom:94px;
         -webkit-font-smoothing:antialiased;
         -webkit-tap-highlight-color:transparent;
     }
 
     a{ text-decoration:none; color:inherit; }
-    button{ font-family:'Inter',sans-serif; cursor:pointer; }
-    ::selection{ background:var(--g100); }
+    button{ font-family:var(--body); cursor:pointer; }
+    ::selection{ background:var(--marigold-tint); }
 
     /* ══════════════════════════════════════
        TOP BAR
     ══════════════════════════════════════ */
     .top-brand-bar{
         position:sticky; top:0; z-index:1000;
-        background:rgba(255,255,255,.96);
-        backdrop-filter:blur(14px);
-        -webkit-backdrop-filter:blur(14px);
+        background:rgba(255,251,246,.94);
+        backdrop-filter:blur(16px);
+        -webkit-backdrop-filter:blur(16px);
         display:flex; justify-content:space-between; align-items:center;
-        padding:12px 16px;
+        gap:20px;
+        padding:13px max(16px,calc((100% - var(--container)) / 2));
         border-bottom:1px solid var(--bs);
     }
 
    .logo-area{
         display:flex;
         align-items:center;
-        gap:12px;
+        gap:11px;
     }
 
     .logo-mark{
-        width:56px;
-        height:56px;
-        border-radius:14px;
+        width:44px;
+        height:44px;
+        border-radius:13px;
         display:flex;
         align-items:center;
         justify-content:center;
         overflow:hidden;
         flex-shrink:0;
+        background:linear-gradient(150deg,var(--marigold),var(--marigold-dark));
+        box-shadow:0 6px 14px rgba(232,93,4,.28);
     }
 
     .logo-mark img{
         width:100%;
         height:100%;
-        object-fit:cover;   /* fills the logo box */
+        object-fit:cover;
     }
 
     .logo-area h1{
-        font-family:'Baloo 2',sans-serif;
-        font-size:1.45rem;
-        font-weight:800;
+        font-family:var(--display);
+        font-size:1.5rem;
+        font-weight:700;
         margin:0;
         line-height:1;
-        letter-spacing:-0.3px;
+        letter-spacing:-0.4px;
         color:var(--ink);
     }
 
     .logo-area h1 span{
-        color:var(--g6);
+        color:var(--peacock);
     }
 
     .top-right{ display:flex; align-items:center; gap:8px; }
@@ -99,16 +116,16 @@
         background:#fff; flex-shrink:0;
     }
 
-    .translate-icon{ color:var(--g6); font-size:.95rem; pointer-events:none; }
+    .translate-icon{ color:var(--peacock); font-size:.95rem; pointer-events:none; }
 
     .lang-select{
         position:absolute; inset:0; opacity:0; cursor:pointer;
     }
 
     .location-pill{
-        background:var(--g50); border:1px solid var(--g100);
-        padding:7px 11px; border-radius:999px;
-        font-size:.72rem; font-weight:700; color:var(--g7);
+        background:var(--peacock-tint); border:1px solid rgba(15,110,110,.18);
+        padding:7px 12px; border-radius:999px;
+        font-size:.72rem; font-weight:700; color:var(--peacock-dark);
         display:flex; align-items:center; gap:5px;
         max-width:130px;
     }
@@ -119,110 +136,81 @@
 
     .location-pill i{ font-size:.82rem; flex-shrink:0; }
 
+    /* ── DESKTOP NAV — replaces the mobile bottom dock on wide
+         screens so the app doesn't ship a phone-shaped nav bar
+         stretched across a monitor. ── */
+    .desktop-nav{
+        display:none;
+        align-items:center; gap:4px;
+        margin-left:8px;
+    }
+
+    .desktop-nav-item{
+        position:relative;
+        display:flex; align-items:center; gap:7px;
+        padding:9px 14px; border-radius:11px;
+        font-size:.82rem; font-weight:700; color:var(--ink5);
+        transition:.16s ease;
+    }
+
+    .desktop-nav-item i{ font-size:1.05rem; }
+
+    .desktop-nav-item:hover{ background:var(--bs); color:var(--ink); }
+
+    .desktop-nav-item.active{ background:var(--peacock-tint); color:var(--peacock-dark); }
+
+    .desktop-nav-item .badge-count{
+        position:static; border:none; margin-left:-2px;
+        min-width:16px; height:16px; font-size:.58rem;
+    }
+
     /* ══════════════════════════════════════
        SEARCH
     ══════════════════════════════════════ */
-    .search-section{ padding:12px 14px 0; }
+    .search-section{ padding:14px max(14px,calc((100% - var(--container)) / 2)) 0; }
 
     .search-box{
         display:flex; align-items:center; gap:10px;
         background:#fff; border:1.5px solid var(--border);
-        border-radius:16px; padding:12px 15px;
+        border-radius:16px; padding:13px 16px;
         box-shadow:var(--s1);
-        transition:border-color .2s;
+        transition:border-color .2s, box-shadow .2s;
     }
 
-    .search-box:focus-within{ border-color:var(--g5); }
+    .search-box:focus-within{ border-color:var(--marigold); box-shadow:0 0 0 4px var(--marigold-tint); }
     .search-box i{ color:var(--ink3); font-size:.95rem; flex-shrink:0; }
 
     .search-box input{
         width:100%; border:none; outline:none; background:transparent;
         font-size:.93rem; font-weight:600; color:var(--ink);
+        font-family:var(--body);
     }
 
     .search-box input::placeholder{ color:var(--ink3); font-weight:500; }
 
     /* ══════════════════════════════════════
-       HUB STRIP
-    ══════════════════════════════════════ */
-    .hub-strip{
-        margin:12px 14px 0;
-        background:linear-gradient(118deg,var(--g7) 0%,var(--g6) 100%);
-        border-radius:var(--rmd); padding:13px 15px;
-        display:flex; align-items:center; gap:11px;
-        box-shadow:0 8px 22px rgba(6,95,70,.22);
-        position:relative; overflow:hidden;
-    }
-
-    .hub-strip::after{
-        content:""; position:absolute; right:-20px; top:-20px;
-        width:100px; height:100px; border-radius:50%;
-        background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%);
-        pointer-events:none;
-    }
-
-    .hub-status-dot{
-        width:8px; height:8px; border-radius:50%;
-        background:var(--m5); flex-shrink:0;
-        animation:hubPulse 1.8s infinite;
-    }
-
-    @keyframes hubPulse{
-        0%{ box-shadow:0 0 0 0 rgba(245,158,11,.55); }
-        70%{ box-shadow:0 0 0 6px rgba(245,158,11,0); }
-        100%{ box-shadow:0 0 0 0 rgba(245,158,11,0); }
-    }
-
-    .hub-strip-text{ flex:1; color:#fff; position:relative; z-index:1; }
-
-    .hub-strip-title{
-        font-size:.84rem; font-weight:700;
-        display:flex; align-items:center; gap:6px;
-    }
-
-    .hub-strip-sub{
-        font-size:.7rem; font-weight:500;
-        opacity:.82; margin-top:2px;
-    }
-
-    .hub-eta-pill{
-        background:rgba(255,255,255,.15);
-        border:1px solid rgba(255,255,255,.22);
-        color:#fff; padding:8px 12px; border-radius:11px;
-        font-size:.72rem; font-weight:800;
-        text-align:center; line-height:1.15;
-        flex-shrink:0; position:relative; z-index:1;
-    }
-
-    .hub-eta-pill small{
-        display:block; font-weight:500;
-        opacity:.78; font-size:.6rem; margin-top:1px;
-    }
-
-    /* ══════════════════════════════════════
        BANNER
     ══════════════════════════════════════ */
-    .banner-wrap{ margin:12px 14px 0; }
+    .banner-wrap{ margin:14px max(14px,calc((100% - var(--container)) / 2)) 0; }
 
     .banner-card{
-        background: linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.25),transparent);
-        border-radius:18px; padding:18px 16px;
-        min-height:110px; display:flex; align-items:center;
+        background: linear-gradient(100deg,var(--marigold-dark) 0%,var(--marigold) 60%,#FFA24D 100%);
+        border-radius:20px; padding:20px 18px;
+        min-height:120px; display:flex; align-items:center;
         position:relative; overflow:hidden;
         text-decoration:none;
     }
 
-
     .banner-card::before{
-        content:""; position:absolute; right:-20px; top:-20px;
-        width:130px; height:130px; border-radius:50%;
-        background:rgba(255,255,255,.06); pointer-events:none;
+        content:""; position:absolute; right:-24px; top:-24px;
+        width:140px; height:140px; border-radius:50%;
+        background:rgba(255,255,255,.10); pointer-events:none;
     }
 
     .banner-card::after{
-        content:""; position:absolute; right:50px; bottom:-40px;
-        width:90px; height:90px; border-radius:50%;
-        background:rgba(255,255,255,.04); pointer-events:none;
+        content:""; position:absolute; right:54px; bottom:-44px;
+        width:96px; height:96px; border-radius:50%;
+        background:rgba(255,255,255,.08); pointer-events:none;
     }
 
     .banner-card.has-img::before,
@@ -231,44 +219,46 @@
     .banner-bg-img{
         position:absolute; inset:0;
         width:100%; height:100%; object-fit:cover;
-        border-radius:18px;
+        border-radius:20px;
     }
 
     .banner-img-overlay{
-        position:absolute; inset:0; border-radius:18px;
+        position:absolute; inset:0; border-radius:20px;
         background:linear-gradient(
-            90deg,
-            rgba(6,95,70,.9) 0%,
-            rgba(6,95,70,.6) 55%,
+            95deg,
+            rgba(11,79,79,.92) 0%,
+            rgba(11,79,79,.62) 55%,
             transparent 100%
         );
     }
 
     .banner-offer-badge{
-        position:absolute; top:11px; right:11px; z-index:3;
-        background:var(--m5); color:#fff;
+        position:absolute; top:12px; right:12px; z-index:3;
+        background:var(--ink); color:#fff;
         font-size:.63rem; font-weight:800;
-        padding:3px 9px; border-radius:999px;
-        box-shadow:0 3px 8px rgba(245,158,11,.4);
+        padding:4px 10px; border-radius:999px;
+        box-shadow:0 3px 8px rgba(0,0,0,.22);
     }
 
     .banner-body{ flex:1; position:relative; z-index:2; }
 
     .banner-eyebrow{
         display:inline-flex; align-items:center; gap:4px;
-        background:rgba(255,255,255,.15); color:#fff;
+        background:rgba(255,255,255,.18); color:#fff;
         font-size:.64rem; font-weight:700;
-        padding:3px 9px; border-radius:999px; margin-bottom:6px;
+        padding:3px 10px; border-radius:999px; margin-bottom:7px;
+        letter-spacing:.3px; text-transform:uppercase;
     }
 
     .banner-title{
-        font-size:1rem; font-weight:800; color:#fff;
-        line-height:1.22; margin-bottom:3px;
+        font-family:var(--display);
+        font-size:1.18rem; font-weight:700; color:#fff;
+        line-height:1.2; margin-bottom:4px;
     }
 
     .banner-sub{
-        font-size:.7rem; color:rgba(255,255,255,.82);
-        margin-bottom:10px; font-weight:500;
+        font-size:.71rem; color:rgba(255,255,255,.86);
+        margin-bottom:11px; font-weight:500;
     }
 
     .banner-slider{
@@ -282,14 +272,14 @@
 
     .banner-cta-btn{
         display:inline-flex; align-items:center; gap:4px;
-        background:#fff; color:var(--g7);
+        background:#fff; color:var(--marigold-dark);
         font-size:.73rem; font-weight:800;
-        padding:6px 13px; border-radius:999px;
+        padding:7px 14px; border-radius:999px;
         border:none;
     }
 
     .banner-dots{
-        display:flex; gap:6px; justify-content:center; margin-top:9px;
+        display:flex; gap:6px; justify-content:center; margin-top:10px;
     }
 
     .bdot{
@@ -298,102 +288,205 @@
     }
 
     .bdot.active{
-        width:20px; border-radius:999px; background:var(--g6);
+        width:20px; border-radius:999px; background:var(--marigold);
     }
 
     /* ══════════════════════════════════════
        CATEGORIES
     ══════════════════════════════════════ */
-    .cat-section{ padding:16px 14px 4px; }
+    .cat-section{ padding:20px max(14px,calc((100% - var(--container)) / 2)) 4px; }
 
     .section-row-head{
         display:flex; justify-content:space-between;
-        align-items:center; margin-bottom:12px;
+        align-items:center; margin-bottom:13px;
     }
 
     .section-row-title{
-        font-family:'Baloo 2',sans-serif;
-        font-size:1rem; font-weight:700; color:var(--ink);
+        font-family:var(--display);
+        font-size:1.08rem; font-weight:700; color:var(--ink);
     }
 
     .section-row-link{
-        font-size:.72rem; font-weight:700; color:var(--g6);
+        font-size:.72rem; font-weight:700; color:var(--peacock);
+    }
+
+    .cat-scroll-wrap{ position:relative; }
+
+    /* edge fade — hints there's more to scroll instead of a hard cut */
+    .cat-scroll-wrap::before,
+    .cat-scroll-wrap::after{
+        content:""; position:absolute; top:0; bottom:4px; width:26px;
+        z-index:2; pointer-events:none;
+    }
+    .cat-scroll-wrap::before{
+        left:0; background:linear-gradient(90deg,var(--paper),rgba(251,248,243,0));
+    }
+    .cat-scroll-wrap::after{
+        right:0; background:linear-gradient(270deg,var(--paper),rgba(251,248,243,0));
     }
 
     .cat-scroll{
-        display:flex; gap:10px; overflow-x:auto;
-        padding-bottom:4px; scrollbar-width:none;
+        display:flex; gap:8px; overflow-x:auto;
+        padding:2px 4px 6px; scrollbar-width:none;
+        scroll-behavior:smooth;
     }
 
     .cat-scroll::-webkit-scrollbar{ display:none; }
 
+    /* ── chip card surface — categories read as filter tabs, not
+         just a row of floating icons ── */
     .cat-card{
         flex-shrink:0; display:flex; flex-direction:column;
-        align-items:center; gap:5px;
-        cursor:pointer; width:58px;
+        align-items:center; gap:7px;
+        cursor:pointer; width:74px;
+        padding:11px 6px 10px; border-radius:19px;
+        background:transparent; border:1px solid transparent;
+        transition:background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .cat-card:hover{
+        background:var(--card); border-color:var(--bs); box-shadow:var(--s1);
+    }
+
+    .cat-card.active{
+        background:linear-gradient(180deg,var(--marigold-tint) 0%,var(--card) 100%);
+        border-color:rgba(255,122,26,.22);
+        box-shadow:var(--s2);
+    }
+
+    /* gradient ring appears only when active, via a padded wrapper
+       rather than a plain border — reads as premium, not default */
+    .cat-avatar-ring{
+        padding:2.5px; border-radius:19px; background:transparent;
+        transition:background .2s ease;
+    }
+
+    .cat-card.active .cat-avatar-ring{
+        background:linear-gradient(135deg,var(--marigold),var(--peacock));
     }
 
     .cat-avatar{
         width:54px; height:54px; border-radius:17px;
         display:flex; align-items:center; justify-content:center;
-        color:#fff; font-size:1.35rem;
-        box-shadow:0 5px 14px rgba(28,25,23,.14);
-        transition:transform .18s, box-shadow .18s;
+        color:#fff; font-size:1.3rem;
+        box-shadow:0 6px 14px rgba(28,20,32,.13);
+        transition:transform .18s ease;
         position:relative; overflow:hidden;
-        background:linear-gradient(150deg,var(--g6),var(--g7));
+        background:linear-gradient(150deg,var(--peacock),var(--peacock-dark));
     }
+
+    .cat-card.active .cat-avatar{ transform:scale(1.03); }
 
     .cat-avatar img{ width:100%; height:100%; object-fit:cover; }
-    .cat-avatar i{ font-size:1.4rem; line-height:1; }
-
-    .cat-card.active .cat-avatar{
-        transform:translateY(-3px) scale(1.06);
-        box-shadow:0 9px 20px rgba(28,25,23,.22);
-    }
-
-    .cat-avatar::after{
-        content:""; position:absolute; inset:0; border-radius:17px;
-        border:2.5px solid rgba(255,255,255,0); transition:.18s;
-    }
-
-    .cat-card.active .cat-avatar::after{
-        border-color:rgba(255,255,255,.8);
-    }
+    .cat-avatar i{ font-size:1.35rem; line-height:1; }
 
     .cat-label{
-        font-size:.64rem; font-weight:700; color:var(--ink5);
+        font-size:.66rem; font-weight:700; color:var(--ink5);
         text-align:center; line-height:1.2;
         display:-webkit-box; -webkit-line-clamp:2;
         -webkit-box-orient:vertical; overflow:hidden;
+        transition:color .18s ease;
     }
 
-    .cat-card.active .cat-label{ color:var(--g7); }
+    .cat-card.active .cat-label{ color:var(--marigold-dark); font-weight:800; }
+
+    /* small tab-style indicator underneath the active chip —
+       ties the category row visually to "you're filtering by this" */
+    .cat-underline{
+        width:14px; height:3px; border-radius:99px;
+        background:transparent; transition:background .18s ease;
+    }
+
+    .cat-card.active .cat-underline{ background:var(--marigold); }
+
+    /* desktop-only scroll arrows — a hover-capable screen can use
+       them, a touch screen just swipes */
+    .cat-arrow{
+        display:none;
+        position:absolute; top:38%; transform:translateY(-50%);
+        width:34px; height:34px; border-radius:50%; z-index:3;
+        background:#fff; border:1px solid var(--border);
+        align-items:center; justify-content:center;
+        box-shadow:var(--s2); color:var(--ink7); font-size:.85rem;
+        transition:.15s ease;
+    }
+
+    .cat-arrow:hover{ background:var(--marigold); color:#fff; border-color:var(--marigold); }
+    .cat-arrow.prev{ left:-6px; }
+    .cat-arrow.next{ right:-6px; }
+
+    @media(min-width:900px){
+        .cat-arrow{ display:flex; }
+        .cat-scroll-wrap{ padding:0 8px; }
+    }
 
     /* ══════════════════════════════════════
        PRODUCT SECTION HEADER
     ══════════════════════════════════════ */
     .section-label{
         display:flex; justify-content:space-between;
-        align-items:center; padding:14px 14px 10px;
+        align-items:center;
+        padding:18px max(14px,calc((100% - var(--container)) / 2)) 11px;
     }
 
     .section-label-left h2{
-        font-family:'Baloo 2',sans-serif;
-        font-size:1rem; font-weight:700;
+        font-family:var(--display);
+        font-size:1.08rem; font-weight:700;
         color:var(--ink); line-height:1;
     }
 
     .section-label-left span{
         font-size:.7rem; color:var(--ink3);
-        font-weight:600; margin-top:2px; display:block;
+        font-weight:600; margin-top:3px; display:block;
     }
 
+    .sort-wrap{ position:relative; flex-shrink:0; }
+
     .sort-pill{
-        display:flex; align-items:center; gap:5px;
+        display:flex; align-items:center; gap:6px;
         background:#fff; border:1px solid var(--border);
-        padding:6px 11px; border-radius:999px;
+        padding:7px 13px; border-radius:999px;
         font-size:.7rem; font-weight:700; color:var(--ink5);
+        transition:.16s ease;
     }
+
+    .sort-pill[aria-expanded="true"]{
+        border-color:var(--marigold); color:var(--marigold-dark);
+        background:var(--marigold-tint);
+    }
+
+    .sort-menu{
+        position:absolute; top:calc(100% + 8px); right:0; z-index:1200;
+        background:#fff; border:1px solid var(--bs); border-radius:16px;
+        box-shadow:var(--s3);
+        width:222px; padding:8px;
+        display:none; flex-direction:column; gap:1px;
+        opacity:0; transform:translateY(-6px);
+        transition:opacity .15s ease, transform .15s ease;
+    }
+
+    .sort-menu.open{ display:flex; opacity:1; transform:translateY(0); }
+
+    .sort-menu-head{
+        font-size:.64rem; font-weight:800; letter-spacing:.4px;
+        text-transform:uppercase; color:var(--ink3);
+        padding:8px 10px 6px;
+    }
+
+    .sort-menu-item{
+        display:flex; align-items:center; justify-content:space-between;
+        gap:10px; width:100%; text-align:left;
+        background:none; border:none; border-radius:10px;
+        padding:10px 10px; font-size:.79rem; font-weight:600;
+        color:var(--ink7); transition:.12s ease;
+    }
+
+    .sort-menu-item:hover{ background:var(--bs); }
+
+    .sort-menu-item i{ font-size:.82rem; color:var(--marigold-dark); opacity:0; transition:.12s ease; }
+
+    .sort-menu-item.active{ color:var(--ink); font-weight:800; }
+    .sort-menu-item.active i{ opacity:1; }
 
     /* ══════════════════════════════════════
        PRODUCT GRID
@@ -401,7 +494,8 @@
     .product-container{
         display:grid;
         grid-template-columns:repeat(2,minmax(0,1fr));
-        gap:10px; padding:0 12px 16px;
+        gap:11px;
+        padding:0 max(12px,calc((100% - var(--container)) / 2)) 16px;
     }
 
     /* ── CARD ── */
@@ -424,7 +518,7 @@
     .p-img-area{
         position:relative; height:170px;
         overflow:hidden; cursor:pointer;
-        background:#F5F0E8;
+        background:var(--marigold-tint);
     }
 
     .p-img-area img{
@@ -440,55 +534,57 @@
 
     /* ── RIBBON ── */
     .p-ribbon{
-        position:absolute; top:9px; left:0; z-index:10;
-        font-size:.58rem; font-weight:800; letter-spacing:.2px;
-        padding:3px 9px 3px 10px; border-radius:0 7px 7px 0;
-        background:var(--m5); color:#fff;
-        box-shadow:0 2px 5px rgba(0,0,0,.18);
+        position:absolute; top:10px; left:0; z-index:10;
+        font-size:.58rem; font-weight:800; letter-spacing:.3px;
+        text-transform:uppercase;
+        padding:4px 10px 4px 11px; border-radius:0 8px 8px 0;
+        background:var(--marigold); color:#fff;
+        box-shadow:0 3px 6px rgba(232,93,4,.28);
+        font-family:var(--body);
     }
 
-    .p-ribbon.ribbon-new{ background:var(--g6); }
+    .p-ribbon.ribbon-new{ background:var(--peacock); }
     .p-ribbon.ribbon-oos{ background:var(--ink3); }
 
     /* ── STOCK BADGE ── */
     .p-stock-badge{
-        position:absolute; bottom:7px; left:7px; z-index:10;
+        position:absolute; bottom:8px; left:8px; z-index:10;
         display:flex; align-items:center; gap:3px;
         font-size:.58rem; font-weight:800;
-        padding:3px 8px; border-radius:999px;
+        padding:4px 9px; border-radius:999px;
         backdrop-filter:blur(4px);
     }
 
     .p-stock-badge.in-stock{
-        background:rgba(6,95,70,.88); color:#fff;
+        background:rgba(11,79,79,.9); color:#fff;
     }
 
     .p-stock-badge.low-stock{
-        background:rgba(194,65,12,.88); color:#fff;
+        background:rgba(194,65,12,.9); color:#fff;
     }
 
     /* ── TOP RIGHT ACTIONS — wish + share stacked ── */
     .p-top-actions{
-        position:absolute; top:7px; right:7px; z-index:10;
-        display:flex; flex-direction:column; gap:5px;
+        position:absolute; top:8px; right:8px; z-index:10;
+        display:flex; flex-direction:column; gap:6px;
     }
 
     .p-icon-btn{
         width:28px; height:28px; border-radius:50%;
-        background:rgba(255,255,255,.92);
-        border:1px solid rgba(0,0,0,.07);
+        background:rgba(255,255,255,.94);
+        border:1px solid rgba(28,20,32,.07);
         display:flex; align-items:center; justify-content:center;
         cursor:pointer;
-        box-shadow:0 2px 6px rgba(0,0,0,.1);
+        box-shadow:0 2px 6px rgba(28,20,32,.12);
         transition:.14s ease;
     }
 
     .p-icon-btn:active{ transform:scale(.86); }
     .p-icon-btn i{ font-size:12px; color:var(--ink7); }
-    .p-icon-btn.wished i{ color:#E11D48; }
+    .p-icon-btn.wished i{ color:var(--terracotta); }
 
     /* ── BODY ── */
-    .p-info{ padding:9px 9px 10px; display:flex; flex-direction:column; flex:1; }
+    .p-info{ padding:10px 10px 11px; display:flex; flex-direction:column; flex:1; }
 
     .p-name{
         font-size:.81rem; font-weight:700; color:var(--ink);
@@ -500,10 +596,10 @@
 
     .p-variant{
         display:inline-flex; align-items:center;
-        background:var(--g50); border:1px solid var(--g100);
-        color:var(--g7); font-size:.62rem; font-weight:800;
-        padding:2px 7px; border-radius:999px;
-        margin-top:5px; align-self:flex-start;
+        background:var(--peacock-tint); border:1px solid rgba(15,110,110,.16);
+        color:var(--peacock-dark); font-size:.62rem; font-weight:800;
+        padding:2px 8px; border-radius:999px;
+        margin-top:6px; align-self:flex-start;
     }
 
     .p-variant.oos-variant{
@@ -511,10 +607,10 @@
     }
 
     /* ── RATING ── */
-    .rating-row{ display:flex; align-items:center; gap:4px; margin-top:5px; }
+    .rating-row{ display:flex; align-items:center; gap:4px; margin-top:6px; }
 
     .rating-chip{
-        background:var(--m50); color:var(--m6);
+        background:var(--gold-tint); color:var(--gold);
         font-size:.66rem; font-weight:800;
         padding:2px 6px; border-radius:6px;
         display:inline-flex; align-items:center; gap:2px;
@@ -525,28 +621,29 @@
     /* ── PRICE + ADD ROW ── */
     .p-pricing-row{
         display:flex; align-items:center;
-        justify-content:space-between; margin-top:8px;
+        justify-content:space-between; margin-top:9px;
     }
 
     .p-price{
-        font-size:1.02rem; font-weight:800; color:var(--ink); line-height:1;
+        font-family:var(--display);
+        font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1;
     }
 
     .p-price.oos-price{ color:var(--ink3); }
 
-    /* ── ADD BUTTON — premium solid green ── */
+    /* ── ADD BUTTON — marigold, premium ── */
     .btn-buy{
         display:flex; align-items:center; justify-content:center; gap:4px;
-        background:var(--g6); color:#fff; border:none;
-        border-radius:10px; padding:7px 12px;
+        background:var(--marigold); color:#fff; border:none;
+        border-radius:11px; padding:8px 13px;
         font-size:.75rem; font-weight:800;
         flex-shrink:0; white-space:nowrap;
-        box-shadow:0 4px 10px rgba(14,159,110,.28);
+        box-shadow:0 5px 12px rgba(255,122,26,.32);
         transition:.15s ease;
     }
 
     .btn-buy:active{ transform:scale(.91); box-shadow:none; }
-    .btn-buy.is-added{ background:var(--g7); }
+    .btn-buy.is-added{ background:var(--peacock-dark); box-shadow:0 5px 12px rgba(11,79,79,.3); }
 
     .btn-buy:disabled{
         background:var(--bs) !important;
@@ -558,8 +655,8 @@
     /* ── NOTIFY BUTTON (OOS) ── */
     .btn-notify{
         display:flex; align-items:center; gap:4px;
-        border:1.5px solid var(--border); border-radius:10px;
-        padding:6px 10px; background:transparent;
+        border:1.5px solid var(--border); border-radius:11px;
+        padding:7px 11px; background:transparent;
         color:var(--ink5); font-size:.72rem; font-weight:700;
         white-space:nowrap; flex-shrink:0;
         transition:.14s ease;
@@ -572,32 +669,34 @@
     ══════════════════════════════════════ */
     #no-products-message{
         display:none; text-align:center;
-        padding:50px 24px; color:var(--ink5);
+        padding:54px 24px; color:var(--ink5);
     }
 
     #no-products-message i{ color:var(--ink3); }
 
     .empty-state-block{
-        text-align:center; padding:50px 24px; width:100%;
+        text-align:center; padding:54px 24px; width:100%;
     }
 
     .empty-state-block .empty-icon{
-        width:64px; height:64px; border-radius:50%;
-        background:var(--g50);
+        width:66px; height:66px; border-radius:50%;
+        background:var(--marigold-tint);
         display:flex; align-items:center; justify-content:center;
-        margin:0 auto 14px; font-size:1.6rem; color:var(--g6);
+        margin:0 auto 15px; font-size:1.65rem; color:var(--marigold-dark);
     }
+
+    .empty-state-block h5{ font-family:var(--display); }
 
     /* ══════════════════════════════════════
        MINI CART BAR — floats above bottom nav
     ══════════════════════════════════════ */
     .mini-cart-bar{
-        position:fixed; left:16px; right:16px; bottom:82px;
+        position:fixed; left:16px; right:16px; bottom:84px;
         z-index:1900; background:var(--ink); color:#fff;
-        border-radius:16px; padding:13px 14px 13px 16px;
+        border-radius:16px; padding:14px 14px 14px 17px;
         display:none; align-items:center;
         justify-content:space-between; gap:10px;
-        box-shadow:0 14px 30px rgba(0,0,0,.28);
+        box-shadow:0 16px 32px rgba(0,0,0,.3);
     }
 
     .mc-left{
@@ -605,11 +704,11 @@
         font-size:.82rem; font-weight:700;
     }
 
-    .mc-left i{ font-size:1.1rem; color:var(--m5); }
+    .mc-left i{ font-size:1.1rem; color:var(--marigold); }
 
     .mc-view{
-        background:var(--g6); color:#fff;
-        padding:9px 16px; border-radius:11px;
+        background:var(--marigold); color:#fff;
+        padding:9px 17px; border-radius:11px;
         font-size:.78rem; font-weight:800;
         display:flex; align-items:center; gap:5px;
         flex-shrink:0;
@@ -623,26 +722,31 @@
         background:#fff;
         display:flex; justify-content:space-around; align-items:center;
         padding:11px 8px 22px;
-        border-radius:22px 22px 0 0;
-        box-shadow:0 -8px 24px rgba(28,25,23,.07);
+        border-radius:24px 24px 0 0;
+        box-shadow:0 -10px 26px rgba(28,20,32,.08);
         border-top:1px solid var(--bs);
     }
+
+    /* On phones the bottom dock IS the nav. On tablets/desktop
+       the top desktop-nav takes over instead — a full-width
+       thumb-reach dock stretched across a monitor is a mobile
+       pattern, not a desktop one. */
 
     .nav-item{
         position:relative; text-align:center;
         color:var(--ink3); font-size:.6rem; font-weight:700;
-        padding:5px 14px; border-radius:12px;
+        padding:6px 15px; border-radius:13px;
         transition:.18s ease; text-decoration:none;
         display:flex; flex-direction:column; align-items:center; gap:2px;
     }
 
-    .nav-item.active{ color:var(--g7); background:var(--g50); }
+    .nav-item.active{ color:var(--peacock-dark); background:var(--peacock-tint); }
     .nav-item i{ font-size:1.26rem; display:block; }
 
     .badge-count{
-        position:absolute; top:1px; right:5px;
+        position:absolute; top:1px; right:6px;
         min-width:15px; height:15px; border-radius:50%;
-        background:var(--t6); color:#fff;
+        background:var(--terracotta); color:#fff;
         font-size:.56rem; font-weight:700;
         display:flex; align-items:center; justify-content:center;
         border:2px solid #fff; padding:0 2px;
@@ -652,21 +756,21 @@
        TOASTS
     ══════════════════════════════════════ */
     .gc-toast{
-        position:fixed; left:20px; right:20px; bottom:82px;
+        position:fixed; left:20px; right:20px; bottom:84px;
         z-index:3000; display:none;
         align-items:center; justify-content:space-between; gap:10px;
         background:var(--ink); color:#fff;
-        padding:13px 16px; border-radius:16px;
-        box-shadow:0 14px 30px rgba(0,0,0,.28);
+        padding:14px 17px; border-radius:16px;
+        box-shadow:0 16px 32px rgba(0,0,0,.3);
     }
 
-    .gc-toast i{ color:var(--g5); font-size:1.05rem; }
+    .gc-toast i{ color:var(--marigold); font-size:1.05rem; }
     .gc-toast .toast-left{ display:flex; align-items:center; gap:9px; }
 
     /* ══════════════════════════════════════
        CATALOG UPDATE BANNER
     ══════════════════════════════════════ */
-    #catalogUpdateBanner{ font-family:'Inter',sans-serif; }
+    #catalogUpdateBanner{ font-family:var(--body); }
 
     /* ══════════════════════════════════════
        GOOGLE TRANSLATE SUPPRESS
@@ -679,13 +783,87 @@
     body{ top:0 !important; position:static !important; }
 
     /* ══════════════════════════════════════
-       RESPONSIVE
+       FOCUS STATES — accessibility
     ══════════════════════════════════════ */
+    a:focus-visible, button:focus-visible, input:focus-visible, .cat-card:focus-visible{
+        outline:2.5px solid var(--peacock); outline-offset:2px;
+    }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE — mobile is the base above;
+       these layer on for wider viewports.
+    ══════════════════════════════════════ */
+
+    /* Small phones: tighten up */
     @media(max-width:360px){
-        .product-container{ gap:8px; padding:0 10px 14px; }
+        .product-container{ gap:8px; padding-left:10px; padding-right:10px; }
         .p-img-area{ height:120px; }
         .p-price{ font-size:.94rem; }
         .btn-buy{ padding:6px 9px; font-size:.7rem; }
+    }
+
+    /* Large phones / small tablets: 3-up grid, slightly bigger touch targets */
+    @media(min-width:600px){
+        .product-container{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+        .p-img-area{ height:190px; }
+        .cat-avatar{ width:62px; height:62px; }
+        .banner-card{ min-height:150px; padding:26px 30px; }
+        .banner-title{ font-size:1.35rem; }
+        .banner-sub{ font-size:.78rem; }
+    }
+
+    /* Tablets landscape / small laptops: 4-up grid */
+    @media(min-width:820px){
+        .product-container{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+    }
+
+    /* Desktop: swap the mobile bottom dock for the top nav,
+       reclaim the space it used, open the hero banner up. */
+    @media(min-width:900px){
+        .desktop-nav{ display:flex; }
+        .bottom-bar{ display:none; }
+        body{ padding-bottom:32px; }
+
+        .mini-cart-bar{
+            left:auto; right:max(16px,calc((100% - var(--container)) / 2));
+            bottom:28px; width:340px;
+        }
+
+        .gc-toast{
+            left:auto; right:max(20px,calc((100% - var(--container)) / 2));
+            bottom:28px; width:360px;
+        }
+
+        #catalogUpdateBanner{
+            left:auto; right:max(20px,calc((100% - var(--container)) / 2));
+            width:320px; bottom:28px;
+        }
+
+        .banner-card{ min-height:230px; padding:38px 48px; border-radius:26px; }
+        .banner-title{ font-size:1.9rem; max-width:60%; }
+        .banner-sub{ font-size:.88rem; max-width:55%; }
+        .banner-eyebrow{ font-size:.7rem; padding:5px 13px; }
+        .banner-cta-btn{ padding:10px 20px; font-size:.82rem; }
+
+        .hub-strip{ padding:18px 22px; }
+        .hub-strip-title{ font-size:.92rem; }
+        .hub-strip-sub{ font-size:.76rem; }
+
+        .search-box{ max-width:640px; }
+    }
+
+    /* Large desktop: 5-up grid, roomier cards */
+    @media(min-width:1200px){
+        .product-container{ grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; }
+        .p-img-area{ height:210px; }
+        :root{ --container:1440px; }
+    }
+
+    /* Extra-wide monitors: 6-up grid, cap growth so cards don't
+       stretch into oversized empty-feeling tiles */
+    @media(min-width:1600px){
+        .product-container{ grid-template-columns:repeat(6,minmax(0,1fr)); }
+        :root{ --container:1680px; }
     }
 
     @media(prefers-reduced-motion:reduce){
@@ -708,22 +886,28 @@
         <h1>Grama<span>Cart</span></h1>
     </div>
     
+    <nav class="desktop-nav" aria-label="Primary">
+        <a href="{% url 'public_dashboard' %}" class="desktop-nav-item active">
+            <i class="bi bi-house-door-fill"></i>Home
+        </a>
+        <a href="{% url 'orders_list' %}" class="desktop-nav-item">
+            <i class="bi bi-truck"></i>Orders
+        </a>
+        <a href="{% url 'cart_view' %}" class="desktop-nav-item">
+            <i class="bi bi-basket3-fill"></i>Cart
+            <span class="badge-count cart-badge-el"
+                  style="display:{% if cart_count > 0 %}flex{% else %}none{% endif %};">
+                {{ cart_count|default:0 }}
+            </span>
+        </a>
+        <a href="{% url 'profile_view' %}" class="desktop-nav-item">
+            <i class="bi bi-person-fill"></i>Profile
+        </a>
+    </nav>
+
     <div class="top-right">
-        <!-- 
-        <div class="translate-box">
-            <i class="bi bi-translate translate-icon"></i>
-            <select id="langSwitcher" class="lang-select">
-                <option value="">🌐</option>
-                <option value="en">English</option>
-                <option value="te">తెలుగు</option>
-                <option value="hi">हिंदी</option>
-                <option value="kn">ಕನ್ನಡ</option>
-                <option value="ta">தமிழ்</option>
-            </select>
-        </div>
-         -->
-        <div class="location-pill">
-            <i class="bi bi-geo-alt-fill"></i>
+        <div class="location-pill" aria-label="Delivery location">
+            <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
             <span>{{ active_hub.name|default:"Select Location" }}</span>
         </div>
 
@@ -739,6 +923,7 @@
         <input type="text" id="searchInput" placeholder="Search rice, milk, eggs...">
     </div>
 </div>
+
 <!-- ═══════════════════════════════════════
      BANNERS — configurable from admin
 ═══════════════════════════════════════ -->
@@ -804,35 +989,51 @@
         {% endif %}
     </div>
 
-    <div class="cat-scroll">
+    <div class="cat-scroll-wrap">
+        <button type="button" class="cat-arrow prev" id="catPrev" aria-label="Scroll categories left">
+            <i class="bi bi-chevron-left"></i>
+        </button>
 
-        <div class="cat-card active" data-category="all">
-            <div class="cat-avatar"
-                 style="background:linear-gradient(150deg,#1C1917,#3a3531);">
-                <i class="bi bi-grid-fill"></i>
+        <div class="cat-scroll" id="catScroll">
+
+            <div class="cat-card active" data-category="all">
+                <div class="cat-avatar-ring">
+                    <div class="cat-avatar"
+                         style="background:linear-gradient(150deg,#1C1420,#463C4C);">
+                        <i class="bi bi-grid-fill"></i>
+                    </div>
+                </div>
+                <div class="cat-label">All</div>
+                <div class="cat-underline"></div>
             </div>
-            <div class="cat-label">All</div>
+
+            {% for category in categories %}
+            <div class="cat-card" data-category="{{ category.slug }}">
+                <div class="cat-avatar-ring">
+                    {% if category.image %}
+                    <div class="cat-avatar">
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                    </div>
+                    {% elif category.icon %}
+                    <div class="cat-avatar" data-catname="{{ category.name }}">
+                        <i class="bi {{ category.icon }}"></i>
+                    </div>
+                    {% else %}
+                    <div class="cat-avatar" data-catname="{{ category.name }}">
+                        <i class="bi"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="cat-label">{{ category.name }}</div>
+                <div class="cat-underline"></div>
+            </div>
+            {% endfor %}
+
         </div>
 
-        {% for category in categories %}
-        <div class="cat-card" data-category="{{ category.slug }}">
-            {% if category.image %}
-            <div class="cat-avatar">
-                <img src="{{ category.image.url }}" alt="{{ category.name }}">
-            </div>
-            {% elif category.icon %}
-            <div class="cat-avatar" data-catname="{{ category.name }}">
-                <i class="bi {{ category.icon }}"></i>
-            </div>
-            {% else %}
-            <div class="cat-avatar" data-catname="{{ category.name }}">
-                <i class="bi"></i>
-            </div>
-            {% endif %}
-            <div class="cat-label">{{ category.name }}</div>
-        </div>
-        {% endfor %}
-
+        <button type="button" class="cat-arrow next" id="catNext" aria-label="Scroll categories right">
+            <i class="bi bi-chevron-right"></i>
+        </button>
     </div>
 </div>
 
@@ -844,8 +1045,33 @@
         <h2>Fresh for you</h2>
         <span id="productCount">{{ products|length }} items available</span>
     </div>
-    <div class="sort-pill">
-        <i class="bi bi-sliders" style="font-size:.78rem;"></i> Sort
+
+    <div class="sort-wrap">
+        <button type="button" class="sort-pill" id="sortTrigger"
+                aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-sliders" style="font-size:.78rem;"></i>
+            <span id="sortLabel">Sort</span>
+        </button>
+
+        <div class="sort-menu" id="sortMenu" role="menu">
+            <div class="sort-menu-head">Sort by</div>
+            <button type="button" class="sort-menu-item active" data-sort="featured" role="menuitem">
+                <span>Recommended</span>
+                <i class="bi bi-check-lg"></i>
+            </button>
+            <button type="button" class="sort-menu-item" data-sort="price-asc" role="menuitem">
+                <span>Price — Low to High</span>
+                <i class="bi bi-check-lg"></i>
+            </button>
+            <button type="button" class="sort-menu-item" data-sort="price-desc" role="menuitem">
+                <span>Price — High to Low</span>
+                <i class="bi bi-check-lg"></i>
+            </button>
+            <button type="button" class="sort-menu-item" data-sort="rating-desc" role="menuitem">
+                <span>Customer Rating</span>
+                <i class="bi bi-check-lg"></i>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -856,7 +1082,11 @@
 
     {% for product in products %}
     <div class="p-card {% if product.total_stock <= 0 %}out-of-stock{% endif %}"
-         data-category="{{ product.category.slug }}">
+         data-category="{{ product.category.slug }}"
+         data-price="{{ product.min_price_value|default:0 }}"
+         data-rating="{{ product.avg_rating_value|default:0 }}"
+         data-featured="{% if product.is_featured %}1{% else %}0{% endif %}"
+         data-original-index="{{ forloop.counter0 }}">
 
         <!-- RIBBON -->
         {% if product.total_stock <= 0 %}
@@ -894,13 +1124,17 @@
             <div class="p-top-actions">
                 <div class="p-icon-btn wishlist-btn
                             {% if product.id in wishlist_ids %}wished{% endif %}"
-                     data-url="{% url 'add_to_wishlist' product.id %}">
-                    <i class="bi {% if product.id in wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                     data-url="{% url 'add_to_wishlist' product.id %}"
+                     role="button" tabindex="0"
+                     aria-label="{% if product.id in wishlist_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}">
+                    <i class="bi {% if product.id in wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}" aria-hidden="true"></i>
                 </div>
                 <div class="p-icon-btn share-btn"
                      data-name="{{ product.name }}"
-                     data-url="{% url 'product_detail' product.slug %}">
-                    <i class="bi bi-share"></i>
+                     data-url="{% url 'product_detail' product.slug %}"
+                     role="button" tabindex="0"
+                     aria-label="Share {{ product.name }}">
+                    <i class="bi bi-share" aria-hidden="true"></i>
                 </div>
             </div>
 
@@ -955,7 +1189,7 @@
     {% empty %}
     <div class="empty-state-block">
         <div class="empty-icon"><i class="bi bi-basket3"></i></div>
-        <h5 class="fw-bold mt-2" style="font-family:'Baloo 2',sans-serif;">
+        <h5 class="fw-bold mt-2">
             No products yet here
         </h5>
         <p class="text-muted small mt-1">
@@ -969,7 +1203,7 @@
 <!-- EMPTY SEARCH STATE -->
 <div id="no-products-message">
     <i class="bi bi-search" style="font-size:1.8rem;"></i>
-    <h5 class="mt-2 fw-bold" style="font-family:'Baloo 2',sans-serif;">
+    <h5 class="mt-2 fw-bold" style="font-family:'Fraunces',serif;">
         No products found
     </h5>
     <p class="small mt-1">Try something else or pick a different category</p>
@@ -1000,7 +1234,7 @@
     </a>
     <a href="{% url 'cart_view' %}" class="nav-item">
         <i class="bi bi-basket3-fill"></i>Cart
-        <span id="cart-badge" class="badge-count"
+        <span id="cart-badge" class="badge-count cart-badge-el"
               style="display:{% if cart_count > 0 %}flex{% else %}none{% endif %};">
             {{ cart_count|default:0 }}
         </span>
@@ -1018,7 +1252,7 @@
         <i class="bi bi-check-circle-fill"></i>
         <span class="small fw-bold" id="cartToastText">Item added to basket!</span>
     </span>
-    <a href="{% url 'cart_view' %}" class="btn btn-sm btn-success rounded-pill px-3">
+    <a href="{% url 'cart_view' %}" class="btn btn-sm rounded-pill px-3" style="background:var(--peacock);color:#fff;">
         View
     </a>
 </div>
@@ -1033,11 +1267,12 @@
 <!-- ═══════════════════════════════════════
      CATALOG UPDATE BANNER
 ═══════════════════════════════════════ -->
-<div id="catalogUpdateBanner"
-     style="display:none;position:fixed;bottom:82px;left:20px;right:20px;
-            z-index:2500;background:var(--m5);color:#fff;padding:14px;
+<div id="catalogUpdateBanner" role="button" tabindex="0"
+     aria-label="New products available. Tap to refresh."
+     style="display:none;position:fixed;bottom:84px;left:20px;right:20px;
+            z-index:2500;background:var(--marigold);color:#fff;padding:14px;
             border-radius:16px;text-align:center;font-weight:700;
-            cursor:pointer;box-shadow:0 12px 26px rgba(217,119,6,.30);">
+            cursor:pointer;box-shadow:0 14px 28px rgba(232,93,4,.32);">
     New products available — tap to refresh.
 </div>
 
@@ -1081,12 +1316,12 @@ const categoryIconMap = [
 ];
 
 const categoryColorThemes = [
-    ["#0E9F6E","#065F46"],
-    ["#F59E0B","#B45309"],
-    ["#0EA5E9","#0369A1"],
-    ["#EC4899","#BE185D"],
-    ["#C2410C","#7C2D12"],
-    ["#8B5CF6","#5B21B6"]
+    ["#0F6E6E","#0B4F4F"],
+    ["#FF7A1A","#E85D04"],
+    ["#B7791F","#8A5A14"],
+    ["#C2410C","#8A2F09"],
+    ["#6D4C9C","#4B3370"],
+    ["#0E7C86","#0A5860"]
 ];
 
 function pickCategoryIcon(name){
@@ -1115,6 +1350,45 @@ function assignCategoryIcons(){
 }
 
 assignCategoryIcons();
+
+// ═══════════════════════════════════════
+// CATEGORY SCROLL ARROWS (desktop)
+// ═══════════════════════════════════════
+(function(){
+    const track = document.getElementById('catScroll');
+    const prev  = document.getElementById('catPrev');
+    const next  = document.getElementById('catNext');
+    if(!track || !prev || !next) return;
+
+    const step = () => Math.round(track.clientWidth * 0.6);
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior:'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left:  step(), behavior:'smooth' }));
+})();
+
+// ═══════════════════════════════════════
+// QUANTITY / PRICE FORMATTING
+// Cleans up backend values like "1.00 Litre" → "1 Litre"
+// and "0.50 Kg" → "0.5 Kg" so trailing zeros never show.
+// NOTE: this is a display-layer fix. The proper long-term
+// fix is formatting the number in Django where display_name
+// / min_price_value is built, e.g. with:
+//   {{ value|floatformat:"-2" }}
+// (floatformat's negative arg drops trailing zeros).
+// ═══════════════════════════════════════
+function stripUselessDecimals(text){
+    return text
+        .replace(/(\d+)\.0+(\D|$)/g, '$1$2')        // 1.00 Litre -> 1 Litre
+        .replace(/(\d+\.\d*?)0+(\D|$)/g, '$1$2')    // 0.50 Kg    -> 0.5 Kg
+        .replace(/(\d+)\.(\D|$)/g, '$1$2');         // stray "5." -> "5"
+}
+
+function cleanQuantityLabels(){
+    document.querySelectorAll('.p-variant, .p-price').forEach(el => {
+        el.textContent = stripUselessDecimals(el.textContent);
+    });
+}
+
+cleanQuantityLabels();
 
 // ═══════════════════════════════════════
 // BANNER AUTO-ROTATE
@@ -1148,15 +1422,28 @@ assignCategoryIcons();
 })();
 
 // ═══════════════════════════════════════
-// MINI CART BAR SYNC
+// CART BADGE SYNC — one source of truth, updates
+// the mobile bottom-nav badge AND the desktop
+// top-nav badge together (there are two in the DOM
+// since the desktop layout doesn't reuse the mobile
+// bottom bar).
 // ═══════════════════════════════════════
+let cartCount = parseInt("{{ cart_count|default:0 }}") || 0;
+
+function updateCartBadges(count){
+    cartCount = count;
+    document.querySelectorAll('.cart-badge-el').forEach(el => {
+        el.innerText = count;
+        el.style.display = count > 0 ? 'flex' : 'none';
+    });
+    syncMiniCartBar();
+}
+
 function syncMiniCartBar(){
-    const badge = document.getElementById('cart-badge');
-    const bar   = document.getElementById('miniCartBar');
-    const text  = document.getElementById('miniCartText');
-    const count = parseInt(badge.innerText) || 0;
-    if(count > 0){
-        text.innerText = count + (count===1 ? ' item' : ' items') + ' in your basket';
+    const bar  = document.getElementById('miniCartBar');
+    const text = document.getElementById('miniCartText');
+    if(cartCount > 0){
+        text.innerText = cartCount + (cartCount===1 ? ' item' : ' items') + ' in your basket';
         bar.style.display = 'flex';
     } else {
         bar.style.display = 'none';
@@ -1247,10 +1534,7 @@ document.querySelectorAll('.add-trigger').forEach(btn => {
         .then(data => {
             if(!data) return;
             if(data.success){
-                const badge = document.getElementById('cart-badge');
-                badge.innerText = data.cart_count;
-                badge.style.display = 'flex';
-                syncMiniCartBar();
+                updateCartBadges(data.cart_count);
 
                 const toast = document.getElementById('cartToast');
                 document.getElementById('cartToastText').innerText = 'Item added to basket!';
@@ -1271,6 +1555,87 @@ document.querySelectorAll('.add-trigger').forEach(btn => {
         .finally(() => { this.disabled = false; });
     });
 });
+
+// ═══════════════════════════════════════
+// SORT — actually reorders the product grid
+// (the previous "Sort" pill was decorative and
+// did nothing; this one does).
+// ═══════════════════════════════════════
+(function(){
+    const trigger  = document.getElementById('sortTrigger');
+    const menu     = document.getElementById('sortMenu');
+    const label    = document.getElementById('sortLabel');
+    const grid     = document.getElementById('productGrid');
+    if(!trigger || !menu || !grid) return;
+
+    const sortLabels = {
+        'featured':    'Sort',
+        'price-asc':   'Price: Low to High',
+        'price-desc':  'Price: High to Low',
+        'rating-desc': 'Top Rated'
+    };
+
+    function openMenu(){
+        menu.classList.add('open');
+        trigger.setAttribute('aria-expanded','true');
+    }
+    function closeMenu(){
+        menu.classList.remove('open');
+        trigger.setAttribute('aria-expanded','false');
+    }
+
+    trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        menu.classList.contains('open') ? closeMenu() : openMenu();
+    });
+
+    document.addEventListener('click', function(e){
+        if(!menu.contains(e.target) && e.target !== trigger) closeMenu();
+    });
+
+    function applySort(mode){
+        const cards = Array.from(grid.querySelectorAll('.p-card'));
+        if(cards.length === 0) return;
+
+        cards.sort((a,b) => {
+            // in-stock items always float above out-of-stock ones,
+            // regardless of which sort is active
+            const aOOS = a.classList.contains('out-of-stock');
+            const bOOS = b.classList.contains('out-of-stock');
+            if(aOOS !== bOOS) return aOOS ? 1 : -1;
+
+            switch(mode){
+                case 'price-asc':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'price-desc':
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                case 'rating-desc':
+                    return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+                default: // featured / recommended
+                    return parseInt(a.dataset.originalIndex) - parseInt(b.dataset.originalIndex);
+            }
+        });
+
+        cards.forEach(card => grid.appendChild(card));
+    }
+
+    menu.querySelectorAll('.sort-menu-item').forEach(item => {
+        item.addEventListener('click', function(){
+            const mode = this.dataset.sort;
+
+            menu.querySelectorAll('.sort-menu-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            label.innerText = sortLabels[mode] || 'Sort';
+
+            applySort(mode);
+            // re-apply the current search/category filter so hidden
+            // items stay hidden after the reorder
+            if(typeof filterProducts === 'function') filterProducts();
+
+            closeMenu();
+        });
+    });
+})();
 
 // ═══════════════════════════════════════
 // SEARCH + CATEGORY FILTER
@@ -1317,13 +1682,16 @@ catCards.forEach(btn => {
     if(lang) document.cookie = 'googtrans=/en/'+lang+';path=/';
 })();
 
-document.getElementById('langSwitcher').addEventListener('change', function(){
-    const lang = this.value;
-    if(!lang) return;
-    localStorage.setItem('lang', lang);
-    document.cookie = 'googtrans=/en/'+lang+';path=/';
-    location.reload();
-});
+const langSwitcherEl = document.getElementById('langSwitcher');
+if(langSwitcherEl){
+    langSwitcherEl.addEventListener('change', function(){
+        const lang = this.value;
+        if(!lang) return;
+        localStorage.setItem('lang', lang);
+        document.cookie = 'googtrans=/en/'+lang+';path=/';
+        location.reload();
+    });
+}
 
 // ═══════════════════════════════════════
 // GOOGLE TRANSLATE INIT + BANNER REMOVE
@@ -1362,6 +1730,20 @@ async function checkCatalogUpdates(){
 setInterval(checkCatalogUpdates, 60000);
 
 document.getElementById('catalogUpdateBanner').onclick = () => location.reload();
+
+// ═══════════════════════════════════════
+// KEYBOARD SUPPORT for role="button" divs
+// (wishlist, share, catalog banner) so keyboard
+// and screen-reader users can activate them too.
+// ═══════════════════════════════════════
+document.querySelectorAll('[role="button"]').forEach(el => {
+    el.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            this.click();
+        }
+    });
+});
 </script>
 
 </body>

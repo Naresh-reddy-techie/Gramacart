@@ -778,3 +778,63 @@ class SellerApplicationForm(forms.ModelForm):
             "description",
             "hub",
         ]
+
+
+#==================================================
+from .models import MarketplaceSettings
+
+
+class MarketplaceSettingsForm(forms.ModelForm):
+    """
+    Form used by the Marketplace Configuration page.
+    """
+
+    class Meta:
+        model = MarketplaceSettings
+
+        fields = [
+            "marketplace_open",
+            "free_delivery_enabled",
+            "free_delivery_min_order",
+            "cod_enabled",
+        ]
+
+        widgets = {
+            "marketplace_open": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
+            "free_delivery_enabled": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
+            "cod_enabled": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
+            "free_delivery_min_order": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0",
+                    "step": "0.01",
+                    "placeholder": "999.00",
+                }
+            ),
+        }
+
+        labels = {
+            "marketplace_open": "Marketplace Open",
+            "free_delivery_enabled": "Enable Free Delivery",
+            "free_delivery_min_order": "Free Delivery Above (₹)",
+            "cod_enabled": "Enable Cash On Delivery",
+        }
+
+        help_texts = {
+            "marketplace_open": "Disable this to stop accepting new customer orders.",
+            "free_delivery_enabled": "Eligible orders will receive free delivery.",
+            "free_delivery_min_order": "Orders with subtotal greater than or equal to this amount qualify for free delivery.",
+            "cod_enabled": "Allow customers to place Cash on Delivery orders.",
+        }

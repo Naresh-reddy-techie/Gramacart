@@ -1083,6 +1083,37 @@ const serviceAlert = document.getElementById(
     "service-alert"
 );
 
+function showMessage(message, type="error") {
+
+    serviceAlert.classList.add("show");
+
+    if(type === "success"){
+
+        serviceAlert.style.background="#ECFDF5";
+        serviceAlert.style.borderColor="#A7F3D0";
+        serviceAlert.style.color="#065F46";
+
+        serviceAlert.innerHTML =
+            '<i class="bi bi-check-circle-fill"></i> ' + message;
+
+    }else{
+
+        serviceAlert.style.background="#FFF1EC";
+        serviceAlert.style.borderColor="#FFE0D1";
+        serviceAlert.style.color="#C2410C";
+
+        serviceAlert.innerHTML =
+            '<i class="bi bi-exclamation-triangle-fill"></i> ' + message;
+    }
+}
+
+function hideMessage(){
+
+    serviceAlert.classList.remove("show");
+
+    serviceAlert.innerHTML="";
+}
+
 /* =========================================
    STEP PROGRESS HELPERS
 ========================================= */
@@ -1193,10 +1224,21 @@ function selectAddressCard(card){
 
             shippingValid = true;
 
-            document.getElementById(
-                "shipping_cost"
-            ).innerText =
-                "₹" + Number(data.shipping_cost).toFixed(2);
+            const shipping = document.getElementById("shipping_cost");
+
+            if (data.free_delivery) {
+
+                shipping.innerHTML =
+                    '<span style="text-decoration:line-through;color:#999;">₹'
+                    + Number(data.original_shipping_fee).toFixed(2)
+                    + '</span> <span style="color:#16A34A;font-weight:700;">FREE</span>';
+
+            } else {
+
+                shipping.innerHTML =
+                    "₹" + Number(data.shipping_cost).toFixed(2);
+
+            }
 
             document.getElementById(
                 "final_total"
@@ -1208,15 +1250,19 @@ function selectAddressCard(card){
             ).innerText =
                 "₹" + Number(data.final_total).toFixed(2);
 
-            serviceAlert.classList.remove("show");
+            hideMessage();
+
+            if(data.delivery_message){
+                showMessage(data.delivery_message, "success");
+            }
 
         }else{
 
             shippingValid = false;
 
-            serviceAlert.innerText =
-                data.message ||
-                "Delivery unavailable for selected address.";
+            showMessage(
+                data.message || "Delivery unavailable for selected address."
+            );
 
             serviceAlert.classList.add("show");
         }
@@ -1231,10 +1277,7 @@ function selectAddressCard(card){
 
         shippingValid = false;
 
-        serviceAlert.innerText =
-            "Unable to calculate delivery fee.";
-
-        serviceAlert.classList.add("show");
+        showMessage("Unable to calculate delivery fee.");
 
         updateButtonState();
 

@@ -37,7 +37,6 @@ ALLOWED_HOSTS = config(
     cast=lambda v: [s.strip() for s in v.split(",")]
 )
 
-
 # Application definition
 
 INSTALLED_APPS = [

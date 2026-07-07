@@ -704,6 +704,11 @@ body{
             class="checkout-message d-none"
         ></div>
 
+        <div
+            id="free-delivery-box"
+            class="checkout-message success d-none"
+        ></div>
+
         <div class="summary-row">
             <span>Item Total</span>
             <span id="sub_total">₹{{ order_totals.sub_total }}</span>
@@ -1046,9 +1051,16 @@ function updateTotals(fetchShipping = false) {
     // API
     // =====================================
 
+    // fetch(
+    //     "{% url 'get_buy_now_shipping_cost' product.id %}?address_id="
+    //     + addressId
+    // )
+
     fetch(
         "{% url 'get_buy_now_shipping_cost' product.id %}?address_id="
         + addressId
+        + "&subtotal="
+        + subtotal.toFixed(2)
     )
 
     .then(res => res.json())
@@ -1068,15 +1080,48 @@ function updateTotals(fetchShipping = false) {
                 data.shipping_cost || 0
             );
 
-            let total =
-                subtotal + SHIPPING_CACHE;
+            let total = subtotal + SHIPPING_CACHE;
 
-            shippingEl.innerText =
-                "₹" + SHIPPING_CACHE.toFixed(2);
+            const freeBox = document.getElementById(
+                "free-delivery-box"
+            );
+
+            // ------------------------------------
+            // FREE DELIVERY
+            // ------------------------------------
+
+            if (data.free_delivery) {
+
+                shippingEl.innerHTML = `
+                    <span style="color:#16a34a;font-weight:700;">
+                        FREE
+                    </span>
+                    <small style="text-decoration:line-through;color:#999;margin-left:6px;">
+                        ₹${data.original_shipping_fee.toFixed(2)}
+                    </small>
+                `;
+
+                freeBox.classList.remove("d-none");
+
+                freeBox.innerHTML =
+                    `🎉 Congratulations! You unlocked <strong>FREE Delivery</strong>.
+                    You saved ₹${data.original_shipping_fee.toFixed(2)}.`;
+
+            }
+            else {
+
+                shippingEl.innerHTML =
+                    "₹" + SHIPPING_CACHE.toFixed(2);
+
+                freeBox.classList.remove("d-none");
+
+                freeBox.innerHTML =
+                    `🛒 Add products worth <strong>₹${data.remaining_for_free_delivery.toFixed(2)}</strong>
+                    more to get FREE Delivery.`;
+            }
 
             totalEl.innerText =
                 "₹" + total.toFixed(2);
-
             if (desktopBtn) {
 
                 desktopBtn.innerText =

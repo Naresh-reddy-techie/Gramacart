@@ -634,3 +634,62 @@ class HubSubscription(models.Model):
     
 
 #==============================================================
+
+#  Marketplace settings 
+#============================================================
+
+
+
+class MarketplaceSettings(models.Model):
+    """
+    Global marketplace configuration.
+
+    This table must contain only ONE record.
+    """
+
+    # -----------------------------
+    # Marketplace
+    # -----------------------------
+    marketplace_open = models.BooleanField(
+        default=True,
+        help_text="Disable to stop accepting new orders."
+    )
+
+    # -----------------------------
+    # Free Delivery
+    # -----------------------------
+    free_delivery_enabled = models.BooleanField(
+        default=True
+    )
+
+    free_delivery_min_order = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=999,
+        help_text="Orders above this subtotal receive free delivery."
+    )
+
+    # -----------------------------
+    # Cash on Delivery
+    # -----------------------------
+    cod_enabled = models.BooleanField(
+        default=True
+    )
+
+    # -----------------------------
+    # Audit
+    # -----------------------------
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name = "Marketplace Settings"
+        verbose_name_plural = "Marketplace Settings"
+
+    def __str__(self):
+        return "Marketplace Configuration"

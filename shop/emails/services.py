@@ -5,11 +5,15 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-
 logger = logging.getLogger(__name__)
 
 
 class EmailService:
+    """
+    Centralized email sending service.
+
+    Every email in GramaCart should use this service.
+    """
 
     @staticmethod
     def send(
@@ -20,15 +24,20 @@ class EmailService:
         recipients,
     ):
         """
-        Generic email sender.
+        Send an HTML + plain text email.
 
         Returns:
-            True  -> email sent successfully
-            False -> sending failed
+            True  -> Email sent successfully.
+            False -> Email sending failed.
         """
 
-        try:
+        if not recipients:
+            logger.warning(
+                "Email not sent because recipient list is empty."
+            )
+            return False
 
+        try:
             html_content = render_to_string(
                 template_name,
                 context,
@@ -51,7 +60,7 @@ class EmailService:
             )
 
             email.send(
-                fail_silently=False
+                fail_silently=False,
             )
 
             logger.info(
@@ -62,7 +71,6 @@ class EmailService:
             return True
 
         except Exception:
-
             logger.exception(
                 "Failed to send email '%s' to %s",
                 subject,

@@ -1,6 +1,6 @@
 from django.urls import path
 from .import views
-from admin_dashboard import banner,hub_partner_views,seller_application_views
+from admin_dashboard import banner,hub_partner_views,seller_application_views,marketplace_views
 
 urlpatterns = [
     path('',views.dashboard,name='admin_dashboard'),
@@ -129,6 +129,13 @@ urlpatterns = [
         "catalogue/<int:hub_id>/",
         views.generate_catalogue,
         name="generate_catalogue",
-    )
+    ),
+
+
+    path(
+        "marketplace-settings/",
+        marketplace_views.marketplace_settings,
+        name="marketplace_settings",
+    ),
 ]
 
