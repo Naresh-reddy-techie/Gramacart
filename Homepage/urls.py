@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path('', views.homepage, name='home'),
     path('sw.js', (TemplateView.as_view(template_name="sw.js", content_type='application/javascript',)), name='sw.js'),
+      path("health/", views.health_check, name="health_check"),
 ]

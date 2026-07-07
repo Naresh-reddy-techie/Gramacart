@@ -23,3 +23,15 @@ def homepage(request):
         "total_categories": total_categories,
     }
     return render(request, "homepage.html", context)
+
+
+
+#for free renderaccounts ping for no sleep 
+from django.http import JsonResponse
+
+
+def health_check(request):
+    return JsonResponse({
+        "status": "ok",
+        "service": "GramaCart",
+    })
