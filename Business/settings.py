@@ -231,6 +231,8 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 EMAIL_TIMEOUT = 10
 
 
+BREVO_API_KEY = config("BREVO_API_KEY")
+
 
 #payment gateway fields based on the different platforms
 PAYMENT_GATEWAY_CONFIG_FIELDS = {

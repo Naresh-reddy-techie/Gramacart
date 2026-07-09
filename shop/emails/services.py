@@ -1,7 +1,7 @@
 import logging
+import requests
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -9,11 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class EmailService:
-    """
-    Centralized email sending service.
-
-    Every email in GramaCart should use this service.
-    """
 
     @staticmethod
     def send(
@@ -23,68 +18,65 @@ class EmailService:
         context,
         recipients,
     ):
-        """
-        Send an HTML + plain text email.
-
-        Returns:
-            True  -> Email sent successfully.
-            False -> Email sending failed.
-        """
 
         if not recipients:
-            logger.warning(
-                "Email not sent because recipient list is empty."
-            )
             return False
 
-        try:
-            html_content = render_to_string(
-                template_name,
-                context,
-            )
+        html_content = render_to_string(
+            template_name,
+            context,
+        )
 
-            text_content = strip_tags(
-                html_content
-            )
+        text_content = strip_tags(html_content)
 
-            email = EmailMultiAlternatives(
-                subject=subject,
-                body=text_content,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=recipients,
-            )
+        headers = {
+            "accept": "application/json",
+            "api-key": settings.BREVO_API_KEY,
+            "content-type": "application/json",
+        }
 
-            email.attach_alternative(
-                html_content,
-                "text/html",
-            )
+        success = True
 
-            import socket
+        for recipient in recipients:
+
+            payload = {
+                "sender": {
+                    "name": "GramaCart",
+                    "email": settings.DEFAULT_FROM_EMAIL,
+                },
+                "to": [
+                    {
+                        "email": recipient,
+                    }
+                ],
+                "subject": subject,
+                "htmlContent": html_content,
+                "textContent": text_content,
+            }
 
             try:
-                print("Testing SMTP connection...")
-                s = socket.create_connection(("smtp-relay.brevo.com", 587), 10)
-                print("SMTP CONNECTION SUCCESS")
-                s.close()
-            except Exception as e:
-                print("SMTP CONNECTION FAILED:", repr(e))
 
-            email.send(
-                fail_silently=False,
-            )
+                response = requests.post(
+                    "https://api.brevo.com/v3/smtp/email",
+                    headers=headers,
+                    json=payload,
+                    timeout=20,
+                )
 
-            logger.info(
-                "Email sent successfully to %s",
-                recipients,
-            )
+                response.raise_for_status()
 
-            return True
+                logger.info(
+                    "Email sent successfully to %s",
+                    recipient,
+                )
 
-        except Exception:
-            logger.exception(
-                "Failed to send email '%s' to %s",
-                subject,
-                recipients,
-            )
+            except Exception:
 
-            return False
+                logger.exception(
+                    "Failed sending email to %s",
+                    recipient,
+                )
+
+                success = False
+
+        return success
