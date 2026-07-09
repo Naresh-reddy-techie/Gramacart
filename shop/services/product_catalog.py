@@ -2,21 +2,25 @@ from django.db.models import (Q,Avg,Count,Prefetch,)
 from inventory.models import Inventory
 from admin_dashboard.models import Product,ProductImage,ProductVariant
 
+from decimal import Decimal
 
 
 def _enrich_products(products):
     """
-    Adds calculated fields to prefetched products.
+    Enrich prefetched products.
 
     Uses ONLY prefetched data.
-    Never queries the database.
+    Executes ZERO additional queries.
     """
 
     for product in products:
 
         total_stock = 0
+
+        best_inventory = None
+        best_variant = None
+
         min_price = None
-        default_variant = None
 
         for variant in getattr(product, "active_variants", []):
 
@@ -26,52 +30,87 @@ def _enrich_products(products):
                 []
             )
 
+            if not inventories:
+                continue
+
             variant_stock = sum(
-                inv.stock
+                inv.stock or 0
                 for inv in inventories
             )
 
             total_stock += variant_stock
 
-            valid_prices = [
-
-                inv.selling_price
-
+            valid_inventories = [
+                inv
                 for inv in inventories
-
                 if inv.selling_price is not None
-
             ]
 
-            if not valid_prices and getattr(
-                variant,
-                "price",
-                None
+            if not valid_inventories:
+                continue
+
+            cheapest_inventory = min(
+                valid_inventories,
+                key=lambda x: x.selling_price
+            )
+
+            if (
+                min_price is None
+                or
+                cheapest_inventory.selling_price < min_price
             ):
-                valid_prices.append(
-                    variant.price
-                )
+                min_price = cheapest_inventory.selling_price
+                best_inventory = cheapest_inventory
+                best_variant = variant
 
-            if valid_prices:
-
-                current_price = min(
-                    valid_prices
-                )
-
-                if (
-                    min_price is None
-                    or
-                    current_price < min_price
-                ):
-
-                    min_price = current_price
-                    default_variant = variant
+        # --------------------------------------------------
+        # Basic
+        # --------------------------------------------------
 
         product.total_stock = total_stock
 
-        product.min_price_value = min_price
+        product.min_price_value = (
+            best_inventory.selling_price
+            if best_inventory
+            else None
+        )
 
-        product.default_variant_value = default_variant
+        product.default_variant_value = best_variant
+
+        # --------------------------------------------------
+        # Pricing
+        # --------------------------------------------------
+
+        if best_inventory:
+
+            product.min_mrp_value = best_inventory.mrp
+
+            product.discount_percentage = (
+                best_inventory.discount_percentage
+            )
+
+            product.offer_label = best_inventory.get_offer_label_display()
+
+            product.save_amount = (
+                best_inventory.mrp
+                - best_inventory.selling_price
+            )
+
+            product.has_offer = (
+                product.discount_percentage > 0
+            )
+
+        else:
+
+            product.min_mrp_value = None
+            product.discount_percentage = 0
+            product.offer_label = ""
+            product.save_amount = Decimal("0.00")
+            product.has_offer = False
+
+        # --------------------------------------------------
+        # Image
+        # --------------------------------------------------
 
         product.first_image = next(
             iter(product.product_images.all()),

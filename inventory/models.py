@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 
 class Inventory(models.Model):
 
+
+
     variant = models.ForeignKey(
         'admin_dashboard.ProductVariant',
         on_delete=models.CASCADE,
@@ -37,6 +39,11 @@ class Inventory(models.Model):
     # PRICING
     # --------------------------------------------------------
 
+    mrp = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
     cost_price = models.DecimalField(
         max_digits=10,
         decimal_places=2
@@ -45,6 +52,22 @@ class Inventory(models.Model):
     selling_price = models.DecimalField(
         max_digits=10,
         decimal_places=2
+    )
+
+    OFFER_CHOICES = [
+        ("", "select offer Label"),
+        ("BESTSELLER", "Best Seller"),
+        ("NEW", "New"),
+        ("TODAY", "Today's Deal"),
+        ("LIMITED", "Limited Stock"),
+        ("POPULAR", "Popular"),
+    ]
+
+    offer_label = models.CharField(
+        max_length=20,
+        choices=OFFER_CHOICES,
+        blank=True,
+        default=""
     )
 
     # --------------------------------------------------------
@@ -81,6 +104,13 @@ class Inventory(models.Model):
                     selling_price__gte=F('cost_price')
                 ),
                 name='inventory_selling_gte_cost'
+            ),
+
+             models.CheckConstraint(
+                condition=Q(
+                    mrp__gte=F('selling_price')
+                ),
+                name='inventory_mrp_gte_selling'
             ),
         ]
 
@@ -198,7 +228,19 @@ class Inventory(models.Model):
     # ========================================================
     # HELPERS
     # ========================================================
+    @property
+    def discount_percentage(self):
+        """
+        Returns the discount percentage based on MRP and selling price.
+        """
 
+        if self.mrp and self.mrp > self.selling_price:
+            return round(
+                ((self.mrp - self.selling_price) / self.mrp) * 100
+            )
+
+        return 0
+    
     @property
     def is_low_stock(self):
 

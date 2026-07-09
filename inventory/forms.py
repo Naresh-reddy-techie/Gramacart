@@ -16,8 +16,10 @@ class InventoryForm(forms.ModelForm):
             'stock',
             'min_stock_level',
             'max_order_quantity',
+            'mrp',
             'cost_price',
-            'selling_price'
+            'selling_price',
+            'offer_label',
         ]
 
         widgets = {
@@ -70,6 +72,13 @@ class InventoryForm(forms.ModelForm):
                 'min': 1
             }),
 
+            'mrp': forms.NumberInput(attrs={
+                'class': 'form-control custom-input',
+                'placeholder': 'Maximum Retail Price (MRP)',
+                'step': '0.01',
+                'min': 0
+            }),
+
             # ------------------------------------------------
             # COST PRICE
             # ------------------------------------------------
@@ -90,6 +99,10 @@ class InventoryForm(forms.ModelForm):
                 'placeholder': 'Selling price',
                 'step': '0.01',
                 'min': 0
+            }),
+
+            'offer_label': forms.Select(attrs={
+                'class': 'form-select custom-input',
             }),
         }
 
@@ -163,7 +176,7 @@ class InventoryForm(forms.ModelForm):
         min_stock = cleaned_data.get('min_stock_level')
 
         max_order_qty = cleaned_data.get('max_order_quantity')
-
+        mrp = cleaned_data.get('mrp')
         cost_price = cleaned_data.get('cost_price')
         selling_price = cleaned_data.get('selling_price')
 
@@ -204,6 +217,12 @@ class InventoryForm(forms.ModelForm):
             raise ValidationError(
                 "Selling price cannot be negative."
             )
+        
+        if mrp is not None and mrp < 0:
+
+            raise ValidationError(
+                "MRP cannot be negative."
+            )
 
         if (
             cost_price is not None and
@@ -214,7 +233,16 @@ class InventoryForm(forms.ModelForm):
             raise ValidationError(
                 "Selling price cannot be lower than cost price."
             )
+        
+        if (
+            mrp is not None and
+            selling_price is not None and
+            mrp < selling_price
+        ):
 
+            raise ValidationError(
+                "MRP cannot be lower than selling price."
+            )
         # ----------------------------------------------------
         # DUPLICATE INVENTORY CHECK
         # ----------------------------------------------------

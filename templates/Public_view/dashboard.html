@@ -1090,10 +1090,18 @@
 
         <!-- RIBBON -->
         {% if product.total_stock <= 0 %}
-            <div class="p-ribbon ribbon-oos">Out of stock</div>
-        {% elif product.is_featured %}
-            <div class="p-ribbon">Bestseller</div>
+            <div class="p-ribbon ribbon-oos">
+                Out of Stock
+            </div>
+
+        {% elif product.offer_label %}
+            <div class="p-ribbon">
+                {{ product.get_offer_label_display }}
+            </div>
+
         {% endif %}
+
+      
 
         <!-- IMAGE -->
         <div class="p-img-area"

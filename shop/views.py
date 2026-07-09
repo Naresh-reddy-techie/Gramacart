@@ -239,6 +239,20 @@ def catalog_version(request):
         "catalog_version": version
     })
 
+
+
+# views.py
+import socket
+from django.http import HttpResponse
+
+def smtp_test(request):
+    try:
+        s = socket.create_connection(("smtp-relay.brevo.com", 587), 10)
+        s.close()
+        return HttpResponse("SMTP CONNECTION SUCCESS")
+    except Exception as e:
+        return HttpResponse(f"SMTP FAILED: {repr(e)}")
+
 # =========================================================
 # WHERE SHOULD WE DELIVER
 # =========================================================
@@ -2718,82 +2732,68 @@ def product_detail(request, slug):
     # =====================================================
     # VARIANTS
     # =====================================================
+ 
     variants = []
 
     for variant in product.active_variants:
 
-        # -------------------------------------------------
-        # SAFETY
-        # -------------------------------------------------
-        if not variant.is_active:
-            continue
+        inventories = getattr(variant, "hub_inventory", [])
 
-        inventories = getattr(
-            variant,
-            "hub_inventory",
-            []
-        )
-
-        # -------------------------------------------------
-        # NO INVENTORY
-        #
-        # Product exists globally
-        # but inventory not assigned yet
-        # -------------------------------------------------
-        if not inventories:
-            continue
-
-        # -------------------------------------------------
-        # VALID PRICES
-        # -------------------------------------------------
-        valid_prices = [
-
-            Decimal(str(inv.selling_price))
-
+        # Inventory records having selling price
+        valid_inventories = [
+            inv
             for inv in inventories
-
             if inv.selling_price is not None
-
         ]
 
-        if not valid_prices:
+        if not valid_inventories:
             continue
 
         # -------------------------------------------------
-        # LOWEST PRICE
+        # Cheapest inventory
         # -------------------------------------------------
-        min_price = min(valid_prices)
-
-        # -------------------------------------------------
-        # TOTAL STOCK
-        # -------------------------------------------------
-        total_stock = sum(
-
-            int(inv.stock or 0)
-
-            for inv in inventories
-
+        best_inventory = min(
+            valid_inventories,
+            key=lambda x: x.selling_price
         )
 
         # -------------------------------------------------
-        # STOCK STATUS
+        # Stock
         # -------------------------------------------------
+        total_stock = sum(
+            inv.stock or 0
+            for inv in valid_inventories
+        )
+
         in_stock = total_stock > 0
 
         if total_stock <= 0:
-
             stock_status = "Coming Soon"
 
         elif total_stock <= 5:
-
             stock_status = f"Only {total_stock} left"
 
         else:
-
             stock_status = "In Stock"
 
         # -------------------------------------------------
-        # APPEND
+        # Pricing
+        # -------------------------------------------------
+        price = best_inventory.selling_price
+        mrp = best_inventory.mrp
+
+        discount = best_inventory.discount_percentage
+
+        save_amount = (
+            mrp - price
+            if mrp and price and mrp > price
+            else Decimal("0.00")
+        )
+
+        has_offer = discount > 0
+
+        # -------------------------------------------------
+        # Variant Data
         # -------------------------------------------------
         variants.append({
 
@@ -2801,13 +2801,25 @@ def product_detail(request, slug):
 
             "name": variant.display_name,
 
-            "price": min_price,
+            "price": price,
+
+            "mrp": mrp,
+
+            "discount_percentage": discount,
+
+            "offer_label": best_inventory.offer_label,
+
+            "save_amount": save_amount,
+
+            "has_offer": has_offer,
 
             "stock": total_stock,
 
             "in_stock": in_stock,
 
             "status": stock_status,
+
+            "inventory_id": best_inventory.id,
 
         })
 
@@ -2900,34 +2912,36 @@ def product_detail(request, slug):
     # =====================================================
     context = {
 
-        # PRODUCT
         "product": product,
 
-        # VARIANTS
         "variants": variants,
 
-        # DEFAULT VARIANT
         "default_variant": default_variant,
 
-        # STOCK
         "is_in_stock": is_in_stock,
 
-        # REVIEWS
         "reviews": reviews,
 
         "avg_rating": product.avg_rating,
 
         "rating_count": product.rating_count,
 
-        # WISHLIST
         "wishlist_ids": wishlist_ids,
 
-        # HUB
         "active_hub": active_hub,
 
-        # RELATED PRODUCTS
         "similar_products": related_products,
 
+        # Pricing
+        "current_price": default_variant["price"] if default_variant else None,
+
+        "current_mrp": default_variant["mrp"] if default_variant else None,
+
+        "current_discount": default_variant["discount_percentage"] if default_variant else 0,
+
+        "current_offer": default_variant["offer_label"] if default_variant else "",
+
+        "current_saving": default_variant["save_amount"] if default_variant else Decimal("0.00"),
     }
 
     # =====================================================

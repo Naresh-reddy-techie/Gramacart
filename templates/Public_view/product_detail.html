@@ -8,836 +8,700 @@
 {% block extra_css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-
+/* ══════════════════════════════════════
+   Tokens mirrored from the dashboard so this
+   page feels like the same product, not a
+   bolted-on screen.
+══════════════════════════════════════ */
 :root{
+    --ink:#1C1420; --ink7:#463C4C; --ink5:#7A6E80; --ink3:#B3A9BA;
+    --paper:#FFFBF6; --card:#FFFFFF;
+    --border:#EFE4D8; --bs:#F5EBDD;
 
-    /* dynamic brand colour stays overridable per-hub/company, same as before */
-    --primary: {{ company.primary_color|default:"#0E9F6E" }};
-    --primary-dark:#065F46;
-    --primary-soft:#ECFDF5;
-    --primary-soft-border:#D1FAE8;
+    --marigold:#FF7A1A; --marigold-dark:#E85D04; --marigold-tint:#FFF1E2;
+    --peacock:#0F6E6E; --peacock-dark:#0B4F4F; --peacock-tint:#E8F5F3;
+    --terracotta:#C2410C; --terracotta-tint:#FDECE3;
+    --gold:#B7791F; --gold-tint:#FBF3DF;
 
-    --marigold:#F59E0B;
-    --marigold-soft:#FFFBEB;
-    --marigold-soft-border:#FDE7BD;
+    --rlg:20px; --rmd:14px; --rsm:10px;
+    --s1:0 2px 10px rgba(28,20,32,.06);
+    --s2:0 10px 26px rgba(28,20,32,.10);
+    --s3:0 18px 44px rgba(28,20,32,.16);
 
-    --terracotta:#C2410C;
-    --terracotta-soft:#FFF1EC;
-
-    --dark:#1C1917;
-    --bg:#FBF8F3;
-    --card:#FFFFFF;
-    --border:#EDE6D8;
-    --border-soft:#F3EEE3;
-    --muted:#78716C;
-    --muted-soft:#A8A29E;
-
-    --shadow-sm:0 2px 8px rgba(28,25,23,0.05);
-    --shadow-md:0 8px 22px rgba(28,25,23,0.08);
-    --shadow-lg:0 16px 36px rgba(28,25,23,0.14);
-
-    --ease:cubic-bezier(.25,.8,.25,1);
+    --display:'Fraunces',serif;
+    --body:'Plus Jakarta Sans',sans-serif;
+    --container:1320px;
 }
 
-*{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 body{
-    background:var(--bg);
-    font-family:'Inter',sans-serif;
-    color:var(--dark);
-    padding-bottom:120px;
+    background:var(--paper);
+    font-family:var(--body);
+    color:var(--ink);
+    padding-bottom:110px;
     -webkit-font-smoothing:antialiased;
 }
 
+a{ text-decoration:none; color:inherit; }
+button{ font-family:var(--body); cursor:pointer; }
+
 h6{
-    font-family:'Sora',sans-serif;
-    font-weight:800;
-    font-size:0.95rem;
-    letter-spacing:-0.005em;
-    color:var(--dark);
+    font-family:var(--display);
+    font-weight:700;
+    font-size:1rem;
+    color:var(--ink);
     margin-bottom:12px;
-    display:flex;
-    align-items:center;
-    gap:7px;
+    display:flex; align-items:center; gap:8px;
 }
+h6 i{ color:var(--peacock-dark); font-size:.95rem; }
 
-h6 i{
-    color:var(--primary-dark);
-}
-
-a{
-    text-decoration:none;
-}
-
-/* ================= LAYOUT ================= */
-
-.product-page{
-    max-width:1100px;
+/* ══════════════════════════════════════
+   LAYOUT — mobile: single column stack.
+   Desktop (≥900px): sticky gallery left,
+   info column right, like every real
+   marketplace PDP.
+══════════════════════════════════════ */
+.pd-wrap{
+    max-width:var(--container);
     margin:auto;
-    padding:12px;
+    padding:12px max(12px,calc((100% - var(--container)) / 2)) 0;
+}
+
+.pd-top{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
 }
 
 .gc-card{
     background:var(--card);
-    border-radius:22px;
+    border-radius:var(--rlg);
     padding:16px;
-    border:1px solid var(--border-soft);
-    box-shadow:var(--shadow-sm);
+    border:1px solid var(--bs);
+    box-shadow:var(--s1);
     margin-bottom:14px;
 }
 
 .section-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display:flex; align-items:center; justify-content:space-between;
     margin-bottom:12px;
 }
+.section-sub{ font-size:.72rem; font-weight:700; color:var(--ink3); }
 
-.section-header h6{
-    margin-bottom:0;
+/* ================= BREADCRUMB (desktop) ================= */
+.pd-crumb{
+    display:none;
+    font-size:.78rem; font-weight:600; color:var(--ink5);
+    padding:14px 0 0;
+    gap:6px; align-items:center;
 }
+.pd-crumb i{ font-size:.68rem; color:var(--ink3); }
+.pd-crumb a:hover{ color:var(--peacock-dark); }
 
-.section-sub{
-    font-size:0.74rem;
-    font-weight:700;
-    color:var(--muted-soft);
-}
-
-/* ================= IMAGE ================= */
+/* ================= GALLERY ================= */
+.pd-gallery-col{ min-width:0; }
 
 .hero-wrap{
     position:relative;
-    border-radius:18px;
+    border-radius:var(--rlg);
     overflow:hidden;
-    background:var(--bg);
+    background:var(--marigold-tint);
+    border:1px solid var(--bs);
 }
 
 .hero-image{
     width:100%;
-    height:320px;
+    height:340px;
     object-fit:contain;
-    background:var(--bg);
+    padding:14px;
+    background:var(--marigold-tint);
     display:block;
     cursor:zoom-in;
 }
 
 .zoom-hint{
-    position:absolute;
-    bottom:12px;
-    left:12px;
-    background:rgba(28,25,23,0.72);
-    color:#fff;
-    font-size:0.7rem;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:999px;
-    display:flex;
-    align-items:center;
-    gap:5px;
-    z-index:4;
+    position:absolute; bottom:12px; left:12px; z-index:4;
+    background:rgba(28,20,32,.72); color:#fff;
+    font-size:.68rem; font-weight:700;
+    padding:5px 10px; border-radius:999px;
+    display:flex; align-items:center; gap:5px;
 }
 
 .action-icons{
-    position:absolute;
-    top:12px;
-    right:12px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    z-index:5;
+    position:absolute; top:12px; right:12px; z-index:5;
+    display:flex; flex-direction:column; gap:9px;
 }
 
 .icon-btn{
-    width:42px;
-    height:42px;
-    border:1px solid var(--border-soft);
-    border-radius:50%;
-    background:rgba(255,255,255,0.96);
-    box-shadow:var(--shadow-sm);
-    font-size:17px;
-    color:var(--dark);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:0.15s var(--ease);
+    width:40px; height:40px; border-radius:50%;
+    border:1px solid var(--bs);
+    background:rgba(255,255,255,.96);
+    box-shadow:var(--s1);
+    font-size:16px; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    transition:.15s ease;
 }
+.icon-btn:active{ transform:scale(.9); }
+.icon-btn.active{ color:#fff; background:var(--terracotta); border-color:var(--terracotta); }
 
-.icon-btn:active{
-    transform:scale(0.92);
-}
-
-.icon-btn.active{
-    color:#fff;
-    background:#EF4444;
-    border-color:#EF4444;
-}
-
-/* DISCOUNT BADGE ON IMAGE */
 .discount-badge{
-    position:absolute;
-    top:12px;
-    left:12px;
-    background:var(--terracotta);
-    color:#fff;
-    font-size:0.78rem;
-    font-weight:800;
-    padding:6px 11px;
-    border-radius:10px;
-    z-index:5;
-    box-shadow:var(--shadow-sm);
+    position:absolute; top:12px; left:12px; z-index:5;
+    background:var(--terracotta); color:#fff;
+    font-size:.76rem; font-weight:800;
+    padding:6px 11px; border-radius:10px;
+    box-shadow:var(--s1);
 }
 
-/* THUMBNAILS */
 .thumb-strip{
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    margin-top:12px;
-    scrollbar-width:none;
+    display:flex; gap:9px; overflow-x:auto;
+    margin-top:11px; scrollbar-width:none;
 }
-
-.thumb-strip::-webkit-scrollbar{
-    display:none;
-}
+.thumb-strip::-webkit-scrollbar{ display:none; }
 
 .thumb{
-    width:64px;
-    height:64px;
-    object-fit:cover;
-    border-radius:13px;
-    border:2px solid var(--border-soft);
-    flex-shrink:0;
-    cursor:pointer;
-    transition:0.15s var(--ease);
+    width:60px; height:60px; object-fit:cover;
+    border-radius:12px; border:2px solid var(--bs);
+    flex-shrink:0; cursor:pointer; transition:.15s ease;
+    background:var(--marigold-tint);
 }
-
-.thumb.active{
-    border-color:var(--primary);
-    box-shadow:0 4px 10px rgba(14,159,110,0.20);
-}
+.thumb.active{ border-color:var(--marigold); box-shadow:0 3px 9px rgba(255,122,26,.22); }
 
 /* ================= ZOOM LIGHTBOX ================= */
 .zoom-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(15,13,12,0.94);
-    z-index:999999;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    touch-action:pinch-zoom;
+    position:fixed; inset:0; z-index:999999;
+    background:rgba(15,10,17,.94);
+    display:none; align-items:center; justify-content:center;
 }
-
-.zoom-overlay.open{
-    display:flex;
-}
-
+.zoom-overlay.open{ display:flex; }
 .zoom-overlay img{
-    max-width:94%;
-    max-height:88%;
-    object-fit:contain;
-    touch-action:pinch-zoom;
-    transition:transform 0.2s var(--ease);
+    max-width:94%; max-height:88%; object-fit:contain;
+    transition:transform .2s ease;
 }
-
 .zoom-close{
-    position:absolute;
-    top:18px;
-    right:18px;
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.12);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    border:none;
+    position:absolute; top:18px; right:18px; z-index:2;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,.12); color:#fff; border:none;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
 }
-
 .zoom-tip{
-    position:absolute;
-    bottom:22px;
-    left:50%;
-    transform:translateX(-50%);
-    color:rgba(255,255,255,0.7);
-    font-size:0.78rem;
-    font-weight:600;
+    position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+    color:rgba(255,255,255,.65); font-size:.76rem; font-weight:600;
 }
 
-/* ================= TITLE ================= */
+/* ================= INFO COLUMN ================= */
+.pd-info-col{ min-width:0; }
 
 .title{
-    font-family:'Sora',sans-serif;
-    font-size:1.28rem;
-    font-weight:800;
-    letter-spacing:-0.01em;
-    color:var(--dark);
-    line-height:1.3;
+    font-family:var(--display);
+    font-size:1.34rem; font-weight:700;
+    color:var(--ink); line-height:1.28;
 }
 
-.rating-row{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:12px;
-}
+.rating-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:11px; }
 
 .pill{
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:0.76rem;
-    font-weight:700;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
+    padding:6px 12px; border-radius:999px;
+    font-size:.74rem; font-weight:700;
+    display:inline-flex; align-items:center; gap:6px;
+}
+.rating-pill{ background:var(--gold-tint); border:1px solid rgba(183,121,31,.22); color:var(--gold); }
+
+/* ================= 30-MIN DELIVERY ================= */
+.eta-strip{
+    display:flex; align-items:center; gap:12px;
+    margin-top:13px; padding:12px 14px;
+    border-radius:16px;
+    background:linear-gradient(100deg,var(--peacock-dark),var(--peacock));
+    color:#fff;
+    box-shadow:0 8px 20px rgba(15,110,110,.24);
 }
 
-.rating{
-    background:var(--marigold-soft);
-    border:1px solid var(--marigold-soft-border);
-    color:#B45309;
+.eta-icon-wrap{
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.16);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; position:relative;
+}
+.eta-icon-wrap i{ font-size:1.15rem; }
+
+.eta-pulse-dot{
+    position:absolute; top:-2px; right:-2px;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--marigold); border:2px solid var(--peacock-dark);
+    animation:pdPulse 1.6s infinite;
+}
+@keyframes pdPulse{
+    0%{ box-shadow:0 0 0 0 rgba(255,122,26,.55); }
+    70%{ box-shadow:0 0 0 8px rgba(255,122,26,0); }
+    100%{ box-shadow:0 0 0 0 rgba(255,122,26,0); }
 }
 
-.delivery{
-    background:var(--primary-soft);
-    border:1px solid var(--primary-soft-border);
-    color:var(--primary-dark);
+.eta-body b{
+    display:block; font-size:.94rem; font-weight:800;
+}
+.eta-body span{
+    font-size:.72rem; font-weight:600; color:rgba(255,255,255,.82);
 }
 
-.trust-row{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-top:10px;
-    font-size:0.78rem;
-    font-weight:700;
-    color:var(--muted);
+@media(prefers-reduced-motion:reduce){
+    .eta-pulse-dot{ animation:none; }
 }
 
-.trust-row i{
-    color:var(--primary-dark);
+/* ================= SELLER / MARKETPLACE CARD ================= */
+.seller-card{
+    display:flex; align-items:center; gap:12px;
+    margin-top:13px; padding:13px 14px;
+    border:1px solid var(--bs); border-radius:16px;
+    background:var(--card);
 }
 
-/* ================= DELIVERY ESTIMATE ================= */
-.delivery-box{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-top:14px;
-    padding:12px 14px;
-    border:1px dashed var(--primary-soft-border);
-    border-radius:14px;
-    background:var(--primary-soft);
+.seller-avatar{
+    width:42px; height:42px; border-radius:12px;
+    background:linear-gradient(150deg,var(--ink7),var(--ink));
+    color:#fff; font-family:var(--display); font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.05rem; flex-shrink:0; overflow:hidden;
+}
+.seller-avatar img{ width:100%; height:100%; object-fit:cover; }
+
+.seller-body{ flex:1; min-width:0; }
+
+.seller-name-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
+.seller-name-row b{
+    font-size:.87rem; font-weight:800; color:var(--ink);
 }
 
-.delivery-box i{
-    font-size:1.3rem;
-    color:var(--primary-dark);
+.seller-official-badge{
+    font-size:.6rem; font-weight:800; color:var(--peacock-dark);
+    background:var(--peacock-tint); border:1px solid rgba(15,110,110,.18);
+    padding:2px 7px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:3px;
 }
 
-.delivery-box b{
-    font-size:0.86rem;
-    color:var(--dark);
-    display:block;
+.seller-meta{
+    font-size:.72rem; color:var(--ink5); font-weight:600; margin-top:2px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
 }
+.seller-meta .sm-rating{ color:var(--gold); font-weight:800; }
 
-.delivery-box span{
-    font-size:0.74rem;
-    color:var(--muted);
-    font-weight:600;
+.seller-visit{
+    flex-shrink:0; font-size:.72rem; font-weight:800; color:var(--peacock-dark);
+    border:1.5px solid var(--peacock); padding:8px 13px; border-radius:11px;
+    white-space:nowrap;
 }
+.seller-visit:hover{ background:var(--peacock-tint); }
 
 /* ================= PRICE ================= */
-
 .price-row{
-    display:flex;
-    align-items:baseline;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:14px;
+    display:flex; align-items:baseline; gap:10px;
+    flex-wrap:wrap; margin-top:16px;
 }
-
 .price{
-    font-family:'Sora',sans-serif;
-    font-size:2.05rem;
-    font-weight:800;
-    color:var(--dark);
-    line-height:1;
+    font-family:var(--display);
+    font-size:2.15rem; font-weight:800; color:var(--ink); line-height:1;
 }
-
 .price small{
-    font-family:'Inter',sans-serif;
-    font-size:1rem;
-    font-weight:700;
-    color:var(--muted);
-    vertical-align:top;
+    font-family:var(--body); font-size:1rem; font-weight:700;
+    color:var(--ink5); vertical-align:top;
+}
+.mrp-strike{ font-size:.95rem; font-weight:600; color:var(--ink3); }
+.mrp-strike b{ text-decoration:line-through; font-weight:600; }
+
+.offer-badge-row{ margin-top:10px; }
+
+.offer-badge-ribbon{
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(100deg,var(--marigold-dark),var(--marigold));
+    color:#fff; font-size:.78rem; font-weight:800; letter-spacing:.2px;
+    padding:6px 14px 6px 11px; border-radius:7px 999px 999px 7px;
+    box-shadow:0 5px 12px rgba(255,122,26,.32);
+    position:relative;
+}
+.offer-badge-ribbon i{ font-size:.82rem; }
+.offer-badge-ribbon::before{
+    content:""; position:absolute; left:-3px; top:50%; transform:translateY(-50%);
+    width:7px; height:7px; border-radius:50%; background:var(--card);
 }
 
-.mrp-strike{
-    font-size:1.05rem;
-    font-weight:700;
-    color:var(--muted-soft);
-    text-decoration:line-through;
-}
-
-.discount-pct{
-    font-size:0.88rem;
-    font-weight:800;
-    color:var(--primary-dark);
-}
-
-.savings-line{
-    font-size:0.8rem;
-    font-weight:700;
-    color:var(--terracotta);
-    margin-top:6px;
-}
+.savings-line{ font-size:.8rem; font-weight:700; color:var(--terracotta); margin-top:8px; }
 
 #stockText{
-    margin-top:8px;
-    font-size:0.84rem;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:6px;
+    margin-top:9px; font-size:.85rem; font-weight:700;
+    display:flex; align-items:center; gap:6px;
 }
-
-#stockText.in-stock{
-    color:var(--primary-dark);
-}
-
-#stockText.out-stock{
-    color:var(--terracotta);
-}
+#stockText.in-stock{ color:var(--peacock-dark); }
+#stockText.out-stock{ color:var(--terracotta); }
 
 /* ================= VARIANTS ================= */
-
-.variant-scroll{
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    padding-bottom:4px;
-    scrollbar-width:none;
-}
-
-.variant-scroll::-webkit-scrollbar{
-    display:none;
-}
+.variant-scroll{ display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.variant-scroll::-webkit-scrollbar{ display:none; }
 
 .variant-card{
-    min-width:150px;
-    border:1.5px solid var(--border);
-    border-radius:16px;
-    padding:12px;
-    cursor:pointer;
-    background:#fff;
-    flex-shrink:0;
-    position:relative;
-    transition:0.15s var(--ease);
+    min-width:148px; border:1.5px solid var(--border); border-radius:15px;
+    padding:12px; cursor:pointer; background:#fff; flex-shrink:0;
+    position:relative; transition:.15s ease;
 }
-
-.variant-card b{
-    font-size:0.85rem;
-    font-weight:700;
-    color:var(--dark);
-    display:block;
-}
-
-.variant-card .v-price{
-    font-weight:800;
-    font-size:0.95rem;
-    margin-top:4px;
-    color:var(--dark);
-}
-
-.variant-card small{
-    display:inline-flex;
-    align-items:center;
-    gap:4px;
-    font-size:0.7rem;
-    font-weight:700;
-    margin-top:6px;
-}
+.variant-card b{ font-size:.84rem; font-weight:700; color:var(--ink); display:block; }
+.variant-card .v-price{ font-weight:800; font-size:.94rem; margin-top:4px; color:var(--ink); }
+.variant-card small{ display:inline-flex; align-items:center; gap:4px; font-size:.7rem; font-weight:700; margin-top:6px; }
 
 .variant-card.active{
-    border-color:var(--primary);
-    background:var(--primary-soft);
-    box-shadow:0 6px 14px rgba(14,159,110,0.18);
+    border-color:var(--marigold); background:var(--marigold-tint);
+    box-shadow:0 6px 14px rgba(255,122,26,.18);
 }
-
 .variant-card.active::after{
-    content:"\F26E";
-    font-family:"bootstrap-icons";
-    position:absolute;
-    top:8px;
-    right:10px;
-    color:var(--primary-dark);
-    font-size:0.95rem;
+    content:"\F26E"; font-family:"bootstrap-icons"; position:absolute;
+    top:8px; right:10px; color:var(--marigold-dark); font-size:.92rem;
 }
 
-/* ================= GRID ================= */
-
-.icon-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
+/* ================= DESKTOP ACTION ROW (inline buy box) ================= */
+.pd-desktop-actions{
+    display:none;
+    gap:12px; margin-top:18px;
 }
 
+/* ================= DESCRIPTION ================= */
+.desc-body{
+    color:var(--ink5); font-size:.88rem; line-height:1.65;
+    max-height:88px; overflow:hidden; position:relative;
+    transition:max-height .25s ease;
+}
+.desc-body p{ margin:0 0 10px; }
+.desc-body p:last-child{ margin-bottom:0; }
+.desc-body.collapsed::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:34px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),var(--card));
+}
+.desc-body.expanded{ max-height:2000px; }
+
+.desc-toggle{
+    display:flex; align-items:center; gap:5px; margin-top:8px;
+    background:none; border:none; padding:0;
+    font-size:.8rem; font-weight:800; color:var(--peacock-dark);
+}
+.desc-toggle i{ font-size:.7rem; transition:transform .2s ease; }
+.desc-toggle.open i{ transform:rotate(180deg); }
+
+/* ================= GRID (policy / why-us) ================= */
+.icon-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .icon-box{
-    text-align:center;
-    padding:14px 8px;
-    border:1px solid var(--border-soft);
-    border-radius:16px;
-    font-size:0.76rem;
-    font-weight:700;
-    color:var(--muted);
+    text-align:center; padding:14px 8px; border:1px solid var(--bs);
+    border-radius:15px; font-size:.75rem; font-weight:700; color:var(--ink5);
     background:#fff;
 }
-
-.icon-box i{
-    display:block;
-    font-size:1.3rem;
-    margin-bottom:7px;
-    color:var(--primary-dark);
-}
+.icon-box i{ display:block; font-size:1.25rem; margin-bottom:7px; color:var(--peacock-dark); }
 
 /* ================= REVIEWS ================= */
-
 .review-summary{
-    display:flex;
-    align-items:center;
-    gap:16px;
-    margin-bottom:16px;
-    padding-bottom:16px;
-    border-bottom:1px solid var(--border-soft);
+    display:flex; align-items:center; gap:16px;
+    margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--bs);
 }
-
-.review-score{
-    font-family:'Sora',sans-serif;
-    font-size:2.4rem;
-    font-weight:800;
-    color:var(--dark);
-    line-height:1;
-}
-
-.review-score-sub{
-    font-size:0.72rem;
-    font-weight:700;
-    color:var(--muted-soft);
-    margin-top:4px;
-}
-
-.review-stars-row{
-    color:#B45309;
-    font-size:0.9rem;
-}
+.review-score{ font-family:var(--display); font-size:2.3rem; font-weight:800; color:var(--ink); line-height:1; }
+.review-score-sub{ font-size:.72rem; font-weight:700; color:var(--ink3); margin-top:4px; }
+.review-stars-row{ color:var(--gold); font-size:.9rem; }
 
 .review{
-    border:1px solid var(--border-soft);
-    padding:14px;
-    border-radius:16px;
-    margin-bottom:10px;
-    display:flex;
-    gap:12px;
+    border:1px solid var(--bs); padding:14px; border-radius:15px;
+    margin-bottom:10px; display:flex; gap:12px;
 }
-
 .review-avatar{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    background:linear-gradient(150deg,var(--primary),var(--primary-dark));
-    color:#fff;
-    font-family:'Sora',sans-serif;
-    font-weight:700;
-    font-size:0.9rem;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
+    width:36px; height:36px; border-radius:50%;
+    background:linear-gradient(150deg,var(--peacock),var(--peacock-dark));
+    color:#fff; font-family:var(--display); font-weight:700; font-size:.88rem;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-
-.review-body{
-    flex:1;
-    min-width:0;
-}
-
-.review-body b{
-    font-size:0.85rem;
-    font-weight:700;
-    color:var(--dark);
-}
-
-.review-stars{
-    font-size:0.72rem;
-    font-weight:800;
-    color:#B45309;
-    margin-left:6px;
-}
-
+.review-body{ flex:1; min-width:0; }
+.review-body b{ font-size:.84rem; font-weight:700; color:var(--ink); }
+.review-stars{ font-size:.71rem; font-weight:800; color:var(--gold); margin-left:6px; }
 .review-verified{
-    font-size:0.68rem;
-    font-weight:700;
-    color:var(--primary-dark);
-    background:var(--primary-soft);
-    border:1px solid var(--primary-soft-border);
-    padding:2px 7px;
-    border-radius:999px;
-    margin-left:6px;
+    font-size:.66rem; font-weight:700; color:var(--peacock-dark);
+    background:var(--peacock-tint); border:1px solid rgba(15,110,110,.16);
+    padding:2px 7px; border-radius:999px; margin-left:6px;
 }
-
-.review-date{
-    font-size:0.72rem;
-    color:var(--muted-soft);
-    margin-top:1px;
-}
-
-.review-comment{
-    margin-top:6px;
-    font-size:0.84rem;
-    color:var(--dark);
-    line-height:1.4;
-}
-
-.review-photos{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-    overflow-x:auto;
-    scrollbar-width:none;
-}
-
-.review-photos::-webkit-scrollbar{
-    display:none;
-}
-
+.review-date{ font-size:.71rem; color:var(--ink3); margin-top:1px; }
+.review-comment{ margin-top:6px; font-size:.83rem; color:var(--ink); line-height:1.4; }
+.review-photos{ display:flex; gap:8px; margin-top:10px; overflow-x:auto; scrollbar-width:none; }
+.review-photos::-webkit-scrollbar{ display:none; }
 .review-photos img{
-    width:56px;
-    height:56px;
-    object-fit:cover;
-    border-radius:10px;
-    border:1px solid var(--border-soft);
-    flex-shrink:0;
-    cursor:pointer;
+    width:54px; height:54px; object-fit:cover; border-radius:10px;
+    border:1px solid var(--bs); flex-shrink:0; cursor:pointer;
 }
 
-/* =========================================================
-SIMILAR PRODUCTS — fully tappable cards, like Meesho/any real
-e-commerce listing. The whole card is a link to that product's
-own detail page (image, name, and price all navigate together)
-========================================================= */
-
-.similar-scroll{
-    display:flex;
-    gap:12px;
-    overflow-x:auto;
-    padding-bottom:4px;
-    scrollbar-width:none;
-}
-
-.similar-scroll::-webkit-scrollbar{
-    display:none;
-}
+/* ================= SIMILAR PRODUCTS ================= */
+.similar-scroll{ display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.similar-scroll::-webkit-scrollbar{ display:none; }
 
 .similar-card{
-    min-width:148px;
-    max-width:148px;
-    border:1px solid var(--border-soft);
-    border-radius:18px;
-    padding:10px;
-    background:#fff;
-    flex-shrink:0;
-    color:var(--dark);
-    display:block;
-    transition:0.15s var(--ease);
-    box-shadow:var(--shadow-sm);
+    min-width:150px; max-width:150px; border:1px solid var(--bs); border-radius:16px;
+    padding:10px; background:#fff; flex-shrink:0; color:var(--ink);
+    display:block; transition:.15s ease; box-shadow:var(--s1);
 }
+.similar-card:active{ transform:scale(.97); background:var(--marigold-tint); border-color:var(--bs); }
 
-.similar-card:active{
-    transform:scale(0.97);
-    background:var(--primary-soft);
-    border-color:var(--primary-soft-border);
-}
-
-.similar-img-wrap{
-    position:relative;
-    border-radius:12px;
-    overflow:hidden;
-    background:var(--bg);
-    margin-bottom:8px;
-}
-
-.similar-img{
-    width:100%;
-    height:96px;
-    object-fit:contain;
-    background:var(--bg);
-    display:block;
-}
-
+.similar-img-wrap{ position:relative; border-radius:11px; overflow:hidden; background:var(--marigold-tint); margin-bottom:8px; }
+.similar-img{ width:100%; height:94px; object-fit:contain; padding:6px; background:var(--marigold-tint); display:block; }
 .similar-tap-hint{
-    position:absolute;
-    bottom:6px;
-    right:6px;
-    width:24px;
-    height:24px;
-    border-radius:50%;
-    background:rgba(28,25,23,0.78);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:0.7rem;
+    position:absolute; bottom:6px; right:6px; width:22px; height:22px; border-radius:50%;
+    background:rgba(28,20,32,.78); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.68rem;
 }
-
 .similar-card b{
-    font-size:0.8rem;
-    font-weight:700;
-    color:var(--dark);
-    display:-webkit-box;
-    -webkit-line-clamp:2;
-    -webkit-box-orient:vertical;
-    overflow:hidden;
-    line-height:1.3;
-    min-height:33px;
+    font-size:.79rem; font-weight:700; color:var(--ink);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; line-height:1.3; min-height:32px;
 }
-
-.similar-card .s-price{
-    font-weight:800;
-    font-size:0.9rem;
-    color:var(--dark);
-    margin-top:6px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.similar-card .s-price i{
-    font-size:0.85rem;
-    color:var(--primary-dark);
-}
-
-.similar-card .s-soon{
-    font-weight:700;
-    font-size:0.76rem;
-    color:var(--muted-soft);
-    margin-top:6px;
-}
+.similar-card .s-price{ font-weight:800; font-size:.89rem; color:var(--ink); margin-top:6px; display:flex; align-items:center; justify-content:space-between; }
+.similar-card .s-price i{ font-size:.84rem; color:var(--peacock-dark); }
+.similar-card .s-soon{ font-weight:700; font-size:.75rem; color:var(--ink3); margin-top:6px; }
 
 /* ================= TOAST ================= */
+#toast{ display:flex; align-items:center; gap:8px; font-weight:700; }
 
-#toast{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-family:'Inter',sans-serif;
-    font-weight:700;
-}
-
-/* ================= BOTTOM BAR ================= */
-
+/* ================= BOTTOM BAR (mobile) ================= */
 .bottom-bar{
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 70px;
-    background: #fff;
-    border-top: 1px solid var(--border-soft);
-    padding: 12px 14px;
-    z-index: 99999;
-    box-shadow:0 -10px 26px rgba(28,25,23,0.06);
+    position:fixed; left:0; right:0; bottom:0; z-index:99999;
+    background:#fff; border-top:1px solid var(--bs);
+    padding:11px 14px calc(11px + env(safe-area-inset-bottom));
+    box-shadow:0 -10px 26px rgba(28,20,32,.08);
 }
-
-.bottom-inner{
-    display:flex;
-    gap:10px;
-    max-width:1100px;
-    margin:auto;
-}
+.bottom-inner{ display:flex; gap:10px; max-width:var(--container); margin:auto; }
 
 .btn{
-    flex:1;
-    height:50px;
-    border-radius:15px;
-    font-weight:800;
-    font-size:0.92rem;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    border:none;
-    transition:0.15s var(--ease);
+    flex:1; height:50px; border-radius:14px; font-weight:800; font-size:.9rem;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    border:none; transition:.15s ease;
+}
+.btn:active{ transform:scale(.97); }
+.btn-cart{ background:#fff; border:1.5px solid var(--peacock); color:var(--peacock-dark); }
+.btn-cart:hover{ background:var(--peacock-tint); }
+.btn-buy{ background:var(--marigold); color:#fff; box-shadow:0 6px 16px rgba(255,122,26,.3); }
+.btn-buy:hover{ background:var(--marigold-dark); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media(min-width:900px){
+    .pd-crumb{ display:flex; }
+
+    .pd-top{
+        grid-template-columns:440px 1fr;
+        gap:30px;
+        align-items:start;
+    }
+
+    .pd-gallery-col{ position:sticky; top:88px; }
+    .hero-image{ height:420px; }
+
+    .pd-desktop-actions{ display:flex; }
+    .bottom-bar{ display:none; }
+    body{ padding-bottom:32px; }
+
+    .pd-below-grid{
+        display:grid;
+        grid-template-columns:2fr 1fr;
+        gap:20px;
+        align-items:start;
+    }
 }
 
-.btn:active{
-    transform:scale(0.97);
-}
-
-.btn-cart{
-    background:#fff;
-    border:1.5px solid var(--primary);
-    color:var(--primary-dark);
-}
-
-.btn-cart:hover{
-    background:var(--primary-soft);
-}
-
-.btn-buy{
-    background:linear-gradient(150deg,var(--dark),#3a3531);
-    color:#fff;
-}
-
-.btn:disabled{
-    opacity:0.5;
-    cursor:not-allowed;
-}
-
+@media(min-width:1200px){ :root{ --container:1360px; } }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="product-page">
+<div class="pd-wrap">
 
-<!-- ================= IMAGE ================= -->
-<div class="gc-card">
+<!-- BREADCRUMB (desktop only) -->
+<div class="pd-crumb">
+    <a href="{% url 'public_dashboard' %}">Home</a>
+    <i class="bi bi-chevron-right"></i>
+    {% if product.category %}
+    <a href="{% url 'public_dashboard' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+    <i class="bi bi-chevron-right"></i>
+    {% endif %}
+    <span style="color:var(--ink);">{{ product.name }}</span>
+</div>
 
-    <div class="hero-wrap">
+<div class="pd-top">
 
-        <div class="action-icons">
-            <button class="icon-btn" onclick="toggleWishlist(this)">
-                <i class="bi bi-heart"></i>
-            </button>
-            <button class="icon-btn" onclick="shareProduct()">
-                <i class="bi bi-share-fill"></i>
-            </button>
+    <!-- ================= GALLERY COLUMN ================= -->
+    <div class="pd-gallery-col">
+        <div class="gc-card" style="margin-bottom:0;">
+
+            <div class="hero-wrap">
+
+                <div class="action-icons">
+                    <button class="icon-btn" onclick="toggleWishlist(this)">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                    <button class="icon-btn" onclick="shareProduct()">
+                        <i class="bi bi-share-fill"></i>
+                    </button>
+                </div>
+
+                <span id="discountBadge" class="discount-badge" style="display:none;"></span>
+
+                <img id="mainImage"
+                     class="hero-image"
+                     onclick="openZoom()"
+                     src="{% if product.product_images.first %}{{ product.product_images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}">
+
+                <span class="zoom-hint"><i class="bi bi-zoom-in"></i> Tap to zoom</span>
+
+            </div>
+
+            <div class="thumb-strip">
+                {% for img in product.product_images.all %}
+                <img src="{{ img.image.url }}"
+                     class="thumb {% if forloop.first %}active{% endif %}"
+                     onclick="switchImage(this)">
+                {% endfor %}
+            </div>
+
         </div>
-
-        <span id="discountBadge" class="discount-badge" style="display:none;"></span>
-
-        <img id="mainImage"
-             class="hero-image"
-             onclick="openZoom()"
-             src="{% if product.product_images.first %}{{ product.product_images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}">
-
-        <span class="zoom-hint"><i class="bi bi-zoom-in"></i> Tap to zoom</span>
-
     </div>
 
-    <div class="thumb-strip">
-        {% for img in product.product_images.all %}
-        <img src="{{ img.image.url }}"
-             class="thumb {% if forloop.first %}active{% endif %}"
-             onclick="switchImage(this)">
-        {% endfor %}
+    <!-- ================= INFO COLUMN ================= -->
+    <div class="pd-info-col">
+
+        <div class="gc-card">
+
+            <div class="title">{{ product.name }}</div>
+
+            <div class="rating-row">
+                <div class="pill rating-pill">
+                    <i class="bi bi-star-fill"></i>
+                    {{ avg_rating|floatformat:1 }} ({{ rating_count }})
+                </div>
+            </div>
+
+            <!-- ================= 30-MIN DELIVERY ================= -->
+            <div class="eta-strip">
+                <div class="eta-icon-wrap">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span class="eta-pulse-dot"></span>
+                </div>
+                <div class="eta-body">
+                    <b id="etaMainText">Delivery in 30 minutes</b>
+                    <span>To {{ active_hub.name|default:"your location" }} &middot; Hyperlocal Express from {{ company.name|default:"GramaCart" }}</span>
+                </div>
+            </div>
+
+            <!-- ================= SELLER / MARKETPLACE ================= -->
+            <div class="seller-card">
+
+                <div class="seller-avatar">
+                    {% if product.seller.logo %}
+                        <img src="{{ product.seller.logo.url }}" alt="{{ product.seller.name }}">
+                    {% else %}
+                        {% firstof product.seller.name company.name "GC" as sellerInitial %}
+                        {{ sellerInitial|slice:":2"|upper }}
+                    {% endif %}
+                </div>
+
+                <div class="seller-body">
+                    <div class="seller-name-row">
+                        <b>{% firstof product.seller.name company.name "GramaCart" %}</b>
+                        {% if product.seller.is_verified|default:True %}
+                        <span class="seller-official-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                        {% endif %}
+                    </div>
+                    <div class="seller-meta">
+                        {% if product.seller.avg_rating %}
+                        <span class="sm-rating">★ {{ product.seller.avg_rating|floatformat:1 }}</span>
+                        {% endif %}
+                        {% if product.seller.total_orders %}
+                        <span>{{ product.seller.total_orders }} orders</span>
+                        {% endif %}
+                        {% if active_hub.name %}
+                        <span>&middot; {{ active_hub.name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if product.seller %}
+                <a href="{% url 'seller_store' product.seller.id %}" class="seller-visit">View Store</a>
+                {% else %}
+                <span class="seller-visit" style="opacity:.6;cursor:default;">Official</span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- ================= VARIANTS ================= -->
+        {% if variants %}
+        <div class="gc-card">
+
+            <h6><i class="bi bi-box-seam"></i> Select Variant</h6>
+
+            <div class="variant-scroll">
+
+                {% for v in variants %}
+                <div class="variant-card"
+                     data-id="{{ v.id }}"
+                     data-price="{{ v.price }}"
+                     data-mrp="{{ v.mrp|default:v.price }}"
+                     data-stock="{{ v.stock }}"
+                     onclick="selectVariant(this)">
+
+                    <b>{{ v.name }}</b>
+                    <div class="v-price">₹{{ v.price }}</div>
+
+                    {% if v.stock > 0 %}
+                        <small style="color:var(--peacock-dark);"><i class="bi bi-dot"></i>{{ v.stock }} left</small>
+                    {% else %}
+                        <small style="color:var(--terracotta);"><i class="bi bi-dot"></i>Out of stock</small>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+        {% endif %}
+
+        <div class="gc-card">
+
+            <div class="price-row">
+                <div class="price">
+                    <small>₹</small>
+                    <span id="priceValue">
+                        {% if default_variant %}{{ default_variant.price }}{% else %}0{% endif %}
+                    </span>
+                </div>
+                <span id="mrpValue" class="mrp-strike" style="display:none;"></span>
+            </div>
+
+            <div id="offerBadgeRow" class="offer-badge-row" style="display:none;">
+                <span class="offer-badge-ribbon" id="discountPct">
+                    <i class="bi bi-tag-fill"></i><span id="discountPctText"></span>
+                </span>
+            </div>
+
+            <div id="savingsLine" class="savings-line" style="display:none;"></div>
+
+            <div id="stockText" class="text-muted">Select variant</div>
+
+            <!-- Desktop inline buy box -->
+            <div class="pd-desktop-actions">
+                <button id="cartBtnDesktop" class="btn btn-cart">
+                    <i class="bi bi-cart3"></i> Add to Cart
+                </button>
+                <button id="buyBtnDesktop" class="btn btn-buy">
+                    <i class="bi bi-lightning-charge-fill"></i> Buy Now
+                </button>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -849,108 +713,52 @@ own detail page (image, name, and price all navigate together)
     <div class="zoom-tip">Double-tap to zoom in/out</div>
 </div>
 
-<!-- ================= DETAILS ================= -->
-<div class="gc-card">
+<!-- ================= BELOW-FOLD: description/policy/reviews + similar rail ================= -->
+<div class="pd-below-grid">
+<div>
 
-    <div class="title">{{ product.name }}</div>
-
-    <div class="rating-row">
-        <div class="pill rating">
-            <i class="bi bi-star-fill"></i>
-            {{ avg_rating|floatformat:1 }} ({{ rating_count }})
-        </div>
-        <div class="pill delivery">
-            <i class="bi bi-geo-alt-fill"></i>
-            {{ active_hub.name }} &middot; Hyperlocal Express
-        </div>
-    </div>
-
-    <div class="trust-row">
-        <i class="bi bi-patch-check-fill"></i>
-        Sold and delivered by your local GramaCart hub
-    </div>
-
-    <div class="delivery-box">
-        <i class="bi bi-truck"></i>
-        <div>
-            <b id="deliveryDate">Calculating delivery date...</b>
-            <span>Free hyperlocal delivery on this order</span>
-        </div>
-    </div>
-
-</div>
-
-<!-- ================= VARIANTS ================= -->
-{% if variants %}
-<div class="gc-card">
-
-    <h6><i class="bi bi-box-seam"></i> Select Variant</h6>
-
-    <div class="variant-scroll">
-
-        {% for v in variants %}
-        <div class="variant-card"
-             data-id="{{ v.id }}"
-             data-price="{{ v.price }}"
-             data-mrp="{{ v.mrp|default:v.price }}"
-             data-stock="{{ v.stock }}"
-             onclick="selectVariant(this)">
-
-            <b>{{ v.name }}</b>
-            <div class="v-price">₹{{ v.price }}</div>
-
-            {% if v.stock > 0 %}
-                <small style="color:var(--primary-dark);"><i class="bi bi-dot"></i>{{ v.stock }} left</small>
-            {% else %}
-                <small style="color:var(--terracotta);"><i class="bi bi-dot"></i>Out of stock</small>
-            {% endif %}
-
-        </div>
-        {% endfor %}
-
-    </div>
-
-</div>
-{% endif %}
-<div class="gc-card">
-
-    <div class="price-row">
-        <div class="price">
-            <small>₹</small>
-            <span id="priceValue">
-                {% if default_variant %}
-                    {{ default_variant.price }}
-                {% else %}
-                    0
-                {% endif %}
-            </span>
-        </div>
-        <span id="mrpValue" class="mrp-strike" style="display:none;"></span>
-        <span id="discountPct" class="discount-pct" style="display:none;"></span>
-    </div>
-
-    <div id="savingsLine" class="savings-line" style="display:none;"></div>
-
-    <div id="stockText" class="text-muted">
-        Select variant
-    </div>
-
-</div>
 <!-- ================= DESCRIPTION ================= -->
 <div class="gc-card">
     <h6><i class="bi bi-card-text"></i> Description</h6>
-    <p class="mb-0" style="color:var(--muted);font-size:0.88rem;line-height:1.55;">
-        {{ product.description|default:"No description available." }}
+
+    {% if product.description %}
+    <div class="desc-body" id="descBody">
+        {{ product.description|linebreaks }}
+    </div>
+    <button type="button" class="desc-toggle" id="descToggle" style="display:none;" onclick="toggleDescription()">
+        <span id="descToggleText">Read more</span>
+        <i class="bi bi-chevron-down" id="descToggleIcon"></i>
+    </button>
+    {% else %}
+    <p class="mb-0" style="color:var(--ink3);font-size:.88rem;">
+        The seller hasn't added a description for this product yet.
     </p>
+    {% endif %}
 </div>
 
-<!-- ================= POLICY ================= -->
+<!-- ================= POLICY — driven by real product/company fields ================= -->
 <div class="gc-card">
     <h6><i class="bi bi-shield-check"></i> Policy</h6>
     <div class="icon-grid">
-        <div class="icon-box"><i class="bi bi-arrow-counterclockwise"></i>Non Returnable</div>
+        {% if product.is_returnable %}
+        <div class="icon-box"><i class="bi bi-arrow-counterclockwise"></i>{{ product.return_window_days|default:"7" }}-Day Return</div>
+        {% else %}
+        <div class="icon-box"><i class="bi bi-x-circle"></i>Non Returnable</div>
+        {% endif %}
+
+        {% if product.is_cancellable %}
+        <div class="icon-box"><i class="bi bi-check2-circle"></i>Cancellable</div>
+        {% else %}
         <div class="icon-box"><i class="bi bi-x-circle"></i>Non Cancellable</div>
+        {% endif %}
+
+        {% if company.policy_url %}
+        <a href="{{ company.policy_url }}" class="icon-box" style="color:inherit;">
+            <i class="bi bi-file-earmark-text"></i>Full Policy
+        </a>
+        {% else %}
         <div class="icon-box"><i class="bi bi-file-earmark-text"></i>Policy</div>
+        {% endif %}
     </div>
 </div>
 
@@ -958,9 +766,9 @@ own detail page (image, name, and price all navigate together)
 <div class="gc-card">
     <h6><i class="bi bi-stars"></i> Why Us</h6>
     <div class="icon-grid">
-        <div class="icon-box"><i class="bi bi-shield-check"></i>Trusted</div>
-        <div class="icon-box"><i class="bi bi-lightning-charge-fill"></i>Fast</div>
-        <div class="icon-box"><i class="bi bi-camera-fill"></i>Proof</div>
+        <div class="icon-box"><i class="bi bi-lightning-charge-fill"></i>30-Min Delivery</div>
+        <div class="icon-box"><i class="bi bi-shield-check"></i>Verified Sellers</div>
+        <div class="icon-box"><i class="bi bi-camera-fill"></i>Buyer Photo Proof</div>
     </div>
 </div>
 
@@ -980,11 +788,7 @@ own detail page (image, name, and price all navigate together)
 
     {% for review in reviews|slice:":5" %}
     <div class="review">
-
-        <div class="review-avatar">
-            {{ review.user.username|slice:":1"|upper }}
-        </div>
-
+        <div class="review-avatar">{{ review.user.username|slice:":1"|upper }}</div>
         <div class="review-body">
             <b>{{ review.user.username }}</b>
             <span class="review-stars">⭐ {{ review.rating }}</span>
@@ -995,7 +799,6 @@ own detail page (image, name, and price all navigate together)
             {% if review.comment %}
             <div class="review-comment">{{ review.comment }}</div>
             {% endif %}
-
             {% if review.review_images.all %}
             <div class="review-photos">
                 {% for rimg in review.review_images.all %}
@@ -1004,49 +807,40 @@ own detail page (image, name, and price all navigate together)
             </div>
             {% endif %}
         </div>
-
     </div>
     {% empty %}
     <p class="text-muted small mb-0">No reviews yet</p>
     {% endfor %}
 </div>
 
-<!-- =========================================================
-SIMILAR PRODUCTS — each card links straight to that product's
-own page, the way every real shopping app behaves: tap the
-picture, the name, or the price and you land on that product.
-========================================================== -->
-<div class="gc-card">
+</div>
 
+<!-- ================= SIMILAR PRODUCTS (right rail on desktop) ================= -->
+<div class="gc-card">
     <div class="section-header">
         <h6><i class="bi bi-grid-3x3-gap-fill"></i> Similar Products</h6>
-        <span class="section-sub">Tap to view &middot; నొక్కండి</span>
+        <span class="section-sub">Tap to view</span>
     </div>
 
     <div class="similar-scroll">
         {% for p in similar_products %}
-        <a class="similar-card" href="{% url 'product_detail' p.id %}">
-
+        <a class="similar-card" href="{% url 'product_detail' p.slug %}">
             <div class="similar-img-wrap">
                 <img class="similar-img"
                      src="{% if p.product_images.first %}{{ p.product_images.first.image.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}">
                 <span class="similar-tap-hint"><i class="bi bi-arrow-up-right"></i></span>
             </div>
-
             <b>{{ p.name }}</b>
-
             {% if p.hub_price %}
-                <div class="s-price">
-                    ₹{{ p.hub_price }}
-                    <i class="bi bi-cart-plus"></i>
-                </div>
+                <div class="s-price">₹{{ p.hub_price }} <i class="bi bi-cart-plus"></i></div>
             {% else %}
                 <div class="s-soon">Coming Soon</div>
             {% endif %}
-
         </a>
         {% endfor %}
     </div>
+</div>
+
 </div>
 
 </div>
@@ -1056,7 +850,7 @@ picture, the name, or the price and you land on that product.
     bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
-    background: #1C1917;
+    background: var(--ink);
     color: #fff;
     padding: 10px 16px;
     border-radius: 12px;
@@ -1066,18 +860,15 @@ picture, the name, or the price and you land on that product.
     box-shadow: 0 14px 30px rgba(0,0,0,0.24);
 "></div>
 
-<!-- ================= BOTTOM BAR ================= -->
+<!-- ================= BOTTOM BAR (mobile) ================= -->
 <div class="bottom-bar">
     <div class="bottom-inner">
-
         <button id="cartBtn" class="btn btn-cart">
             <i class="bi bi-cart3"></i> Add to Cart
         </button>
-
         <button id="buyBtn" class="btn btn-buy">
             <i class="bi bi-lightning-charge-fill"></i> Buy Now
         </button>
-
     </div>
 </div>
 
@@ -1085,41 +876,30 @@ picture, the name, or the price and you land on that product.
 
 /* ================= TOAST ================= */
 function showToast(message, success = true) {
-
     const toast = document.getElementById("toast");
     if (!toast) return;
-
     toast.innerText = message;
-    toast.style.background = success ? "#0E9F6E" : "#C2410C";
+    toast.style.background = success ? "#0F6E6E" : "#C2410C";
     toast.style.display = "block";
-
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 2000);
+    setTimeout(() => { toast.style.display = "none"; }, 2000);
 }
-
 
 /* ================= STATE ================= */
 let selectedVariant = null;
 
-
-/* ================= IMAGE ================= */
+/* ================= IMAGE SWITCH ================= */
 function switchImage(el) {
-
     const main = document.getElementById("mainImage");
     if (main) main.src = el.src;
-
     document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
     el.classList.add("active");
 }
-
 
 /* ================= ZOOM LIGHTBOX ================= */
 function openZoom() {
     const main = document.getElementById("mainImage");
     openZoomSrc(main.src);
 }
-
 function openZoomSrc(src) {
     const overlay = document.getElementById("zoomOverlay");
     const img = document.getElementById("zoomImage");
@@ -1128,14 +908,8 @@ function openZoomSrc(src) {
     img.dataset.zoomed = "0";
     overlay.classList.add("open");
 }
-
-function closeZoom() {
-    document.getElementById("zoomOverlay").classList.remove("open");
-}
-
-function closeZoomIfBackground(e) {
-    if (e.target.id === "zoomOverlay") closeZoom();
-}
+function closeZoom() { document.getElementById("zoomOverlay").classList.remove("open"); }
+function closeZoomIfBackground(e) { if (e.target.id === "zoomOverlay") closeZoom(); }
 
 document.addEventListener("DOMContentLoaded", function () {
     const zoomImg = document.getElementById("zoomImage");
@@ -1148,65 +922,110 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+/* ================= DESCRIPTION EXPAND/COLLAPSE ================= */
+function toggleDescription() {
+    const body = document.getElementById("descBody");
+    const toggle = document.getElementById("descToggle");
+    const text = document.getElementById("descToggleText");
+    const icon = document.getElementById("descToggleIcon");
 
-/* ================= DELIVERY ESTIMATE ================= */
-function setDeliveryEstimate() {
-    const el = document.getElementById("deliveryDate");
-    if (!el) return;
+    const isExpanded = body.classList.contains("expanded");
 
-    const days = 3; // hyperlocal default window; wire to hub SLA if available
-    const target = new Date();
-    target.setDate(target.getDate() + days);
-
-    const options = { weekday: "short", month: "short", day: "numeric" };
-    el.innerText = "Delivery by " + target.toLocaleDateString("en-IN", options);
+    if (isExpanded) {
+        body.classList.remove("expanded");
+        body.classList.add("collapsed");
+        text.innerText = "Read more";
+        toggle.classList.remove("open");
+    } else {
+        body.classList.remove("collapsed");
+        body.classList.add("expanded");
+        text.innerText = "Read less";
+        toggle.classList.add("open");
+    }
 }
 
+function setupDescriptionToggle() {
+    const body = document.getElementById("descBody");
+    const toggle = document.getElementById("descToggle");
+    if (!body || !toggle) return;
+
+    // Only show the toggle if the content actually overflows the collapsed height
+    if (body.scrollHeight > body.clientHeight + 4) {
+        body.classList.add("collapsed");
+        toggle.style.display = "flex";
+    }
+}
+
+/* ================= 30-MIN DELIVERY COUNTDOWN ================= */
+function setDeliveryEstimate() {
+    const el = document.getElementById("etaMainText");
+    if (!el) return;
+    const minutes = 30; // hyperlocal SLA; wire to hub's live ETA API if available
+    const target = new Date(Date.now() + minutes * 60000);
+    const timeStr = target.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+    el.innerText = "Delivery by " + timeStr + " (~30 min)";
+}
 
 /* ================= PRICE / DISCOUNT ================= */
 function updatePriceDisplay(price, mrp) {
-
     document.getElementById("priceValue").innerText = price;
 
     const mrpEl = document.getElementById("mrpValue");
-    const pctEl = document.getElementById("discountPct");
+    const badgeRow = document.getElementById("offerBadgeRow");
+    const pctTextEl = document.getElementById("discountPctText");
     const savingsEl = document.getElementById("savingsLine");
-    const badgeEl = document.getElementById("discountBadge");
+    const cornerBadgeEl = document.getElementById("discountBadge");
 
     if (mrp && mrp > price) {
-
         const savings = mrp - price;
         const pct = Math.round((savings / mrp) * 100);
 
-        mrpEl.innerText = "₹" + mrp;
+        mrpEl.innerHTML = "M.R.P.: <b>₹" + mrp + "</b>";
         mrpEl.style.display = "inline";
 
-        pctEl.innerText = pct + "% OFF";
-        pctEl.style.display = "inline";
+        pctTextEl.innerText = pct + "% OFF";
+        badgeRow.style.display = "block";
 
         savingsEl.innerText = "You save ₹" + savings + " on this order";
         savingsEl.style.display = "block";
 
-        badgeEl.innerText = pct + "% OFF";
-        badgeEl.style.display = "inline-block";
-
+        cornerBadgeEl.innerText = pct + "% OFF";
+        cornerBadgeEl.style.display = "inline-block";
     } else {
-
         mrpEl.style.display = "none";
-        pctEl.style.display = "none";
+        badgeRow.style.display = "none";
         savingsEl.style.display = "none";
-        badgeEl.style.display = "none";
+        cornerBadgeEl.style.display = "none";
     }
 }
 
+/* ================= VARIANT SELECT ================= */
+function setStockUI(inStock){
+    const stockText = document.getElementById("stockText");
+    const btns = [
+        document.getElementById("cartBtn"), document.getElementById("buyBtn"),
+        document.getElementById("cartBtnDesktop"), document.getElementById("buyBtnDesktop")
+    ];
 
-/* ================= VARIANT ================= */
+    if (inStock) {
+        stockText.innerHTML = '<i class="bi bi-check-circle-fill"></i> In Stock';
+        stockText.classList.add("in-stock");
+        stockText.classList.remove("out-stock");
+    } else {
+        stockText.innerHTML = '<i class="bi bi-x-circle-fill"></i> Out of Stock';
+        stockText.classList.add("out-stock");
+        stockText.classList.remove("in-stock");
+    }
+
+    btns.forEach(b => {
+        if (!b) return;
+        b.disabled = !inStock;
+        b.style.opacity = inStock ? "1" : "0.5";
+    });
+}
+
 function selectVariant(el) {
-
-    document.querySelectorAll(".variant-card").forEach(v =>
-        v.classList.remove("active")
-    );
-
+    document.querySelectorAll(".variant-card").forEach(v => v.classList.remove("active"));
     el.classList.add("active");
 
     selectedVariant = {
@@ -1217,111 +1036,53 @@ function selectVariant(el) {
     };
 
     updatePriceDisplay(selectedVariant.price, selectedVariant.mrp);
-
-    const stockText = document.getElementById("stockText");
-    const cartBtn = document.getElementById("cartBtn");
-    const buyBtn = document.getElementById("buyBtn");
-
-    if (selectedVariant.stock > 0) {
-
-        stockText.innerHTML = '<i class="bi bi-check-circle-fill"></i> In Stock';
-        stockText.classList.add("in-stock");
-        stockText.classList.remove("out-stock");
-
-        cartBtn.disabled = false;
-        buyBtn.disabled = false;
-
-        cartBtn.style.opacity = "1";
-        buyBtn.style.opacity = "1";
-
-    } else {
-
-        stockText.innerHTML = '<i class="bi bi-x-circle-fill"></i> Out of Stock';
-        stockText.classList.add("out-stock");
-        stockText.classList.remove("in-stock");
-
-        cartBtn.disabled = true;
-        buyBtn.disabled = true;
-
-        cartBtn.style.opacity = "0.5";
-        buyBtn.style.opacity = "0.5";
-    }
+    setStockUI(selectedVariant.stock > 0);
 }
-
 
 /* ================= AUTO SELECT BEST VARIANT ================= */
 document.addEventListener("DOMContentLoaded", function () {
 
     setDeliveryEstimate();
+    setupDescriptionToggle();
 
     let best = null;
-
     document.querySelectorAll(".variant-card").forEach(v => {
-
         const stock = parseInt(v.dataset.stock);
         const price = parseFloat(v.dataset.price);
-
         if (stock > 0) {
-            if (!best || price < parseFloat(best.dataset.price)) {
-                best = v;
-            }
+            if (!best || price < parseFloat(best.dataset.price)) best = v;
         }
     });
 
     if (best) {
         best.click();
     } else {
-
         const stockText = document.getElementById("stockText");
-        const cartBtn = document.getElementById("cartBtn");
-        const buyBtn = document.getElementById("buyBtn");
-
         if (stockText) {
             stockText.innerHTML = '<i class="bi bi-x-circle-fill"></i> Out of Stock (All Variants)';
             stockText.classList.add("out-stock");
         }
-
-        if (cartBtn) {
-            cartBtn.disabled = true;
-            cartBtn.style.opacity = "0.5";
-        }
-
-        if (buyBtn) {
-            buyBtn.disabled = true;
-            buyBtn.style.opacity = "0.5";
-        }
+        setStockUI(false);
     }
 });
 
-
 /* ================= SHARE ================= */
 function shareProduct() {
-
     const url = window.location.href;
-
     if (navigator.share) {
-
-        navigator.share({
-            title: document.title,
-            url: url
-        }).catch(() => fallbackShare(url));
-
+        navigator.share({ title: document.title, url: url }).catch(() => fallbackShare(url));
     } else {
         fallbackShare(url);
     }
 }
-
 function fallbackShare(url) {
     navigator.clipboard.writeText(url);
     showToast("Link copied!");
 }
 
-
 /* ================= WISHLIST ================= */
 function toggleWishlist(btn) {
-
     const url = "{% url 'add_to_wishlist' product.id %}";
-
     const icon = btn.querySelector("i");
 
     fetch(url, {
@@ -1334,100 +1095,65 @@ function toggleWishlist(btn) {
     })
     .then(res => res.json())
     .then(data => {
-
-        // backend decides actual state
         if (data.success === true) {
             btn.classList.add("active");
-            if (icon) {
-                icon.classList.remove("bi-heart");
-                icon.classList.add("bi-heart-fill");
-            }
+            if (icon) { icon.classList.remove("bi-heart"); icon.classList.add("bi-heart-fill"); }
             showToast("Added to wishlist");
         } else {
             btn.classList.remove("active");
-            if (icon) {
-                icon.classList.remove("bi-heart-fill");
-                icon.classList.add("bi-heart");
-            }
+            if (icon) { icon.classList.remove("bi-heart-fill"); icon.classList.add("bi-heart"); }
             showToast(data.message || "Removed from wishlist");
         }
-
     })
-    .catch(() => {
-        btn.classList.remove("active");
-        showToast("Wishlist error", false);
-    });
+    .catch(() => { btn.classList.remove("active"); showToast("Wishlist error", false); });
 }
 
-
-/* ================= ADD TO CART ================= */
+/* ================= ADD TO CART (mobile + desktop buttons share logic) ================= */
 const ADD_TO_CART_URL = "{% url 'add_to_cart' product.id %}";
 
-document.getElementById("cartBtn").addEventListener("click", function () {
-
+function handleAddToCart() {
     if (!selectedVariant || selectedVariant.stock <= 0) {
         showToast("This item is out of stock", false);
         return;
     }
 
-    const btn = this;
-    btn.disabled = true;
-
-    fetch(ADD_TO_CART_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
-            "X-CSRFToken":"{{ csrf_token }}",
-            "X-Requested-With":"XMLHttpRequest"
+    fetch(ADD_TO_CART_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
         },
-        body:JSON.stringify({
-            variant_id:selectedVariant.id,
-            quantity:1
-        })
+        body: JSON.stringify({ variant_id: selectedVariant.id, quantity: 1 })
     })
-    .then(response=>{
-
-        // User is not logged in
-        if(response.redirected){
-            window.location.href = response.url;
-            return;
-        }
-
+    .then(response => {
+        if (response.redirected) { window.location.href = response.url; return; }
         return response.json();
-
     })
-    .then(data=>{
-
-        if(!data) return;
-
-        if(data.success){
-            showToast(data.message);
-        }else{
-            showToast(data.message,false);
-        }
-
+    .then(data => {
+        if (!data) return;
+        if (data.success) { showToast(data.message); }
+        else { showToast(data.message, false); }
     })
-    .catch(()=>{
-        showToast("Server error",false);
-    })
-    .finally(()=>{
-        btn.disabled=false;
-    });
-});
+    .catch(() => showToast("Server error", false));
+}
 
-
-/* ================= BUY NOW ================= */
-document.getElementById("buyBtn").addEventListener("click", function () {
-
+function handleBuyNow() {
     if (!selectedVariant || selectedVariant.stock <= 0) {
         showToast("This item is out of stock", false);
         return;
     }
-
     showToast("Redirecting...");
+    window.location.href = "{% url 'buy_now' product.id %}?variant_id=" + selectedVariant.id;
+}
 
-    window.location.href =
-        "{% url 'buy_now' product.id %}?variant_id=" + selectedVariant.id;
+["cartBtn", "cartBtnDesktop"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", handleAddToCart);
+});
+["buyBtn", "buyBtnDesktop"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", handleBuyNow);
 });
 
 </script>

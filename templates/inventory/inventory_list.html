@@ -167,9 +167,17 @@
 
                         <th>Stock</th>
 
+                        <th>MRP</th>
+
                         <th>Cost Price</th>
 
                         <th>Selling Price</th>
+
+                        <th>Discount</th>
+
+                        <th>Offer</th>
+
+                        <th>Status</th>
 
                         <th>Status</th>
 
@@ -235,14 +243,78 @@
 
                         </td>
 
-                        <!-- COST -->
+                        <!-- MRP -->
+                        <td class="fw-700 text-muted">
+                            ₹{{ item.mrp }}
+                        </td>
+
+                        <!-- COST PRICE -->
                         <td class="fw-700">
                             ₹{{ item.cost_price }}
                         </td>
 
-                        <!-- SELL -->
+                        <!-- SELLING PRICE -->
                         <td class="fw-700 text-success">
                             ₹{{ item.selling_price }}
+                        </td>
+
+                        <!-- DISCOUNT -->
+                        <td>
+
+                            {% if item.discount_percentage > 0 %}
+
+                                <span class="status-badge success">
+                                    {{ item.discount_percentage }}% OFF
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- OFFER -->
+                        <td>
+
+                            {% if item.offer_label %}
+
+                                <span class="status-badge primary">
+                                    {{ item.get_offer_label_display }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if item.stock <= 0 %}
+
+                                <span class="status-badge danger">
+                                    Out of Stock
+                                </span>
+
+                            {% elif item.stock <= item.min_stock_level %}
+
+                                <span class="status-badge warning">
+                                    Low Stock
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge success">
+                                    Healthy
+                                </span>
+
+                            {% endif %}
+
                         </td>
 
                         <!-- STATUS -->

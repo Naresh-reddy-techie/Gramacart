@@ -214,6 +214,23 @@
 
                     </div>
 
+                    <div class="col-md-4">
+
+                        <label class="form-label custom-label">
+                            MRP
+                        </label>
+
+                        <div class="input-group custom-group">
+                            <span class="input-group-text">₹</span>
+                            {{ form.mrp }}
+                        </div>
+
+                        <small class="helper-text">
+                            Maximum Retail Price printed on the product.
+                        </small>
+
+                    </div>
+
                     <!-- SELLING -->
                     <div class="col-md-6">
 
@@ -229,6 +246,39 @@
                         <small class="helper-text">
                             Final customer-facing price.
                         </small>
+
+                    </div>
+
+                    <div class="section-title mt-5 mb-4">
+
+                        <div class="section-icon">
+                            <i class="bi bi-tags-fill"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="mb-1 fw-bold">Marketing</h5>
+                            <p class="text-muted small mb-0">
+                                Highlight products with promotional labels.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label custom-label">
+                                Offer Label
+                            </label>
+
+                            {{ form.offer_label }}
+
+                            <small class="helper-text">
+                                Example: Best Seller, New, Today's Deal.
+                            </small>
+
+                        </div>
 
                     </div>
 

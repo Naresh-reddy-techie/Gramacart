@@ -180,6 +180,7 @@ class ProductVariant(models.Model):
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
 
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    
 
     # auto-generated display (NO manual mistakes)
     @property
