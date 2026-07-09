@@ -239,20 +239,6 @@ def catalog_version(request):
         "catalog_version": version
     })
 
-
-
-# views.py
-import socket
-from django.http import HttpResponse
-
-def smtp_test(request):
-    try:
-        s = socket.create_connection(("smtp-relay.brevo.com", 587), 10)
-        s.close()
-        return HttpResponse("SMTP CONNECTION SUCCESS")
-    except Exception as e:
-        return HttpResponse(f"SMTP FAILED: {repr(e)}")
-
 # =========================================================
 # WHERE SHOULD WE DELIVER
 # =========================================================

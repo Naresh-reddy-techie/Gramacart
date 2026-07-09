@@ -59,6 +59,16 @@ class EmailService:
                 "text/html",
             )
 
+            import socket
+
+            try:
+                print("Testing SMTP connection...")
+                s = socket.create_connection(("smtp-relay.brevo.com", 587), 10)
+                print("SMTP CONNECTION SUCCESS")
+                s.close()
+            except Exception as e:
+                print("SMTP CONNECTION FAILED:", repr(e))
+
             email.send(
                 fail_silently=False,
             )

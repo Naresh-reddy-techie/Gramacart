@@ -6,8 +6,7 @@ urlpatterns = [
     path( 'where-we-deliver/', views.where_should_we_deliver, name='where_we_deliver' ), 
     path( 'check-delivery-availability/', views.check_delivery_availability, name='check_delivery_availability' ),
     
-    # urls.py
-    path("smtp-test/",views.smtp_test,name='smtp_test'),
+   
     # 1. Dashboards & Profiles
     path('public_dashboard/', views.public_dashboard, name='public_dashboard'),
     path('category/<slug:category_slug>/', views.public_dashboard, name='public_dashboard_by_category'), 
