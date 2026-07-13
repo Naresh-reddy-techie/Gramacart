@@ -138,12 +138,17 @@ urlpatterns = [
         name="marketplace_settings",
     ),
 
-    # urls.py
-
     path(
         "products/search/",
         views.search_products,
         name="search_products"
+    ),
+
+
+    path(
+        "orders/invoice/<str:order_number>/",
+        views.order_invoice,
+        name="order_invoice"
     ),
 ]
 

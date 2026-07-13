@@ -1,194 +1,935 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GramaCart Invoice #{{ order.order_number }}</title>
-    <style>
-        /* Modern Invoice Styles */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            color: #333; 
-            line-height: 1.6; 
-            margin: 0; 
-            padding: 40px; 
-        }
-        
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 3px solid #0f172a;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
 
-        .brand-name {
-            font-size: 28px;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -1px;
-        }
+<meta charset="UTF-8">
 
-        .invoice-title {
-            text-align: right;
-            text-transform: uppercase;
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 700;
-        }
+<title>
+GramaCart Invoice #{{ order.order_number }}
+</title>
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
+<style>
 
-        .section-label {
-            text-transform: uppercase;
-            font-size: 11px;
-            font-weight: 800;
-            color: #64748b;
-            margin-bottom: 8px;
-            display: block;
-        }
+*{
+    box-sizing:border-box;
+}
 
-        .address-box {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
+body{
 
-        .landmark-badge {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 5px 10px;
-            background: #fff1f2;
-            color: #be123c;
-            border: 1px dashed #fb7185;
-            font-weight: 700;
-            font-size: 13px;
-        }
+    font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
+    background:#f1f5f9;
 
-        th {
-            text-align: left;
-            background: #f1f5f9;
-            padding: 12px;
-            font-size: 12px;
-            text-transform: uppercase;
-            border-bottom: 2px solid #cbd5e1;
-        }
+    margin:0;
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    padding:30px;
 
-        .total-row {
-            font-size: 18px;
-            font-weight: 800;
-            background: #f8fafc;
-        }
+    color:#111827;
+}
 
-        .footer-note {
-            text-align: center;
-            margin-top: 50px;
-            font-size: 12px;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 20px;
-        }
 
-        @media print {
-            body { padding: 20px; }
-            button { display: none; }
-        }
-    </style>
+.invoice{
+
+    max-width:850px;
+
+    margin:auto;
+
+    background:white;
+
+    padding:35px;
+
+    border-radius:18px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.08);
+
+}
+
+
+
+/* HEADER */
+
+.header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-bottom:
+    3px solid #16a34a;
+
+    padding-bottom:20px;
+
+}
+
+
+
+.logo{
+
+    width:150px;
+
+}
+
+
+.brand{
+
+    font-size:13px;
+
+    color:#64748b;
+
+    margin-top:8px;
+
+}
+
+
+.invoice-title{
+
+    text-align:right;
+
+}
+
+
+.invoice-title h2{
+
+    margin:0;
+
+    font-size:26px;
+
+    color:#111827;
+
+}
+
+
+.invoice-number{
+
+    margin-top:8px;
+
+    font-weight:800;
+
+    color:#16a34a;
+
+}
+
+
+
+
+/* CUSTOMER SECTION */
+
+.info-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    1fr 1fr;
+
+    gap:25px;
+
+    margin-top:30px;
+
+}
+
+
+
+.box{
+
+    background:#f8fafc;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    border:1px solid #e5e7eb;
+
+}
+
+
+
+.label{
+
+    font-size:11px;
+
+    text-transform:uppercase;
+
+    color:#64748b;
+
+    font-weight:800;
+
+    margin-bottom:8px;
+
+}
+
+
+
+.value{
+
+    font-weight:700;
+
+}
+
+
+
+/* ITEMS */
+
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:30px;
+
+}
+
+
+
+thead th{
+
+    background:#111827;
+
+    color:white;
+
+    padding:12px;
+
+    font-size:13px;
+
+    text-align:left;
+
+}
+
+
+
+tbody td{
+
+    padding:12px;
+
+    border-bottom:1px solid #e5e7eb;
+
+    font-size:14px;
+
+}
+
+
+
+.text-right{
+
+    text-align:right;
+
+}
+
+
+
+
+/* TOTAL */
+
+
+.summary{
+
+    width:100%;
+
+    margin-top:20px;
+
+}
+
+
+.summary-row{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:40px;
+
+    padding:8px;
+
+}
+
+
+
+.summary-label{
+
+    width:150px;
+
+    text-align:right;
+
+    color:#64748b;
+
+}
+
+
+
+.summary-value{
+
+    width:100px;
+
+    text-align:right;
+
+    font-weight:700;
+
+}
+
+
+
+.grand{
+
+    background:#16a34a;
+
+    color:white;
+
+    border-radius:10px;
+
+    padding:15px;
+
+    margin-top:15px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:20px;
+
+    font-weight:900;
+
+}
+
+
+
+/* BUTTONS */
+
+
+.actions{
+
+    margin-top:25px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+}
+
+
+
+.btn{
+
+    padding:12px 22px;
+
+    border-radius:30px;
+
+    text-decoration:none;
+
+    font-weight:800;
+
+    border:none;
+
+    cursor:pointer;
+
+}
+
+
+
+.print{
+
+    background:#111827;
+
+    color:white;
+
+}
+
+
+
+.whatsapp{
+
+    background:#25D366;
+
+    color:white;
+
+}
+
+
+
+
+.footer{
+
+    text-align:center;
+
+    margin-top:35px;
+
+    padding-top:20px;
+
+    border-top:1px solid #e5e7eb;
+
+    color:#64748b;
+
+    font-size:13px;
+
+}
+
+
+
+/* MOBILE */
+
+
+@media(max-width:600px){
+
+
+body{
+
+    padding:10px;
+
+}
+
+
+
+.invoice{
+
+    padding:18px;
+
+}
+
+
+
+.header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+
+
+.invoice-title{
+
+    text-align:left;
+
+    margin-top:15px;
+
+}
+
+
+
+.info-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+
+
+table{
+
+    font-size:12px;
+
+}
+
+
+
+thead th,
+tbody td{
+
+    padding:8px;
+
+}
+
+
+
+.actions{
+
+    flex-direction:column;
+
+}
+
+
+
+.btn{
+
+    text-align:center;
+
+}
+
+}
+
+
+
+/* PRINT */
+
+
+@media print{
+
+
+body{
+
+    background:white;
+
+    padding:0;
+
+}
+
+
+.invoice{
+
+    box-shadow:none;
+
+    border-radius:0;
+
+}
+
+
+
+.actions{
+
+    display:none;
+
+}
+
+
+}
+
+</style>
+
+
 </head>
+
+
 <body>
 
-    <div class="invoice-header">
-        <div>
-            <div class="brand-name">GramaCart</div>
-            <div style="font-size: 12px; font-weight: 600;">Essentials from Village to Doorstep</div>
-        </div>
-        <div class="invoice-title">
-            Tax Invoice<br>
-            <span style="color: #0f172a; font-size: 16px;">#{{ order.order_number }}</span><br>
-            Date: {{ order.placed_at|date:"d M Y" }}
-        </div>
-    </div>
 
-    <div class="info-grid">
-        <div>
-            <span class="section-label">Deliver To:</span>
-            <div class="address-box">
-                <strong>{{ order.customer }}</strong><br>
-                {{ order.address.address_line_1 }}<br>
-                {% if order.address.address_line_2 %}{{ order.address.address_line_2 }}<br>{% endif %}
-                {{ order.address.city }}, {{ order.address.state }} - {{ order.address.pincode }}<br>
-                <strong>Phone: {{ order.address.phone_number }}</strong>
-                
-                {% if order.address.landmark %}
-                <div class="landmark-badge">
-                    📍 LANDMARK: {{ order.address.landmark }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        <div style="text-align: right;">
-            <span class="section-label">Payment Method:</span>
-            <div style="font-size: 16px; font-weight: 700; text-transform: uppercase;">
-                {{ order.payment_method|default:"Cash on Delivery" }}
-            </div>
-            <br>
-            <span class="section-label">Order Status:</span>
-            <div style="font-weight: 600;">{{ order.status }}</div>
-        </div>
-    </div>
+<div class="invoice">
 
-    <table>
-        <thead>
-            <tr>
-                <th>Product Description</th>
-                <th>Qty</th>
-                <th style="text-align: right;">Unit Price</th>
-                <th style="text-align: right;">Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in order.items.all %}
-            <tr>
-                <td style="font-weight: 600;">{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td style="text-align: right;">₹{{ item.price }}</td>
-                <td style="text-align: right; font-weight: 600;">₹{{ item.get_total_item_price }}</td>
-            </tr>
-            {% endfor %}
-            <tr class="total-row">
-                <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
-                <td style="text-align: right; color: #0f172a;">₹{{ order.total }}</td>
-            </tr>
-        </tbody>
-    </table>
 
-    <div class="footer-note">
-        <p>Thank you for choosing <strong>GramaCart</strong>. Your purchase supports local village farmers and suppliers.</p>
-        <p>For support, contact us on WhatsApp: <strong>+91 XXXXXXXXXX</strong></p>
-    </div>
+<!-- HEADER -->
 
-    <script>
-        window.onload = function() {
-            window.print();
-            // Optional: window.onafterprint = function() { window.close(); }
-        }
-    </script>
+<div class="header">
+
+
+<div>
+
+<img 
+src="/static/images/logo.png"
+class="logo"
+alt="GramaCart Logo"
+>
+
+
+<div class="brand">
+
+Essentials from Village to Doorstep
+
+</div>
+
+
+</div>
+
+
+
+<div class="invoice-title">
+
+
+<h2>
+INVOICE
+</h2>
+
+
+<div class="invoice-number">
+
+#{{ order.order_number }}
+
+</div>
+
+
+<div>
+
+{{ order.placed_at|date:"d M Y, h:i A" }}
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- CUSTOMER -->
+
+
+<div class="info-grid">
+
+
+<div class="box">
+
+
+<div class="label">
+Deliver To
+</div>
+
+
+<div class="value">
+
+{{ order.user.get_full_name|default:order.user.username }}
+
+</div>
+
+
+<br>
+
+
+{{ order.address.address_line }}
+
+
+<br>
+
+
+{{ order.address.city }},
+{{ order.address.state }}
+-
+{{ order.address.pincode }}
+
+
+<br>
+
+
+<strong>
+Phone:
+</strong>
+
+{{ order.address.phone_number }}
+
+
+
+{% if order.address.landmark %}
+
+<br>
+
+<br>
+
+📍
+
+<strong>
+Landmark:
+</strong>
+
+{{ order.address.landmark }}
+
+
+{% endif %}
+
+
+</div>
+
+
+
+
+<div class="box">
+
+
+<div class="label">
+Payment Details
+</div>
+
+
+<p>
+
+<strong>
+Method:
+</strong>
+
+{{ order.payment_method_display }}
+
+</p>
+
+
+<p>
+
+<strong>
+Status:
+</strong>
+
+{{ order.payment_status_display }}
+
+</p>
+
+
+
+<p>
+
+<strong>
+Order Status:
+</strong>
+
+{{ order.display_status }}
+
+</p>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<!-- ITEMS -->
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+Product
+</th>
+
+
+<th>
+Qty
+</th>
+
+
+<th>
+Price
+</th>
+
+
+<th class="text-right">
+Amount
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody>
+
+
+{% for item in order.items.all %}
+
+
+<tr>
+
+
+<td>
+
+<strong>
+{{ item.product.name }}
+</strong>
+
+
+{% if item.variant_name %}
+
+<br>
+
+<small>
+{{ item.variant_name }}
+</small>
+
+{% endif %}
+
+
+</td>
+
+
+<td>
+
+{{ item.quantity }}
+
+</td>
+
+
+<td>
+
+₹{{ item.price }}
+
+</td>
+
+
+<td class="text-right">
+
+₹{{ item.get_total }}
+
+</td>
+
+
+
+</tr>
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+
+
+
+<!-- SUMMARY -->
+
+
+<div class="summary">
+
+
+<div class="summary-row">
+
+
+<div class="summary-label">
+Subtotal
+</div>
+
+
+<div class="summary-value">
+
+₹{{ order.subtotal }}
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="summary-row">
+
+
+<div class="summary-label">
+
+Delivery
+
+</div>
+
+
+<div class="summary-value">
+
+₹{{ order.shipping_cost }}
+
+</div>
+
+
+</div>
+
+
+
+<div class="grand">
+
+
+<span>
+Grand Total
+</span>
+
+
+<span>
+
+₹{{ order.total }}
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- ACTIONS -->
+
+
+<div class="actions">
+
+
+<button 
+class="btn print"
+onclick="window.print()">
+
+🖨 Print
+
+</button>
+
+
+
+<a 
+
+class="btn whatsapp"
+
+target="_blank"
+
+href="https://wa.me/?text=GramaCart Invoice {{ order.order_number }} Total ₹{{ order.total }}">
+
+📲 WhatsApp Share
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+<div class="footer">
+
+
+Thank you for choosing 
+
+<strong>
+GramaCart
+</strong>
+
+
+<br>
+
+
+Supporting local village shopping ❤️
+
+
+<br><br>
+
+
+https://gramacart.in
+
+
+</div>
+
+
+
+</div>
+
+
 </body>
+
 </html>
+

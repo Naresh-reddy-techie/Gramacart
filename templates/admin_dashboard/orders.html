@@ -904,71 +904,254 @@ function showToast(msg){
 
 function openDrawer(data){
 
+    currentOrder = data;
+
+    let whatsappButton = "";
+
+    if(data.status_code === "delivered"){
+
+        const message = encodeURIComponent(
+`
+        Thank you for ordering from GramaCart.
+
+        Order: #${data.order_number}
+        Amount: ₹${data.total}
+
+        We hope you enjoyed your shopping experience.
+        `
+        );
+
+        whatsappButton = `
+            <a
+                href="https://wa.me/91${data.phone}?text=${message}"
+                target="_blank"
+                class="btn"
+                style="
+                    background:#16a34a;
+                    color:white;
+                    text-decoration:none;
+                "
+            >
+                <i class="bi bi-whatsapp"></i>
+                WhatsApp Customer
+            </a>
+        `;
+    }
+
+
     document.getElementById("drawerContent").innerHTML = `
-        <div class="card">
 
-            <p><b>Order:</b> ${data.order_number}</p>
+    <div class="card">
 
-            <p><b>Customer:</b> ${data.customer}</p>
+        <h4>
+            Order #${data.order_number}
+        </h4>
 
-            <p><b>Phone:</b>
-                <a href="tel:${data.phone}">
-                    ${data.phone}
-                </a>
-            </p>
 
-            <p><b>Hub:</b> ${data.hub}</p>
+        <hr>
 
-            <p><b>Address:</b> ${data.address}</p>
 
-            <hr>
+        <p>
+            <b>Customer:</b>
+            ${data.customer}
+        </p>
 
-            <p><b>Payment Method:</b> ${data.payment_method}</p>
 
-            <p><b>Payment Status:</b> ${data.payment_status}</p>
+        <p>
+            <b>Phone:</b>
 
-            ${
-                data.transaction_id
-                    ? `<p><b>Transaction ID:</b> ${data.transaction_id}</p>`
+            <a href="tel:${data.phone}">
+                ${data.phone}
+            </a>
+
+        </p>
+
+
+        <p>
+            <b>Hub:</b>
+            ${data.hub || "-"}
+        </p>
+
+
+        <p>
+            <b>Address:</b><br>
+            ${data.address || "-"}
+        </p>
+
+
+        <hr>
+
+
+        <h5>Items</h5>
+
+
+        ${
+            data.items.map(i => `
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:8px;
+            ">
+
+                <span>
+                ${i.product_name}
+
+                ${
+                    i.variant_name
+                    ? "(" + i.variant_name + ")"
                     : ""
-            }
+                }
 
-            ${
-                data.reference_id
-                    ? `<p><b>Reference ID:</b> ${data.reference_id}</p>`
-                    : ""
-            }
+                × ${i.quantity}
 
-            ${
-                data.paid_at
-                    ? `<p><b>Paid At:</b> ${data.paid_at}</p>`
-                    : ""
-            }
+                </span>
 
-            <hr>
 
-            <p><b>Total:</b> ₹${data.total}</p>
+                <b>
+                ₹${i.price * i.quantity}
+                </b>
 
-            <p><b>Status:</b> ${data.status_label}</p>
+            </div>
 
-            <hr>
+            `).join("")
+        }
 
-            <h4>Items</h4>
 
-            ${data.items.map(i => `
-                <div>
-                    ${i.product_name}
-                    ${i.variant_name ? `(${i.variant_name})` : ""}
-                    × ${i.quantity}
-                    - ₹${i.price}
-                </div>
-            `).join("")}
+        <hr>
+
+
+        <h5>
+            Billing
+        </h5>
+
+
+        <div>
+            <span>Subtotal</span>
+
+            <strong style="float:right">
+                ₹${data.subtotal || 0}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>
+                Delivery Charge
+            </span>
+
+            <strong style="float:right">
+                ₹${data.shipping_cost || 0}
+            </strong>
+        </div>
+
+
+        <div style="
+            margin-top:12px;
+            font-size:18px;
+        ">
+
+            <span>
+                Final Total
+            </span>
+
+
+            <strong style="float:right">
+                ₹${data.total}
+            </strong>
 
         </div>
+
+
+        <hr>
+
+
+        <h5>
+            Payment
+        </h5>
+
+
+        <p>
+            <b>Method:</b>
+            ${data.payment_method || "-"}
+        </p>
+
+
+        <p>
+            <b>Status:</b>
+            ${data.payment_status || "-"}
+        </p>
+
+
+
+        ${
+            data.rider_name
+
+            ?
+
+            `
+            <hr>
+
+            <h5>
+            Delivery Partner
+            </h5>
+
+            <p>
+            ${data.rider_name}
+            </p>
+
+            <p>
+            ${data.rider_phone || ""}
+            </p>
+
+            `
+
+            :
+
+            ""
+
+        }
+
+
+
+        <hr>
+
+
+        <div style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+        ">
+
+
+        <a href="https://wa.me/${data.phone.replace(/\D/g,'')}?text=${message}" class="btn"style="background:#2563eb;color:white;">
+            Call Customer
+        </a>
+
+        
+
+
+        ${whatsappButton}
+
+
+        </div>
+
+      
+
+
+    </div>
+
     `;
 
-    document.getElementById("orderDrawer").classList.add("active");
-    document.getElementById("drawerBackdrop").classList.add("active");
+
+    document
+    .getElementById("orderDrawer")
+    .classList.add("active");
+
+
+    document
+    .getElementById("drawerBackdrop")
+    .classList.add("active");
 }
 
 function closeDrawer(){
@@ -976,8 +1159,20 @@ function closeDrawer(){
     document.getElementById("drawerBackdrop").classList.remove("active");
 }
 
+
 function printOrder(){
-    window.print();
+
+    if(!currentOrder){
+        alert("Order not selected");
+        return;
+    }
+
+
+    window.open(
+        `/admin_dashboard/orders/invoice/${currentOrder.order_number}/`,
+        "_blank"
+    );
+
 }
 
 

@@ -1091,6 +1091,7 @@ from django.utils.timezone import localtime
 def serialize_order(order):
 
     payment = order.payment
+    payment = order.payments.first()
 
     return {
 
@@ -1437,13 +1438,28 @@ def admin_order_list_json(request, order_number=None):
 
 @staff_member_required
 def admin_order_detail_json(request, order_number):
+
     order = get_object_or_404(
-        Order.objects.select_related("user", "address", "hub"),
+
+        Order.objects
+        .select_related(
+            "user",
+            "address",
+            "hub",
+            "payment",
+            "payment__method"
+        )
+        .prefetch_related(
+            "items__product__product_images"
+        ),
+
         order_number=order_number
     )
 
-    return JsonResponse(serialize_order(order))
 
+    return JsonResponse(
+        serialize_order(order)
+    )
 
 from shop.services.order_workflow import OrderWorkflowService
 
@@ -1911,3 +1927,36 @@ def generate_catalogue(request, hub_id):
     )
 
     return response
+
+
+from django.shortcuts import render, get_object_or_404
+from shop.models import Order
+
+
+def order_invoice(request, order_number):
+
+    order = get_object_or_404(
+        Order.objects
+        .select_related(
+            "user",
+            "address",
+            "hub"
+        )
+        .prefetch_related(
+            "items__product",
+            "items__variant"
+        ),
+        order_number=order_number
+    )
+
+
+    context = {
+        "order": order,
+    }
+
+
+    return render(
+        request,
+        "admin_dashboard/order_print.html",
+        context
+    )

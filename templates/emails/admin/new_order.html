@@ -1,20 +1,24 @@
+html
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 
 body{
     margin:0;
-    padding:30px;
+    padding:15px;
     background:#f4f6f9;
     font-family:Arial,Helvetica,sans-serif;
     color:#1f2937;
 }
 
-.wrapper{
-    max-width:760px;
+.container{
+    width:100%;
+    max-width:620px;
     margin:auto;
     background:#ffffff;
     border-radius:18px;
@@ -22,298 +26,620 @@ body{
     border:1px solid #e5e7eb;
 }
 
+
 .header{
     background:#0f9d58;
-    color:#fff;
-    padding:28px;
+    text-align:center;
+    padding:25px 15px;
+    color:white;
 }
+
 
 .logo{
-    font-size:28px;
+    width:90px;
+    height:auto;
+    background:white;
+    padding:8px;
+    border-radius:12px;
+}
+
+
+.header-title{
+    margin-top:12px;
+    font-size:22px;
     font-weight:bold;
 }
 
-.subtitle{
-    opacity:.9;
+
+.header-text{
     margin-top:6px;
-    font-size:14px;
+    font-size:13px;
 }
 
-.section{
-    padding:24px 30px;
+
+.content{
+    padding:20px;
 }
+
 
 .card{
-    background:#f9fafb;
+
     border:1px solid #e5e7eb;
-    border-radius:12px;
-    padding:18px;
-    margin-bottom:18px;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:16px;
+
 }
 
-.title{
-    font-size:18px;
+
+.card-title{
+
+    font-size:17px;
     font-weight:bold;
+    color:#111827;
     margin-bottom:12px;
+
 }
 
-.row{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:10px;
-}
 
-.label{
-    color:#6b7280;
-    font-weight:600;
-}
+.info{
 
-.value{
-    font-weight:bold;
-}
-
-.status{
-    display:inline-block;
-    padding:7px 16px;
-    border-radius:50px;
-    background:#DCFCE7;
-    color:#166534;
-    font-weight:bold;
-    font-size:13px;
-}
-
-table{
     width:100%;
     border-collapse:collapse;
-    margin-top:15px;
+
 }
 
-th{
-    background:#f3f4f6;
-    padding:12px;
-    text-align:left;
+
+.info td{
+
+    padding:7px 0;
     font-size:14px;
+    vertical-align:top;
+
 }
 
-td{
-    padding:12px;
-    border-top:1px solid #ececec;
-    font-size:14px;
+
+.label{
+
+    color:#6b7280;
+    width:40%;
+
 }
 
-tfoot td{
+
+.value{
+
+    text-align:right;
     font-weight:bold;
-    background:#f9fafb;
+
 }
 
-.total-box{
+
+.status{
+
+    background:#dcfce7;
+    color:#166534;
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+
+}
+
+
+.product{
+
+    border-bottom:1px solid #eeeeee;
+    padding:12px 0;
+
+}
+
+
+.product:last-child{
+
+    border-bottom:none;
+
+}
+
+
+.product-name{
+
+    font-weight:bold;
+    font-size:15px;
+
+}
+
+
+.product-info{
+
+    color:#6b7280;
+    font-size:13px;
+    margin-top:5px;
+
+}
+
+
+.product-price{
+
+    font-weight:bold;
+    margin-top:5px;
+
+}
+
+
+
+.total{
+
     background:#10b981;
     color:white;
-    border-radius:12px;
-    padding:20px;
     text-align:center;
-    margin-top:25px;
+    padding:20px;
+    border-radius:14px;
+
 }
 
-.total-box h2{
+
+.total h1{
+
     margin:8px 0 0;
-    font-size:34px;
+    font-size:30px;
+
 }
+
+
+
+.button{
+
+    display:block;
+    background:#0f9d58;
+    color:white !important;
+    text-decoration:none;
+    text-align:center;
+    padding:14px;
+    border-radius:10px;
+    margin-top:20px;
+    font-weight:bold;
+
+}
+
+
 
 .footer{
+
     background:#f9fafb;
+    padding:20px;
     text-align:center;
-    padding:22px;
     font-size:13px;
     color:#6b7280;
+
 }
+
+
+
+@media only screen and (max-width:600px){
+
+body{
+    padding:5px;
+}
+
+
+.content{
+
+    padding:12px;
+
+}
+
+
+.card{
+
+    padding:14px;
+
+}
+
+
+.header-title{
+
+    font-size:20px;
+
+}
+
+
+.info td{
+
+    font-size:13px;
+
+}
+
+
+.total h1{
+
+    font-size:26px;
+
+}
+
+}
+
 
 </style>
 
 </head>
 
+
 <body>
 
-<div class="wrapper">
+
+<div class="container">
+
 
 <div class="header">
 
-<div class="logo">
+
+<img class="logo"
+src="https://gramacart.in/static/images/logo.png"
+alt="GramaCart">
+
+
+<div class="header-title">
 🛒 New Order Received
 </div>
 
-<div class="subtitle">
+
+<div class="header-text">
 GramaCart Admin Notification
 </div>
 
+
 </div>
 
-<div class="section">
+
+
+<div class="content">
+
+
 
 <div class="card">
 
-<div class="title">
+<div class="card-title">
 Order Details
 </div>
 
-<div class="row">
-<div class="label">Order Number</div>
-<div class="value">{{ order.order_number }}</div>
-</div>
 
-<div class="row">
-<div class="label">Order Status</div>
-<div>
+<table class="info">
+
+
+<tr>
+<td class="label">
+Order Number
+</td>
+
+<td class="value">
+{{ order.order_number }}
+</td>
+</tr>
+
+
+<tr>
+<td class="label">
+Status
+</td>
+
+<td class="value">
+
 <span class="status">
-{{ order.get_status_display }}
+{{ order.display_status }}
 </span>
-</div>
-</div>
 
-<div class="row">
-<div class="label">Order Date</div>
-<div class="value">
-{{ order.created_at }}
-</div>
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="title">
-Customer Details
-</div>
-
-<div class="row">
-<div class="label">Customer</div>
-<div class="value">
-{{ order.user.get_full_name|default:order.user.username }}
-</div>
-</div>
-
-<div class="row">
-<div class="label">Phone</div>
-<div class="value">
-{{ order.phone_number }}
-</div>
-</div>
-
-<div class="row">
-<div class="label">Payment</div>
-<div class="value">
-{{ order.payment_method.display_name }}
-</div>
-</div>
-
-<div class="row">
-<div class="label">Hub</div>
-<div class="value">
-{{ order.hub.name }}
-</div>
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="title">
-Delivery Address
-</div>
-
-{{ order.delivery_address }}
-
-</div>
-
-<div class="card">
-
-<div class="title">
-Ordered Items
-</div>
-
-<table>
-
-<thead>
-
-<tr>
-<th>Product</th>
-<th>Variant</th>
-<th>Qty</th>
-<th>Price</th>
-<th>Total</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for item in order.items.all %}
-
-<tr>
-
-<td>{{ item.product.name }}</td>
-
-<td>{{ item.variant_name }}</td>
-
-<td>{{ item.quantity }}</td>
-
-<td>₹{{ item.price }}</td>
-
-<td>₹{{ item.line_total }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-<tfoot>
-
-<tr>
-<td colspan="4" align="right">
-Subtotal
-</td>
-<td>
-₹{{ order.sub_total }}
 </td>
 </tr>
 
+
 <tr>
-<td colspan="4" align="right">
-Delivery
+<td class="label">
+Order Date
 </td>
-<td>
-₹{{ order.shipping_cost }}
+
+<td class="value">
+{{ order.placed_at }}
 </td>
 </tr>
 
-</tfoot>
 
 </table>
 
 </div>
 
-<div class="total-box">
+
+
+
+<div class="card">
+
+
+<div class="card-title">
+Customer Details
+</div>
+
+
+<table class="info">
+
+
+<tr>
+<td class="label">
+Name
+</td>
+
+<td class="value">
+{{ order.address.recipient_name }}
+</td>
+</tr>
+
+
+<tr>
+<td class="label">
+Phone
+</td>
+
+<td class="value">
+{{ order.address.phone_number }}
+</td>
+</tr>
+
+
+<tr>
+<td class="label">
+Payment
+</td>
+
+<td class="value">
+{{ order.payment_method_display }}
+</td>
+</tr>
+
+
+<tr>
+<td class="label">
+Hub
+</td>
+
+<td class="value">
+{{ order.hub.name }}
+</td>
+</tr>
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<div class="card-title">
+Delivery Address
+</div>
+
+
+<div style="font-size:14px;line-height:22px;">
+
+
+<strong>
+{{ order.address.recipient_name }}
+</strong>
+<br>
+
+
+{{ order.address.address_line }}
+
+<br>
+
+
+{% if order.address.landmark %}
+Landmark: {{ order.address.landmark }}
+<br>
+{% endif %}
+
+
+{{ order.address.city }},
+{{ order.address.state }}
+
+<br>
+
+
+{{ order.address.pincode }},
+{{ order.address.country }}
+
+
+<br><br>
+
+
+Phone:
+{{ order.address.phone_number }}
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<div class="card-title">
+Ordered Items
+</div>
+
+
+
+{% for item in order.items.all %}
+
+
+<div class="product">
+
+
+<div class="product-name">
+
+{{ item.product.name }}
+
+</div>
+
+
+<div class="product-info">
+
+
+Variant:
+{{ item.variant_name|default:"Standard" }}
+
+<br>
+
+
+Quantity:
+{{ item.quantity }}
+
+
+</div>
+
+
+<div class="product-price">
+
+₹{{ item.get_total }}
+
+</div>
+
+
+</div>
+
+
+{% endfor %}
+
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<table class="info">
+
+
+<tr>
+<td>
+Subtotal
+</td>
+
+<td class="value">
+₹{{ order.subtotal }}
+</td>
+</tr>
+
+
+<tr>
+<td>
+Tax
+</td>
+
+<td class="value">
+₹{{ order.tax }}
+</td>
+</tr>
+
+
+<tr>
+<td>
+Delivery Charge
+</td>
+
+<td class="value">
+₹{{ order.shipping_cost }}
+</td>
+</tr>
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+
+<div class="total">
+
 
 Grand Total
 
-<h2>
+
+<h1>
 ₹{{ order.total }}
-</h2>
+</h1>
+
 
 </div>
 
+
+
+
+<a class="button"
+href="https://gramacart.in">
+
+Open GramaCart Dashboard
+
+</a>
+
+
+
+
 </div>
+
+
+
 
 <div class="footer">
 
-This email was generated automatically by <strong>GramaCart</strong>.<br>
 
-Please process this order from the Admin Dashboard.
+This email was generated automatically by
+
+<strong>
+GramaCart
+</strong>
+
+
+<br><br>
+
+
+Your trusted village delivery partner
+
+
+<br><br>
+
+
+<a href="https://gramacart.in">
+gramacart.in
+</a>
+
 
 </div>
 
+
+
+
 </div>
+
 
 </body>
+
 </html>
