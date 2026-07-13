@@ -199,16 +199,43 @@ from core.decorators import delivery_boy_required
 from django.http import HttpResponse
 import traceback
 
+from django.contrib import messages
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
+import traceback
+
+from core.decorators import delivery_boy_required
+
+
 @delivery_boy_required
 def dashboard(request):
+    """
+    Rider Command Center
+
+    - Safe for production
+    - Never mixes list and QuerySet
+    - Handles missing rider profile
+    - Uses a single base queryset
+    - Optimized with select_related/prefetch_related
+    """
 
     steps = []
 
     try:
-
         steps.append("1. Dashboard entered")
 
-        profile = request.user.delivery_profile
+        # --------------------------------------------------
+        # Rider Profile
+        # --------------------------------------------------
+
+        try:
+            profile = request.user.delivery_profile
+        except Exception:
+            messages.error(request, "Delivery profile not found.")
+            return redirect("logout")
+
         steps.append("2. Delivery profile loaded")
 
         if not profile.hub:
@@ -218,9 +245,18 @@ def dashboard(request):
 
         steps.append("4. Hub OK")
 
+        # --------------------------------------------------
+        # Date
+        # --------------------------------------------------
+
         target_date = get_target_date(request)
         start, end = get_day_bounds(target_date)
+
         steps.append("5. Date OK")
+
+        # --------------------------------------------------
+        # Base QuerySet
+        # --------------------------------------------------
 
         base_qs = (
             Delivery.objects
@@ -228,60 +264,99 @@ def dashboard(request):
                 "order",
                 "order__address",
                 "nearest_hub",
-                "delivery_boy"
+                "delivery_boy",
             )
             .prefetch_related(
-                "order__items__product"
+                "order__items__product",
             )
         )
 
         steps.append("6. Base queryset OK")
 
-        radar_orders = []
+        # --------------------------------------------------
+        # Radar Orders
+        # --------------------------------------------------
+
+        radar_orders = base_qs.none()
 
         if profile.is_online:
-            radar_orders = base_qs.filter(
-                status=DeliveryStatus.PACKED,
-                delivery_boy__isnull=True,
-                nearest_hub_id=profile.hub_id
-            ).order_by("-created_at")
+            radar_orders = (
+                base_qs.filter(
+                    status=DeliveryStatus.PACKED,
+                    delivery_boy__isnull=True,
+                    nearest_hub_id=profile.hub_id,
+                )
+                .order_by("-created_at")
+            )
 
         steps.append(f"7. Radar orders: {radar_orders.count()}")
 
-        assigned_orders = base_qs.filter(
-            delivery_boy=request.user,
-            status=DeliveryStatus.ASSIGNED
+        # --------------------------------------------------
+        # Assigned
+        # --------------------------------------------------
+
+        assigned_orders = (
+            base_qs.filter(
+                delivery_boy=request.user,
+                status=DeliveryStatus.ASSIGNED,
+            )
+            .order_by("-created_at")
         )
 
         steps.append(f"8. Assigned: {assigned_orders.count()}")
 
-        out_orders = base_qs.filter(
-            delivery_boy=request.user,
-            status=DeliveryStatus.OUT_FOR_DELIVERY
+        # --------------------------------------------------
+        # Out For Delivery
+        # --------------------------------------------------
+
+        out_orders = (
+            base_qs.filter(
+                delivery_boy=request.user,
+                status=DeliveryStatus.OUT_FOR_DELIVERY,
+            )
+            .order_by("-created_at")
         )
 
         steps.append(f"9. Out for delivery: {out_orders.count()}")
 
-        delivered_orders = base_qs.filter(
-            delivery_boy=request.user,
-            status=DeliveryStatus.DELIVERED,
-            delivered_at__range=(start, end)
+        # --------------------------------------------------
+        # Delivered Today
+        # --------------------------------------------------
+
+        delivered_orders = (
+            base_qs.filter(
+                delivery_boy=request.user,
+                status=DeliveryStatus.DELIVERED,
+                delivered_at__range=(start, end),
+            )
         )
 
         steps.append(f"10. Delivered: {delivered_orders.count()}")
 
-        today_earnings = delivered_orders.aggregate(
-            total=Sum("rider_earning")
-        )["total"] or 0
+        # --------------------------------------------------
+        # Earnings
+        # --------------------------------------------------
 
-        cash_in_hand = delivered_orders.filter(
-            cod_collected=True,
-            cod_submitted=False
-        ).aggregate(
-            total=Sum("cod_amount")
-        )["total"] or 0
+        today_earnings = (
+            delivered_orders.aggregate(
+                total=Sum("rider_earning")
+            )["total"] or 0
+        )
+
+        cash_in_hand = (
+            delivered_orders.filter(
+                cod_collected=True,
+                cod_submitted=False,
+            ).aggregate(
+                total=Sum("cod_amount")
+            )["total"] or 0
+        )
 
         steps.append("11. Aggregates OK")
+
+        # --------------------------------------------------
+        # Wallet
+        # --------------------------------------------------
 
         wallet, _ = FinancialWallet.objects.get_or_create(
             user=request.user
@@ -289,12 +364,29 @@ def dashboard(request):
 
         steps.append("12. Wallet OK")
 
+        # --------------------------------------------------
+        # Context
+        # --------------------------------------------------
+
         context = {
             "company": CompanyInfo.objects.first(),
             "profile": profile,
-            "orders": [serialize_delivery(d) for d in radar_orders],
-            "assigned": [serialize_delivery(d) for d in assigned_orders],
-            "out_deliveries": [serialize_delivery(d) for d in out_orders],
+
+            "orders": [
+                serialize_delivery(d)
+                for d in radar_orders
+            ],
+
+            "assigned": [
+                serialize_delivery(d)
+                for d in assigned_orders
+            ],
+
+            "out_deliveries": [
+                serialize_delivery(d)
+                for d in out_orders
+            ],
+
             "today_earnings": float(today_earnings),
             "orders_delivered": delivered_orders.count(),
             "orders_cancelled": 0,
@@ -309,18 +401,19 @@ def dashboard(request):
         return render(
             request,
             "delivery_portal/dashboard.html",
-            context
+            context,
         )
 
     except Exception:
         return HttpResponse(
-            "<pre>\n"
+            "<pre>"
             + "\n".join(steps)
             + "\n\n"
             + traceback.format_exc()
             + "</pre>"
         )
 
+        
 @login_required
 @delivery_boy_required
 def dashboard_api(request):
