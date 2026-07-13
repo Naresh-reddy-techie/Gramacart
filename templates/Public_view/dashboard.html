@@ -656,15 +656,40 @@
 
     .p-price.oos-price{ color:var(--ink3); }
 
-    /* ── ADD BUTTON — marigold, premium ── */
+    
+    /* ── ADD BUTTON — Fresh Green ─────────────────────────── */
     .btn-buy{
-        display:flex; align-items:center; justify-content:center; gap:4px;
-        background:var(--marigold); color:#fff; border:none;
-        border-radius:11px; padding:8px 13px;
-        font-size:.75rem; font-weight:800;
-        flex-shrink:0; white-space:nowrap;
-        box-shadow:0 5px 12px rgba(255,122,26,.32);
-        transition:.15s ease;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:4px;
+
+        background:#16a34a;
+        color:#fff;
+        border:none;
+
+        border-radius:11px;
+        padding:8px 13px;
+
+        font-size:.75rem;
+        font-weight:800;
+
+        flex-shrink:0;
+        white-space:nowrap;
+
+        box-shadow:0 5px 12px rgba(22,163,74,.28);
+
+        transition:all .2s ease;
+    }
+
+    .btn-buy:hover{
+        background:#15803d;
+        transform:translateY(-1px);
+        box-shadow:0 8px 16px rgba(22,163,74,.35);
+    }
+
+    .btn-buy:active{
+        transform:scale(.97);
     }
 
     .btn-buy:active{ transform:scale(.91); box-shadow:none; }
