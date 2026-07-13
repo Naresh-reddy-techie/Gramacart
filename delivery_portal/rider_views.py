@@ -194,145 +194,153 @@ def serialize_delivery(delivery):
 # =========================================================
 from core.decorators import delivery_boy_required
 
+
+from django.http import HttpResponse
+
 @delivery_boy_required
 def dashboard(request):
+    return HttpResponse("STEP 1")
 
-    profile = request.user.delivery_profile
 
-    if not profile.hub:
+# @delivery_boy_required
+# def dashboard(request):
 
-        messages.error(
-            request,
-            "No delivery hub assigned."
-        )
+#     profile = request.user.delivery_profile
 
-        return redirect("logout")
+#     if not profile.hub:
 
-    target_date = get_target_date(request)
+#         messages.error(
+#             request,
+#             "No delivery hub assigned."
+#         )
 
-    start, end = get_day_bounds(target_date)
+#         return redirect("logout")
 
-    base_qs = (
-        Delivery.objects
-        .select_related(
-            "order",
-            "order__address",
-            "nearest_hub",
-            "delivery_boy"
-        )
-        .prefetch_related(
-            "order__items__product"
-        )
-    )
+#     target_date = get_target_date(request)
 
-    # =====================================================
-    # RADAR ORDERS
-    # =====================================================
+#     start, end = get_day_bounds(target_date)
 
-    radar_orders = []
+#     base_qs = (
+#         Delivery.objects
+#         .select_related(
+#             "order",
+#             "order__address",
+#             "nearest_hub",
+#             "delivery_boy"
+#         )
+#         .prefetch_related(
+#             "order__items__product"
+#         )
+#     )
 
-    if profile.is_online:
+#     # =====================================================
+#     # RADAR ORDERS
+#     # =====================================================
 
-        radar_orders = base_qs.filter(
-            status=DeliveryStatus.PACKED,
-            delivery_boy__isnull=True,
-            nearest_hub_id=profile.hub_id
-        ).order_by("-created_at")
+#     radar_orders = []
 
-    # =====================================================
-    # ACTIVE TASKS
-    # =====================================================
+#     if profile.is_online:
 
-    assigned_orders = base_qs.filter(
-        delivery_boy=request.user,
-        status=DeliveryStatus.ASSIGNED
-    )
+#         radar_orders = base_qs.filter(
+#             status=DeliveryStatus.PACKED,
+#             delivery_boy__isnull=True,
+#             nearest_hub_id=profile.hub_id
+#         ).order_by("-created_at")
 
-    out_orders = base_qs.filter(
-        delivery_boy=request.user,
-        status=DeliveryStatus.OUT_FOR_DELIVERY
-    )
+#     # =====================================================
+#     # ACTIVE TASKS
+#     # =====================================================
 
-    # =====================================================
-    # PERFORMANCE
-    # =====================================================
+#     assigned_orders = base_qs.filter(
+#         delivery_boy=request.user,
+#         status=DeliveryStatus.ASSIGNED
+#     )
 
-    delivered_orders = base_qs.filter(
-        delivery_boy=request.user,
-        status=DeliveryStatus.DELIVERED,
-        delivered_at__range=(start, end)
-    )
+#     out_orders = base_qs.filter(
+#         delivery_boy=request.user,
+#         status=DeliveryStatus.OUT_FOR_DELIVERY
+#     )
 
-    today_earnings = delivered_orders.aggregate(
-        total=Sum("rider_earning")
-    )["total"] or 0
+#     # =====================================================
+#     # PERFORMANCE
+#     # =====================================================
 
-    cash_in_hand = delivered_orders.filter(
-        cod_collected=True,
-        cod_submitted=False
-    ).aggregate(
-        total=Sum("cod_amount")
-    )["total"] or 0
+#     delivered_orders = base_qs.filter(
+#         delivery_boy=request.user,
+#         status=DeliveryStatus.DELIVERED,
+#         delivered_at__range=(start, end)
+#     )
 
-    wallet, _ = FinancialWallet.objects.get_or_create(
-        user=request.user
-    )
+#     today_earnings = delivered_orders.aggregate(
+#         total=Sum("rider_earning")
+#     )["total"] or 0
 
-    context = {
+#     cash_in_hand = delivered_orders.filter(
+#         cod_collected=True,
+#         cod_submitted=False
+#     ).aggregate(
+#         total=Sum("cod_amount")
+#     )["total"] or 0
 
-        "company": CompanyInfo.objects.first(),
+#     wallet, _ = FinancialWallet.objects.get_or_create(
+#         user=request.user
+#     )
 
-        "profile": profile,
+#     context = {
 
-        # =====================================
-        # RADAR
-        # =====================================
+#         "company": CompanyInfo.objects.first(),
 
-        "orders": [
-            serialize_delivery(d)
-            for d in radar_orders
-        ],
+#         "profile": profile,
 
-        # =====================================
-        # TASKS
-        # =====================================
+#         # =====================================
+#         # RADAR
+#         # =====================================
 
-        "assigned": [
-            serialize_delivery(d)
-            for d in assigned_orders
-        ],
+#         "orders": [
+#             serialize_delivery(d)
+#             for d in radar_orders
+#         ],
 
-        "out_deliveries": [
-            serialize_delivery(d)
-            for d in out_orders
-        ],
+#         # =====================================
+#         # TASKS
+#         # =====================================
 
-        # =====================================
-        # STATS
-        # =====================================
+#         "assigned": [
+#             serialize_delivery(d)
+#             for d in assigned_orders
+#         ],
 
-        "today_earnings": float(today_earnings),
+#         "out_deliveries": [
+#             serialize_delivery(d)
+#             for d in out_orders
+#         ],
 
-        "orders_delivered": delivered_orders.count(),
+#         # =====================================
+#         # STATS
+#         # =====================================
 
-        "orders_cancelled": 0,
+#         "today_earnings": float(today_earnings),
 
-        "cash_to_pay": float(cash_in_hand),
+#         "orders_delivered": delivered_orders.count(),
 
-        "wallet_balance": float(
-            wallet.pending_balance or 0
-        ),
+#         "orders_cancelled": 0,
 
-        "selected_date": target_date.isoformat(),
+#         "cash_to_pay": float(cash_in_hand),
 
-        "today": timezone.localdate().isoformat(),
-    }
+#         "wallet_balance": float(
+#             wallet.pending_balance or 0
+#         ),
 
-    return render(
-        request,
-        "delivery_portal/dashboard.html",
-        context
-    )
+#         "selected_date": target_date.isoformat(),
+
+#         "today": timezone.localdate().isoformat(),
+#     }
+
+#     return render(
+#         request,
+#         "delivery_portal/dashboard.html",
+#         context
+#     )
 
 @login_required
 @delivery_boy_required

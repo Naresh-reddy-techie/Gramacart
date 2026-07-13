@@ -906,37 +906,31 @@ function openDrawer(data){
 
     currentOrder = data;
 
-    let whatsappButton = "";
-
-    if(data.status_code === "delivered"){
-
-        const message = encodeURIComponent(
-`
+    const message = encodeURIComponent(`
         Thank you for ordering from GramaCart.
 
         Order: #${data.order_number}
         Amount: ₹${data.total}
 
         We hope you enjoyed your shopping experience.
-        `
-        );
+        `);
 
-        whatsappButton = `
-            <a
-                href="https://wa.me/91${data.phone}?text=${message}"
-                target="_blank"
-                class="btn"
-                style="
-                    background:#16a34a;
-                    color:white;
-                    text-decoration:none;
-                "
-            >
-                <i class="bi bi-whatsapp"></i>
-                WhatsApp Customer
-            </a>
-        `;
-    }
+            let whatsappButton = "";
+
+            if(data.status_code === "delivered"){
+
+                whatsappButton = `
+                    <a
+                        href="https://wa.me/91${data.phone}?text=${message}"
+                        target="_blank"
+                        class="btn"
+                        style="background:#16a34a;color:white;text-decoration:none;"
+                    >
+                        <i class="bi bi-whatsapp"></i>
+                        WhatsApp Customer
+                    </a>
+                `;
+            }
 
 
     document.getElementById("drawerContent").innerHTML = `

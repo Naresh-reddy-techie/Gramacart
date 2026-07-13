@@ -1090,7 +1090,6 @@ from django.utils.timezone import localtime
 
 def serialize_order(order):
 
-    payment = order.payment
     payment = order.payments.first()
 
     return {
@@ -1404,8 +1403,15 @@ def admin_order_list_json(request, order_number=None):
         return metrics_qs.filter(status__in=status_list).count()
 
     # revenue
+    # revenue = Payment.objects.filter(
+    #     status="success"
+    # ).aggregate(
+    #     total=Sum("amount")
+    # )["total"] or 0
+
     revenue = Payment.objects.filter(
-        status="success"
+        status="success",
+        order__in=metrics_qs,
     ).aggregate(
         total=Sum("amount")
     )["total"] or 0
@@ -1446,8 +1452,6 @@ def admin_order_detail_json(request, order_number):
             "user",
             "address",
             "hub",
-            "payment",
-            "payment__method"
         )
         .prefetch_related(
             "items__product__product_images"
