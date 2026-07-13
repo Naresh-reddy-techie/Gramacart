@@ -1147,6 +1147,7 @@ ANIMATION
 </div>
 
 
+
 {% endblock %}
 
 {% block page_scripts %}
@@ -1357,13 +1358,15 @@ function renderRadar(orders){
         return;
     }
 
+
+
+
     orders.forEach(order=>{
 
         if(!riderState.notifiedOrders.has(order.id)){
 
-            playNewOrderSound();
-
             riderState.notifiedOrders.add(order.id);
+
         }
     });
 
@@ -1719,22 +1722,7 @@ async function acceptOrder(orderId){
     }
 }
 
-/* =========================================================
-SOUND
-========================================================= */
 
-// function playNewOrderSound(){
-
-//     const audio =
-//         document.getElementById('new-order-sound');
-
-//     if(audio){
-
-//         audio.currentTime = 0;
-
-//         audio.play().catch(()=>{});
-//     }
-// }
 
 /* =========================================================
 EMPTY STATE
