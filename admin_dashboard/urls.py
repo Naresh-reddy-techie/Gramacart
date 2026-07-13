@@ -137,5 +137,13 @@ urlpatterns = [
         marketplace_views.marketplace_settings,
         name="marketplace_settings",
     ),
+
+    # urls.py
+
+    path(
+        "products/search/",
+        views.search_products,
+        name="search_products"
+    ),
 ]
 

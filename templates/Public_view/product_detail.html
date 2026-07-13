@@ -832,10 +832,31 @@ h6 i{ color:var(--peacock-dark); font-size:.95rem; }
             </div>
             <b>{{ p.name }}</b>
             {% if p.hub_price %}
-                <div class="s-price">₹{{ p.hub_price }} <i class="bi bi-cart-plus"></i></div>
-            {% else %}
-                <div class="s-soon">Coming Soon</div>
+
+            {% if p.hub_mrp and p.hub_mrp > p.hub_price %}
+                <div style="font-size:12px;color:#888;">
+                    <del>₹{{ p.hub_mrp }}</del>
+                </div>
             {% endif %}
+
+            <div class="s-price">
+                ₹{{ p.hub_price }}
+                <i class="bi bi-cart-plus"></i>
+            </div>
+
+            {% if p.discount_percentage %}
+                <small style="color:#198754;font-weight:700;">
+                    {{ p.discount_percentage }}% OFF
+                </small>
+            {% endif %}
+
+        {% else %}
+
+            <div class="s-soon">
+                Out of Stock
+            </div>
+
+        {% endif %}
         </a>
         {% endfor %}
     </div>

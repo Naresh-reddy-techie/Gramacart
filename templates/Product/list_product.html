@@ -300,8 +300,7 @@ RESPONSIVE
     <!-- ===================================================
     HEADER
     ==================================================== -->
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
 
         <div>
 
@@ -315,13 +314,28 @@ RESPONSIVE
 
         </div>
 
-        <a href="{% url 'add_product' %}"
-           class="btn btn-emerald">
+        <div class="d-flex align-items-center gap-2">
 
-            <i class="bi bi-plus-lg me-2"></i>
-            Add Product
+            <div class="input-group" style="width:320px;">
 
-        </a>
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    id="productSearch"
+                    class="form-control border-start-0"
+                    placeholder="Search products...">
+
+            </div>
+
+            <a href="{% url 'add_product' %}" class="btn btn-emerald">
+                <i class="bi bi-plus-lg me-2"></i>
+                Add Product
+            </a>
+
+        </div>
 
     </div>
 
@@ -384,7 +398,8 @@ RESPONSIVE
 
                 </thead>
 
-                <tbody>
+                
+                <tbody id="productTableBody"></tbody>
 
                     {% for product in products %}
 
@@ -651,5 +666,37 @@ RESPONSIVE
     </div>
 
 </div>
+
+
+<script>
+
+let timer;
+
+document.getElementById("productSearch").addEventListener("keyup", function () {
+
+    clearTimeout(timer);
+
+    const query = this.value;
+
+    timer = setTimeout(function () {
+
+        fetch(`/admin_dashboard/products/search/?q=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            console.log(data);
+
+            // We'll populate the table here next.
+
+        });
+
+    }, 300);
+
+});
+
+</script>
+
 
 {% endblock %} 

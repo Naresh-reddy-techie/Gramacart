@@ -291,6 +291,31 @@
         width:20px; border-radius:999px; background:var(--marigold);
     }
 
+    .p-price-block{
+        display:flex;
+        flex-direction:column;
+        gap:2px;
+    }
+
+    .p-mrp{
+        font-size:.72rem;
+        color:#9aa0a6;
+        line-height:1;
+    }
+
+    .p-price{
+        font-size:1.02rem;
+        font-weight:800;
+        color:var(--ink);
+        line-height:1.1;
+    }
+
+    .p-discount{
+        font-size:.68rem;
+        font-weight:700;
+        color:#16a34a;
+    }
+
     /* ══════════════════════════════════════
        CATEGORIES
     ══════════════════════════════════════ */
@@ -1090,17 +1115,18 @@
 
         <!-- RIBBON -->
         {% if product.total_stock <= 0 %}
+
             <div class="p-ribbon ribbon-oos">
                 Out of Stock
             </div>
 
-        {% elif product.offer_label %}
+        {% elif product.has_offer %}
+
             <div class="p-ribbon">
-                {{ product.get_offer_label_display }}
+                {{ product.offer_label }}
             </div>
 
         {% endif %}
-
       
 
         <!-- IMAGE -->
@@ -1174,22 +1200,46 @@
             </div>
 
             <div class="p-pricing-row">
-                <span class="p-price {% if product.total_stock <= 0 %}oos-price{% endif %}">
-                    ₹{{ product.min_price_value|default:0 }}
-                </span>
 
-                {% if product.total_stock > 0 %}
-                <button class="btn-buy add-trigger"
-                        data-url="{% url 'add_to_cart' product.id %}"
-                        data-variant="{{ product.default_variant_value.id }}">
-                    <i class="bi bi-plus" style="font-size:.8rem;"></i> Add
-                </button>
-                {% else %}
-                <button class="btn-notify">
-                    <i class="bi bi-bell" style="font-size:.72rem;"></i> Notify
-                </button>
+            <div class="p-price-block">
+
+            {% if product.total_stock > 0 and product.hub_price %}
+
+                {% if product.hub_mrp and product.hub_mrp > product.hub_price %}
+                    <div class="p-mrp">
+                        <del>₹{{ product.hub_mrp }}</del>
+                    </div>
                 {% endif %}
+
+                <div class="p-price">
+                    ₹{{ product.hub_price }}
+                </div>
+
+                {% if product.discount_percentage %}
+                    <div class="p-discount">
+                        {{ product.discount_percentage }}% OFF
+                    </div>
+                {% endif %}
+
+            {% else %}
+
+                <div class="p-out-stock">
+                    coming soon
+                </div>
+
+            {% endif %}
+
             </div>
+
+            {% if product.total_stock > 0 %}
+            <button class="btn-buy add-trigger"
+                    data-url="{% url 'add_to_cart' product.id %}"
+                    data-variant="{{ product.default_variant_value.id }}">
+                <i class="bi bi-plus"></i> Add
+            </button>
+            {% endif %}
+
+        </div>
 
         </div>
     </div>

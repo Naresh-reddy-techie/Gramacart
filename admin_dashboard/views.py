@@ -797,22 +797,83 @@ def delete_product(request, slug):
 
 
 
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+
 def list_product(request):
 
-    product_list = Product.objects.all().prefetch_related('product_images', 'variants').select_related('category').order_by('-id')
-    # product_list = Product.objects.all().order_by('-id')  # newest first
+    search = request.GET.get('search', '').strip()
 
-    # Set pagination: 10 products per page
+    product_list = (
+        Product.objects
+        .select_related('category')
+        .prefetch_related('product_images', 'variants')
+        .order_by('-id')
+    )
+
+    if search:
+        product_list = product_list.filter(
+            Q(name__icontains=search) |
+            Q(category__name__icontains=search) |
+            Q(slug__icontains=search)
+        )
+
     paginator = Paginator(product_list, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'products': page_obj,
+        'search': search,
     }
+
     return render(request, 'Product/list_product.html', context)
 
 
+
+from django.http import JsonResponse
+from django.db.models import Q
+
+def search_products(request):
+
+    query = request.GET.get("q", "").strip()
+
+    products = (
+        Product.objects
+        .select_related("category")
+        .prefetch_related("product_images", "variants")
+        .order_by("-id")
+    )
+
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(slug__icontains=query) |
+            Q(variants__quantity__icontains=query) |
+            Q(variants__unit__icontains=query)
+        ).distinct()
+
+    data = []
+
+    for product in products[:30]:   # limit results
+
+        first_image = product.product_images.first()
+
+        data.append({
+            "name": product.name,
+            "slug": product.slug,
+            "category": product.category.name if product.category else "",
+            "active": product.is_active,
+            "image": first_image.image.url if first_image and first_image.image else "",
+            "variants": [
+                f"{v.quantity}{v.unit}"
+                for v in product.variants.all()
+            ],
+        })
+
+    return JsonResponse(data, safe=False)
 
 #--------------------------------------------------------
 

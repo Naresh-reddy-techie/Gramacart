@@ -1022,6 +1022,24 @@ RESPONSIVE
 
                 <div class="gc-eta-time">
 
+                    <!-- {% if order.status == "delivered" %}
+
+                        Delivered
+
+                    {% elif order.status == "out_for_delivery" %}
+
+                        Arriving Soon
+
+                    {% elif order.status == "packed" %}
+
+                        Preparing
+
+                    {% else %}
+
+                        Processing
+
+                    {% endif %} -->
+
                     {% if order.status == "delivered" %}
 
                         Delivered
@@ -1110,12 +1128,60 @@ RESPONSIVE
 
     <div class="gc-card">
 
+        {% if order.status == "cancelled" or order.status == "declined" %}
+
         <div class="gc-section-title">
 
             <i class="bi bi-truck"></i>
             Order Timeline
 
         </div>
+
+        <div class="gc-timeline">
+
+            <!-- Order Placed -->
+
+            <div class="gc-step active">
+
+                <div class="gc-step-dot">
+                    <i class="bi bi-check"></i>
+                </div>
+
+                <div class="gc-step-title">
+                    Order Placed
+                </div>
+
+                <div class="gc-step-time">
+                    {{ order.placed_at|date:"d M Y • h:i A" }}
+                </div>
+
+            </div>
+
+            <!-- Cancelled -->
+
+            <div class="gc-step active">
+
+                <div class="gc-step-dot" style="background:#EF4444;color:#fff;">
+                    <i class="bi bi-x-lg"></i>
+                </div>
+
+                <div class="gc-step-title" style="color:#DC2626;">
+                    Order Cancelled
+                </div>
+
+                <div class="gc-step-time">
+
+                    <strong>Reason:</strong><br>
+
+                    {{ order.rejection_reason|default:"No reason provided." }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% else %}
 
         <div class="gc-timeline">
 
@@ -1135,7 +1201,8 @@ RESPONSIVE
 
             </div>
 
-            <div class="gc-step {% if order.status != 'pending' %}active{% endif %}">
+            <!-- <div class="gc-step {% if order.status != 'pending' %}active{% endif %}"> -->
+            <div class="gc-step {% if order.status == 'packed' or order.status == 'assigned' or order.status == 'out_for_delivery' or order.status == 'delivered' %}active{% endif %}"></div>
 
                 <div class="gc-step-dot">
                     <i class="bi bi-box"></i>
@@ -1184,6 +1251,7 @@ RESPONSIVE
             </div>
 
         </div>
+        {% endif %}
 
     </div>
 
@@ -1465,12 +1533,15 @@ RESPONSIVE
         <div class="gc-support-grid">
 
             <a
-                href="tel:+919999999999"
+                href="tel:+919701969272"
                 class="gc-support-btn gc-support-call"
             >
                 <i class="bi bi-telephone-fill"></i>
                 Call Support
             </a>
+
+            <a href="https://wa.me." class="gc-support-btn gc-support-chat" target="_blank"> 
+
 
             <a
                 href="#"
@@ -1479,6 +1550,9 @@ RESPONSIVE
                 <i class="bi bi-chat-dots-fill"></i>
                 Chat Support
             </a>
+
+            
+            
 
         </div>
 

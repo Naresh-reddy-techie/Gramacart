@@ -69,13 +69,31 @@ def _enrich_products(products):
 
         product.total_stock = total_stock
 
+        # product.min_price_value = (
+        #     best_inventory.selling_price
+        #     if best_inventory
+        #     else None
+        # )
+
+        # product.default_variant_value = best_variant
+
+
+        # Lowest selling price
         product.min_price_value = (
             best_inventory.selling_price
             if best_inventory
             else None
         )
 
+        # Backward compatibility
+        product.hub_price = product.min_price_value
+
         product.default_variant_value = best_variant
+
+        if best_inventory:
+            product.hub_mrp = best_inventory.mrp
+        else:
+            product.hub_mrp = None
 
         # --------------------------------------------------
         # Pricing
@@ -89,7 +107,17 @@ def _enrich_products(products):
                 best_inventory.discount_percentage
             )
 
-            product.offer_label = best_inventory.get_offer_label_display()
+            if (
+                best_inventory.discount_percentage > 0
+                and best_inventory.offer_label
+            ):
+                product.offer_label = best_inventory.get_offer_label_display()
+            else:
+                product.offer_label = ""
+
+            product.has_offer = (
+                best_inventory.discount_percentage > 0
+            )
 
             product.save_amount = (
                 best_inventory.mrp
@@ -131,6 +159,16 @@ def get_hub_products(hub, query=None, category_slug=None):
     # INVENTORY FOR CURRENT HUB
     # -----------------------------------------------------
 
+    # inventory_qs = Inventory.objects.select_related(
+    #     "shop",
+    #     "variant",
+    #     "variant__product",
+    # ).filter(
+    #     shop__hub=hub,
+    #     shop__is_active=True,
+    # )
+
+
     inventory_qs = Inventory.objects.select_related(
         "shop",
         "variant",
@@ -138,6 +176,7 @@ def get_hub_products(hub, query=None, category_slug=None):
     ).filter(
         shop__hub=hub,
         shop__is_active=True,
+        selling_price__isnull=False,
     )
 
     # -----------------------------------------------------
@@ -215,6 +254,15 @@ def get_hub_products(hub, query=None, category_slug=None):
 
 def get_similar_products(product, hub, limit=8):
 
+    # inventory_qs = Inventory.objects.select_related(
+    #     "shop",
+    #     "variant",
+    #     "variant__product",
+    # ).filter(
+    #     shop__hub=hub,
+    #     shop__is_active=True,
+    # )
+
     inventory_qs = Inventory.objects.select_related(
         "shop",
         "variant",
@@ -222,6 +270,7 @@ def get_similar_products(product, hub, limit=8):
     ).filter(
         shop__hub=hub,
         shop__is_active=True,
+        selling_price__isnull=False,
     )
 
     products = (
