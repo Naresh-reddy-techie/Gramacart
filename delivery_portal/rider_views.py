@@ -195,152 +195,131 @@ def serialize_delivery(delivery):
 from core.decorators import delivery_boy_required
 
 
+
 from django.http import HttpResponse
+import traceback
 
 @delivery_boy_required
 def dashboard(request):
-    return HttpResponse("STEP 1")
 
+    steps = []
 
-# @delivery_boy_required
-# def dashboard(request):
+    try:
 
-#     profile = request.user.delivery_profile
+        steps.append("1. Dashboard entered")
 
-#     if not profile.hub:
+        profile = request.user.delivery_profile
+        steps.append("2. Delivery profile loaded")
 
-#         messages.error(
-#             request,
-#             "No delivery hub assigned."
-#         )
+        if not profile.hub:
+            steps.append("3. No hub assigned")
+            messages.error(request, "No delivery hub assigned.")
+            return redirect("logout")
 
-#         return redirect("logout")
+        steps.append("4. Hub OK")
 
-#     target_date = get_target_date(request)
+        target_date = get_target_date(request)
+        start, end = get_day_bounds(target_date)
+        steps.append("5. Date OK")
 
-#     start, end = get_day_bounds(target_date)
+        base_qs = (
+            Delivery.objects
+            .select_related(
+                "order",
+                "order__address",
+                "nearest_hub",
+                "delivery_boy"
+            )
+            .prefetch_related(
+                "order__items__product"
+            )
+        )
 
-#     base_qs = (
-#         Delivery.objects
-#         .select_related(
-#             "order",
-#             "order__address",
-#             "nearest_hub",
-#             "delivery_boy"
-#         )
-#         .prefetch_related(
-#             "order__items__product"
-#         )
-#     )
+        steps.append("6. Base queryset OK")
 
-#     # =====================================================
-#     # RADAR ORDERS
-#     # =====================================================
+        radar_orders = []
 
-#     radar_orders = []
+        if profile.is_online:
+            radar_orders = base_qs.filter(
+                status=DeliveryStatus.PACKED,
+                delivery_boy__isnull=True,
+                nearest_hub_id=profile.hub_id
+            ).order_by("-created_at")
 
-#     if profile.is_online:
+        steps.append(f"7. Radar orders: {radar_orders.count()}")
 
-#         radar_orders = base_qs.filter(
-#             status=DeliveryStatus.PACKED,
-#             delivery_boy__isnull=True,
-#             nearest_hub_id=profile.hub_id
-#         ).order_by("-created_at")
+        assigned_orders = base_qs.filter(
+            delivery_boy=request.user,
+            status=DeliveryStatus.ASSIGNED
+        )
 
-#     # =====================================================
-#     # ACTIVE TASKS
-#     # =====================================================
+        steps.append(f"8. Assigned: {assigned_orders.count()}")
 
-#     assigned_orders = base_qs.filter(
-#         delivery_boy=request.user,
-#         status=DeliveryStatus.ASSIGNED
-#     )
+        out_orders = base_qs.filter(
+            delivery_boy=request.user,
+            status=DeliveryStatus.OUT_FOR_DELIVERY
+        )
 
-#     out_orders = base_qs.filter(
-#         delivery_boy=request.user,
-#         status=DeliveryStatus.OUT_FOR_DELIVERY
-#     )
+        steps.append(f"9. Out for delivery: {out_orders.count()}")
 
-#     # =====================================================
-#     # PERFORMANCE
-#     # =====================================================
+        delivered_orders = base_qs.filter(
+            delivery_boy=request.user,
+            status=DeliveryStatus.DELIVERED,
+            delivered_at__range=(start, end)
+        )
 
-#     delivered_orders = base_qs.filter(
-#         delivery_boy=request.user,
-#         status=DeliveryStatus.DELIVERED,
-#         delivered_at__range=(start, end)
-#     )
+        steps.append(f"10. Delivered: {delivered_orders.count()}")
 
-#     today_earnings = delivered_orders.aggregate(
-#         total=Sum("rider_earning")
-#     )["total"] or 0
+        today_earnings = delivered_orders.aggregate(
+            total=Sum("rider_earning")
+        )["total"] or 0
 
-#     cash_in_hand = delivered_orders.filter(
-#         cod_collected=True,
-#         cod_submitted=False
-#     ).aggregate(
-#         total=Sum("cod_amount")
-#     )["total"] or 0
+        cash_in_hand = delivered_orders.filter(
+            cod_collected=True,
+            cod_submitted=False
+        ).aggregate(
+            total=Sum("cod_amount")
+        )["total"] or 0
 
-#     wallet, _ = FinancialWallet.objects.get_or_create(
-#         user=request.user
-#     )
+        steps.append("11. Aggregates OK")
 
-#     context = {
+        wallet, _ = FinancialWallet.objects.get_or_create(
+            user=request.user
+        )
 
-#         "company": CompanyInfo.objects.first(),
+        steps.append("12. Wallet OK")
 
-#         "profile": profile,
+        context = {
+            "company": CompanyInfo.objects.first(),
+            "profile": profile,
+            "orders": [serialize_delivery(d) for d in radar_orders],
+            "assigned": [serialize_delivery(d) for d in assigned_orders],
+            "out_deliveries": [serialize_delivery(d) for d in out_orders],
+            "today_earnings": float(today_earnings),
+            "orders_delivered": delivered_orders.count(),
+            "orders_cancelled": 0,
+            "cash_to_pay": float(cash_in_hand),
+            "wallet_balance": float(wallet.pending_balance or 0),
+            "selected_date": target_date.isoformat(),
+            "today": timezone.localdate().isoformat(),
+        }
 
-#         # =====================================
-#         # RADAR
-#         # =====================================
+        steps.append("13. Context created")
 
-#         "orders": [
-#             serialize_delivery(d)
-#             for d in radar_orders
-#         ],
+        return render(
+            request,
+            "delivery_portal/dashboard.html",
+            context
+        )
 
-#         # =====================================
-#         # TASKS
-#         # =====================================
-
-#         "assigned": [
-#             serialize_delivery(d)
-#             for d in assigned_orders
-#         ],
-
-#         "out_deliveries": [
-#             serialize_delivery(d)
-#             for d in out_orders
-#         ],
-
-#         # =====================================
-#         # STATS
-#         # =====================================
-
-#         "today_earnings": float(today_earnings),
-
-#         "orders_delivered": delivered_orders.count(),
-
-#         "orders_cancelled": 0,
-
-#         "cash_to_pay": float(cash_in_hand),
-
-#         "wallet_balance": float(
-#             wallet.pending_balance or 0
-#         ),
-
-#         "selected_date": target_date.isoformat(),
-
-#         "today": timezone.localdate().isoformat(),
-#     }
-
-#     return render(
-#         request,
-#         "delivery_portal/dashboard.html",
-#         context
-#     )
+    except Exception:
+        return HttpResponse(
+            "<pre>\n"
+            + "\n".join(steps)
+            + "\n\n"
+            + traceback.format_exc()
+            + "</pre>"
+        )
 
 @login_required
 @delivery_boy_required
