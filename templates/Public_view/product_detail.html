@@ -208,8 +208,20 @@ h6 i{ color:var(--peacock-dark); font-size:.95rem; }
     font-size:.74rem; font-weight:700;
     display:inline-flex; align-items:center; gap:6px;
 }
-.rating-pill{ background:var(--gold-tint); border:1px solid rgba(183,121,31,.22); color:var(--gold); }
+.rating-pill{
+    cursor:pointer;
+    transition:all .2s ease;
+}
 
+.rating-pill:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--s1);
+}
+
+.rating-pill i:last-child{
+    font-size:.72rem;
+    opacity:.6;
+}
 /* ================= 30-MIN DELIVERY ================= */
 .eta-strip{
     display:flex; align-items:center; gap:12px;
@@ -575,10 +587,17 @@ h6 i{ color:var(--peacock-dark); font-size:.95rem; }
             <div class="title">{{ product.name }}</div>
 
             <div class="rating-row">
-                <div class="pill rating-pill">
+                <a href="#reviewsSection" class="pill rating-pill">
                     <i class="bi bi-star-fill"></i>
-                    {{ avg_rating|floatformat:1 }} ({{ rating_count }})
-                </div>
+
+                    <span>{{ avg_rating|floatformat:1 }}</span>
+
+                    <span style="opacity:.75;">
+                        ({{ rating_count }} Reviews)
+                    </span>
+
+                    <i class="bi bi-chevron-down small"></i>
+                </a>
             </div>
 
             <!-- ================= 30-MIN DELIVERY ================= -->
@@ -773,45 +792,99 @@ h6 i{ color:var(--peacock-dark); font-size:.95rem; }
 </div>
 
 <!-- ================= REVIEWS ================= -->
-<div class="gc-card">
-    <h6><i class="bi bi-chat-square-text-fill"></i> Reviews ({{ rating_count }})</h6>
+<!-- ================= REVIEWS ================= -->
+<div class="gc-card" id="reviewsSection">
+
+    <h6>
+        <i class="bi bi-chat-square-text-fill"></i>
+        Reviews ({{ rating_count }})
+    </h6>
 
     {% if rating_count %}
     <div class="review-summary">
         <div>
-            <div class="review-score">{{ avg_rating|floatformat:1 }}</div>
-            <div class="review-stars-row">★★★★★</div>
-            <div class="review-score-sub">{{ rating_count }} ratings</div>
+            <div class="review-score">
+                {{ avg_rating|floatformat:1 }}
+            </div>
+
+            <div class="review-stars-row">
+                ★★★★★
+            </div>
+
+            <div class="review-score-sub">
+                {{ rating_count }} ratings
+            </div>
         </div>
     </div>
     {% endif %}
 
     {% for review in reviews|slice:":5" %}
+
     <div class="review">
-        <div class="review-avatar">{{ review.user.username|slice:":1"|upper }}</div>
+
+        <div class="review-avatar">
+            {% if review.user.first_name %}
+                {{ review.user.first_name|slice:":1"|upper }}
+            {% else %}
+                <i class="bi bi-person-fill"></i>
+            {% endif %}
+        </div>
+
         <div class="review-body">
-            <b>{{ review.user.username }}</b>
-            <span class="review-stars">⭐ {{ review.rating }}</span>
-            {% if review.verified_purchase %}
-            <span class="review-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
-            {% endif %}
-            <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+
+                <b>
+                    {% if review.user.first_name %}
+                        {{ review.user.first_name }}
+                    {% else %}
+                        Verified Customer
+                    {% endif %}
+                </b>
+
+                <span class="review-stars">
+                    ⭐ {{ review.rating }}
+                </span>
+
+                {% if review.verified_purchase %}
+                <span class="review-verified">
+                    <i class="bi bi-patch-check-fill"></i>
+                    Verified
+                </span>
+                {% endif %}
+
+            </div>
+
+            <div class="review-date">
+                {{ review.created_at|date:"M d, Y" }}
+            </div>
+
             {% if review.comment %}
-            <div class="review-comment">{{ review.comment }}</div>
+            <div class="review-comment">
+                {{ review.comment }}
+            </div>
             {% endif %}
+
             {% if review.review_images.all %}
             <div class="review-photos">
                 {% for rimg in review.review_images.all %}
-                <img src="{{ rimg.image.url }}" onclick="openZoomSrc('{{ rimg.image.url }}')">
+                    <img src="{{ rimg.image.url }}"
+                         onclick="openZoomSrc('{{ rimg.image.url }}')">
                 {% endfor %}
             </div>
             {% endif %}
+
         </div>
+
     </div>
+
     {% empty %}
-    <p class="text-muted small mb-0">No reviews yet</p>
+
+    <p class="text-muted small mb-0">
+        No reviews yet
+    </p>
+
     {% endfor %}
-</div>
 
 </div>
 

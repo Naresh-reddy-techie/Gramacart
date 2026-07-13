@@ -44,6 +44,8 @@ class EmailService:
 
             for recipient in recipients:
 
+                print("DEFAULT_FROM_EMAIL =", settings.DEFAULT_FROM_EMAIL)
+
                 payload = {
                     "sender": {
                         "name": "GramaCart",

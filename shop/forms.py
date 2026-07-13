@@ -1,14 +1,33 @@
 from .models import CustomerProfile,Address,Order, Address
 from django import forms
 
+
+    
 class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = CustomerProfile
-        fields = ['phone_number']
+        fields = [
+            'full_name',
+            'phone_number',
+        ]
+
         widgets = {
-            'phone_number':forms.NumberInput(attrs={'class':'form-control','placeholder':'Enter Mobile Number'}),
+            'full_name': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter Full Name',
+                    'autocomplete': 'name',
+                }
+            ),
+
+            'phone_number': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter Mobile Number',
+                    'autocomplete': 'tel',
+                }
+            ),
         }
-        
 
 # =========================================================
 # FORMS.py (PRODUCTION READY)

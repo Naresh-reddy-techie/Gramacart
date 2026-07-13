@@ -289,10 +289,16 @@ CLOUDINARY_STORAGE = {
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
-
 # ==========================================================
 # EMAIL NOTIFICATIONS
 # ==========================================================
+
+BREVO_API_KEY = config("BREVO_API_KEY")
+
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default="contact.gramacart@gmail.com"
+)
 
 ORDER_NOTIFICATION_EMAILS = config(
     "ORDER_NOTIFICATION_EMAILS",
