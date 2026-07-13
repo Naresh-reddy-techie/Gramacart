@@ -1146,9 +1146,6 @@ ANIMATION
 
 </div>
 
-<!-- <audio id="new-order-sound" preload="auto">
-    <source src="{% static 'sounds/new-order.mp3' %}" type="audio/mpeg">
-</audio> -->
 
 {% endblock %}
 
@@ -1726,18 +1723,18 @@ async function acceptOrder(orderId){
 SOUND
 ========================================================= */
 
-function playNewOrderSound(){
+// function playNewOrderSound(){
 
-    const audio =
-        document.getElementById('new-order-sound');
+//     const audio =
+//         document.getElementById('new-order-sound');
 
-    if(audio){
+//     if(audio){
 
-        audio.currentTime = 0;
+//         audio.currentTime = 0;
 
-        audio.play().catch(()=>{});
-    }
-}
+//         audio.play().catch(()=>{});
+//     }
+// }
 
 /* =========================================================
 EMPTY STATE
