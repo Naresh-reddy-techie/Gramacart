@@ -694,25 +694,15 @@ Order Status:
 
 <tr>
 
-<th>
-Product
-</th>
+<th>Product</th>
 
+<th>MRP</th>
 
-<th>
-Qty
-</th>
+<th>Price</th>
 
+<th>Qty</th>
 
-<th>
-Price
-</th>
-
-
-<th class="text-right">
-Amount
-</th>
-
+<th class="text-right">Amount</th>
 
 </tr>
 
@@ -725,52 +715,36 @@ Amount
 
 {% for item in order.items.all %}
 
-
 <tr>
 
+    <td>
+        <strong>{{ item.product.name }}</strong>
 
-<td>
+        {% if item.variant_name %}
+            <br>
+            <small>{{ item.variant_name }}</small>
+        {% endif %}
+    </td>
 
-<strong>
-{{ item.product.name }}
-</strong>
+    <td>
+        {% if item.inventory %}
+            ₹{{ item.inventory.mrp }}
+        {% else %}
+            -
+        {% endif %}
+    </td>
 
+    <td>
+        ₹{{ item.price }}
+    </td>
 
-{% if item.variant_name %}
+    <td>
+        {{ item.quantity }}
+    </td>
 
-<br>
-
-<small>
-{{ item.variant_name }}
-</small>
-
-{% endif %}
-
-
-</td>
-
-
-<td>
-
-{{ item.quantity }}
-
-</td>
-
-
-<td>
-
-₹{{ item.price }}
-
-</td>
-
-
-<td class="text-right">
-
-₹{{ item.get_total }}
-
-</td>
-
-
+    <td class="text-right">
+        ₹{{ item.get_total }}
+    </td>
 
 </tr>
 
@@ -792,69 +766,95 @@ Amount
 
 <!-- SUMMARY -->
 
-
 <div class="summary">
-
 
 <div class="summary-row">
 
+<div class="summary-label">
+MRP Total
+</div>
+
+<div class="summary-value">
+₹{{ order.mrp_total }}
+</div>
+
+</div>
+
+
+<div class="summary-row">
 
 <div class="summary-label">
 Subtotal
 </div>
 
-
 <div class="summary-value">
-
 ₹{{ order.subtotal }}
-
 </div>
 
-
 </div>
-
-
 
 
 <div class="summary-row">
 
+<div class="summary-label">
+You Saved
+</div>
+
+<div class="summary-value" style="color:#16a34a;font-weight:900;">
+
+-₹{{ order.total_saved }}
+
+</div>
+
+</div>
+
+
+<div class="summary-row">
 
 <div class="summary-label">
-
 Delivery
-
 </div>
-
 
 <div class="summary-value">
-
 ₹{{ order.shipping_cost }}
+</div>
 
 </div>
 
 
+{% if order.total_saved > 0 %}
+
+<div style="
+margin-top:20px;
+padding:15px;
+background:#ecfdf5;
+border:1px solid #bbf7d0;
+border-radius:10px;
+text-align:center;
+font-size:18px;
+font-weight:800;
+color:#15803d;">
+
+🎉 You Saved
+<strong>₹{{ order.total_saved }}</strong>
+on this order.
+
 </div>
 
+{% endif %}
 
 
 <div class="grand">
-
 
 <span>
 Grand Total
 </span>
 
-
 <span>
-
 ₹{{ order.total }}
-
 </span>
 
-
 </div>
-
-
 
 </div>
 

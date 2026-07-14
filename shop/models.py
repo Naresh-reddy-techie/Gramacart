@@ -503,6 +503,31 @@ class Order(models.Model):
             return "-"
 
         return payment.method.display_name
+
+
+    from decimal import Decimal
+
+    @property
+    def mrp_total(self):
+        total = Decimal("0.00")
+
+        for item in self.items.all():
+            if item.inventory:
+                total += item.inventory.mrp * item.quantity
+            else:
+                total += item.price * item.quantity
+
+        return total
+
+
+    @property
+    def total_saved(self):
+        saved = self.mrp_total - self.subtotal
+
+        if saved < 0:
+            return Decimal("0.00")
+
+        return saved
     
 
     @property
